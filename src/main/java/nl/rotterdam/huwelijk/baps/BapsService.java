@@ -2,49 +2,21 @@ package nl.rotterdam.huwelijk.baps;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class BapsService {
+public interface BapsService {
 
-    private final BapsRepository bapsRepository;
+    List<Baps> findAll();
 
-    // Required by Wicket's @SpringBean CGLIB proxy (no Objenesis on classpath)
-    protected BapsService() {
-        this.bapsRepository = null;
-    }
+    Page<Baps> findAll(Pageable pageable);
 
-    public BapsService(BapsRepository bapsRepository) {
-        this.bapsRepository = bapsRepository;
-    }
+    Optional<Baps> findById(Long id);
 
-    public List<Baps> findAll() {
-        return bapsRepository.findAllByOrderByNaamAsc();
-    }
+    Baps save(Baps baps);
 
-    public Page<Baps> findAll(Pageable pageable) {
-        return bapsRepository.findAll(pageable);
-    }
+    void delete(Long id);
 
-    public Optional<Baps> findById(Long id) {
-        return bapsRepository.findById(id);
-    }
-
-    @Transactional
-    public Baps save(Baps baps) {
-        return bapsRepository.save(baps);
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        bapsRepository.deleteById(id);
-    }
-
-    public long count() {
-        return bapsRepository.count();
-    }
+    long count();
 }
