@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>BAPS Beheer</title>
+</head>
+<body>
+<h1 wicket:id="paginaTitel"></h1>
+
+<p><a wicket:id="terugLink">Terug naar overzicht</a></p>
+
+<div wicket:id="feedback"></div>
+
+<form wicket:id="bapsForm">
+
+    <div wicket:id="naam"></div>
+
+    <div wicket:id="fotoUrl"></div>
+
+    <div>
+        <label wicket:id="hobbiesLabel"></label>
+        <textarea wicket:id="hobbies" rows="4" cols="60"></textarea>
+    </div>
+
+    <div>
+        <label wicket:id="beschrijvingLabel"></label>
+        <textarea wicket:id="beschrijving" rows="6" cols="60"></textarea>
+    </div>
+
+    <div wicket:id="beschikbareDagen"></div>
+
+    <div>
+        <label wicket:id="actiefLabel"></label>
+        <input type="checkbox" wicket:id="actief"/>
+    </div>
+
+    <div wicket:id="actiefVanaf"></div>
+
+    <div wicket:id="actiefTotEnMet"></div>
+
+    <div>
+        <button wicket:id="opslaan" type="submit"></button>
+    </div>
+
+</form>
+</body>
+</html>
