@@ -3,7 +3,6 @@ package nl.rotterdam.huwelijk.baps;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,13 +43,30 @@ public class BapsImportServiceImpl implements BapsImportService {
                     List.of("Kon pagina niet ophalen: " + e.getMessage()));
         }
 
-        // Collect links to individual trouwambtenaar pages
+        // Find the h2 with text "Trouwambtenaren" and collect links from the ul that follows it
         List<String> ambtenaarUrls = new ArrayList<>();
-        Elements links = overzichtPage.select("a[href]");
-        for (Element link : links) {
-            String href = link.absUrl("href");
-            if (href.contains("/trouwambtenaar/") && !ambtenaarUrls.contains(href)) {
-                ambtenaarUrls.add(href);
+        Element trouwambtenarHeading = null;
+        for (Element h2 : overzichtPage.select("h2")) {
+            if (h2.text().contains("Trouwambtenaren")) {
+                trouwambtenarHeading = h2;
+                break;
+            }
+        }
+        if (trouwambtenarHeading != null) {
+            Element ul = trouwambtenarHeading.nextElementSibling();
+            while (ul != null && !ul.tagName().equals("ul")) {
+                ul = ul.nextElementSibling();
+            }
+            if (ul != null) {
+                for (Element li : ul.select("li")) {
+                    Element a = li.selectFirst("a[href]");
+                    if (a != null) {
+                        String href = a.absUrl("href");
+                        if (!href.isEmpty() && !ambtenaarUrls.contains(href)) {
+                            ambtenaarUrls.add(href);
+                        }
+                    }
+                }
             }
         }
 
