@@ -1,0 +1,12 @@
+package nl.rotterdam.huwelijk;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class HuwelijkApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(HuwelijkApplication.class, args);
+    }
+}
