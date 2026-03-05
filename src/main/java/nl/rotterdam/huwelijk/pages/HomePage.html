@@ -1,10 +1,191 @@
 <!DOCTYPE html>
-<html xmlns:wicket="http://wicket.apache.org">
+<html xmlns:wicket="http://wicket.apache.org" wicket:id="root" lang="nl" dir="ltr">
 <head>
     <meta charset="UTF-8"/>
-    <title>Huwelijk POC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mijn dag - Gemeente Rotterdam</title>
 </head>
-<body>
-    <h1 wicket:id="title"></h1>
+<body wicket:id="body">
+
+<!-- Page Layout -->
+<div wicket:id="pageLayout">
+
+    <!-- Page Header -->
+    <header wicket:id="pageHeader">
+
+        <!-- Top utility bar -->
+        <div class="rd-top-bar">
+            <div class="rd-top-bar__inner">
+                <a href="#">&#128269; Zoeken</a>
+                <span class="rd-top-bar__sep">|</span>
+                <a href="#">&#127758; Nederlands &#x25BE;</a>
+                <span class="rd-top-bar__sep">|</span>
+                <span>&#128100; A.J. de Vries</span>
+                <span class="rd-top-bar__sep">|</span>
+                <a href="#">&#128682; Uitloggen</a>
+            </div>
+        </div>
+
+        <!-- Main header: logo + primary nav -->
+        <div class="rd-header-inner">
+            <div wicket:id="logo">
+                <a class="rd-logo-link" href="/">
+                    <!-- Rotterdam seagull logo (simplified) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="54" height="48" viewBox="0 0 180 160" aria-hidden="true" focusable="false">
+                        <!-- Body -->
+                        <ellipse cx="90" cy="75" rx="50" ry="35" fill="currentColor"/>
+                        <!-- Head -->
+                        <ellipse cx="130" cy="50" rx="20" ry="18" fill="currentColor"/>
+                        <!-- Beak -->
+                        <polygon points="148,47 162,52 148,57" fill="currentColor"/>
+                        <!-- Left wing tip -->
+                        <path d="M42,68 C20,60 8,80 20,95 C35,85 50,78 42,68Z" fill="currentColor"/>
+                        <!-- Right wing tip -->
+                        <path d="M138,68 C160,60 172,80 160,95 C145,85 130,78 138,68Z" fill="currentColor"/>
+                        <!-- Tail -->
+                        <path d="M50,85 C40,110 35,130 55,125 C65,110 70,95 50,85Z" fill="currentColor"/>
+                        <!-- Feet -->
+                        <line x1="80" y1="108" x2="70" y2="125" stroke="currentColor" stroke-width="4"/>
+                        <line x1="100" y1="108" x2="110" y2="125" stroke="currentColor" stroke-width="4"/>
+                    </svg>
+                    <span class="rd-logo-text">Gemeente<br/>Rotterdam</span>
+                </a>
+            </div>
+
+            <nav class="rd-header-nav" aria-label="Hoofdnavigatie">
+                <a href="#">Link 1</a>
+                <a href="#">Link 2</a>
+                <a href="#">Link 3</a>
+            </nav>
+        </div>
+
+    </header>
+
+    <!-- Page Body -->
+    <div wicket:id="pageBody">
+
+        <!-- Breadcrumb -->
+        <div wicket:id="breadcrumb"></div>
+
+        <!-- Tab navigation -->
+        <nav class="rd-tabs" aria-label="Stappen">
+            <button class="rd-tab rd-tab--active" type="button" aria-current="step">D&#233; dag</button>
+            <button class="rd-tab" type="button">Jullie gegevens</button>
+            <button class="rd-tab" type="button">De getuigen</button>
+            <button class="rd-tab" type="button">Extra&#x27;s</button>
+        </nav>
+
+        <!-- Page heading (rendered by RdHeading) -->
+        <h1 wicket:id="heading">Heading</h1>
+        <p class="rd-intro-text">Kies eerst wat voor soort dag jullie willen en ga daarna jullie dag plannen.</p>
+
+        <!-- Form -->
+        <form wicket:id="form">
+
+            <!-- Registratie section (RdRadioGroup border) -->
+            <div class="rd-card" wicket:id="registrationGroup">
+                <div class="rd-radio-options">
+                    <label class="rd-radio-option" for="huwelijk-input">
+                        <input type="radio" wicket:id="huwelijk" id="huwelijk-input"/>
+                        Huwelijk
+                    </label>
+                    <label class="rd-radio-option" for="partnerschap-input">
+                        <input type="radio" wicket:id="geregistreerdPartnerschap" id="partnerschap-input"/>
+                        Geregistreerd partnerschap
+                    </label>
+                </div>
+            </div>
+
+            <!-- Soort section (RdRadioGroup border) -->
+            <div class="rd-card" wicket:id="ceremonyGroup">
+                <div class="rd-soort-options">
+                    <!-- Gratis -->
+                    <div class="rd-soort-option">
+                        <div class="rd-soort-option__header">
+                            <span class="rd-soort-option__title">Gratis</span>
+                            <span class="rd-price-badge">&#x20AC;&nbsp;00<sup>,00</sup></span>
+                        </div>
+                        <p class="rd-soort-option__desc">
+                            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
+                            quos dolores et quas molestias excepturi
+                            <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
+                        </p>
+                        <label class="rd-soort-radio-box" for="gratis-input">
+                            <input type="radio" wicket:id="gratis" id="gratis-input"/>
+                            Gratis
+                        </label>
+                    </div>
+
+                    <!-- Eenvoudig -->
+                    <div class="rd-soort-option">
+                        <div class="rd-soort-option__header">
+                            <span class="rd-soort-option__title">Eenvoudig</span>
+                            <span class="rd-price-badge">&#x20AC;&nbsp;267<sup>,81</sup></span>
+                        </div>
+                        <p class="rd-soort-option__desc">
+                            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
+                            quos dolores et quas molestias excepturi
+                            <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
+                        </p>
+                        <label class="rd-soort-radio-box" for="eenvoudig-input">
+                            <input type="radio" wicket:id="eenvoudig" id="eenvoudig-input"/>
+                            Eenvoudig
+                        </label>
+                    </div>
+
+                    <!-- Regulier -->
+                    <div class="rd-soort-option">
+                        <div class="rd-soort-option__header">
+                            <span class="rd-soort-option__title">Regulier</span>
+                            <span class="rd-price-badge">&#x20AC;&nbsp;461<sup>,48</sup></span>
+                        </div>
+                        <p class="rd-soort-option__desc">
+                            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
+                            quos dolores et quas molestias excepturi
+                            <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
+                        </p>
+                        <label class="rd-soort-radio-box" for="regulier-input">
+                            <input type="radio" wicket:id="regulier" id="regulier-input"/>
+                            Regulier
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit button -->
+            <div class="rd-submit-area">
+                <button wicket:id="submitButton" type="submit">
+                    &#128197; Plan jullie dag
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- Page Footer -->
+    <footer wicket:id="pageFooter">
+        <div class="rd-footer-inner">
+            <nav class="rd-footer-links" aria-label="Service-navigatie">
+                <a href="#">Cookies</a>
+                <a href="#">Privacy</a>
+                <a href="#">Toegankelijkheid</a>
+            </nav>
+            <div class="rd-footer-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="30" viewBox="0 0 180 160" aria-hidden="true" focusable="false">
+                    <ellipse cx="90" cy="75" rx="50" ry="35" fill="currentColor"/>
+                    <ellipse cx="130" cy="50" rx="20" ry="18" fill="currentColor"/>
+                    <polygon points="148,47 162,52 148,57" fill="currentColor"/>
+                    <path d="M42,68 C20,60 8,80 20,95 C35,85 50,78 42,68Z" fill="currentColor"/>
+                    <path d="M138,68 C160,60 172,80 160,95 C145,85 130,78 138,68Z" fill="currentColor"/>
+                    <path d="M50,85 C40,110 35,130 55,125 C65,110 70,95 50,85Z" fill="currentColor"/>
+                </svg>
+                <span>Gemeente<br/>Rotterdam</span>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
 </body>
 </html>

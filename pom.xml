@@ -101,6 +101,13 @@
             <version>${rotterdam-nlds-wicket.version}</version>
         </dependency>
 
+        <!-- Rotterdam Design Tokens CSS for Wicket -->
+        <dependency>
+            <groupId>nl.rotterdam.nl-design-system</groupId>
+            <artifactId>rotterdam-nlds-css-wicket</artifactId>
+            <version>${rotterdam-nlds-wicket.version}</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -110,7 +117,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -126,6 +132,7 @@
                     <include>**/*.html</include>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
+                    <include>**/*.css</include>
                 </includes>
             </resource>
         </resources>

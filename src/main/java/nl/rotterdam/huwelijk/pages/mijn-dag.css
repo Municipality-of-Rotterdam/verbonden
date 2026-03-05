@@ -1,0 +1,326 @@
+/* =============================================================
+   Mijn Dag page styles
+   ============================================================= */
+
+/* Top utility bar */
+.rd-top-bar {
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #d0d0d0;
+    font-size: 0.875rem;
+}
+
+.rd-top-bar__inner {
+    max-width: 75rem;
+    margin: 0 auto;
+    padding: 0.375rem 1rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    color: #333;
+}
+
+.rd-top-bar__inner a {
+    color: #333;
+    text-decoration: none;
+}
+
+.rd-top-bar__inner a:hover {
+    text-decoration: underline;
+}
+
+.rd-top-bar__sep {
+    color: #bbb;
+}
+
+/* Header inner layout */
+.rd-header-inner {
+    max-width: 75rem;
+    margin: 0 auto;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Logo link */
+.rd-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+.rd-logo-text {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* Primary navigation */
+.rd-header-nav {
+    display: flex;
+    align-items: flex-end;
+    gap: 2rem;
+}
+
+.rd-header-nav a {
+    text-decoration: none;
+    color: #222;
+    font-size: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid transparent;
+}
+
+.rd-header-nav a:hover,
+.rd-header-nav a:focus {
+    text-decoration: underline;
+}
+
+/* Page body content constraint */
+.utrecht-page-body__content {
+    max-width: 47.5rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+/* Breadcrumb spacing and list reset */
+.utrecht-breadcrumb-nav {
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 0;
+}
+
+.utrecht-breadcrumb-nav__list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.utrecht-breadcrumb-nav__item {
+    display: flex;
+    align-items: center;
+}
+
+.utrecht-breadcrumb-nav__item + .utrecht-breadcrumb-nav__item::before {
+    content: "›";
+    margin: 0 0.5rem;
+    color: #666;
+    font-size: 1rem;
+}
+
+.utrecht-breadcrumb-nav__link {
+    font-size: 0.9375rem;
+}
+
+.utrecht-breadcrumb-nav__link[aria-current="page"] {
+    color: #333;
+    text-decoration: none;
+    cursor: default;
+}
+
+/* Tab navigation */
+.rd-tabs {
+    display: flex;
+    border-bottom: 1px solid #c8c8c8;
+    margin-bottom: 1.5rem;
+    gap: 0;
+}
+
+.rd-tab {
+    padding: 0.625rem 1rem;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: #444;
+    margin-bottom: -1px;
+    border-radius: 2px 2px 0 0;
+    font-family: inherit;
+}
+
+.rd-tab:hover {
+    background-color: #f5f5f5;
+}
+
+.rd-tab--active {
+    border-color: #c8c8c8;
+    border-bottom-color: #fff;
+    background-color: #fff;
+    font-weight: 600;
+}
+
+/* Intro paragraph */
+.rd-intro-text {
+    margin: 0 0 1.5rem;
+    font-size: 1rem;
+}
+
+/* Section card (wrapping fieldset) */
+.rd-card {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background: #fff;
+}
+
+/* Fieldset reset inside card */
+.rd-card .utrecht-form-fieldset__fieldset--html-fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Description text under legend */
+.rd-card .utrecht-form-field-description {
+    color: #555;
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+}
+
+.rd-card .utrecht-form-field-description a {
+    color: var(--rd-color-green-500, #007a3e);
+}
+
+/* Radio option row (Registratie) */
+.rd-radio-options {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.rd-radio-option {
+    flex: 1;
+    min-width: 10rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 0.625rem 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background: #fff;
+}
+
+.rd-radio-option:has(input:checked) {
+    border-color: var(--rd-color-green-500, #007a3e);
+    background-color: #f0f8f4;
+}
+
+/* Soort: three-column grid */
+.rd-soort-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 640px) {
+    .rd-soort-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+.rd-soort-option {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rd-soort-option__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.rd-soort-option__title {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.rd-price-badge {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    border: 1px solid var(--rd-color-green-500, #007a3e);
+    color: var(--rd-color-green-500, #007a3e);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.rd-soort-option__desc {
+    font-size: 0.875rem;
+    color: #555;
+    margin: 0;
+    flex: 1;
+}
+
+.rd-soort-option__desc a {
+    color: var(--rd-color-green-500, #007a3e);
+}
+
+.rd-soort-radio-box {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    background: #fff;
+    margin-top: auto;
+}
+
+.rd-soort-radio-box:has(input:checked) {
+    border-color: var(--rd-color-green-500, #007a3e);
+    background-color: #f0f8f4;
+}
+
+/* Submit button row */
+.rd-submit-area {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+/* Footer inner */
+.rd-footer-inner {
+    max-width: 75rem;
+    margin: 0 auto;
+    padding: 1.25rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.rd-footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.rd-footer-links a {
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.rd-footer-links a:hover {
+    text-decoration: underline;
+}
+
+.rd-footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
