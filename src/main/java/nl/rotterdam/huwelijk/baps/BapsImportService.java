@@ -21,6 +21,11 @@ public class BapsImportService {
 
     private final BapsRepository bapsRepository;
 
+    // Required by Wicket's @SpringBean CGLIB proxy (no Objenesis on classpath)
+    protected BapsImportService() {
+        this.bapsRepository = null;
+    }
+
     public BapsImportService(BapsRepository bapsRepository) {
         this.bapsRepository = bapsRepository;
     }

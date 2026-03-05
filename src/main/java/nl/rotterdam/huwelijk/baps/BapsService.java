@@ -13,6 +13,11 @@ public class BapsService {
 
     private final BapsRepository bapsRepository;
 
+    // Required by Wicket's @SpringBean CGLIB proxy (no Objenesis on classpath)
+    protected BapsService() {
+        this.bapsRepository = null;
+    }
+
     public BapsService(BapsRepository bapsRepository) {
         this.bapsRepository = bapsRepository;
     }
