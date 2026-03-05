@@ -4,7 +4,7 @@ import nl.rotterdam.huwelijk.baps.Baps;
 import nl.rotterdam.huwelijk.baps.BapsService;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
-import org.apache.wicket.markup.html.WebPage;
+import nl.rotterdam.huwelijk.pages.BasePage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.Form;
@@ -21,7 +21,7 @@ import java.io.Serial;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-public class BapsFormPage extends WebPage {
+public class BapsFormPage extends BasePage {
 
     @Serial
     private static final long serialVersionUID = 1L;

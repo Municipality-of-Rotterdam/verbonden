@@ -13,7 +13,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColu
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
-import org.apache.wicket.markup.html.WebPage;
+import nl.rotterdam.huwelijk.pages.BasePage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class BeheerPage extends WebPage {
+public class BeheerPage extends BasePage {
 
     @Serial
     private static final long serialVersionUID = 1L;

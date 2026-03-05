@@ -30,7 +30,7 @@
     <properties>
         <java.version>25</java.version>
         <wicket.version>10.8.0</wicket.version>
-        <rotterdam-nlds-wicket.version>0.0.8</rotterdam-nlds-wicket.version>
+        <rotterdam-nlds.version>0.0.8</rotterdam-nlds.version>
     </properties>
 
     <dependencyManagement>
@@ -98,7 +98,13 @@
         <dependency>
             <groupId>nl.rotterdam.nl-design-system</groupId>
             <artifactId>rotterdam-nlds-wicket</artifactId>
-            <version>${rotterdam-nlds-wicket.version}</version>
+            <version>${rotterdam-nlds.version}</version>
+        </dependency>
+        <!-- Rotterdam Design Tokens (rods-theme CSS custom properties) -->
+        <dependency>
+            <groupId>nl.rotterdam.nl-design-system</groupId>
+            <artifactId>rotterdam-nlds-css-wicket</artifactId>
+            <version>${rotterdam-nlds.version}</version>
         </dependency>
 
         <!-- Spring Security -->
