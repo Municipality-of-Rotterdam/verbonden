@@ -1,6 +1,7 @@
 package nl.rotterdam.huwelijk.pages.beheer;
 
 import nl.rotterdam.huwelijk.baps.Baps;
+import nl.rotterdam.huwelijk.baps.BapsImportResult;
 import nl.rotterdam.huwelijk.baps.BapsImportService;
 import nl.rotterdam.huwelijk.baps.BapsService;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
@@ -58,7 +59,7 @@ public class BeheerPage extends WebPage {
 
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                BapsImportService.ImportResult result = bapsImportService.importeerVanRotterdam();
+                BapsImportResult result = bapsImportService.importeerVanRotterdam();
                 if (result.errors() == 0) {
                     success("Import voltooid: " + result.imported() + " BAPS geïmporteerd.");
                 } else {

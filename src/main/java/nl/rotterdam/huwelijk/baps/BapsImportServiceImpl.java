@@ -27,7 +27,7 @@ public class BapsImportServiceImpl implements BapsImportService {
 
     @Override
     @Transactional
-    public ImportResult importeerVanRotterdam() {
+    public BapsImportResult importeerVanRotterdam() {
         int imported = 0;
         int errors = 0;
         List<String> messages = new ArrayList<>();
@@ -40,7 +40,7 @@ public class BapsImportServiceImpl implements BapsImportService {
                     .get();
         } catch (IOException e) {
             log.error("Kon Rotterdam trouwambtenaar pagina niet ophalen: {}", e.getMessage());
-            return new ImportResult(0, 1,
+            return new BapsImportResult(0, 1,
                     List.of("Kon pagina niet ophalen: " + e.getMessage()));
         }
 
@@ -56,7 +56,7 @@ public class BapsImportServiceImpl implements BapsImportService {
 
         if (ambtenaarUrls.isEmpty()) {
             messages.add("Geen trouwambtenaar-links gevonden op de overzichtspagina.");
-            return new ImportResult(0, 0, messages);
+            return new BapsImportResult(0, 0, messages);
         }
 
         for (String url : ambtenaarUrls) {
@@ -74,7 +74,7 @@ public class BapsImportServiceImpl implements BapsImportService {
             }
         }
 
-        return new ImportResult(imported, errors, messages);
+        return new BapsImportResult(imported, errors, messages);
     }
 
     private Baps parseerBapsVanPagina(String url) throws IOException {
