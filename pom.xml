@@ -108,6 +108,13 @@
             <version>${rotterdam-nlds-wicket.version}</version>
         </dependency>
 
+        <!-- Rotterdam NLDS Extensions (RotterdamLogoImage, icons, etc.) -->
+        <dependency>
+            <groupId>nl.rotterdam.nl-design-system</groupId>
+            <artifactId>rotterdam-nlds-extensions-wicket</artifactId>
+            <version>${rotterdam-nlds-wicket.version}</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

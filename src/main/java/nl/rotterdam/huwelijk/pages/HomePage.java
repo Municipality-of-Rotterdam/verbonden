@@ -1,6 +1,7 @@
 package nl.rotterdam.huwelijk.pages;
 
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_logo.RotterdamLogoImage;
 import nl.rotterdam.nl_design_system.wicket.components.body.RdBodyTransparentContainer;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
@@ -55,6 +56,7 @@ public class HomePage extends WebPage {
 
         // Logo inside header
         RdLogoBorder logo = new RdLogoBorder("logo");
+        logo.add(new RotterdamLogoImage("rotterdamLogoImage"));
         pageHeader.add(logo);
 
         // Page Body
@@ -115,6 +117,7 @@ public class HomePage extends WebPage {
 
         // Page Footer
         RdPageFooterBorder pageFooter = new RdPageFooterBorder("pageFooter");
+        pageFooter.add(new RotterdamLogoImage("footerLogoImage"));
         pageLayout.add(pageFooter);
     }
 
