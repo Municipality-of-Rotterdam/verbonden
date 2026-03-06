@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk;
 
+import de.agilecoders.wicket.webjars.WicketWebjars;
 import nl.rotterdam.huwelijk.pages.HomePage;
 import nl.rotterdam.huwelijk.pages.beheer.BapsToevoegenPage;
 import nl.rotterdam.huwelijk.pages.beheer.BapsWijzigenPage;
@@ -20,6 +21,7 @@ public class WicketApplication extends WebApplication {
     @Override
     public void init() {
         super.init();
+        WicketWebjars.install(this);
         getComponentInstantiationListeners().add(new SpringComponentInjector(this));
 
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
