@@ -18,24 +18,26 @@ public class BapsServiceImpl implements BapsService {
     }
 
     @Override
-    public List<Baps> findAll() {
-        return bapsRepository.findAllByOrderByNaamAsc();
+    public List<BapsDto> findAll() {
+        return bapsRepository.findAllByOrderByNaamAsc().stream()
+                .map(this::toDto)
+                .toList();
     }
 
     @Override
-    public Page<Baps> findAll(Pageable pageable) {
-        return bapsRepository.findAll(pageable);
+    public Page<BapsDto> findAll(Pageable pageable) {
+        return bapsRepository.findAll(pageable).map(this::toDto);
     }
 
     @Override
-    public Optional<Baps> findById(Long id) {
-        return bapsRepository.findById(id);
+    public Optional<BapsDto> findById(Long id) {
+        return bapsRepository.findById(id).map(this::toDto);
     }
 
     @Override
     @Transactional
-    public Baps save(Baps baps) {
-        return bapsRepository.save(baps);
+    public BapsDto save(BapsDto dto) {
+        return toDto(bapsRepository.save(toEntity(dto)));
     }
 
     @Override
@@ -47,5 +49,37 @@ public class BapsServiceImpl implements BapsService {
     @Override
     public long count() {
         return bapsRepository.count();
+    }
+
+    private BapsDto toDto(Baps baps) {
+        return new BapsDto(
+                baps.getId(),
+                baps.getNaam(),
+                baps.getFotoUrl(),
+                baps.getHobbies(),
+                baps.getBeschrijving(),
+                baps.isActief(),
+                baps.getActiefVanaf(),
+                baps.getActiefTotEnMet(),
+                baps.getBeschikbareDagen(),
+                baps.getAangemaaktOp()
+        );
+    }
+
+    private Baps toEntity(BapsDto dto) {
+        Baps baps = new Baps();
+        baps.setId(dto.id());
+        baps.setNaam(dto.naam());
+        baps.setFotoUrl(dto.fotoUrl());
+        baps.setHobbies(dto.hobbies());
+        baps.setBeschrijving(dto.beschrijving());
+        baps.setActief(dto.actief());
+        baps.setActiefVanaf(dto.actiefVanaf());
+        baps.setActiefTotEnMet(dto.actiefTotEnMet());
+        baps.setBeschikbareDagen(dto.beschikbareDagen());
+        if (dto.aangemaaktOp() != null) {
+            baps.setAangemaaktOp(dto.aangemaaktOp());
+        }
+        return baps;
     }
 }

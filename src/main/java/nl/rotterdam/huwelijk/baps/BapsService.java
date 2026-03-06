@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface BapsService {
 
-    List<Baps> findAll();
+    List<BapsDto> findAll();
 
-    Page<Baps> findAll(Pageable pageable);
+    Page<BapsDto> findAll(Pageable pageable);
 
-    Optional<Baps> findById(Long id);
+    Optional<BapsDto> findById(Long id);
 
-    Baps save(Baps baps);
+    BapsDto save(BapsDto dto);
 
     void delete(Long id);
 
