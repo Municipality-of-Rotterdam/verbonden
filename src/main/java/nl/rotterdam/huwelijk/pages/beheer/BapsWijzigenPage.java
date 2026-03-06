@@ -12,14 +12,15 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.io.Serial;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BapsWijzigenPage extends BasePage {
@@ -51,32 +52,26 @@ public class BapsWijzigenPage extends BasePage {
         feedback.setOutputMarkupId(true);
         add(feedback);
 
-        Model<String> naamModel = Model.of(dto.naam() != null ? dto.naam() : "");
-        Model<String> fotoUrlModel = Model.of(dto.fotoUrl() != null ? dto.fotoUrl() : "");
-        Model<String> hobbiesModel = Model.of(dto.hobbies() != null ? dto.hobbies() : "");
-        Model<String> beschrijvingModel = Model.of(dto.beschrijving() != null ? dto.beschrijving() : "");
-        Model<ArrayList<DayOfWeek>> beschikbareDagenModel = Model.of(
-                dto.beschikbareDagen() != null ? new ArrayList<>(dto.beschikbareDagen()) : new ArrayList<>());
-        Model<Boolean> actiefModel = Model.of(dto.actief());
-        Model<String> actiefVanafModel = Model.of(dto.actiefVanaf() != null ? dto.actiefVanaf().toString() : "");
-        Model<String> actiefTotEnMetModel = Model.of(dto.actiefTotEnMet() != null ? dto.actiefTotEnMet().toString() : "");
+        BapsFormDto formDto = BapsFormDto.vanDto(dto);
+        ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(formDto.getBeschikbareDagen());
 
-        Form<Void> form = new Form<>("bapsForm") {
+        Form<BapsFormDto> form = new Form<>("bapsForm", Model.of(formDto)) {
             @Serial
             private static final long serialVersionUID = 1L;
 
             @Override
             protected void onSubmit() {
+                BapsFormDto f = getModelObject();
                 BapsDto saveDto = new BapsDto(
                         dtoId,
-                        naamModel.getObject(),
-                        fotoUrlModel.getObject(),
-                        hobbiesModel.getObject(),
-                        beschrijvingModel.getObject(),
-                        Boolean.TRUE.equals(actiefModel.getObject()),
-                        parseDate(actiefVanafModel.getObject()),
-                        parseDate(actiefTotEnMetModel.getObject()),
-                        new ArrayList<>(beschikbareDagenModel.getObject()),
+                        f.getNaam(),
+                        f.getFotoUrl(),
+                        f.getHobbies(),
+                        f.getBeschrijving(),
+                        f.isActief(),
+                        parseDate(f.getActiefVanaf()),
+                        parseDate(f.getActiefTotEnMet()),
+                        List.copyOf(beschikbareDagenModel.getObject()),
                         aangemaaktOp
                 );
                 bapsService.save(saveDto);
@@ -84,18 +79,22 @@ public class BapsWijzigenPage extends BasePage {
             }
         };
 
-        form.add(new RdFormFieldTextInput<String>("naam", naamModel,
+        form.add(new RdFormFieldTextInput<String>("naam",
+                LambdaModel.of(formDto, BapsFormDto::getNaam, BapsFormDto::setNaam),
                 Model.of("Naam")).setRequired(true));
 
-        form.add(new RdFormFieldTextInput<String>("fotoUrl", fotoUrlModel,
+        form.add(new RdFormFieldTextInput<String>("fotoUrl",
+                LambdaModel.of(formDto, BapsFormDto::getFotoUrl, BapsFormDto::setFotoUrl),
                 Model.of("Foto URL"),
                 Model.of("URL naar de profielfoto van de BAPS")));
 
         form.add(new Label("hobbiesLabel", Model.of("Hobbies")));
-        form.add(new TextArea<>("hobbies", hobbiesModel));
+        form.add(new TextArea<>("hobbies",
+                LambdaModel.of(formDto, BapsFormDto::getHobbies, BapsFormDto::setHobbies)));
 
         form.add(new Label("beschrijvingLabel", Model.of("Beschrijving")));
-        form.add(new TextArea<>("beschrijving", beschrijvingModel));
+        form.add(new TextArea<>("beschrijving",
+                LambdaModel.of(formDto, BapsFormDto::getBeschrijving, BapsFormDto::setBeschrijving)));
 
         form.add(new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")));
         form.add(new CheckBoxMultipleChoice<>("beschikbareDagen",
@@ -104,13 +103,16 @@ public class BapsWijzigenPage extends BasePage {
                 BapsToevoegenPage.dagRenderer()));
 
         form.add(new Label("actiefLabel", Model.of("Actief")));
-        form.add(new CheckBox("actief", actiefModel));
+        form.add(new CheckBox("actief",
+                LambdaModel.of(formDto, BapsFormDto::isActief, BapsFormDto::setActief)));
 
-        form.add(new RdFormFieldTextInput<String>("actiefVanaf", actiefVanafModel,
+        form.add(new RdFormFieldTextInput<String>("actiefVanaf",
+                LambdaModel.of(formDto, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
                 Model.of("Actief Vanaf"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 
-        form.add(new RdFormFieldTextInput<String>("actiefTotEnMet", actiefTotEnMetModel,
+        form.add(new RdFormFieldTextInput<String>("actiefTotEnMet",
+                LambdaModel.of(formDto, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
                 Model.of("Actief Tot en Met"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 
