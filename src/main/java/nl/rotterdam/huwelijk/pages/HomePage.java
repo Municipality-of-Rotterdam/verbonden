@@ -1,6 +1,8 @@
 package nl.rotterdam.huwelijk.pages;
 
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_logo.RotterdamLogoImage;
 import nl.rotterdam.nl_design_system.wicket.components.body.RdBodyTransparentContainer;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
@@ -18,7 +20,9 @@ import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
 import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.model.Model;
@@ -106,13 +110,16 @@ public class HomePage extends WebPage {
         ceremonyGroup.add(new RdRadioButton<>("regulier", Model.of("regulier"), cerRadioGroup));
 
         // Submit button
-        RdButton submitButton = new RdButton("submitButton", Model.of("Plan jullie dag")) {
+        RdButton submitButton = new RdButton("submitButton") {
             @Override
             public void onSubmit() {
                 // Navigate to next step (to be implemented)
             }
         };
         submitButton.setAppearance(RdButtonAppearance.PRIMARY_ACTION);
+        submitButton.add(new WebMarkupContainer("icon")
+                .add(new RotterdamIconBehavior(RotterdamIconType.RING)));
+
         form.add(submitButton);
 
         // Page Footer
