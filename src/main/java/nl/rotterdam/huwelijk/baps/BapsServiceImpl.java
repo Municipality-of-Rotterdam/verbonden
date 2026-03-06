@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,7 +63,7 @@ public class BapsServiceImpl implements BapsService {
                 baps.isActief(),
                 baps.getActiefVanaf(),
                 baps.getActiefTotEnMet(),
-                baps.getBeschikbareDagen(),
+                new ArrayList<>(baps.getBeschikbareDagen()),
                 baps.getAangemaaktOp()
         );
     }
@@ -76,7 +78,8 @@ public class BapsServiceImpl implements BapsService {
         baps.setActief(dto.actief());
         baps.setActiefVanaf(dto.actiefVanaf());
         baps.setActiefTotEnMet(dto.actiefTotEnMet());
-        baps.setBeschikbareDagen(dto.beschikbareDagen());
+        baps.setBeschikbareDagen(dto.beschikbareDagen() != null
+                ? new ArrayList<>(dto.beschikbareDagen()) : new ArrayList<>());
         if (dto.aangemaaktOp() != null) {
             baps.setAangemaaktOp(dto.aangemaaktOp());
         }

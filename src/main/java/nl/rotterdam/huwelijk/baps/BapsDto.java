@@ -2,8 +2,10 @@ package nl.rotterdam.huwelijk.baps;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record BapsDto(
         Long id,
@@ -14,7 +16,7 @@ public record BapsDto(
         boolean actief,
         LocalDate actiefVanaf,
         LocalDate actiefTotEnMet,
-        String beschikbareDagen,
+        List<DayOfWeek> beschikbareDagen,
         LocalDateTime aangemaaktOp
 ) implements Serializable {
 
@@ -23,7 +25,7 @@ public record BapsDto(
 
     /** Lege DTO voor nieuwe BAPS-invoer. */
     public static BapsDto leeg() {
-        return new BapsDto(null, "", null, null, null, true, null, null, null, null);
+        return new BapsDto(null, "", null, null, null, true, null, null, List.of(), null);
     }
 
     /** Geeft een nieuwe instantie terug met alleen het veld {@code actief} gewijzigd. */

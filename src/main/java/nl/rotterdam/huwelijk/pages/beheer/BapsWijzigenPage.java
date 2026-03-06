@@ -7,6 +7,7 @@ import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdF
 import nl.rotterdam.huwelijk.pages.BasePage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -16,7 +17,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.io.Serial;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BapsWijzigenPage extends BasePage {
 
@@ -51,7 +55,8 @@ public class BapsWijzigenPage extends BasePage {
         Model<String> fotoUrlModel = Model.of(dto.fotoUrl() != null ? dto.fotoUrl() : "");
         Model<String> hobbiesModel = Model.of(dto.hobbies() != null ? dto.hobbies() : "");
         Model<String> beschrijvingModel = Model.of(dto.beschrijving() != null ? dto.beschrijving() : "");
-        Model<String> beschikbareDagenModel = Model.of(dto.beschikbareDagen() != null ? dto.beschikbareDagen() : "");
+        Model<ArrayList<DayOfWeek>> beschikbareDagenModel = Model.of(
+                dto.beschikbareDagen() != null ? new ArrayList<>(dto.beschikbareDagen()) : new ArrayList<>());
         Model<Boolean> actiefModel = Model.of(dto.actief());
         Model<String> actiefVanafModel = Model.of(dto.actiefVanaf() != null ? dto.actiefVanaf().toString() : "");
         Model<String> actiefTotEnMetModel = Model.of(dto.actiefTotEnMet() != null ? dto.actiefTotEnMet().toString() : "");
@@ -71,7 +76,7 @@ public class BapsWijzigenPage extends BasePage {
                         Boolean.TRUE.equals(actiefModel.getObject()),
                         parseDate(actiefVanafModel.getObject()),
                         parseDate(actiefTotEnMetModel.getObject()),
-                        beschikbareDagenModel.getObject(),
+                        new ArrayList<>(beschikbareDagenModel.getObject()),
                         aangemaaktOp
                 );
                 bapsService.save(saveDto);
@@ -92,9 +97,11 @@ public class BapsWijzigenPage extends BasePage {
         form.add(new Label("beschrijvingLabel", Model.of("Beschrijving")));
         form.add(new TextArea<>("beschrijving", beschrijvingModel));
 
-        form.add(new RdFormFieldTextInput<String>("beschikbareDagen", beschikbareDagenModel,
-                Model.of("Beschikbare Dagen"),
-                Model.of("Bijv. Maandag, Woensdag, Vrijdag")));
+        form.add(new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")));
+        form.add(new CheckBoxMultipleChoice<>("beschikbareDagen",
+                beschikbareDagenModel,
+                List.of(DayOfWeek.values()),
+                BapsToevoegenPage.dagRenderer()));
 
         form.add(new Label("actiefLabel", Model.of("Actief")));
         form.add(new CheckBox("actief", actiefModel));

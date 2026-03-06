@@ -7,14 +7,22 @@ import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdF
 import nl.rotterdam.huwelijk.pages.BasePage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.io.Serial;
+import java.time.DayOfWeek;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class BapsToevoegenPage extends BasePage {
 
@@ -35,7 +43,7 @@ public class BapsToevoegenPage extends BasePage {
         Model<String> fotoUrlModel = Model.of("");
         Model<String> hobbiesModel = Model.of("");
         Model<String> beschrijvingModel = Model.of("");
-        Model<String> beschikbareDagenModel = Model.of("");
+        Model<ArrayList<DayOfWeek>> beschikbareDagenModel = Model.of(new ArrayList<>());
         Model<Boolean> actiefModel = Model.of(true);
         Model<String> actiefVanafModel = Model.of("");
         Model<String> actiefTotEnMetModel = Model.of("");
@@ -55,7 +63,7 @@ public class BapsToevoegenPage extends BasePage {
                         Boolean.TRUE.equals(actiefModel.getObject()),
                         parseDate(actiefVanafModel.getObject()),
                         parseDate(actiefTotEnMetModel.getObject()),
-                        beschikbareDagenModel.getObject(),
+                        new ArrayList<>(beschikbareDagenModel.getObject()),
                         null
                 );
                 bapsService.save(dto);
@@ -76,9 +84,11 @@ public class BapsToevoegenPage extends BasePage {
         form.add(new Label("beschrijvingLabel", Model.of("Beschrijving")));
         form.add(new TextArea<>("beschrijving", beschrijvingModel));
 
-        form.add(new RdFormFieldTextInput<String>("beschikbareDagen", beschikbareDagenModel,
-                Model.of("Beschikbare Dagen"),
-                Model.of("Bijv. Maandag, Woensdag, Vrijdag")));
+        form.add(new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")));
+        form.add(new CheckBoxMultipleChoice<>("beschikbareDagen",
+                beschikbareDagenModel,
+                List.of(DayOfWeek.values()),
+                dagRenderer()));
 
         form.add(new Label("actiefLabel", Model.of("Actief")));
         form.add(new CheckBox("actief", actiefModel));
@@ -94,5 +104,28 @@ public class BapsToevoegenPage extends BasePage {
         form.add(new RdButton("opslaan", Model.of("Toevoegen")));
 
         add(form);
+    }
+
+    static IChoiceRenderer<DayOfWeek> dagRenderer() {
+        return new IChoiceRenderer<>() {
+            @Serial
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Object getDisplayValue(DayOfWeek day) {
+                return day.getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+            }
+
+            @Override
+            public String getIdValue(DayOfWeek day, int index) {
+                return day.name();
+            }
+
+            @Override
+            public DayOfWeek getObject(String id,
+                    IModel<? extends List<? extends DayOfWeek>> choices) {
+                return DayOfWeek.valueOf(id);
+            }
+        };
     }
 }

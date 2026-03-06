@@ -3,8 +3,11 @@ package nl.rotterdam.huwelijk.baps;
 import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "baps")
@@ -38,8 +41,11 @@ public class BapsEntity implements Serializable {
     @Column(name = "actief_tot_en_met")
     private LocalDate actiefTotEnMet;
 
-    @Column(name = "beschikbare_dagen", columnDefinition = "TEXT")
-    private String beschikbareDagen;
+    @ElementCollection
+    @CollectionTable(name = "baps_beschikbare_dagen", joinColumns = @JoinColumn(name = "baps_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "dag", nullable = false)
+    private List<DayOfWeek> beschikbareDagen = new ArrayList<>();
 
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
@@ -108,12 +114,12 @@ public class BapsEntity implements Serializable {
         this.actiefTotEnMet = actiefTotEnMet;
     }
 
-    public String getBeschikbareDagen() {
+    public List<DayOfWeek> getBeschikbareDagen() {
         return beschikbareDagen;
     }
 
-    public void setBeschikbareDagen(String beschikbareDagen) {
-        this.beschikbareDagen = beschikbareDagen;
+    public void setBeschikbareDagen(List<DayOfWeek> beschikbareDagen) {
+        this.beschikbareDagen = beschikbareDagen != null ? beschikbareDagen : new ArrayList<>();
     }
 
     public LocalDateTime getAangemaaktOp() {
