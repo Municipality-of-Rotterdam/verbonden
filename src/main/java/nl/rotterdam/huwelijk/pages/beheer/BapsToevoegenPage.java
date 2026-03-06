@@ -41,9 +41,10 @@ public class BapsToevoegenPage extends BasePage {
         add(feedback);
 
         BapsFormDto formDto = BapsFormDto.leeg();
+        Model<BapsFormDto> formDtoModel = Model.of(formDto);
         ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(formDto.getBeschikbareDagen());
 
-        Form<BapsFormDto> form = new Form<>("bapsForm", Model.of(formDto)) {
+        Form<BapsFormDto> form = new Form<>("bapsForm", formDtoModel) {
             @Serial
             private static final long serialVersionUID = 1L;
 
@@ -68,21 +69,21 @@ public class BapsToevoegenPage extends BasePage {
         };
 
         form.add(new RdFormFieldTextInput<String>("naam",
-                LambdaModel.of(formDto, BapsFormDto::getNaam, BapsFormDto::setNaam),
+                LambdaModel.of(formDtoModel, BapsFormDto::getNaam, BapsFormDto::setNaam),
                 Model.of("Naam")).setRequired(true));
 
         form.add(new RdFormFieldTextInput<String>("fotoUrl",
-                LambdaModel.of(formDto, BapsFormDto::getFotoUrl, BapsFormDto::setFotoUrl),
+                LambdaModel.of(formDtoModel, BapsFormDto::getFotoUrl, BapsFormDto::setFotoUrl),
                 Model.of("Foto URL"),
                 Model.of("URL naar de profielfoto van de BAPS")));
 
         form.add(new Label("hobbiesLabel", Model.of("Hobbies")));
         form.add(new TextArea<>("hobbies",
-                LambdaModel.of(formDto, BapsFormDto::getHobbies, BapsFormDto::setHobbies)));
+                LambdaModel.of(formDtoModel, BapsFormDto::getHobbies, BapsFormDto::setHobbies)));
 
         form.add(new Label("beschrijvingLabel", Model.of("Beschrijving")));
         form.add(new TextArea<>("beschrijving",
-                LambdaModel.of(formDto, BapsFormDto::getBeschrijving, BapsFormDto::setBeschrijving)));
+                LambdaModel.of(formDtoModel, BapsFormDto::getBeschrijving, BapsFormDto::setBeschrijving)));
 
         form.add(new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")));
         form.add(new CheckBoxMultipleChoice<>("beschikbareDagen",
@@ -92,15 +93,15 @@ public class BapsToevoegenPage extends BasePage {
 
         form.add(new Label("actiefLabel", Model.of("Actief")));
         form.add(new CheckBox("actief",
-                LambdaModel.of(formDto, BapsFormDto::isActief, BapsFormDto::setActief)));
+                LambdaModel.of(formDtoModel, BapsFormDto::isActief, BapsFormDto::setActief)));
 
         form.add(new RdFormFieldTextInput<String>("actiefVanaf",
-                LambdaModel.of(formDto, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
+                LambdaModel.of(formDtoModel, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
                 Model.of("Actief Vanaf"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 
         form.add(new RdFormFieldTextInput<String>("actiefTotEnMet",
-                LambdaModel.of(formDto, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
+                LambdaModel.of(formDtoModel, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
                 Model.of("Actief Tot en Met"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 
