@@ -20,6 +20,7 @@ public class BapsServiceImpl implements BapsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BapsDto> findAll() {
         return bapsRepository.findAllByOrderByNaamAsc().stream()
                 .map(this::toDto)
@@ -27,11 +28,13 @@ public class BapsServiceImpl implements BapsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<BapsDto> findAll(Pageable pageable) {
         return bapsRepository.findAll(pageable).map(this::toDto);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<BapsDto> findById(Long id) {
         return bapsRepository.findById(id).map(this::toDto);
     }
