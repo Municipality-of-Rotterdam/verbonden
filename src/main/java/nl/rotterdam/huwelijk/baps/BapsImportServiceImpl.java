@@ -77,7 +77,7 @@ public class BapsImportServiceImpl implements BapsImportService {
 
         for (String url : ambtenaarUrls) {
             try {
-                Baps baps = parseerBapsVanPagina(url);
+                BapsEntity baps = parseerBapsVanPagina(url);
                 if (baps != null) {
                     bapsRepository.save(baps);
                     imported++;
@@ -93,7 +93,7 @@ public class BapsImportServiceImpl implements BapsImportService {
         return new BapsImportResult(imported, errors, messages);
     }
 
-    private Baps parseerBapsVanPagina(String url) throws IOException {
+    private BapsEntity parseerBapsVanPagina(String url) throws IOException {
         Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (compatible; HuwelijkPOC)")
                 .timeout(15_000)
@@ -104,7 +104,7 @@ public class BapsImportServiceImpl implements BapsImportService {
             return null;
         }
 
-        Baps baps = new Baps();
+        BapsEntity baps = new BapsEntity();
         baps.setNaam(heading.text().trim());
 
         // Foto

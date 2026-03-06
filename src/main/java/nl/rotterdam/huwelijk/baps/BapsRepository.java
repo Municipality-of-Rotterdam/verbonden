@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BapsRepository extends JpaRepository<Baps, Long> {
+public interface BapsRepository extends JpaRepository<BapsEntity, Long> {
 
-    List<Baps> findAllByOrderByNaamAsc();
+    List<BapsEntity> findAllByOrderByNaamAsc();
 
-    Page<Baps> findAll(Pageable pageable);
+    Page<BapsEntity> findAll(Pageable pageable);
 }

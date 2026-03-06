@@ -51,7 +51,7 @@ public class BapsServiceImpl implements BapsService {
         return bapsRepository.count();
     }
 
-    private BapsDto toDto(Baps baps) {
+    private BapsDto toDto(BapsEntity baps) {
         return new BapsDto(
                 baps.getId(),
                 baps.getNaam(),
@@ -66,8 +66,8 @@ public class BapsServiceImpl implements BapsService {
         );
     }
 
-    private Baps toEntity(BapsDto dto) {
-        Baps baps = new Baps();
+    private BapsEntity toEntity(BapsDto dto) {
+        BapsEntity baps = new BapsEntity();
         baps.setId(dto.id());
         baps.setNaam(dto.naam());
         baps.setFotoUrl(dto.fotoUrl());

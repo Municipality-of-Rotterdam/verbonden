@@ -13,4 +13,5 @@
 
 ### Algemeen
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
+- JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`).
 - Voeg geen JPA-annotaties toe aan klassen buiten het `baps`-package (of gelijkwaardige datapakketten).
