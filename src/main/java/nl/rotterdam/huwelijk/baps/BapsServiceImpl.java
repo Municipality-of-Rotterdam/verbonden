@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,14 +16,6 @@ public class BapsServiceImpl implements BapsService {
 
     public BapsServiceImpl(BapsRepository bapsRepository) {
         this.bapsRepository = bapsRepository;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<BapsDto> findAll() {
-        return bapsRepository.findAllByOrderByNaamAsc().stream()
-                .map(this::toDto)
-                .toList();
     }
 
     @Override
