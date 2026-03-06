@@ -16,11 +16,9 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.io.Serial;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
-public class BapsFormPage extends BasePage {
+public class BapsWijzigenPage extends BasePage {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -28,27 +26,27 @@ public class BapsFormPage extends BasePage {
     @SpringBean
     private BapsService bapsService;
 
-    public BapsFormPage(PageParameters params) {
+    public BapsWijzigenPage(PageParameters params) {
         Long id = params.get("id").toOptionalLong();
-        BapsDto dto = (id != null)
-                ? bapsService.findById(id).orElseGet(BapsDto::leeg)
-                : BapsDto.leeg();
+        if (id == null) {
+            setResponsePage(BeheerPage.class);
+            return;
+        }
+        BapsDto dto = bapsService.findById(id).orElse(null);
+        if (dto == null) {
+            setResponsePage(BeheerPage.class);
+            return;
+        }
 
-        boolean isNieuw = dto.id() == null;
-
-        // Capture immutable identity fields for use in onSubmit
         Long dtoId = dto.id();
         LocalDateTime aangemaaktOp = dto.aangemaaktOp();
 
-        add(new Label("paginaTitel",
-                Model.of(isNieuw ? "Nieuwe BAPS toevoegen" : "BAPS bewerken")));
         add(new BookmarkablePageLink<>("terugLink", BeheerPage.class));
 
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         add(feedback);
 
-        // Individual mutable models for each form field
         Model<String> naamModel = Model.of(dto.naam() != null ? dto.naam() : "");
         Model<String> fotoUrlModel = Model.of(dto.fotoUrl() != null ? dto.fotoUrl() : "");
         Model<String> hobbiesModel = Model.of(dto.hobbies() != null ? dto.hobbies() : "");
@@ -109,21 +107,8 @@ public class BapsFormPage extends BasePage {
                 Model.of("Actief Tot en Met"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 
-        form.add(new RdButton("opslaan",
-                Model.of(isNieuw ? "Toevoegen" : "Opslaan")));
+        form.add(new RdButton("opslaan", Model.of("Opslaan")));
 
         add(form);
-    }
-
-    /** Parses an ISO date string (yyyy-MM-dd); returns {@code null} on blank or invalid input. */
-    private static LocalDate parseDate(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(value);
-        } catch (DateTimeParseException e) {
-            return null;
-        }
     }
 }

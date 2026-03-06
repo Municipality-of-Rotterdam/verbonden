@@ -15,3 +15,4 @@
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
 - JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`).
 - Voeg geen JPA-annotaties toe aan klassen buiten het `baps`-package (of gelijkwaardige datapakketten).
+- Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsToevoegenPage` en `BapsWijzigenPage`).

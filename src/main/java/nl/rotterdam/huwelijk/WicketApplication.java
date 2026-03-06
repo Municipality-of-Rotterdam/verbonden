@@ -1,7 +1,8 @@
 package nl.rotterdam.huwelijk;
 
 import nl.rotterdam.huwelijk.pages.HomePage;
-import nl.rotterdam.huwelijk.pages.beheer.BapsFormPage;
+import nl.rotterdam.huwelijk.pages.beheer.BapsToevoegenPage;
+import nl.rotterdam.huwelijk.pages.beheer.BapsWijzigenPage;
 import nl.rotterdam.huwelijk.pages.beheer.BeheerPage;
 import org.apache.wicket.Page;
 import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
@@ -29,7 +30,7 @@ public class WicketApplication extends WebApplication {
                         new FetchMetadataResourceIsolationPolicy()));
 
         mountPage("/beheer", BeheerPage.class);
-        mountPage("/beheer/baps/nieuw", BapsFormPage.class);
-        mountPage("/beheer/baps/${id}", BapsFormPage.class);
+        mountPage("/beheer/baps/nieuw", BapsToevoegenPage.class);
+        mountPage("/beheer/baps/${id}", BapsWijzigenPage.class);
     }
 }

@@ -49,7 +49,7 @@ public class BeheerPage extends BasePage {
         feedback.setOutputMarkupId(true);
         add(feedback);
 
-        add(new BookmarkablePageLink<>("nieuwBapsLink", BapsFormPage.class));
+        add(new BookmarkablePageLink<>("nieuwBapsLink", BapsToevoegenPage.class));
 
         Form<?> importForm = new Form<>("importForm");
         importForm.add(new RdAjaxButton("importeerButton") {
@@ -203,7 +203,7 @@ public class BeheerPage extends BasePage {
             PageParameters params = new PageParameters();
             params.add("id", dto.id());
 
-            add(new BookmarkablePageLink<>("bewerkLink", BapsFormPage.class, params));
+            add(new BookmarkablePageLink<>("bewerkLink", BapsWijzigenPage.class, params));
 
             add(new Link<BapsDto>("toggleActiefLink", model) {
                 @Serial
