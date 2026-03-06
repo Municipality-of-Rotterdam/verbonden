@@ -22,7 +22,6 @@ import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.model.Model;
@@ -62,6 +61,14 @@ public class HomePage extends WebPage {
         RdLogoBorder logo = new RdLogoBorder("logo");
         logo.add(new RotterdamLogoImage("rotterdamLogoImage"));
         pageHeader.add(logo);
+
+        // Top bar icons
+        pageHeader.add(new WebMarkupContainer("globeIcon")
+                .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
+        pageHeader.add(new WebMarkupContainer("userIcon")
+                .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
+        pageHeader.add(new WebMarkupContainer("logOutIcon")
+                .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
 
         // Page Body
         RdPageBodyBorder pageBody = new RdPageBodyBorder("pageBody");
