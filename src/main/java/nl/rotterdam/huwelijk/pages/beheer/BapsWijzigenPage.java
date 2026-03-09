@@ -3,8 +3,10 @@ package nl.rotterdam.huwelijk.pages.beheer;
 import nl.rotterdam.huwelijk.baps.BapsDto;
 import nl.rotterdam.huwelijk.baps.BapsService;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.huwelijk.pages.BasePage;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
@@ -80,22 +82,24 @@ public class BapsWijzigenPage extends BasePage {
             }
         };
 
-        form.add(new RdFormFieldTextInput<String>("naam",
+        form.add(new RdFormFieldTextInput<>("naam",
                 LambdaModel.of(formDtoModel, BapsFormDto::getNaam, BapsFormDto::setNaam),
                 Model.of("Naam")).setRequired(true));
 
-        form.add(new RdFormFieldTextInput<String>("fotoUrl",
+        form.add(new RdFormFieldTextInput<>("fotoUrl",
                 LambdaModel.of(formDtoModel, BapsFormDto::getFotoUrl, BapsFormDto::setFotoUrl),
                 Model.of("Foto URL"),
                 Model.of("URL naar de profielfoto van de BAPS")));
 
-        form.add(new Label("hobbiesLabel", Model.of("Hobbies")));
-        form.add(new TextArea<>("hobbies",
-                LambdaModel.of(formDtoModel, BapsFormDto::getHobbies, BapsFormDto::setHobbies)));
-
-        form.add(new Label("beschrijvingLabel", Model.of("Beschrijving")));
-        form.add(new TextArea<>("beschrijving",
-                LambdaModel.of(formDtoModel, BapsFormDto::getBeschrijving, BapsFormDto::setBeschrijving)));
+        form.add(new RdFormFieldTextArea<>("hobbies",
+                        LambdaModel.of(formDtoModel, BapsFormDto::getHobbies, BapsFormDto::setHobbies),
+                        Model.of("Hobbies")
+                ),
+                new RdFormFieldTextArea<>("beschrijving",
+                        LambdaModel.of(formDtoModel, BapsFormDto::getBeschrijving, BapsFormDto::setBeschrijving),
+                        Model.of("Beschrijving")
+                )
+        );
 
         form.add(new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")));
         form.add(new CheckBoxMultipleChoice<>("beschikbareDagen",
@@ -103,16 +107,17 @@ public class BapsWijzigenPage extends BasePage {
                 List.of(DayOfWeek.values()),
                 BapsToevoegenPage.dagRenderer()));
 
-        form.add(new Label("actiefLabel", Model.of("Actief")));
-        form.add(new CheckBox("actief",
-                LambdaModel.of(formDtoModel, BapsFormDto::isActief, BapsFormDto::setActief)));
+        form.add(new RdFormFieldCheckbox("actief",
+                LambdaModel.of(formDtoModel, BapsFormDto::isActief, BapsFormDto::setActief),
+                Model.of("Actief")));
 
-        form.add(new RdFormFieldTextInput<String>("actiefVanaf",
+
+        form.add(new RdFormFieldTextInput<>("actiefVanaf",
                 LambdaModel.of(formDtoModel, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
                 Model.of("Actief Vanaf"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 
-        form.add(new RdFormFieldTextInput<String>("actiefTotEnMet",
+        form.add(new RdFormFieldTextInput<>("actiefTotEnMet",
                 LambdaModel.of(formDtoModel, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
                 Model.of("Actief Tot en Met"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
