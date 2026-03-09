@@ -24,6 +24,8 @@ public class WicketApplication extends WebApplication {
         WicketWebjars.install(this);
         getComponentInstantiationListeners().add(new SpringComponentInjector(this));
 
+        getMarkupSettings().setStripWicketTags(true);
+
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
         // Spring Security's CSRF filter is disabled in SecurityConfig to avoid conflicts
         // with Wicket's own form submission mechanism (see SecurityConfig for details).
