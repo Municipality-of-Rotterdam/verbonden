@@ -42,7 +42,8 @@ public class BapsToevoegenPage extends BasePage {
 
         BapsFormDto formDto = BapsFormDto.leeg();
         Model<BapsFormDto> formDtoModel = Model.of(formDto);
-        ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(formDto.getBeschikbareDagen());
+        // TODO this is bad
+        ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(List.copyOf(formDto.getBeschikbareDagen()));
 
         Form<BapsFormDto> form = new Form<>("bapsForm", formDtoModel) {
             @Serial
@@ -68,11 +69,11 @@ public class BapsToevoegenPage extends BasePage {
             }
         };
 
-        form.add(new RdFormFieldTextInput<String>("naam",
+        form.add(new RdFormFieldTextInput<>("naam",
                 LambdaModel.of(formDtoModel, BapsFormDto::getNaam, BapsFormDto::setNaam),
                 Model.of("Naam")).setRequired(true));
 
-        form.add(new RdFormFieldTextInput<String>("fotoUrl",
+        form.add(new RdFormFieldTextInput<>("fotoUrl",
                 LambdaModel.of(formDtoModel, BapsFormDto::getFotoUrl, BapsFormDto::setFotoUrl),
                 Model.of("Foto URL"),
                 Model.of("URL naar de profielfoto van de BAPS")));
@@ -95,12 +96,12 @@ public class BapsToevoegenPage extends BasePage {
         form.add(new CheckBox("actief",
                 LambdaModel.of(formDtoModel, BapsFormDto::isActief, BapsFormDto::setActief)));
 
-        form.add(new RdFormFieldTextInput<String>("actiefVanaf",
+        form.add(new RdFormFieldTextInput<>("actiefVanaf",
                 LambdaModel.of(formDtoModel, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
                 Model.of("Actief Vanaf"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 
-        form.add(new RdFormFieldTextInput<String>("actiefTotEnMet",
+        form.add(new RdFormFieldTextInput<>("actiefTotEnMet",
                 LambdaModel.of(formDtoModel, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
                 Model.of("Actief Tot en Met"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));

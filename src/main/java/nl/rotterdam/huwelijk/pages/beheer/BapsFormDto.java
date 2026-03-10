@@ -5,8 +5,8 @@ import nl.rotterdam.huwelijk.baps.BapsDto;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -60,9 +60,9 @@ public class BapsFormDto implements Serializable {
     public String getBeschrijving() { return beschrijving; }
     public void setBeschrijving(String beschrijving) { this.beschrijving = beschrijving; }
 
-    public List<DayOfWeek> getBeschikbareDagen() { return beschikbareDagen; }
-    public void setBeschikbareDagen(List<DayOfWeek> beschikbareDagen) {
-        this.beschikbareDagen = beschikbareDagen != null ? beschikbareDagen : new ArrayList<>();
+    public Collection<DayOfWeek> getBeschikbareDagen() { return beschikbareDagen; }
+    public void setBeschikbareDagen(Collection<DayOfWeek> beschikbareDagen) {
+        this.beschikbareDagen = beschikbareDagen != null ? List.copyOf(beschikbareDagen) : new ArrayList<>();
     }
 
     public boolean isActief() { return actief; }

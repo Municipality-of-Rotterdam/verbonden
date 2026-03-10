@@ -2,27 +2,25 @@ package nl.rotterdam.huwelijk.pages.beheer;
 
 import nl.rotterdam.huwelijk.baps.BapsDto;
 import nl.rotterdam.huwelijk.baps.BapsService;
+import nl.rotterdam.huwelijk.pages.BasePage;
+import nl.rotterdam.huwelijk.wicket_components.DayOfWeekCheckboxGroup;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
-import nl.rotterdam.huwelijk.pages.BasePage;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.CheckBoxMultipleChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.io.Serial;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public class BapsWijzigenPage extends BasePage {
@@ -56,7 +54,7 @@ public class BapsWijzigenPage extends BasePage {
 
         BapsFormDto formDto = BapsFormDto.vanDto(dto);
         Model<BapsFormDto> formDtoModel = Model.of(formDto);
-        ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(formDto.getBeschikbareDagen());
+        IModel<Collection<DayOfWeek>> geselecteerdeDagen = LambdaModel.of(formDtoModel, BapsFormDto::getBeschikbareDagen, BapsFormDto::setBeschikbareDagen);
 
         Form<BapsFormDto> form = new Form<>("bapsForm", formDtoModel) {
             @Serial
@@ -74,7 +72,7 @@ public class BapsWijzigenPage extends BasePage {
                         f.isActief(),
                         parseDate(f.getActiefVanaf()),
                         parseDate(f.getActiefTotEnMet()),
-                        List.copyOf(beschikbareDagenModel.getObject()),
+                        List.copyOf(geselecteerdeDagen.getObject()),
                         aangemaaktOp
                 );
                 bapsService.save(saveDto);
@@ -101,11 +99,7 @@ public class BapsWijzigenPage extends BasePage {
                 )
         );
 
-        form.add(new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")));
-        form.add(new CheckBoxMultipleChoice<>("beschikbareDagen",
-                beschikbareDagenModel,
-                List.of(DayOfWeek.values()),
-                BapsToevoegenPage.dagRenderer()));
+        form.add(new DayOfWeekCheckboxGroup("beschikbareDagen", geselecteerdeDagen, Model.of("Beschikbare dagen") ));
 
         form.add(new RdFormFieldCheckbox("actief",
                 LambdaModel.of(formDtoModel, BapsFormDto::isActief, BapsFormDto::setActief),

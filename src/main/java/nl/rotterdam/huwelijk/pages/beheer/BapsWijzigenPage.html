@@ -16,10 +16,13 @@
     <div wicket:id="fotoUrl"></div>
     <div wicket:id="hobbies"></div>
     <div wicket:id="beschrijving"></div>
-
-    <div>
-        <label wicket:id="beschikbareDagenLabel"></label>
-        <div wicket:id="beschikbareDagen"></div>
+    <div wicket:id="beschikbareDagen">
+        <div class="d-flex flex-column gap-2">
+            <label wicket:id="day" >
+                <input type="checkbox" wicket:id="checkbox" />
+                <wicket:container wicket:id="label"></wicket:container>
+            </label>
+        </div>
     </div>
 
     <div wicket:id="actief">
