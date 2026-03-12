@@ -2,7 +2,6 @@ package nl.rotterdam.huwelijk.pages.beheer;
 
 import nl.rotterdam.huwelijk.baps.BapsDto;
 import nl.rotterdam.huwelijk.baps.BapsService;
-import nl.rotterdam.huwelijk.pages.BasePage;
 import nl.rotterdam.huwelijk.wicket_components.DayOfWeekCheckboxGroup;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
@@ -23,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-public class BapsWijzigenPage extends BasePage {
+public class BapsWijzigenPage extends BeheerBasePage {
 
     @Serial
     private static final long serialVersionUID = 1L;

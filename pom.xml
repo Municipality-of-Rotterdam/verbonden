@@ -152,10 +152,22 @@
             <version>${wicket.version}</version>
         </dependency>
 
+        <!-- Rotterdam NLDS Extensions (RotterdamLogoImage, icons, etc.) -->
+        <dependency>
+            <groupId>nl.rotterdam.nl-design-system</groupId>
+            <artifactId>rotterdam-nlds-extensions-wicket</artifactId>
+            <version>${rotterdam-nlds.version}</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -182,6 +194,7 @@
                     <include>**/*.html</include>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
+                    <include>**/*.css</include>
                 </includes>
             </resource>
         </resources>
