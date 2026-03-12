@@ -93,7 +93,8 @@ public class BapsImportServiceImpl implements BapsImportService {
         return new BapsImportResult(imported, errors, messages);
     }
 
-    private BapsEntity parseerBapsVanPagina(String url) throws IOException {
+    BapsEntity parseerBapsVanPagina(String url) throws IOException {
+        System.out.println("Importeren van: " + url);
         Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (compatible; HuwelijkPOC)")
                 .timeout(15_000)
@@ -108,10 +109,10 @@ public class BapsImportServiceImpl implements BapsImportService {
         baps.setNaam(heading.text().trim());
 
         // Foto
-        Element img = doc.selectFirst(".person-photo img, .profile-image img, "
-                + ".artikel__afbeelding img, article img");
+        Element img = doc.selectFirst("img[class^=styles_profilePicture]");
         if (img != null) {
             String src = img.absUrl("src");
+
             if (!src.isEmpty()) {
                 baps.setFotoUrl(src);
             }
