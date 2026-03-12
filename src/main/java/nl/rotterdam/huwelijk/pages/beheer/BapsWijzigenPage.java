@@ -2,7 +2,6 @@ package nl.rotterdam.huwelijk.pages.beheer;
 
 import nl.rotterdam.huwelijk.baps.BapsDto;
 import nl.rotterdam.huwelijk.baps.BapsService;
-
 import nl.rotterdam.huwelijk.wicket_components.DayOfWeekCheckboxGroup;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
