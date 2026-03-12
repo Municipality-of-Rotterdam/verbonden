@@ -33,10 +33,10 @@ public class BapsFormDto implements Serializable {
     /** Vult een instantie met de waarden uit een bestaande {@link ChangeBapsDto}. */
     public static BapsFormDto vanDto(ChangeBapsDto dto) {
         BapsFormDto form = new BapsFormDto();
-        form.naam = dto.naam() != null ? dto.naam() : "";
-        form.fotoUrl = dto.fotoUrl() != null ? dto.fotoUrl() : "";
-        form.hobbies = dto.hobbies() != null ? dto.hobbies() : "";
-        form.beschrijving = dto.beschrijving() != null ? dto.beschrijving() : "";
+        form.naam = dto.naam();
+        form.fotoUrl = dto.fotoUrl();
+        form.hobbies = dto.hobbies();
+        form.beschrijving = dto.beschrijving();
         form.beschikbareDagen = dto.beschikbareDagen() != null
                 ? new ArrayList<>(dto.beschikbareDagen()) : new ArrayList<>();
         form.actief = dto.actief();
