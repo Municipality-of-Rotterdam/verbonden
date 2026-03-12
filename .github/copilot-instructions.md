@@ -5,11 +5,17 @@
 ### Packagestructuur
 De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.huwelijk.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
-- `nl.rotterdam.huwelijk.features.baps_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS): service interface (`BapsAdministrationService`), implementatie, repository, DTOs, import-service en Wicket-pagina's.
-- `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers: `HomePage` en gerelateerde pagina's.
+- `nl.rotterdam.huwelijk.features.baps_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
+- `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.beheer_common` — gedeelde basisklassen voor beheerpagina's: `BeheerBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema + `parseDate`-helper).
 - `nl.rotterdam.huwelijk.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
 - `nl.rotterdam.huwelijk.config` — Spring Boot configuratieklassen.
+
+Elke feature-package bevat de volgende sub-packages:
+- `feature.<naam>.ui` — Wicket-pagina's en UI-hulpklassen (FormDto, componenten).
+- `feature.<naam>.application` — Service-interfaces (public) en service-implementaties (package-private).
+- `feature.<naam>.domain` — DTOs en domeinklassen (`CreateXxxDto`, `ChangeXxxDto`, `ListXxxDto`, resultaatrecords).
+- `feature.<naam>.repository` — Repository-interfaces.
 
 ### Service layer
 - JPA Entities mogen de service layer niet verlaten.

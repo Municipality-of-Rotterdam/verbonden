@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.features.baps_administration;
+package nl.rotterdam.huwelijk.features.baps_administration.domain;
 
 import java.io.Serializable;
 import java.time.LocalDate;

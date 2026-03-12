@@ -1,5 +1,7 @@
-package nl.rotterdam.huwelijk.features.baps_administration;
+package nl.rotterdam.huwelijk.features.baps_administration.application;
 
+import nl.rotterdam.huwelijk.features.baps_administration.domain.BapsImportResult;
+import nl.rotterdam.huwelijk.features.baps_administration.repository.BapsRepository;
 import nl.rotterdam.huwelijk.persistence.BapsEntity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class BapsImportServiceImpl implements BapsImportService {
+class BapsImportServiceImpl implements BapsImportService {
 
     private static final Logger log = LoggerFactory.getLogger(BapsImportServiceImpl.class);
     private static final String ROTTERDAM_TROUWAMBTENAAR_URL = "https://www.rotterdam.nl/trouwambtenaar";
 
     private final BapsRepository bapsRepository;
 
-    public BapsImportServiceImpl(BapsRepository bapsRepository) {
+    BapsImportServiceImpl(BapsRepository bapsRepository) {
         this.bapsRepository = bapsRepository;
     }
 

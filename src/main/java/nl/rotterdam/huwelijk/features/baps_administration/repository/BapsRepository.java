@@ -1,5 +1,6 @@
-package nl.rotterdam.huwelijk.features.baps_administration;
+package nl.rotterdam.huwelijk.features.baps_administration.repository;
 
+import nl.rotterdam.huwelijk.features.baps_administration.domain.ListBapsDto;
 import nl.rotterdam.huwelijk.persistence.BapsEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Repository;
 public interface BapsRepository extends JpaRepository<BapsEntity, Long> {
 
     @Query("""
-            SELECT new nl.rotterdam.huwelijk.features.baps_administration.ListBapsDto(
+            SELECT new nl.rotterdam.huwelijk.features.baps_administration.domain.ListBapsDto(
                 b.id, b.naam, b.actief, b.actiefVanaf, b.actiefTotEnMet, b.aangemaaktOp)
             FROM BapsEntity b
             """)

@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.features.marriage_intake;
+package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;

@@ -1,5 +1,9 @@
-package nl.rotterdam.huwelijk.features.baps_administration;
+package nl.rotterdam.huwelijk.features.baps_administration.application;
 
+import nl.rotterdam.huwelijk.features.baps_administration.domain.ChangeBapsDto;
+import nl.rotterdam.huwelijk.features.baps_administration.domain.CreateBapsDto;
+import nl.rotterdam.huwelijk.features.baps_administration.domain.ListBapsDto;
+import nl.rotterdam.huwelijk.features.baps_administration.repository.BapsRepository;
 import nl.rotterdam.huwelijk.persistence.BapsEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,11 +14,11 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
-public class BapsAdministrationServiceImpl implements BapsAdministrationService {
+class BapsAdministrationServiceImpl implements BapsAdministrationService {
 
     private final BapsRepository bapsRepository;
 
-    public BapsAdministrationServiceImpl(BapsRepository bapsRepository) {
+    BapsAdministrationServiceImpl(BapsRepository bapsRepository) {
         this.bapsRepository = bapsRepository;
     }
 

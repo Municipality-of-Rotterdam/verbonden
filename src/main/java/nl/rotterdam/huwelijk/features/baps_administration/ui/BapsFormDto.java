@@ -1,4 +1,6 @@
-package nl.rotterdam.huwelijk.features.baps_administration;
+package nl.rotterdam.huwelijk.features.baps_administration.ui;
+
+import nl.rotterdam.huwelijk.features.baps_administration.domain.ChangeBapsDto;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;
