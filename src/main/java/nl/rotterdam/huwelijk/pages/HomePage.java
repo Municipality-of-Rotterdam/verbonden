@@ -21,7 +21,6 @@ import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentCon
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.model.Model;
@@ -31,7 +30,7 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 
 import java.util.List;
 
-public class HomePage extends WebPage {
+public class HomePage extends BurgerBasePage {
 
     private String registrationType = "geregistreerd_partnerschap";
     private String ceremonyType = "eenvoudig";

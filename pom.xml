@@ -30,7 +30,9 @@
     <properties>
         <java.version>25</java.version>
         <wicket.version>10.8.0</wicket.version>
-        <rotterdam-nlds-wicket.version>0.0.8</rotterdam-nlds-wicket.version>
+        <rotterdam-nlds.version>0.0.8</rotterdam-nlds.version>
+        <wicket-webjars.version>4.0.8</wicket-webjars.version>
+        <bootstrap.version>5.3.7</bootstrap.version>
     </properties>
 
     <dependencyManagement>
@@ -98,27 +100,74 @@
         <dependency>
             <groupId>nl.rotterdam.nl-design-system</groupId>
             <artifactId>rotterdam-nlds-wicket</artifactId>
-            <version>${rotterdam-nlds-wicket.version}</version>
+            <version>${rotterdam-nlds.version}</version>
         </dependency>
-
-        <!-- Rotterdam Design Tokens CSS for Wicket -->
+        <!-- Rotterdam Design Tokens (rods-theme CSS custom properties) -->
         <dependency>
             <groupId>nl.rotterdam.nl-design-system</groupId>
             <artifactId>rotterdam-nlds-css-wicket</artifactId>
-            <version>${rotterdam-nlds-wicket.version}</version>
+            <version>${rotterdam-nlds.version}</version>
+        </dependency>
+
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Flyway database migrations -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+
+        <!-- Jsoup for web scraping (BAPS import from rotterdam.nl) -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.18.3</version>
+        </dependency>
+
+        <!-- Wicket Webjars integration -->
+        <dependency>
+            <groupId>de.agilecoders.wicket.webjars</groupId>
+            <artifactId>wicket-webjars</artifactId>
+            <version>${wicket-webjars.version}</version>
+        </dependency>
+        <!-- Bootstrap utilities CSS (via WebJars) -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>${bootstrap.version}</version>
+        </dependency>
+
+        <!-- Wicket Extensions (for DataTable toolbars) -->
+        <dependency>
+            <groupId>org.apache.wicket</groupId>
+            <artifactId>wicket-extensions</artifactId>
+            <version>${wicket.version}</version>
         </dependency>
 
         <!-- Rotterdam NLDS Extensions (RotterdamLogoImage, icons, etc.) -->
         <dependency>
             <groupId>nl.rotterdam.nl-design-system</groupId>
             <artifactId>rotterdam-nlds-extensions-wicket</artifactId>
-            <version>${rotterdam-nlds-wicket.version}</version>
+            <version>${rotterdam-nlds.version}</version>
         </dependency>
 
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
