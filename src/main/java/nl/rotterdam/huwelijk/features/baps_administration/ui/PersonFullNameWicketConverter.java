@@ -18,10 +18,10 @@ public class PersonFullNameWicketConverter implements IConverter<PersonFullName>
         try {
             return new PersonFullName(value);
         } catch (PersonFullNameTooShortException e) {
-            throw new ConversionException("Naam moet meer dan 4 tekens bevatten")
+            throw new ConversionException("Naam moet minimaal 5 tekens bevatten")
                     .setResourceKey("PersonFullName.tooShort");
         } catch (PersonFullNameTooLongException e) {
-            throw new ConversionException("Naam moet minder dan 80 tekens bevatten")
+            throw new ConversionException("Naam moet maximaal 79 tekens bevatten")
                     .setResourceKey("PersonFullName.tooLong");
         }
     }
