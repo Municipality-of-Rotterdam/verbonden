@@ -27,6 +27,7 @@ Elke feature-package bevat de volgende sub-packages:
   - `create`-methoden retourneren de aangemaakte primaire sleutel als primitief (`long`, niet `Long`).
   - `update`-methoden retourneren `void`.
   - `delete`- en toggle-methoden accepteren de primaire sleutel als primitief (`long id`, niet `Long id`).
+  - **Gebruik altijd primitieven** (`long`, `int`, `boolean`, …) in plaats van wrapper-typen (`Long`, `Integer`, `Boolean`, …) waar dat mogelijk is — dit geldt voor methode-parameters én retourtypen in services én repositories.
 
 ### Wicket
 - Injecteer altijd een service **interface** (niet de implementatie) via `@SpringBean`, zodat Wicket een JDK dynamic proxy kan aanmaken (voorkomt CGLIB-/Objenesis-problemen zonder no-arg constructor).
@@ -39,9 +40,9 @@ Elke feature-package bevat de volgende sub-packages:
   - Heeft toegang tot de `@SpringBean`-service van de omringende page (via de outer class reference).
   - Voorbeeld: `private class ChangeBapsForm extends Form<BapsFormDto> { ... }`
 - **FormDto-conventies:**
-  - Velden mogen `public` zijn — getters en setters hebben geen toegevoegde waarde.
+  - Velden zijn `private` met standaard getters en setters. Gebruik voor `LambdaModel`-bindingen **method references** in plaats van inline lambdas: `LambdaModel.of(model, BapsFormDto::getNaam, BapsFormDto::setNaam)`. In Java kunnen lambdas niet direct naar instantievelden wijzen zoals method references naar methoden kunnen wijzen; getters en setters zijn daarom noodzakelijk voor leesbare bindingen.
   - Gebruik `LocalDate` voor datumvelden (niet `String`). Wicket converteert automatisch via de globaal geregistreerde `LocalDateConverter(DateTimeFormatter.ISO_LOCAL_DATE)` in `WicketApplication`.
-  - In de statische `vanDto(XxxDto dto)`-methode worden waarden **direct** overgenomen: `form.veld = dto.veld()`. Gebruik **nooit** een null-naar-lege-string coercitie zoals `dto.veld() != null ? dto.veld() : ""`. Uitzondering: voor `List`-velden geldt een fallback naar een lege `ArrayList` (`dto.lijst() != null ? new ArrayList<>(dto.lijst()) : new ArrayList<>()`).
+  - In de statische `vanDto(XxxDto dto)`-methode worden waarden via setters overgenomen: `form.setVeld(dto.veld())`. Gebruik **nooit** een null-naar-lege-string coercitie zoals `dto.veld() != null ? dto.veld() : ""`. Uitzondering: voor `List`-velden geldt een fallback naar een lege `ArrayList` (`dto.lijst() != null ? new ArrayList<>(dto.lijst()) : new ArrayList<>()`).
 
 ### Algemeen
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.

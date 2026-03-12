@@ -54,18 +54,18 @@ public class BapsToevoegenPage extends BeheerBasePage {
             IModel<BapsFormDto> model = getModel();
             add(
                     new RdFormFieldTextInput<>("naam",
-                            LambdaModel.of(model, f -> f.naam, (f, v) -> f.naam = v),
+                            LambdaModel.of(model, BapsFormDto::getNaam, BapsFormDto::setNaam),
                             Model.of("Naam")).setRequired(true),
                     new RdFormFieldTextInput<>("fotoUrl",
-                            LambdaModel.of(model, f -> f.fotoUrl, (f, v) -> f.fotoUrl = v),
+                            LambdaModel.of(model, BapsFormDto::getFotoUrl, BapsFormDto::setFotoUrl),
                             Model.of("Foto URL"),
                             Model.of("URL naar de profielfoto van de BAPS")),
                     new Label("hobbiesLabel", Model.of("Hobbies")),
                     new TextArea<>("hobbies",
-                            LambdaModel.of(model, f -> f.hobbies, (f, v) -> f.hobbies = v)),
+                            LambdaModel.of(model, BapsFormDto::getHobbies, BapsFormDto::setHobbies)),
                     new Label("beschrijvingLabel", Model.of("Beschrijving")),
                     new TextArea<>("beschrijving",
-                            LambdaModel.of(model, f -> f.beschrijving, (f, v) -> f.beschrijving = v)),
+                            LambdaModel.of(model, BapsFormDto::getBeschrijving, BapsFormDto::setBeschrijving)),
                     new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")),
                     new CheckBoxMultipleChoice<>("beschikbareDagen",
                             beschikbareDagenModel,
@@ -73,13 +73,13 @@ public class BapsToevoegenPage extends BeheerBasePage {
                             dagRenderer()),
                     new Label("actiefLabel", Model.of("Actief")),
                     new CheckBox("actief",
-                            LambdaModel.of(model, f -> f.actief, (f, v) -> f.actief = v)),
+                            LambdaModel.of(model, BapsFormDto::isActief, BapsFormDto::setActief)),
                     new RdFormFieldTextInput<>("actiefVanaf",
-                            LambdaModel.of(model, f -> f.actiefVanaf, (f, v) -> f.actiefVanaf = v),
+                            LambdaModel.of(model, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
                             Model.of("Actief Vanaf"),
                             Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
                     new RdFormFieldTextInput<>("actiefTotEnMet",
-                            LambdaModel.of(model, f -> f.actiefTotEnMet, (f, v) -> f.actiefTotEnMet = v),
+                            LambdaModel.of(model, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
                             Model.of("Actief Tot en Met"),
                             Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
                     new RdButton("opslaan", Model.of("Toevoegen"))
@@ -90,13 +90,13 @@ public class BapsToevoegenPage extends BeheerBasePage {
         protected void onSubmit() {
             BapsFormDto f = getModelObject();
             bapsAdministrationService.create(new CreateBapsDto(
-                    f.naam,
-                    f.fotoUrl,
-                    f.hobbies,
-                    f.beschrijving,
-                    f.actief,
-                    f.actiefVanaf,
-                    f.actiefTotEnMet,
+                    f.getNaam(),
+                    f.getFotoUrl(),
+                    f.getHobbies(),
+                    f.getBeschrijving(),
+                    f.isActief(),
+                    f.getActiefVanaf(),
+                    f.getActiefTotEnMet(),
                     List.copyOf(beschikbareDagenModel.getObject())
             ));
             setResponsePage(BeheerPage.class);

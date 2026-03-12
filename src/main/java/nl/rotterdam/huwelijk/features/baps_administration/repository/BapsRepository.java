@@ -22,5 +22,5 @@ public interface BapsRepository extends JpaRepository<BapsEntity, Long> {
 
     @Modifying
     @Query("UPDATE BapsEntity b SET b.actief = CASE WHEN b.actief = TRUE THEN FALSE ELSE TRUE END WHERE b.id = :id")
-    void toggleActief(@Param("id") Long id);
+    void toggleActief(@Param("id") long id);
 }
