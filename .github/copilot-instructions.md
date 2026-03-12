@@ -35,6 +35,7 @@ Elke feature-package bevat de volgende sub-packages:
 - **FormDto-conventies:**
   - Velden mogen `public` zijn — getters en setters hebben geen toegevoegde waarde.
   - Gebruik `LocalDate` voor datumvelden (niet `String`). Wicket converteert automatisch via de globaal geregistreerde `LocalDateConverter(DateTimeFormatter.ISO_LOCAL_DATE)` in `WicketApplication`.
+  - In de statische `vanDto(XxxDto dto)`-methode worden waarden **direct** overgenomen: `form.veld = dto.veld()`. Gebruik **nooit** een null-naar-lege-string coercitie zoals `dto.veld() != null ? dto.veld() : ""`. Uitzondering: voor `List`-velden geldt een fallback naar een lege `ArrayList` (`dto.lijst() != null ? new ArrayList<>(dto.lijst()) : new ArrayList<>()`).
 
 ### Algemeen
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
