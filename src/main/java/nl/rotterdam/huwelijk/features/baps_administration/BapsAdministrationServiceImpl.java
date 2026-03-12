@@ -21,19 +21,27 @@ public class BapsAdministrationServiceImpl implements BapsAdministrationService 
     @Override
     @Transactional(readOnly = true)
     public Page<ListBapsDto> findAll(Pageable pageable) {
-        return bapsRepository.findAll(pageable).map(this::toListDto);
+        return bapsRepository.findAllProjected(pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ListBapsDto> findById(Long id) {
-        return bapsRepository.findById(id).map(this::toListDto);
+    public Optional<ChangeBapsDto> findById(Long id) {
+        return bapsRepository.findById(id).map(this::toChangeDto);
     }
 
     @Override
     @Transactional
     public ListBapsDto create(CreateBapsDto dto) {
-        return toListDto(bapsRepository.save(toEntity(dto)));
+        BapsEntity saved = bapsRepository.save(toEntity(dto));
+        return new ListBapsDto(
+                saved.getId(),
+                saved.getNaam(),
+                saved.isActief(),
+                saved.getActiefVanaf(),
+                saved.getActiefTotEnMet(),
+                saved.getAangemaaktOp()
+        );
     }
 
     @Override
@@ -50,7 +58,21 @@ public class BapsAdministrationServiceImpl implements BapsAdministrationService 
         baps.setActiefTotEnMet(dto.actiefTotEnMet());
         baps.setBeschikbareDagen(dto.beschikbareDagen() != null
                 ? new ArrayList<>(dto.beschikbareDagen()) : new ArrayList<>());
-        return toListDto(bapsRepository.save(baps));
+        BapsEntity saved = bapsRepository.save(baps);
+        return new ListBapsDto(
+                saved.getId(),
+                saved.getNaam(),
+                saved.isActief(),
+                saved.getActiefVanaf(),
+                saved.getActiefTotEnMet(),
+                saved.getAangemaaktOp()
+        );
+    }
+
+    @Override
+    @Transactional
+    public void toggleActief(Long id) {
+        bapsRepository.toggleActief(id);
     }
 
     @Override
@@ -64,8 +86,8 @@ public class BapsAdministrationServiceImpl implements BapsAdministrationService 
         return bapsRepository.count();
     }
 
-    private ListBapsDto toListDto(BapsEntity baps) {
-        return new ListBapsDto(
+    private ChangeBapsDto toChangeDto(BapsEntity baps) {
+        return new ChangeBapsDto(
                 baps.getId(),
                 baps.getNaam(),
                 baps.getFotoUrl(),
@@ -74,8 +96,7 @@ public class BapsAdministrationServiceImpl implements BapsAdministrationService 
                 baps.isActief(),
                 baps.getActiefVanaf(),
                 baps.getActiefTotEnMet(),
-                new ArrayList<>(baps.getBeschikbareDagen()),
-                baps.getAangemaaktOp()
+                new ArrayList<>(baps.getBeschikbareDagen())
         );
     }
 

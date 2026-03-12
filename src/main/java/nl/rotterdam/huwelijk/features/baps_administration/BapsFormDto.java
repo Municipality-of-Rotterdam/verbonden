@@ -27,8 +27,8 @@ public class BapsFormDto implements Serializable {
         return new BapsFormDto();
     }
 
-    /** Vult een instantie met de waarden uit een bestaande {@link ListBapsDto}. */
-    public static BapsFormDto vanDto(ListBapsDto dto) {
+    /** Vult een instantie met de waarden uit een bestaande {@link ChangeBapsDto}. */
+    public static BapsFormDto vanDto(ChangeBapsDto dto) {
         BapsFormDto form = new BapsFormDto();
         form.naam = dto.naam() != null ? dto.naam() : "";
         form.fotoUrl = dto.fotoUrl() != null ? dto.fotoUrl() : "";

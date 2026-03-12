@@ -9,11 +9,13 @@ public interface BapsAdministrationService {
 
     Page<ListBapsDto> findAll(Pageable pageable);
 
-    Optional<ListBapsDto> findById(Long id);
+    Optional<ChangeBapsDto> findById(Long id);
 
     ListBapsDto create(CreateBapsDto dto);
 
     ListBapsDto update(ChangeBapsDto dto);
+
+    void toggleActief(Long id);
 
     void delete(Long id);
 

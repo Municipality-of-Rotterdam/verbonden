@@ -140,8 +140,7 @@ public class BeheerPage extends BeheerBasePage {
 
             @Override
             public IModel<ListBapsDto> model(ListBapsDto dto) {
-                Long id = dto.id();
-                return () -> bapsAdministrationService.findById(id).orElse(null);
+                return Model.of(dto);
             }
         };
         provider.setSort("naam", SortOrder.ASCENDING);
@@ -167,19 +166,7 @@ public class BeheerPage extends BeheerBasePage {
             add(new Link<ListBapsDto>("toggleActiefLink", model) {
                 @Override
                 public void onClick() {
-                    ListBapsDto b = getModelObject();
-                    ChangeBapsDto changeDto = new ChangeBapsDto(
-                            b.id(),
-                            b.naam(),
-                            b.fotoUrl(),
-                            b.hobbies(),
-                            b.beschrijving(),
-                            !b.actief(),
-                            b.actiefVanaf(),
-                            b.actiefTotEnMet(),
-                            b.beschikbareDagen()
-                    );
-                    bapsAdministrationService.update(changeDto);
+                    bapsAdministrationService.toggleActief(getModelObject().id());
                     setResponsePage(BeheerPage.class);
                 }
 

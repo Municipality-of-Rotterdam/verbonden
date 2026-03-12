@@ -28,7 +28,7 @@ public class BapsWijzigenPage extends BeheerBasePage {
             setResponsePage(BeheerPage.class);
             return;
         }
-        ListBapsDto dto = bapsAdministrationService.findById(id).orElse(null);
+        ChangeBapsDto dto = bapsAdministrationService.findById(id).orElse(null);
         if (dto == null) {
             setResponsePage(BeheerPage.class);
             return;
