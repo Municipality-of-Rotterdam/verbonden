@@ -23,6 +23,10 @@ Elke feature-package bevat de volgende sub-packages:
 - Service implementaties mogen intern JPA Entities gebruiken, maar mogen ze **nooit** teruggeven aan of ontvangen van de presentation layer.
 - Annoteer alle lees-methoden in een `@Service`-implementatie met `@Transactional(readOnly = true)` en schrijf-/verwijdermethoden met `@Transactional`, zodat de Hibernate-sessie open blijft voor lazy-loaded collecties.
 - Splits de DTO's altijd op naar gebruik: gebruik `CreateXxxDto` voor aanmaken (geen id, geen aangemaaktOp), `ChangeXxxDto` voor wijzigen (met id, zonder aangemaaktOp), en `ListXxxDto` voor weergave/overzichten (uitsluitend de velden die in de lijstweergave worden getoond — niet alle entiteitsvelden). Dit zijn aparte `record`-klassen; dupliceer velden gerust.
+- **Beheer-service methode conventies:**
+  - `create`-methoden retourneren de aangemaakte primaire sleutel als primitief (`long`, niet `Long`).
+  - `update`-methoden retourneren `void`.
+  - `delete`- en toggle-methoden accepteren de primaire sleutel als primitief (`long id`, niet `Long id`).
 
 ### Wicket
 - Injecteer altijd een service **interface** (niet de implementatie) via `@SpringBean`, zodat Wicket een JDK dynamic proxy kan aanmaken (voorkomt CGLIB-/Objenesis-problemen zonder no-arg constructor).

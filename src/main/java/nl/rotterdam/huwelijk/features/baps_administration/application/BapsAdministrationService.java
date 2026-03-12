@@ -14,13 +14,13 @@ public interface BapsAdministrationService {
 
     Optional<ChangeBapsDto> findById(Long id);
 
-    ListBapsDto create(CreateBapsDto dto);
+    long create(CreateBapsDto dto);
 
-    ListBapsDto update(ChangeBapsDto dto);
+    void update(ChangeBapsDto dto);
 
-    void toggleActief(Long id);
+    void toggleActief(long id);
 
-    void delete(Long id);
+    void delete(long id);
 
     long count();
 }

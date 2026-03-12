@@ -36,21 +36,13 @@ class BapsAdministrationServiceImpl implements BapsAdministrationService {
 
     @Override
     @Transactional
-    public ListBapsDto create(CreateBapsDto dto) {
-        BapsEntity saved = bapsRepository.save(toEntity(dto));
-        return new ListBapsDto(
-                saved.getId(),
-                saved.getNaam(),
-                saved.isActief(),
-                saved.getActiefVanaf(),
-                saved.getActiefTotEnMet(),
-                saved.getAangemaaktOp()
-        );
+    public long create(CreateBapsDto dto) {
+        return bapsRepository.save(toEntity(dto)).getId();
     }
 
     @Override
     @Transactional
-    public ListBapsDto update(ChangeBapsDto dto) {
+    public void update(ChangeBapsDto dto) {
         BapsEntity baps = bapsRepository.findById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException("BAPS niet gevonden: " + dto.id()));
         baps.setNaam(dto.naam());
@@ -62,26 +54,18 @@ class BapsAdministrationServiceImpl implements BapsAdministrationService {
         baps.setActiefTotEnMet(dto.actiefTotEnMet());
         baps.setBeschikbareDagen(dto.beschikbareDagen() != null
                 ? new ArrayList<>(dto.beschikbareDagen()) : new ArrayList<>());
-        BapsEntity saved = bapsRepository.save(baps);
-        return new ListBapsDto(
-                saved.getId(),
-                saved.getNaam(),
-                saved.isActief(),
-                saved.getActiefVanaf(),
-                saved.getActiefTotEnMet(),
-                saved.getAangemaaktOp()
-        );
+        bapsRepository.save(baps);
     }
 
     @Override
     @Transactional
-    public void toggleActief(Long id) {
+    public void toggleActief(long id) {
         bapsRepository.toggleActief(id);
     }
 
     @Override
     @Transactional
-    public void delete(Long id) {
+    public void delete(long id) {
         bapsRepository.deleteById(id);
     }
 
