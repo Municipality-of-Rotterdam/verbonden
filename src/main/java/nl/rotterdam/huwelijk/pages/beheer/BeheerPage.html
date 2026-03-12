@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>BAPS Beheer</title>
+</head>
+<body>
+<h1>BAPS Beheer – Buitengewoon Ambtenaren van de Burgerlijke Stand</h1>
+
+<div wicket:id="feedback"></div>
+
+<p>
+    <a wicket:id="nieuwBapsLink">Nieuwe BAPS toevoegen</a>
+</p>
+
+<form wicket:id="importForm">
+    <button wicket:id="importeerButton" type="submit">
+        Importeer van rotterdam.nl
+    </button>
+</form>
+
+<table wicket:id="bapsTable"></table>
+
+<wicket:fragment wicket:id="actiesFragment">
+    <a wicket:id="bewerkLink">Bewerken</a>
+    &nbsp;
+    <a wicket:id="toggleActiefLink"></a>
+</wicket:fragment>
+
+</body>
+</html>
