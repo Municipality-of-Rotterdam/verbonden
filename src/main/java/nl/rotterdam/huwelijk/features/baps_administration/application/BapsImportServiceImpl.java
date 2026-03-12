@@ -1,6 +1,7 @@
 package nl.rotterdam.huwelijk.features.baps_administration.application;
 
 import nl.rotterdam.huwelijk.features.baps_administration.domain.BapsImportResult;
+import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
 import nl.rotterdam.huwelijk.features.baps_administration.repository.BapsRepository;
 import nl.rotterdam.huwelijk.persistence.BapsEntity;
 import org.jsoup.Jsoup;
@@ -109,7 +110,7 @@ class BapsImportServiceImpl implements BapsImportService {
         }
 
         BapsEntity baps = new BapsEntity();
-        baps.setNaam(heading.text().trim());
+        baps.setNaam(new PersonFullName(heading.text().trim()));
 
         // Foto
         Element img = doc.selectFirst("img[class^=styles_profilePicture]");

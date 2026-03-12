@@ -6,7 +6,7 @@ import java.util.List;
 
 public record ChangeBapsDto(
         Long id,
-        String naam,
+        PersonFullName naam,
         String fotoUrl,
         String hobbies,
         String beschrijving,

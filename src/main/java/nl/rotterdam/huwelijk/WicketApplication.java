@@ -1,9 +1,11 @@
 package nl.rotterdam.huwelijk;
 
 import de.agilecoders.wicket.webjars.WicketWebjars;
+import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsToevoegenPage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsWijzigenPage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BeheerPage;
+import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.HomePage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
@@ -43,6 +45,7 @@ public class WicketApplication extends WebApplication {
                 return value != null ? value.format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
             }
         });
+        locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
         return locator;
     }
 

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public record ListBapsDto(
         Long id,
-        String naam,
+        PersonFullName naam,
         boolean actief,
         LocalDate actiefVanaf,
         LocalDate actiefTotEnMet,

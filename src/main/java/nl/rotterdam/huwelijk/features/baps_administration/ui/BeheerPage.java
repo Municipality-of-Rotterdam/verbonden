@@ -79,7 +79,7 @@ public class BeheerPage extends BeheerBasePage {
             public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
                                      String componentId,
                                      IModel<ListBapsDto> rowModel) {
-                cellItem.add(new Label(componentId, Model.of(rowModel.getObject().naam())));
+                cellItem.add(new Label(componentId, Model.of(rowModel.getObject().naam().getValue())));
             }
         });
 

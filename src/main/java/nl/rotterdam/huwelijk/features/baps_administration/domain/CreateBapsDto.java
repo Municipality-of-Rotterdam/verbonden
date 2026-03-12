@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record CreateBapsDto(
-        String naam,
+        PersonFullName naam,
         String fotoUrl,
         String hobbies,
         String beschrijving,

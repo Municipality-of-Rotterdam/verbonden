@@ -1,6 +1,7 @@
 package nl.rotterdam.huwelijk.features.baps_administration.ui;
 
 import nl.rotterdam.huwelijk.features.baps_administration.domain.ChangeBapsDto;
+import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class BapsFormDto implements Serializable {
 
-    private String naam = "";
+    private PersonFullName naam = null;
     private String fotoUrl = "";
     private String hobbies = "";
     private String beschrijving = "";
@@ -26,8 +27,8 @@ public class BapsFormDto implements Serializable {
     private LocalDate actiefVanaf = null;
     private LocalDate actiefTotEnMet = null;
 
-    public String getNaam() { return naam; }
-    public void setNaam(String naam) { this.naam = naam; }
+    public PersonFullName getNaam() { return naam; }
+    public void setNaam(PersonFullName naam) { this.naam = naam; }
 
     public String getFotoUrl() { return fotoUrl; }
     public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }

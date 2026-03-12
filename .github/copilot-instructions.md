@@ -51,3 +51,12 @@ Elke feature-package bevat de volgende sub-packages:
 - Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsToevoegenPage` en `BapsWijzigenPage`).
 - Genereer nooit methoden of klassen die nergens worden aangeroepen of gebruikt.
 - Genereer **nooit** `serialVersionUID`-velden. We gebruiken Java-serialisatie niet op deze manier en willen geen achterwaartse compatibiliteit voor geserialiseerde klassen.
+
+### Value types
+- Gebruik **value types** voor domeinwaarden die validatie, type-veiligheid of semantiek toevoegen (bijv. `PersonFullName` voor een volledige naam).
+- Value types implementeren de `ValueHolder<T>` interface met een `T getValue()` methode.
+- `toString()` retourneert `SimpleClassName[value]`, bijvoorbeeld `PersonFullName[Jan de Vries]`. Gebruik `getValue()` wanneer de ruwe waarde nodig is (bijv. voor weergave in UI of opslag in database).
+- Validatie vindt plaats in de constructor. Gooi specifieke `RuntimeException`-subklassen bij ongeldige input (bijv. `PersonFullNameTooShortException`, `PersonFullNameTooLongException`).
+- **JPA-integratie:** maak een `AttributeConverter` aan in het `persistence`-package die de conversie tussen het value type en het databasetype afhandelt. Gebruik `@Convert(converter = ...)` op het entity-veld.
+- **Wicket-integratie:** maak een `IConverter` aan in het `ui`-package die de conversie tussen `String` en het value type afhandelt. Vang validatie-excepties af en geef nette Wicket `ConversionException`-meldingen. Registreer de converter globaal in `WicketApplication.newConverterLocator()`.
+- Value types worden gebruikt in JPA Entities, DTOs (`CreateXxxDto`, `ChangeXxxDto`, `ListXxxDto`) en `FormDto`-klassen — consistent door alle lagen heen.

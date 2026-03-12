@@ -1,6 +1,8 @@
 package nl.rotterdam.huwelijk.persistence;
 
 import jakarta.persistence.*;
+import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,7 +18,8 @@ public class BapsEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String naam;
+    @Convert(converter = PersonFullNameAttributeConverter.class)
+    private PersonFullName naam;
 
     @Column(name = "foto_url")
     private String fotoUrl;
@@ -53,11 +56,11 @@ public class BapsEntity {
         this.id = id;
     }
 
-    public String getNaam() {
+    public PersonFullName getNaam() {
         return naam;
     }
 
-    public void setNaam(String naam) {
+    public void setNaam(PersonFullName naam) {
         this.naam = naam;
     }
 
