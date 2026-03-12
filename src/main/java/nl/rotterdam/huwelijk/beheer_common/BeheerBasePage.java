@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.features.baps_administration;
+package nl.rotterdam.huwelijk.beheer_common;
 
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;

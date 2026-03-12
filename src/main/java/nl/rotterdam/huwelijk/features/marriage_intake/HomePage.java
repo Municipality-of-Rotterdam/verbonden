@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.marriage_intake;
 
+import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;

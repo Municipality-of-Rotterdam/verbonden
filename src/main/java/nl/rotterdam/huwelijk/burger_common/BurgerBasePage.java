@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.features.marriage_intake;
+package nl.rotterdam.huwelijk.burger_common;
 
 import org.apache.wicket.markup.html.WebPage;
 

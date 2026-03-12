@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.baps_administration;
 
+import nl.rotterdam.huwelijk.beheer_common.BeheerBasePage;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.ajax.AjaxRequestTarget;
