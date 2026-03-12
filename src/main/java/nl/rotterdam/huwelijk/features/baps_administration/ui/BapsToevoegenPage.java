@@ -21,6 +21,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,21 +39,20 @@ public class BapsToevoegenPage extends BeheerBasePage {
 
         BapsFormDto formDto = BapsFormDto.leeg();
         Model<BapsFormDto> formDtoModel = Model.of(formDto);
-        // TODO this is bad
-        ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(List.copyOf(formDto.getBeschikbareDagen()));
+        ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(new ArrayList<>(formDto.beschikbareDagen));
 
         Form<BapsFormDto> form = new Form<>("bapsForm", formDtoModel) {
             @Override
             protected void onSubmit() {
                 BapsFormDto f = getModelObject();
                 CreateBapsDto dto = new CreateBapsDto(
-                        f.getNaam(),
-                        f.getFotoUrl(),
-                        f.getHobbies(),
-                        f.getBeschrijving(),
-                        f.isActief(),
-                        parseDate(f.getActiefVanaf()),
-                        parseDate(f.getActiefTotEnMet()),
+                        f.naam,
+                        f.fotoUrl,
+                        f.hobbies,
+                        f.beschrijving,
+                        f.actief,
+                        f.actiefVanaf,
+                        f.actiefTotEnMet,
                         List.copyOf(beschikbareDagenModel.getObject())
                 );
                 bapsAdministrationService.create(dto);
@@ -61,21 +61,21 @@ public class BapsToevoegenPage extends BeheerBasePage {
         };
 
         form.add(new RdFormFieldTextInput<>("naam",
-                LambdaModel.of(formDtoModel, BapsFormDto::getNaam, BapsFormDto::setNaam),
+                LambdaModel.of(formDtoModel, f -> f.naam, (f, v) -> f.naam = v),
                 Model.of("Naam")).setRequired(true));
 
         form.add(new RdFormFieldTextInput<>("fotoUrl",
-                LambdaModel.of(formDtoModel, BapsFormDto::getFotoUrl, BapsFormDto::setFotoUrl),
+                LambdaModel.of(formDtoModel, f -> f.fotoUrl, (f, v) -> f.fotoUrl = v),
                 Model.of("Foto URL"),
                 Model.of("URL naar de profielfoto van de BAPS")));
 
         form.add(new Label("hobbiesLabel", Model.of("Hobbies")));
         form.add(new TextArea<>("hobbies",
-                LambdaModel.of(formDtoModel, BapsFormDto::getHobbies, BapsFormDto::setHobbies)));
+                LambdaModel.of(formDtoModel, f -> f.hobbies, (f, v) -> f.hobbies = v)));
 
         form.add(new Label("beschrijvingLabel", Model.of("Beschrijving")));
         form.add(new TextArea<>("beschrijving",
-                LambdaModel.of(formDtoModel, BapsFormDto::getBeschrijving, BapsFormDto::setBeschrijving)));
+                LambdaModel.of(formDtoModel, f -> f.beschrijving, (f, v) -> f.beschrijving = v)));
 
         form.add(new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")));
         form.add(new CheckBoxMultipleChoice<>("beschikbareDagen",
@@ -85,15 +85,15 @@ public class BapsToevoegenPage extends BeheerBasePage {
 
         form.add(new Label("actiefLabel", Model.of("Actief")));
         form.add(new CheckBox("actief",
-                LambdaModel.of(formDtoModel, BapsFormDto::isActief, BapsFormDto::setActief)));
+                LambdaModel.of(formDtoModel, f -> f.actief, (f, v) -> f.actief = v)));
 
         form.add(new RdFormFieldTextInput<>("actiefVanaf",
-                LambdaModel.of(formDtoModel, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
+                LambdaModel.of(formDtoModel, f -> f.actiefVanaf, (f, v) -> f.actiefVanaf = v),
                 Model.of("Actief Vanaf"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 
         form.add(new RdFormFieldTextInput<>("actiefTotEnMet",
-                LambdaModel.of(formDtoModel, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
+                LambdaModel.of(formDtoModel, f -> f.actiefTotEnMet, (f, v) -> f.actiefTotEnMet = v),
                 Model.of("Actief Tot en Met"),
                 Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
 

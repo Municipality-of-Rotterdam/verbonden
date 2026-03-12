@@ -7,9 +7,6 @@ import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-
 public abstract class BeheerBasePage extends WebPage {
 
     private static final CssReferenceHeaderItem BOOTSTRAP_UTILITIES_HEADER_ITEM =
@@ -23,17 +20,5 @@ public abstract class BeheerBasePage extends WebPage {
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
         response.render(BOOTSTRAP_UTILITIES_HEADER_ITEM);
-    }
-
-    /** Parses an ISO date string (yyyy-MM-dd); returns {@code null} on blank or invalid input. */
-    protected static LocalDate parseDate(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(value);
-        } catch (DateTimeParseException e) {
-            return null;
-        }
     }
 }

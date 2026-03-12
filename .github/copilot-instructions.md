@@ -7,7 +7,7 @@ De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.huwelijk.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
 - `nl.rotterdam.huwelijk.features.baps_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
-- `nl.rotterdam.huwelijk.beheer_common` — gedeelde basisklassen voor beheerpagina's: `BeheerBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema + `parseDate`-helper).
+- `nl.rotterdam.huwelijk.beheer_common` — gedeelde basisklassen voor beheerpagina's: `BeheerBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
 - `nl.rotterdam.huwelijk.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
 - `nl.rotterdam.huwelijk.config` — Spring Boot configuratieklassen.
 
@@ -31,7 +31,10 @@ Elke feature-package bevat de volgende sub-packages:
 ### Wicket
 - Injecteer altijd een service **interface** (niet de implementatie) via `@SpringBean`, zodat Wicket een JDK dynamic proxy kan aanmaken (voorkomt CGLIB-/Objenesis-problemen zonder no-arg constructor).
 - Activeer het Rotterdam NLDS-thema via `PatchingNldsRotterdamDesignSystemThemeBehavior.INSTANCE` direct op de page (niet via een `TransparentWebMarkupContainer` op `<html>`), zodat `<wicket:fragment>`-tags vindbaar blijven.
-- Gebruik voor formulieren een **`FormDto`** klasse (mutable POJO, implementeert `Serializable`) als model object van het `Form`. Maak een `Model<FormDto> model = Model.of(formDto)` aan en gebruik dat als model van het `Form` én als eerste argument voor `LambdaModel.of(model, Getter::get, Setter::set)` voor elk veld. Gebruik `ListModel` voor `List`-velden (`Model.of(new ArrayList<>())` werkt niet betrouwbaar voor lijsten in Wicket).
+- Gebruik voor formulieren een **`FormDto`** klasse (mutable POJO, implementeert `Serializable`) als model object van het `Form`. Maak een `Model<FormDto> model = Model.of(formDto)` aan en gebruik dat als model van het `Form` én als eerste argument voor `LambdaModel.of(model, f -> f.veld, (f, v) -> f.veld = v)` voor elk veld. Gebruik `ListModel` voor `List`-velden (`Model.of(new ArrayList<>())` werkt niet betrouwbaar voor lijsten in Wicket).
+- **FormDto-conventies:**
+  - Velden mogen `public` zijn — getters en setters hebben geen toegevoegde waarde.
+  - Gebruik `LocalDate` voor datumvelden (niet `String`). Wicket converteert automatisch via de globaal geregistreerde `LocalDateConverter(DateTimeFormatter.ISO_LOCAL_DATE)` in `WicketApplication`.
 
 ### Algemeen
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
