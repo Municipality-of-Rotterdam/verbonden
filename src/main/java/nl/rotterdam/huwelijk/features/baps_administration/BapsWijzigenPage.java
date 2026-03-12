@@ -1,13 +1,9 @@
-package nl.rotterdam.huwelijk.pages.beheer;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
-import nl.rotterdam.huwelijk.baps.BapsService;
-import nl.rotterdam.huwelijk.baps.ChangeBapsDto;
-import nl.rotterdam.huwelijk.baps.ListBapsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
-import nl.rotterdam.huwelijk.wicket_components.DayOfWeekCheckboxGroup;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -24,7 +20,7 @@ import java.util.List;
 public class BapsWijzigenPage extends BeheerBasePage {
 
     @SpringBean
-    private BapsService bapsService;
+    private BapsAdministrationService bapsAdministrationService;
 
     public BapsWijzigenPage(PageParameters params) {
         Long id = params.get("id").toOptionalLong();
@@ -32,7 +28,7 @@ public class BapsWijzigenPage extends BeheerBasePage {
             setResponsePage(BeheerPage.class);
             return;
         }
-        ListBapsDto dto = bapsService.findById(id).orElse(null);
+        ListBapsDto dto = bapsAdministrationService.findById(id).orElse(null);
         if (dto == null) {
             setResponsePage(BeheerPage.class);
             return;
@@ -65,7 +61,7 @@ public class BapsWijzigenPage extends BeheerBasePage {
                         parseDate(f.getActiefTotEnMet()),
                         List.copyOf(geselecteerdeDagen.getObject())
                 );
-                bapsService.update(saveDto);
+                bapsAdministrationService.update(saveDto);
                 setResponsePage(BeheerPage.class);
             }
         };
@@ -94,7 +90,6 @@ public class BapsWijzigenPage extends BeheerBasePage {
         form.add(new RdFormFieldCheckbox("actief",
                 LambdaModel.of(formDtoModel, BapsFormDto::isActief, BapsFormDto::setActief),
                 Model.of("Actief")));
-
 
         form.add(new RdFormFieldTextInput<>("actiefVanaf",
                 LambdaModel.of(formDtoModel, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),

@@ -1,10 +1,10 @@
 package nl.rotterdam.huwelijk;
 
 import de.agilecoders.wicket.webjars.WicketWebjars;
-import nl.rotterdam.huwelijk.pages.HomePage;
-import nl.rotterdam.huwelijk.pages.beheer.BapsToevoegenPage;
-import nl.rotterdam.huwelijk.pages.beheer.BapsWijzigenPage;
-import nl.rotterdam.huwelijk.pages.beheer.BeheerPage;
+import nl.rotterdam.huwelijk.features.baps_administration.BapsToevoegenPage;
+import nl.rotterdam.huwelijk.features.baps_administration.BapsWijzigenPage;
+import nl.rotterdam.huwelijk.features.baps_administration.BeheerPage;
+import nl.rotterdam.huwelijk.features.marriage_intake.HomePage;
 import org.apache.wicket.Page;
 import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
 import org.apache.wicket.protocol.http.ResourceIsolationRequestCycleListener;

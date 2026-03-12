@@ -2,6 +2,13 @@
 
 ## Architectuurregels
 
+### Packagestructuur
+De code is opgedeeld in de volgende packages:
+- `nl.rotterdam.huwelijk.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
+- `nl.rotterdam.huwelijk.features.baps_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS): service interface (`BapsAdministrationService`), implementatie, repository, DTOs, import-service en Wicket-pagina's.
+- `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers: `HomePage` en gerelateerde pagina's.
+- `nl.rotterdam.huwelijk.config` — Spring Boot configuratieklassen.
+
 ### Service layer
 - JPA Entities mogen de service layer niet verlaten.
 - De inputs en outputs van de service layer moeten altijd immutable `record` klassen zijn (DTOs).
@@ -16,8 +23,8 @@
 
 ### Algemeen
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
-- JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`).
-- Voeg geen JPA-annotaties toe aan klassen buiten het `baps`-package (of gelijkwaardige datapakketten).
+- JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`) en staan in `nl.rotterdam.huwelijk.persistence`.
+- Voeg geen JPA-annotaties toe aan klassen buiten het `persistence`-package.
 - Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsToevoegenPage` en `BapsWijzigenPage`).
 - Genereer nooit methoden of klassen die nergens worden aangeroepen of gebruikt.
 - Genereer **nooit** `serialVersionUID`-velden. We gebruiken Java-serialisatie niet op deze manier en willen geen achterwaartse compatibiliteit voor geserialiseerde klassen.

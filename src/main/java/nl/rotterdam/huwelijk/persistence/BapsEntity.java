@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.baps;
+package nl.rotterdam.huwelijk.persistence;
 
 import jakarta.persistence.*;
 import java.time.DayOfWeek;

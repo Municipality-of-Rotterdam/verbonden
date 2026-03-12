@@ -1,5 +1,6 @@
-package nl.rotterdam.huwelijk.baps;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
+import nl.rotterdam.huwelijk.persistence.BapsEntity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

@@ -1,5 +1,6 @@
-package nl.rotterdam.huwelijk.baps;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
+import nl.rotterdam.huwelijk.persistence.BapsEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -9,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
-public class BapsServiceImpl implements BapsService {
+public class BapsAdministrationServiceImpl implements BapsAdministrationService {
 
     private final BapsRepository bapsRepository;
 
-    public BapsServiceImpl(BapsRepository bapsRepository) {
+    public BapsAdministrationServiceImpl(BapsRepository bapsRepository) {
         this.bapsRepository = bapsRepository;
     }
 

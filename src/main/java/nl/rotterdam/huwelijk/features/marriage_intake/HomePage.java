@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.pages;
+package nl.rotterdam.huwelijk.features.marriage_intake;
 
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;

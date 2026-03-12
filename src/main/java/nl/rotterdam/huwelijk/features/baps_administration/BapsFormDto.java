@@ -1,6 +1,4 @@
-package nl.rotterdam.huwelijk.pages.beheer;
-
-import nl.rotterdam.huwelijk.baps.ListBapsDto;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;

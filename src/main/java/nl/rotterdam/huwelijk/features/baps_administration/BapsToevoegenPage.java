@@ -1,7 +1,5 @@
-package nl.rotterdam.huwelijk.pages.beheer;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
-import nl.rotterdam.huwelijk.baps.BapsService;
-import nl.rotterdam.huwelijk.baps.CreateBapsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import org.apache.wicket.markup.html.basic.Label;
@@ -26,7 +24,7 @@ import java.util.Locale;
 public class BapsToevoegenPage extends BeheerBasePage {
 
     @SpringBean
-    private BapsService bapsService;
+    private BapsAdministrationService bapsAdministrationService;
 
     public BapsToevoegenPage() {
         add(new BookmarkablePageLink<>("terugLink", BeheerPage.class));
@@ -54,7 +52,7 @@ public class BapsToevoegenPage extends BeheerBasePage {
                         parseDate(f.getActiefTotEnMet()),
                         List.copyOf(beschikbareDagenModel.getObject())
                 );
-                bapsService.create(dto);
+                bapsAdministrationService.create(dto);
                 setResponsePage(BeheerPage.class);
             }
         };

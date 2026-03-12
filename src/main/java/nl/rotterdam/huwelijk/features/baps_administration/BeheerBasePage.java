@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.pages;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
@@ -10,12 +10,12 @@ import org.apache.wicket.markup.html.WebPage;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-public abstract class BasePage extends WebPage {
+public abstract class BeheerBasePage extends WebPage {
 
     private static final CssReferenceHeaderItem BOOTSTRAP_UTILITIES_HEADER_ITEM =
             CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-utilities.min.css"));
 
-    public BasePage() {
+    public BeheerBasePage() {
         add(PatchingNldsRotterdamDesignSystemThemeBehavior.INSTANCE);
     }
 

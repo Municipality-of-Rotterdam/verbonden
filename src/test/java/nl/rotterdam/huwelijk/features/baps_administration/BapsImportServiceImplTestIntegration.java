@@ -1,5 +1,6 @@
-package nl.rotterdam.huwelijk.baps;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
+import nl.rotterdam.huwelijk.persistence.BapsEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,10 +1,11 @@
-package nl.rotterdam.huwelijk.baps;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
-public record ChangeBapsDto(
+public record ListBapsDto(
         Long id,
         String naam,
         String fotoUrl,
@@ -13,6 +14,7 @@ public record ChangeBapsDto(
         boolean actief,
         LocalDate actiefVanaf,
         LocalDate actiefTotEnMet,
-        List<DayOfWeek> beschikbareDagen
+        List<DayOfWeek> beschikbareDagen,
+        LocalDateTime aangemaaktOp
 ) {
 }

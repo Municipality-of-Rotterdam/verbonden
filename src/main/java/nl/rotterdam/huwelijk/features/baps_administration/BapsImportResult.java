@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.baps;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
 import java.util.List;
 

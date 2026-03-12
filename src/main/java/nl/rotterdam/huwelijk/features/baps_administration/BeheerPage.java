@@ -1,10 +1,5 @@
-package nl.rotterdam.huwelijk.pages.beheer;
+package nl.rotterdam.huwelijk.features.baps_administration;
 
-import nl.rotterdam.huwelijk.baps.BapsImportResult;
-import nl.rotterdam.huwelijk.baps.BapsImportService;
-import nl.rotterdam.huwelijk.baps.BapsService;
-import nl.rotterdam.huwelijk.baps.ChangeBapsDto;
-import nl.rotterdam.huwelijk.baps.ListBapsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -35,7 +30,7 @@ import java.util.List;
 public class BeheerPage extends BeheerBasePage {
 
     @SpringBean
-    private BapsService bapsService;
+    private BapsAdministrationService bapsAdministrationService;
 
     @SpringBean
     private BapsImportService bapsImportService;
@@ -134,19 +129,19 @@ public class BeheerPage extends BeheerBasePage {
                 int pageNumber = pageSize > 0 ? (int) (first / pageSize) : 0;
                 PageRequest pageRequest = PageRequest.of(pageNumber, pageSize,
                         Sort.by(direction, sortProperty));
-                Page<ListBapsDto> page = bapsService.findAll(pageRequest);
+                Page<ListBapsDto> page = bapsAdministrationService.findAll(pageRequest);
                 return page.iterator();
             }
 
             @Override
             public long size() {
-                return bapsService.count();
+                return bapsAdministrationService.count();
             }
 
             @Override
             public IModel<ListBapsDto> model(ListBapsDto dto) {
                 Long id = dto.id();
-                return () -> bapsService.findById(id).orElse(null);
+                return () -> bapsAdministrationService.findById(id).orElse(null);
             }
         };
         provider.setSort("naam", SortOrder.ASCENDING);
@@ -184,7 +179,7 @@ public class BeheerPage extends BeheerBasePage {
                             b.actiefTotEnMet(),
                             b.beschikbareDagen()
                     );
-                    bapsService.update(changeDto);
+                    bapsAdministrationService.update(changeDto);
                     setResponsePage(BeheerPage.class);
                 }
 
