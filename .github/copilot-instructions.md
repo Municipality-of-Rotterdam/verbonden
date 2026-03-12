@@ -32,6 +32,12 @@ Elke feature-package bevat de volgende sub-packages:
 - Injecteer altijd een service **interface** (niet de implementatie) via `@SpringBean`, zodat Wicket een JDK dynamic proxy kan aanmaken (voorkomt CGLIB-/Objenesis-problemen zonder no-arg constructor).
 - Activeer het Rotterdam NLDS-thema via `PatchingNldsRotterdamDesignSystemThemeBehavior.INSTANCE` direct op de page (niet via een `TransparentWebMarkupContainer` op `<html>`), zodat `<wicket:fragment>`-tags vindbaar blijven.
 - Gebruik voor formulieren een **`FormDto`** klasse (mutable POJO, implementeert `Serializable`) als model object van het `Form`. Maak een `Model<FormDto> model = Model.of(formDto)` aan en gebruik dat als model van het `Form` én als eerste argument voor `LambdaModel.of(model, f -> f.veld, (f, v) -> f.veld = v)` voor elk veld. Gebruik `ListModel` voor `List`-velden (`Model.of(new ArrayList<>())` werkt niet betrouwbaar voor lijsten in Wicket).
+- **Formulieren worden OO opgebouwd via een inner class** die `Form<XxxFormDto>` uitbreidt. Gebruik nooit een anonieme klasse of een formulier dat in een variabele wordt gestopt. De inner class:
+  - Is `private` en heet `CreateXxxForm` (aanmaken) of `ChangeXxxForm` (wijzigen).
+  - Bevat een `onInitialize()`-methode die alle kinderen toevoegt via **één** varargs `add()`-aanroep, zodat de hiërarchie van het formulier direct zichtbaar is in de code.
+  - Bevat een `onSubmit()`-methode voor de submit-logica.
+  - Heeft toegang tot de `@SpringBean`-service van de omringende page (via de outer class reference).
+  - Voorbeeld: `private class ChangeBapsForm extends Form<BapsFormDto> { ... }`
 - **FormDto-conventies:**
   - Velden mogen `public` zijn — getters en setters hebben geen toegevoegde waarde.
   - Gebruik `LocalDate` voor datumvelden (niet `String`). Wicket converteert automatisch via de globaal geregistreerde `LocalDateConverter(DateTimeFormatter.ISO_LOCAL_DATE)` in `WicketApplication`.

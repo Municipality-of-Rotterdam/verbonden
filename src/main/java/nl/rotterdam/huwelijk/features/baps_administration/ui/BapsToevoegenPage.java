@@ -31,78 +31,79 @@ public class BapsToevoegenPage extends BeheerBasePage {
     private BapsAdministrationService bapsAdministrationService;
 
     public BapsToevoegenPage() {
-        add(new BookmarkablePageLink<>("terugLink", BeheerPage.class));
-
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
-        add(feedback);
-
-        BapsFormDto formDto = BapsFormDto.leeg();
-        Model<BapsFormDto> formDtoModel = Model.of(formDto);
-        ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(new ArrayList<>(formDto.beschikbareDagen));
-
-        Form<BapsFormDto> form = new Form<>("bapsForm", formDtoModel) {
-            @Override
-            protected void onSubmit() {
-                BapsFormDto f = getModelObject();
-                CreateBapsDto dto = new CreateBapsDto(
-                        f.naam,
-                        f.fotoUrl,
-                        f.hobbies,
-                        f.beschrijving,
-                        f.actief,
-                        f.actiefVanaf,
-                        f.actiefTotEnMet,
-                        List.copyOf(beschikbareDagenModel.getObject())
-                );
-                bapsAdministrationService.create(dto);
-                setResponsePage(BeheerPage.class);
-            }
-        };
-
-        form.add(new RdFormFieldTextInput<>("naam",
-                LambdaModel.of(formDtoModel, f -> f.naam, (f, v) -> f.naam = v),
-                Model.of("Naam")).setRequired(true));
-
-        form.add(new RdFormFieldTextInput<>("fotoUrl",
-                LambdaModel.of(formDtoModel, f -> f.fotoUrl, (f, v) -> f.fotoUrl = v),
-                Model.of("Foto URL"),
-                Model.of("URL naar de profielfoto van de BAPS")));
-
-        form.add(new Label("hobbiesLabel", Model.of("Hobbies")));
-        form.add(new TextArea<>("hobbies",
-                LambdaModel.of(formDtoModel, f -> f.hobbies, (f, v) -> f.hobbies = v)));
-
-        form.add(new Label("beschrijvingLabel", Model.of("Beschrijving")));
-        form.add(new TextArea<>("beschrijving",
-                LambdaModel.of(formDtoModel, f -> f.beschrijving, (f, v) -> f.beschrijving = v)));
-
-        form.add(new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")));
-        form.add(new CheckBoxMultipleChoice<>("beschikbareDagen",
-                beschikbareDagenModel,
-                List.of(DayOfWeek.values()),
-                dagRenderer()));
-
-        form.add(new Label("actiefLabel", Model.of("Actief")));
-        form.add(new CheckBox("actief",
-                LambdaModel.of(formDtoModel, f -> f.actief, (f, v) -> f.actief = v)));
-
-        form.add(new RdFormFieldTextInput<>("actiefVanaf",
-                LambdaModel.of(formDtoModel, f -> f.actiefVanaf, (f, v) -> f.actiefVanaf = v),
-                Model.of("Actief Vanaf"),
-                Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
-
-        form.add(new RdFormFieldTextInput<>("actiefTotEnMet",
-                LambdaModel.of(formDtoModel, f -> f.actiefTotEnMet, (f, v) -> f.actiefTotEnMet = v),
-                Model.of("Actief Tot en Met"),
-                Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
-
-        form.add(new RdButton("opslaan", Model.of("Toevoegen")));
-
-        add(form);
+        add(
+                new BookmarkablePageLink<>("terugLink", BeheerPage.class),
+                feedback,
+                new CreateBapsForm("bapsForm")
+        );
     }
 
-    static IChoiceRenderer<DayOfWeek> dagRenderer() {
+    private class CreateBapsForm extends Form<BapsFormDto> {
+
+        private final ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(new ArrayList<>());
+
+        CreateBapsForm(String id) {
+            super(id, Model.of(BapsFormDto.leeg()));
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            IModel<BapsFormDto> model = getModel();
+            add(
+                    new RdFormFieldTextInput<>("naam",
+                            LambdaModel.of(model, f -> f.naam, (f, v) -> f.naam = v),
+                            Model.of("Naam")).setRequired(true),
+                    new RdFormFieldTextInput<>("fotoUrl",
+                            LambdaModel.of(model, f -> f.fotoUrl, (f, v) -> f.fotoUrl = v),
+                            Model.of("Foto URL"),
+                            Model.of("URL naar de profielfoto van de BAPS")),
+                    new Label("hobbiesLabel", Model.of("Hobbies")),
+                    new TextArea<>("hobbies",
+                            LambdaModel.of(model, f -> f.hobbies, (f, v) -> f.hobbies = v)),
+                    new Label("beschrijvingLabel", Model.of("Beschrijving")),
+                    new TextArea<>("beschrijving",
+                            LambdaModel.of(model, f -> f.beschrijving, (f, v) -> f.beschrijving = v)),
+                    new Label("beschikbareDagenLabel", Model.of("Beschikbare Dagen")),
+                    new CheckBoxMultipleChoice<>("beschikbareDagen",
+                            beschikbareDagenModel,
+                            List.of(DayOfWeek.values()),
+                            dagRenderer()),
+                    new Label("actiefLabel", Model.of("Actief")),
+                    new CheckBox("actief",
+                            LambdaModel.of(model, f -> f.actief, (f, v) -> f.actief = v)),
+                    new RdFormFieldTextInput<>("actiefVanaf",
+                            LambdaModel.of(model, f -> f.actiefVanaf, (f, v) -> f.actiefVanaf = v),
+                            Model.of("Actief Vanaf"),
+                            Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
+                    new RdFormFieldTextInput<>("actiefTotEnMet",
+                            LambdaModel.of(model, f -> f.actiefTotEnMet, (f, v) -> f.actiefTotEnMet = v),
+                            Model.of("Actief Tot en Met"),
+                            Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
+                    new RdButton("opslaan", Model.of("Toevoegen"))
+            );
+        }
+
+        @Override
+        protected void onSubmit() {
+            BapsFormDto f = getModelObject();
+            bapsAdministrationService.create(new CreateBapsDto(
+                    f.naam,
+                    f.fotoUrl,
+                    f.hobbies,
+                    f.beschrijving,
+                    f.actief,
+                    f.actiefVanaf,
+                    f.actiefTotEnMet,
+                    List.copyOf(beschikbareDagenModel.getObject())
+            ));
+            setResponsePage(BeheerPage.class);
+        }
+    }
+
+    private static IChoiceRenderer<DayOfWeek> dagRenderer() {
         return new IChoiceRenderer<>() {
             @Override
             public Object getDisplayValue(DayOfWeek day) {

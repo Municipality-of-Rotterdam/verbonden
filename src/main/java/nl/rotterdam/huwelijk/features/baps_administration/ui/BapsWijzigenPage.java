@@ -38,78 +38,77 @@ public class BapsWijzigenPage extends BeheerBasePage {
             return;
         }
 
-        Long dtoId = dto.id();
-
-        add(new BookmarkablePageLink<>("terugLink", BeheerPage.class));
-
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
-        add(feedback);
-
-        BapsFormDto formDto = BapsFormDto.vanDto(dto);
-        Model<BapsFormDto> formDtoModel = Model.of(formDto);
-        IModel<Collection<DayOfWeek>> geselecteerdeDagen = LambdaModel.of(
-                formDtoModel,
-                f -> f.beschikbareDagen,
-                (f, v) -> f.beschikbareDagen = new ArrayList<>(v));
-
-        Form<BapsFormDto> form = new Form<>("bapsForm", formDtoModel) {
-            @Override
-            protected void onSubmit() {
-                BapsFormDto f = getModelObject();
-                ChangeBapsDto saveDto = new ChangeBapsDto(
-                        dtoId,
-                        f.naam,
-                        f.fotoUrl,
-                        f.hobbies,
-                        f.beschrijving,
-                        f.actief,
-                        f.actiefVanaf,
-                        f.actiefTotEnMet,
-                        List.copyOf(geselecteerdeDagen.getObject())
-                );
-                bapsAdministrationService.update(saveDto);
-                setResponsePage(BeheerPage.class);
-            }
-        };
-
-        form.add(new RdFormFieldTextInput<>("naam",
-                LambdaModel.of(formDtoModel, f -> f.naam, (f, v) -> f.naam = v),
-                Model.of("Naam")).setRequired(true));
-
-        form.add(new RdFormFieldTextInput<>("fotoUrl",
-                LambdaModel.of(formDtoModel, f -> f.fotoUrl, (f, v) -> f.fotoUrl = v),
-                Model.of("Foto URL"),
-                Model.of("URL naar de profielfoto van de BAPS")));
-
-        form.add(new RdFormFieldTextArea<>("hobbies",
-                        LambdaModel.of(formDtoModel, f -> f.hobbies, (f, v) -> f.hobbies = v),
-                        Model.of("Hobbies")
-                ),
-                new RdFormFieldTextArea<>("beschrijving",
-                        LambdaModel.of(formDtoModel, f -> f.beschrijving, (f, v) -> f.beschrijving = v),
-                        Model.of("Beschrijving")
-                )
+        add(
+                new BookmarkablePageLink<>("terugLink", BeheerPage.class),
+                feedback,
+                new ChangeBapsForm("bapsForm", dto)
         );
+    }
 
-        form.add(new DayOfWeekCheckboxGroup("beschikbareDagen", geselecteerdeDagen, Model.of("Beschikbare dagen") ));
+    private class ChangeBapsForm extends Form<BapsFormDto> {
 
-        form.add(new RdFormFieldCheckbox("actief",
-                LambdaModel.of(formDtoModel, f -> f.actief, (f, v) -> f.actief = v),
-                Model.of("Actief")));
+        private final long bapsId;
 
-        form.add(new RdFormFieldTextInput<>("actiefVanaf",
-                LambdaModel.of(formDtoModel, f -> f.actiefVanaf, (f, v) -> f.actiefVanaf = v),
-                Model.of("Actief Vanaf"),
-                Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
+        ChangeBapsForm(String id, ChangeBapsDto dto) {
+            super(id, Model.of(BapsFormDto.vanDto(dto)));
+            bapsId = dto.id();
+        }
 
-        form.add(new RdFormFieldTextInput<>("actiefTotEnMet",
-                LambdaModel.of(formDtoModel, f -> f.actiefTotEnMet, (f, v) -> f.actiefTotEnMet = v),
-                Model.of("Actief Tot en Met"),
-                Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"));
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            IModel<BapsFormDto> model = getModel();
+            IModel<Collection<DayOfWeek>> geselecteerdeDagen = LambdaModel.of(
+                    model,
+                    f -> f.beschikbareDagen,
+                    (f, v) -> f.beschikbareDagen = new ArrayList<>(v));
+            add(
+                    new RdFormFieldTextInput<>("naam",
+                            LambdaModel.of(model, f -> f.naam, (f, v) -> f.naam = v),
+                            Model.of("Naam")).setRequired(true),
+                    new RdFormFieldTextInput<>("fotoUrl",
+                            LambdaModel.of(model, f -> f.fotoUrl, (f, v) -> f.fotoUrl = v),
+                            Model.of("Foto URL"),
+                            Model.of("URL naar de profielfoto van de BAPS")),
+                    new RdFormFieldTextArea<>("hobbies",
+                            LambdaModel.of(model, f -> f.hobbies, (f, v) -> f.hobbies = v),
+                            Model.of("Hobbies")),
+                    new RdFormFieldTextArea<>("beschrijving",
+                            LambdaModel.of(model, f -> f.beschrijving, (f, v) -> f.beschrijving = v),
+                            Model.of("Beschrijving")),
+                    new DayOfWeekCheckboxGroup("beschikbareDagen", geselecteerdeDagen, Model.of("Beschikbare dagen")),
+                    new RdFormFieldCheckbox("actief",
+                            LambdaModel.of(model, f -> f.actief, (f, v) -> f.actief = v),
+                            Model.of("Actief")),
+                    new RdFormFieldTextInput<>("actiefVanaf",
+                            LambdaModel.of(model, f -> f.actiefVanaf, (f, v) -> f.actiefVanaf = v),
+                            Model.of("Actief Vanaf"),
+                            Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
+                    new RdFormFieldTextInput<>("actiefTotEnMet",
+                            LambdaModel.of(model, f -> f.actiefTotEnMet, (f, v) -> f.actiefTotEnMet = v),
+                            Model.of("Actief Tot en Met"),
+                            Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
+                    new RdButton("opslaan", Model.of("Opslaan"))
+            );
+        }
 
-        form.add(new RdButton("opslaan", Model.of("Opslaan")));
-
-        add(form);
+        @Override
+        protected void onSubmit() {
+            BapsFormDto f = getModelObject();
+            bapsAdministrationService.update(new ChangeBapsDto(
+                    bapsId,
+                    f.naam,
+                    f.fotoUrl,
+                    f.hobbies,
+                    f.beschrijving,
+                    f.actief,
+                    f.actiefVanaf,
+                    f.actiefTotEnMet,
+                    List.copyOf(f.beschikbareDagen)
+            ));
+            setResponsePage(BeheerPage.class);
+        }
     }
 }
