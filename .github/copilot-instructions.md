@@ -7,6 +7,7 @@
 - De inputs en outputs van de service layer moeten altijd immutable `record` klassen zijn (DTOs).
 - Service implementaties mogen intern JPA Entities gebruiken, maar mogen ze **nooit** teruggeven aan of ontvangen van de presentation layer.
 - Annoteer alle lees-methoden in een `@Service`-implementatie met `@Transactional(readOnly = true)` en schrijf-/verwijdermethoden met `@Transactional`, zodat de Hibernate-sessie open blijft voor lazy-loaded collecties.
+- Splits de DTO's altijd op naar gebruik: gebruik `CreateXxxDto` voor aanmaken (geen id, geen aangemaaktOp), `ChangeXxxDto` voor wijzigen (met id, zonder aangemaaktOp), en `ListXxxDto` voor weergave/overzichten (alle velden inclusief aangemaaktOp). Dit zijn aparte `record`-klassen; dupliceer velden gerust.
 
 ### Wicket
 - Injecteer altijd een service **interface** (niet de implementatie) via `@SpringBean`, zodat Wicket een JDK dynamic proxy kan aanmaken (voorkomt CGLIB-/Objenesis-problemen zonder no-arg constructor).
@@ -19,3 +20,4 @@
 - Voeg geen JPA-annotaties toe aan klassen buiten het `baps`-package (of gelijkwaardige datapakketten).
 - Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsToevoegenPage` en `BapsWijzigenPage`).
 - Genereer nooit methoden of klassen die nergens worden aangeroepen of gebruikt.
+- Genereer **nooit** `serialVersionUID`-velden. We gebruiken Java-serialisatie niet op deze manier en willen geen achterwaartse compatibiliteit voor geserialiseerde klassen.

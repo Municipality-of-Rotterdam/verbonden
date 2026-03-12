@@ -7,11 +7,13 @@ import java.util.Optional;
 
 public interface BapsService {
 
-    Page<BapsDto> findAll(Pageable pageable);
+    Page<ListBapsDto> findAll(Pageable pageable);
 
-    Optional<BapsDto> findById(Long id);
+    Optional<ListBapsDto> findById(Long id);
 
-    BapsDto save(BapsDto dto);
+    ListBapsDto create(CreateBapsDto dto);
+
+    ListBapsDto update(ChangeBapsDto dto);
 
     void delete(Long id);
 

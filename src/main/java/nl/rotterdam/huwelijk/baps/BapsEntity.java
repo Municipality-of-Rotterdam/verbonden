@@ -1,8 +1,6 @@
 package nl.rotterdam.huwelijk.baps;
 
 import jakarta.persistence.*;
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,10 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "baps")
-public class BapsEntity implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class BapsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

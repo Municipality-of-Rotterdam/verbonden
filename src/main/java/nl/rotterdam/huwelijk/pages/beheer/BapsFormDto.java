@@ -1,8 +1,7 @@
 package nl.rotterdam.huwelijk.pages.beheer;
 
-import nl.rotterdam.huwelijk.baps.BapsDto;
+import nl.rotterdam.huwelijk.baps.ListBapsDto;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -15,9 +14,6 @@ import java.util.List;
  * {@link org.apache.wicket.model.util.ListModel} for the {@code beschikbareDagen} list.
  */
 public class BapsFormDto implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     private String naam = "";
     private String fotoUrl = "";
@@ -33,8 +29,8 @@ public class BapsFormDto implements Serializable {
         return new BapsFormDto();
     }
 
-    /** Vult een instantie met de waarden uit een bestaande {@link BapsDto}. */
-    public static BapsFormDto vanDto(BapsDto dto) {
+    /** Vult een instantie met de waarden uit een bestaande {@link ListBapsDto}. */
+    public static BapsFormDto vanDto(ListBapsDto dto) {
         BapsFormDto form = new BapsFormDto();
         form.naam = dto.naam() != null ? dto.naam() : "";
         form.fotoUrl = dto.fotoUrl() != null ? dto.fotoUrl() : "";

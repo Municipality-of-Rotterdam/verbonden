@@ -1,12 +1,13 @@
 package nl.rotterdam.huwelijk.pages.beheer;
 
-import nl.rotterdam.huwelijk.baps.BapsDto;
 import nl.rotterdam.huwelijk.baps.BapsService;
-import nl.rotterdam.huwelijk.wicket_components.DayOfWeekCheckboxGroup;
+import nl.rotterdam.huwelijk.baps.ChangeBapsDto;
+import nl.rotterdam.huwelijk.baps.ListBapsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
+import nl.rotterdam.huwelijk.wicket_components.DayOfWeekCheckboxGroup;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -16,16 +17,11 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.io.Serial;
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 public class BapsWijzigenPage extends BeheerBasePage {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     @SpringBean
     private BapsService bapsService;
@@ -36,14 +32,13 @@ public class BapsWijzigenPage extends BeheerBasePage {
             setResponsePage(BeheerPage.class);
             return;
         }
-        BapsDto dto = bapsService.findById(id).orElse(null);
+        ListBapsDto dto = bapsService.findById(id).orElse(null);
         if (dto == null) {
             setResponsePage(BeheerPage.class);
             return;
         }
 
         Long dtoId = dto.id();
-        LocalDateTime aangemaaktOp = dto.aangemaaktOp();
 
         add(new BookmarkablePageLink<>("terugLink", BeheerPage.class));
 
@@ -56,13 +51,10 @@ public class BapsWijzigenPage extends BeheerBasePage {
         IModel<Collection<DayOfWeek>> geselecteerdeDagen = LambdaModel.of(formDtoModel, BapsFormDto::getBeschikbareDagen, BapsFormDto::setBeschikbareDagen);
 
         Form<BapsFormDto> form = new Form<>("bapsForm", formDtoModel) {
-            @Serial
-            private static final long serialVersionUID = 1L;
-
             @Override
             protected void onSubmit() {
                 BapsFormDto f = getModelObject();
-                BapsDto saveDto = new BapsDto(
+                ChangeBapsDto saveDto = new ChangeBapsDto(
                         dtoId,
                         f.getNaam(),
                         f.getFotoUrl(),
@@ -71,10 +63,9 @@ public class BapsWijzigenPage extends BeheerBasePage {
                         f.isActief(),
                         parseDate(f.getActiefVanaf()),
                         parseDate(f.getActiefTotEnMet()),
-                        List.copyOf(geselecteerdeDagen.getObject()),
-                        aangemaaktOp
+                        List.copyOf(geselecteerdeDagen.getObject())
                 );
-                bapsService.save(saveDto);
+                bapsService.update(saveDto);
                 setResponsePage(BeheerPage.class);
             }
         };

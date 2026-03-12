@@ -1,7 +1,7 @@
 package nl.rotterdam.huwelijk.pages.beheer;
 
-import nl.rotterdam.huwelijk.baps.BapsDto;
 import nl.rotterdam.huwelijk.baps.BapsService;
+import nl.rotterdam.huwelijk.baps.CreateBapsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import org.apache.wicket.markup.html.basic.Label;
@@ -18,16 +18,12 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.io.Serial;
 import java.time.DayOfWeek;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
 public class BapsToevoegenPage extends BeheerBasePage {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
 
     @SpringBean
     private BapsService bapsService;
@@ -45,14 +41,10 @@ public class BapsToevoegenPage extends BeheerBasePage {
         ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(List.copyOf(formDto.getBeschikbareDagen()));
 
         Form<BapsFormDto> form = new Form<>("bapsForm", formDtoModel) {
-            @Serial
-            private static final long serialVersionUID = 1L;
-
             @Override
             protected void onSubmit() {
                 BapsFormDto f = getModelObject();
-                BapsDto dto = new BapsDto(
-                        null,
+                CreateBapsDto dto = new CreateBapsDto(
                         f.getNaam(),
                         f.getFotoUrl(),
                         f.getHobbies(),
@@ -60,10 +52,9 @@ public class BapsToevoegenPage extends BeheerBasePage {
                         f.isActief(),
                         parseDate(f.getActiefVanaf()),
                         parseDate(f.getActiefTotEnMet()),
-                        List.copyOf(beschikbareDagenModel.getObject()),
-                        null
+                        List.copyOf(beschikbareDagenModel.getObject())
                 );
-                bapsService.save(dto);
+                bapsService.create(dto);
                 setResponsePage(BeheerPage.class);
             }
         };
@@ -112,9 +103,6 @@ public class BapsToevoegenPage extends BeheerBasePage {
 
     static IChoiceRenderer<DayOfWeek> dagRenderer() {
         return new IChoiceRenderer<>() {
-            @Serial
-            private static final long serialVersionUID = 1L;
-
             @Override
             public Object getDisplayValue(DayOfWeek day) {
                 return day.getDisplayName(TextStyle.FULL, Locale.ENGLISH);
