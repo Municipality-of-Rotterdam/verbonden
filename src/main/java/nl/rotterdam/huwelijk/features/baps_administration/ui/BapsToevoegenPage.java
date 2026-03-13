@@ -78,11 +78,11 @@ public class BapsToevoegenPage extends BeheerBasePage {
                     new RdFormFieldTextInput<>("actiefVanaf",
                             LambdaModel.of(model, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
                             Model.of("Actief Vanaf"),
-                            Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
+                            Model.of("Datum in formaat JJJJ-MM-DD")).setHtmlInputType("date"),
                     new RdFormFieldTextInput<>("actiefTotEnMet",
                             LambdaModel.of(model, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
                             Model.of("Actief Tot en Met"),
-                            Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
+                            Model.of("Datum in formaat JJJJ-MM-DD")).setHtmlInputType("date"),
                     new RdButton("opslaan", Model.of("Toevoegen"))
             );
         }

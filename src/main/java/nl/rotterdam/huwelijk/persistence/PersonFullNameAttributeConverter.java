@@ -9,7 +9,7 @@ public class PersonFullNameAttributeConverter implements AttributeConverter<Pers
 
     @Override
     public String convertToDatabaseColumn(PersonFullName attribute) {
-        return attribute != null ? attribute.getValue() : null;
+        return attribute != null ? attribute.value() : null;
     }
 
     @Override

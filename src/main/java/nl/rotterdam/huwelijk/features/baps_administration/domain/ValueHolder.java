@@ -7,5 +7,5 @@ package nl.rotterdam.huwelijk.features.baps_administration.domain;
  */
 public interface ValueHolder<T> {
 
-    T getValue();
+    T value();
 }

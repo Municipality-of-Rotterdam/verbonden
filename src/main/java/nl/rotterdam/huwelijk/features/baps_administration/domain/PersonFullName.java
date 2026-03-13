@@ -1,50 +1,27 @@
 package nl.rotterdam.huwelijk.features.baps_administration.domain;
 
 import java.io.Serializable;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Value type representing a person's full name (first name + last name stored as a single string).
- * <p>
- * Validates that the value is more than 4 characters and less than 80 characters.
- * Throws {@link PersonFullNameTooShortException} or {@link PersonFullNameTooLongException}
- * when the input does not meet these constraints.
  */
-public final class PersonFullName implements ValueHolder<String>, Serializable {
+public record PersonFullName(String value) implements Serializable, ValueHolder<String> {
 
-    private final String value;
+    public static final int MINIMUM_LENGTH = 5;
+    public static final int MAXIMUM_LENGTH = 80;
 
-    public PersonFullName(String value) {
-        Objects.requireNonNull(value, "Naam mag niet null zijn");
-        if (value.length() <= 4) {
+    public PersonFullName {
+        requireNonNull(value, "Naam mag niet null zijn");
+        value = value.trim();
+
+        if (value.length() < MINIMUM_LENGTH) {
             throw new PersonFullNameTooShortException(value);
         }
-        if (value.length() >= 80) {
+        if (value.length() >= MAXIMUM_LENGTH) {
             throw new PersonFullNameTooLongException(value);
         }
-        this.value = value;
     }
 
-    @Override
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return "PersonFullName[" + value + "]";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PersonFullName that = (PersonFullName) o;
-        return value.equals(that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return value.hashCode();
-    }
 }

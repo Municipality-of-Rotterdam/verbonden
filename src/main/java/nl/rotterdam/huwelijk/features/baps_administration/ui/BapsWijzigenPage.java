@@ -3,7 +3,6 @@ package nl.rotterdam.huwelijk.features.baps_administration.ui;
 import nl.rotterdam.huwelijk.beheer_common.BeheerBasePage;
 import nl.rotterdam.huwelijk.features.baps_administration.application.BapsAdministrationService;
 import nl.rotterdam.huwelijk.features.baps_administration.domain.ChangeBapsDto;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
@@ -86,11 +85,13 @@ public class BapsWijzigenPage extends BeheerBasePage {
                     new RdFormFieldTextInput<>("actiefVanaf",
                             LambdaModel.of(model, BapsFormDto::getActiefVanaf, BapsFormDto::setActiefVanaf),
                             Model.of("Actief Vanaf"),
-                            Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
+                            Model.of("Datum in formaat JJJJ-MM-DD"))
+                            .setHtmlInputType("date"),
                     new RdFormFieldTextInput<>("actiefTotEnMet",
                             LambdaModel.of(model, BapsFormDto::getActiefTotEnMet, BapsFormDto::setActiefTotEnMet),
                             Model.of("Actief Tot en Met"),
-                            Model.of("Datum in formaat JJJJ-MM-DD")).setInputType("date"),
+                            Model.of("Datum in formaat JJJJ-MM-DD"))
+                            .setHtmlInputType("date"),
                     new RdButton("opslaan", Model.of("Opslaan"))
             );
         }

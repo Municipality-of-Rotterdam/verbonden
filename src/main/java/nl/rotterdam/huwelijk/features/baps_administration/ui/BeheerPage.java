@@ -74,16 +74,16 @@ public class BeheerPage extends BeheerBasePage {
     private RdDataTable<ListBapsDto, String> buildBapsTable() {
         List<IColumn<ListBapsDto, String>> columns = new ArrayList<>();
 
-        columns.add(new AbstractColumn<ListBapsDto, String>(Model.of("Naam"), "naam") {
+        columns.add(new AbstractColumn<>(Model.of("Naam"), "naam") {
             @Override
             public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
                                      String componentId,
                                      IModel<ListBapsDto> rowModel) {
-                cellItem.add(new Label(componentId, Model.of(rowModel.getObject().naam().getValue())));
+                cellItem.add(new Label(componentId, rowModel.map(ListBapsDto::naam)));
             }
         });
 
-        columns.add(new AbstractColumn<ListBapsDto, String>(Model.of("Status")) {
+        columns.add(new AbstractColumn<>(Model.of("Status")) {
             @Override
             public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
                                      String componentId,
@@ -93,7 +93,7 @@ public class BeheerPage extends BeheerBasePage {
             }
         });
 
-        columns.add(new AbstractColumn<ListBapsDto, String>(Model.of("Actief Vanaf")) {
+        columns.add(new AbstractColumn<>(Model.of("Actief Vanaf")) {
             @Override
             public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
                                      String componentId,
@@ -104,7 +104,7 @@ public class BeheerPage extends BeheerBasePage {
             }
         });
 
-        columns.add(new AbstractColumn<ListBapsDto, String>(Model.of("Actief Tot en Met")) {
+        columns.add(new AbstractColumn<>(Model.of("Actief Tot en Met")) {
             @Override
             public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
                                      String componentId,
@@ -115,7 +115,7 @@ public class BeheerPage extends BeheerBasePage {
             }
         });
 
-        columns.add(new AbstractColumn<ListBapsDto, String>(Model.of("Acties")) {
+        columns.add(new AbstractColumn<>(Model.of("Acties")) {
             @Override
             public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
                                      String componentId,
@@ -168,7 +168,7 @@ public class BeheerPage extends BeheerBasePage {
 
             add(new BookmarkablePageLink<>("bewerkLink", BapsWijzigenPage.class, params));
 
-            add(new Link<ListBapsDto>("toggleActiefLink", model) {
+            add(new Link<>("toggleActiefLink", model) {
                 @Override
                 public void onClick() {
                     bapsAdministrationService.toggleActief(getModelObject().id());

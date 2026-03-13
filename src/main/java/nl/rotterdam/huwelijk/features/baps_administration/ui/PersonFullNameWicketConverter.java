@@ -5,29 +5,33 @@ import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullNameT
 import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullNameTooShortException;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 
 public class PersonFullNameWicketConverter implements IConverter<PersonFullName> {
 
     @Override
-    public PersonFullName convertToObject(String value, Locale locale) throws ConversionException {
-        if (value == null || value.isBlank()) {
+    public @Nullable PersonFullName convertToObject(String value, Locale locale) throws ConversionException {
+        if (value.isBlank()) {
             return null;
         }
         try {
             return new PersonFullName(value);
         } catch (PersonFullNameTooShortException e) {
             throw new ConversionException("Naam moet minimaal 5 tekens bevatten")
-                    .setResourceKey("PersonFullName.tooShort");
+                    .setResourceKey("PersonFullName.tooShort")
+                    .setVariable("min", PersonFullName.MINIMUM_LENGTH)
+                    .setLocale(locale);
         } catch (PersonFullNameTooLongException e) {
             throw new ConversionException("Naam moet maximaal 79 tekens bevatten")
-                    .setResourceKey("PersonFullName.tooLong");
+                    .setResourceKey("PersonFullName.tooLong")
+                    .setVariable("max", PersonFullName.MAXIMUM_LENGTH)
+                    .setLocale(locale);
         }
     }
 
-    @Override
     public String convertToString(PersonFullName value, Locale locale) {
-        return value != null ? value.getValue() : "";
+        return value.value();
     }
 }
