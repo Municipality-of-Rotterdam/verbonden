@@ -20,7 +20,5 @@ public interface BapsAdministrationService {
 
     void toggleActief(long id);
 
-    void delete(long id);
-
     long count();
 }

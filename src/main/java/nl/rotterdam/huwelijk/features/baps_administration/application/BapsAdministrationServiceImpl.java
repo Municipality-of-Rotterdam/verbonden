@@ -64,12 +64,6 @@ class BapsAdministrationServiceImpl implements BapsAdministrationService {
     }
 
     @Override
-    @Transactional
-    public void delete(long id) {
-        bapsRepository.deleteById(id);
-    }
-
-    @Override
     public long count() {
         return bapsRepository.count();
     }
