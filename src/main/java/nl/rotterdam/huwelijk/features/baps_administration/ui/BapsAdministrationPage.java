@@ -1,6 +1,6 @@
 package nl.rotterdam.huwelijk.features.baps_administration.ui;
 
-import nl.rotterdam.huwelijk.beheer_common.BeheerBasePage;
+import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.baps_administration.application.BapsAdministrationService;
 import nl.rotterdam.huwelijk.features.baps_administration.application.BapsImportService;
 import nl.rotterdam.huwelijk.features.baps_administration.domain.BapsImportResult;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class BapsBeheerPage extends BeheerBasePage {
+public class BapsAdministrationPage extends AdministrationBasePage {
 
     @SpringBean
     private BapsAdministrationService bapsAdministrationService;
@@ -40,12 +40,12 @@ public class BapsBeheerPage extends BeheerBasePage {
     @SpringBean
     private BapsImportService bapsImportService;
 
-    public BapsBeheerPage() {
+    public BapsAdministrationPage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         add(feedback);
 
-        add(new BookmarkablePageLink<>("nieuwBapsLink", BapsToevoegenPage.class));
+        add(new BookmarkablePageLink<>("nieuwBapsLink", BapsCreatePage.class));
 
         Form<?> importForm = new Form<>("importForm");
         importForm.add(new RdAjaxButton("importeerButton") {
@@ -154,25 +154,25 @@ public class BapsBeheerPage extends BeheerBasePage {
     }
 
     // ---------------------------------------------------------------------------
-    // Fragment for row action buttons, defined in BapsBeheerPage.html
+    // Fragment for row action buttons, defined in BapsAdministrationPage.html
     // ---------------------------------------------------------------------------
 
     private final class ActiesFragment extends Fragment {
 
         ActiesFragment(String id, IModel<ListBapsDto> model) {
-            super(id, "actiesFragment", BapsBeheerPage.this, model);
+            super(id, "actiesFragment", BapsAdministrationPage.this, model);
 
             ListBapsDto dto = model.getObject();
             PageParameters params = new PageParameters();
             params.add("id", dto.id());
 
-            add(new BookmarkablePageLink<>("bewerkLink", BapsWijzigenPage.class, params));
+            add(new BookmarkablePageLink<>("bewerkLink", BapsUpdatePage.class, params));
 
             add(new Link<>("toggleActiefLink", model) {
                 @Override
                 public void onClick() {
                     bapsAdministrationService.toggleActief(getModelObject().id());
-                    setResponsePage(BapsBeheerPage.class);
+                    setResponsePage(BapsAdministrationPage.class);
                 }
 
                 @Override

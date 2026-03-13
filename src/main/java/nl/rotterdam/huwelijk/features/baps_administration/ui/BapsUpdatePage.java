@@ -1,6 +1,6 @@
 package nl.rotterdam.huwelijk.features.baps_administration.ui;
 
-import nl.rotterdam.huwelijk.beheer_common.BeheerBasePage;
+import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.baps_administration.application.BapsAdministrationService;
 import nl.rotterdam.huwelijk.features.baps_administration.domain.ChangeBapsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
@@ -21,27 +21,27 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class BapsWijzigenPage extends BeheerBasePage {
+public class BapsUpdatePage extends AdministrationBasePage {
 
     @SpringBean
     private BapsAdministrationService bapsAdministrationService;
 
-    public BapsWijzigenPage(PageParameters params) {
+    public BapsUpdatePage(PageParameters params) {
         Long id = params.get("id").toOptionalLong();
         if (id == null) {
-            setResponsePage(BapsBeheerPage.class);
+            setResponsePage(BapsAdministrationPage.class);
             return;
         }
         ChangeBapsDto dto = bapsAdministrationService.findById(id).orElse(null);
         if (dto == null) {
-            setResponsePage(BapsBeheerPage.class);
+            setResponsePage(BapsAdministrationPage.class);
             return;
         }
 
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         add(
-                new BookmarkablePageLink<>("terugLink", BapsBeheerPage.class),
+                new BookmarkablePageLink<>("terugLink", BapsAdministrationPage.class),
                 feedback,
                 new ChangeBapsForm("bapsForm", dto)
         );
@@ -110,7 +110,7 @@ public class BapsWijzigenPage extends BeheerBasePage {
                     f.getActiefTotEnMet(),
                     List.copyOf(f.getBeschikbareDagen())
             ));
-            setResponsePage(BapsBeheerPage.class);
+            setResponsePage(BapsAdministrationPage.class);
         }
     }
 }

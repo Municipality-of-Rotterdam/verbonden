@@ -1,6 +1,6 @@
 package nl.rotterdam.huwelijk.features.baps_administration.ui;
 
-import nl.rotterdam.huwelijk.beheer_common.BeheerBasePage;
+import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.baps_administration.application.BapsAdministrationService;
 import nl.rotterdam.huwelijk.features.baps_administration.domain.CreateBapsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
@@ -21,16 +21,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class BapsToevoegenPage extends BeheerBasePage {
+public class BapsCreatePage extends AdministrationBasePage {
 
     @SpringBean
     private BapsAdministrationService bapsAdministrationService;
 
-    public BapsToevoegenPage() {
+    public BapsCreatePage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         add(
-                new BookmarkablePageLink<>("terugLink", BapsBeheerPage.class),
+                new BookmarkablePageLink<>("terugLink", BapsAdministrationPage.class),
                 feedback,
                 new CreateBapsForm("bapsForm")
         );
@@ -95,7 +95,7 @@ public class BapsToevoegenPage extends BeheerBasePage {
                     f.getActiefTotEnMet(),
                     List.copyOf(beschikbareDagenModel.getObject())
             ));
-            setResponsePage(BapsBeheerPage.class);
+            setResponsePage(BapsAdministrationPage.class);
         }
     }
 }

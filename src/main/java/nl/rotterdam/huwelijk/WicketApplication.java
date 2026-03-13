@@ -2,9 +2,9 @@ package nl.rotterdam.huwelijk;
 
 import de.agilecoders.wicket.webjars.WicketWebjars;
 import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsToevoegenPage;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsWijzigenPage;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsBeheerPage;
+import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsCreatePage;
+import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsUpdatePage;
+import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.HomePage;
 import org.apache.wicket.ConverterLocator;
@@ -69,8 +69,8 @@ public class WicketApplication extends WebApplication {
                 new ResourceIsolationRequestCycleListener(
                         new FetchMetadataResourceIsolationPolicy()));
 
-        mountPage("/beheer", BapsBeheerPage.class);
-        mountPage("/beheer/baps/nieuw", BapsToevoegenPage.class);
-        mountPage("/beheer/baps/${id}", BapsWijzigenPage.class);
+        mountPage("/beheer", BapsAdministrationPage.class);
+        mountPage("/beheer/baps/nieuw", BapsCreatePage.class);
+        mountPage("/beheer/baps/${id}", BapsUpdatePage.class);
     }
 }

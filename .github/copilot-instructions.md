@@ -8,7 +8,7 @@ De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.huwelijk.domain` — gedeelde domeininterfaces zoals `ValueHolder<T>`, die door meerdere feature-packages worden hergebruikt.
 - `nl.rotterdam.huwelijk.features.baps_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
-- `nl.rotterdam.huwelijk.beheer_common` — gedeelde basisklassen voor beheerpagina's: `BeheerBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
+- `nl.rotterdam.huwelijk.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
 - `nl.rotterdam.huwelijk.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
 - `nl.rotterdam.huwelijk.config` — Spring Boot configuratieklassen.
 
@@ -49,7 +49,7 @@ Elke feature-package bevat de volgende sub-packages:
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
 - JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`) en staan in `nl.rotterdam.huwelijk.persistence`.
 - Voeg geen JPA-annotaties toe aan klassen buiten het `persistence`-package.
-- Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsToevoegenPage` en `BapsWijzigenPage`).
+- Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsCreatePage` en `BapsUpdatePage`).
 - Genereer nooit methoden of klassen die nergens worden aangeroepen of gebruikt.
 - Genereer **nooit** `serialVersionUID`-velden. We gebruiken Java-serialisatie niet op deze manier en willen geen achterwaartse compatibiliteit voor geserialiseerde klassen.
 
