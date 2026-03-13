@@ -7,8 +7,7 @@ import java.util.List;
 public record CreateBapsDto(
         PersonFullName naam,
         String fotoUrl,
-        String hobbies,
-        String beschrijving,
+        String detailUrl,
         boolean actief,
         LocalDate actiefVanaf,
         LocalDate actiefTotEnMet,

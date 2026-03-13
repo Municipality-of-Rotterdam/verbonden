@@ -47,8 +47,7 @@ class BapsAdministrationServiceImpl implements BapsAdministrationService {
                 .orElseThrow(() -> new IllegalArgumentException("BAPS niet gevonden: " + dto.id()));
         baps.setNaam(dto.naam());
         baps.setFotoUrl(dto.fotoUrl());
-        baps.setHobbies(dto.hobbies());
-        baps.setBeschrijving(dto.beschrijving());
+        baps.setDetailUrl(dto.detailUrl());
         baps.setActief(dto.actief());
         baps.setActiefVanaf(dto.actiefVanaf());
         baps.setActiefTotEnMet(dto.actiefTotEnMet());
@@ -73,8 +72,7 @@ class BapsAdministrationServiceImpl implements BapsAdministrationService {
                 baps.getId(),
                 baps.getNaam(),
                 baps.getFotoUrl(),
-                baps.getHobbies(),
-                baps.getBeschrijving(),
+                baps.getDetailUrl(),
                 baps.isActief(),
                 baps.getActiefVanaf(),
                 baps.getActiefTotEnMet(),
@@ -86,8 +84,7 @@ class BapsAdministrationServiceImpl implements BapsAdministrationService {
         BapsEntity baps = new BapsEntity();
         baps.setNaam(dto.naam());
         baps.setFotoUrl(dto.fotoUrl());
-        baps.setHobbies(dto.hobbies());
-        baps.setBeschrijving(dto.beschrijving());
+        baps.setDetailUrl(dto.detailUrl());
         baps.setActief(dto.actief());
         baps.setActiefVanaf(dto.actiefVanaf());
         baps.setActiefTotEnMet(dto.actiefTotEnMet());

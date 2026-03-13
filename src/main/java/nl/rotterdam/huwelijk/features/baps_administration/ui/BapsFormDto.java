@@ -20,8 +20,7 @@ public class BapsFormDto implements Serializable {
 
     private PersonFullName naam = null;
     private String fotoUrl = "";
-    private String hobbies = "";
-    private String beschrijving = "";
+    private String detailUrl = "";
     private List<DayOfWeek> beschikbareDagen = new ArrayList<>();
     private boolean actief = true;
     private LocalDate actiefVanaf = null;
@@ -33,11 +32,8 @@ public class BapsFormDto implements Serializable {
     public String getFotoUrl() { return fotoUrl; }
     public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
 
-    public String getHobbies() { return hobbies; }
-    public void setHobbies(String hobbies) { this.hobbies = hobbies; }
-
-    public String getBeschrijving() { return beschrijving; }
-    public void setBeschrijving(String beschrijving) { this.beschrijving = beschrijving; }
+    public String getDetailUrl() { return detailUrl; }
+    public void setDetailUrl(String detailUrl) { this.detailUrl = detailUrl; }
 
     public List<DayOfWeek> getBeschikbareDagen() { return beschikbareDagen; }
     public void setBeschikbareDagen(List<DayOfWeek> beschikbareDagen) { this.beschikbareDagen = beschikbareDagen; }
@@ -61,8 +57,7 @@ public class BapsFormDto implements Serializable {
         BapsFormDto form = new BapsFormDto();
         form.setNaam(dto.naam());
         form.setFotoUrl(dto.fotoUrl());
-        form.setHobbies(dto.hobbies());
-        form.setBeschrijving(dto.beschrijving());
+        form.setDetailUrl(dto.detailUrl());
         form.setBeschikbareDagen(dto.beschikbareDagen() != null
                 ? new ArrayList<>(dto.beschikbareDagen()) : new ArrayList<>());
         form.setActief(dto.actief());

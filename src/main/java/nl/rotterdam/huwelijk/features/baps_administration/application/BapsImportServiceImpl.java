@@ -122,13 +122,7 @@ class BapsImportServiceImpl implements BapsImportService {
             }
         }
 
-        // Beschrijving / hobbies – neem de eerste tekstparagraaf
-        Element content = doc.selectFirst(
-                ".rich-text p, .content-body p, .artikel__tekst p, article p");
-        if (content != null && !content.text().isBlank()) {
-            baps.setBeschrijving(content.text().trim());
-        }
-
+        baps.setDetailUrl(url);
         baps.setActief(true);
         return baps;
     }

@@ -6,7 +6,6 @@ import nl.rotterdam.huwelijk.features.baps_administration.domain.CreateBapsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
-import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -57,12 +56,10 @@ public class BapsCreatePage extends AdministrationBasePage {
                             LambdaModel.of(model, BapsFormDto::getFotoUrl, BapsFormDto::setFotoUrl),
                             Model.of("Foto URL"),
                             Model.of("URL naar de profielfoto van de BAPS")),
-                    new RdFormFieldTextArea<>("hobbies",
-                            LambdaModel.of(model, BapsFormDto::getHobbies, BapsFormDto::setHobbies),
-                            Model.of("Hobbies")),
-                    new RdFormFieldTextArea<>("beschrijving",
-                            LambdaModel.of(model, BapsFormDto::getBeschrijving, BapsFormDto::setBeschrijving),
-                            Model.of("Beschrijving")),
+                    new RdFormFieldTextInput<>("detailUrl",
+                            LambdaModel.of(model, BapsFormDto::getDetailUrl, BapsFormDto::setDetailUrl),
+                            Model.of("Detail URL"),
+                            Model.of("URL naar de detailpagina op rotterdam.nl")),
                     new DayOfWeekCheckboxGroup("beschikbareDagen", geselecteerdeDagen, Model.of("Beschikbare dagen")),
                     new RdFormFieldCheckbox("actief",
                             LambdaModel.of(model, BapsFormDto::isActief, BapsFormDto::setActief),
@@ -85,8 +82,7 @@ public class BapsCreatePage extends AdministrationBasePage {
             bapsAdministrationService.create(new CreateBapsDto(
                     f.getNaam(),
                     f.getFotoUrl(),
-                    f.getHobbies(),
-                    f.getBeschrijving(),
+                    f.getDetailUrl(),
                     f.isActief(),
                     f.getActiefVanaf(),
                     f.getActiefTotEnMet(),

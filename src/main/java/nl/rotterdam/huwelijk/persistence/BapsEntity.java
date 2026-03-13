@@ -24,11 +24,8 @@ public class BapsEntity {
     @Column(name = "foto_url")
     private String fotoUrl;
 
-    @Column(columnDefinition = "TEXT")
-    private String hobbies;
-
-    @Column(columnDefinition = "TEXT")
-    private String beschrijving;
+    @Column(name = "detail_url")
+    private String detailUrl;
 
     @Column(nullable = false)
     private boolean actief = true;
@@ -72,20 +69,12 @@ public class BapsEntity {
         this.fotoUrl = fotoUrl;
     }
 
-    public String getHobbies() {
-        return hobbies;
+    public String getDetailUrl() {
+        return detailUrl;
     }
 
-    public void setHobbies(String hobbies) {
-        this.hobbies = hobbies;
-    }
-
-    public String getBeschrijving() {
-        return beschrijving;
-    }
-
-    public void setBeschrijving(String beschrijving) {
-        this.beschrijving = beschrijving;
+    public void setDetailUrl(String detailUrl) {
+        this.detailUrl = detailUrl;
     }
 
     public boolean isActief() {
