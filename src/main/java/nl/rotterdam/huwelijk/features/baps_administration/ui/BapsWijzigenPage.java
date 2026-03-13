@@ -29,19 +29,19 @@ public class BapsWijzigenPage extends BeheerBasePage {
     public BapsWijzigenPage(PageParameters params) {
         Long id = params.get("id").toOptionalLong();
         if (id == null) {
-            setResponsePage(BeheerPage.class);
+            setResponsePage(BapsBeheerPage.class);
             return;
         }
         ChangeBapsDto dto = bapsAdministrationService.findById(id).orElse(null);
         if (dto == null) {
-            setResponsePage(BeheerPage.class);
+            setResponsePage(BapsBeheerPage.class);
             return;
         }
 
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         add(
-                new BookmarkablePageLink<>("terugLink", BeheerPage.class),
+                new BookmarkablePageLink<>("terugLink", BapsBeheerPage.class),
                 feedback,
                 new ChangeBapsForm("bapsForm", dto)
         );
@@ -110,7 +110,7 @@ public class BapsWijzigenPage extends BeheerBasePage {
                     f.getActiefTotEnMet(),
                     List.copyOf(f.getBeschikbareDagen())
             ));
-            setResponsePage(BeheerPage.class);
+            setResponsePage(BapsBeheerPage.class);
         }
     }
 }

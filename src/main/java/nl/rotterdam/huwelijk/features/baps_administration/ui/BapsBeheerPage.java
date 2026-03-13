@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class BeheerPage extends BeheerBasePage {
+public class BapsBeheerPage extends BeheerBasePage {
 
     @SpringBean
     private BapsAdministrationService bapsAdministrationService;
@@ -40,7 +40,7 @@ public class BeheerPage extends BeheerBasePage {
     @SpringBean
     private BapsImportService bapsImportService;
 
-    public BeheerPage() {
+    public BapsBeheerPage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         add(feedback);
@@ -154,13 +154,13 @@ public class BeheerPage extends BeheerBasePage {
     }
 
     // ---------------------------------------------------------------------------
-    // Fragment for row action buttons, defined in BeheerPage.html
+    // Fragment for row action buttons, defined in BapsBeheerPage.html
     // ---------------------------------------------------------------------------
 
     private final class ActiesFragment extends Fragment {
 
         ActiesFragment(String id, IModel<ListBapsDto> model) {
-            super(id, "actiesFragment", BeheerPage.this, model);
+            super(id, "actiesFragment", BapsBeheerPage.this, model);
 
             ListBapsDto dto = model.getObject();
             PageParameters params = new PageParameters();
@@ -172,7 +172,7 @@ public class BeheerPage extends BeheerBasePage {
                 @Override
                 public void onClick() {
                     bapsAdministrationService.toggleActief(getModelObject().id());
-                    setResponsePage(BeheerPage.class);
+                    setResponsePage(BapsBeheerPage.class);
                 }
 
                 @Override

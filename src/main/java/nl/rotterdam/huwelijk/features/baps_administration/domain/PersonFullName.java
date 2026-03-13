@@ -1,5 +1,7 @@
 package nl.rotterdam.huwelijk.features.baps_administration.domain;
 
+import nl.rotterdam.huwelijk.domain.ValueHolder;
+
 import java.io.Serializable;
 
 import static java.util.Objects.requireNonNull;
@@ -7,7 +9,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Value type representing a person's full name (first name + last name stored as a single string).
  */
-public record PersonFullName(String value) implements Serializable, ValueHolder<String> {
+public record PersonFullName(String value) implements ValueHolder<String>, Serializable {
 
     public static final int MINIMUM_LENGTH = 5;
     public static final int MAXIMUM_LENGTH = 80;
@@ -24,4 +26,13 @@ public record PersonFullName(String value) implements Serializable, ValueHolder<
         }
     }
 
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return "PersonFullName[" + value + "]";
+    }
 }

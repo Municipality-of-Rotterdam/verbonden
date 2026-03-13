@@ -32,6 +32,6 @@ public class PersonFullNameWicketConverter implements IConverter<PersonFullName>
     }
 
     public String convertToString(PersonFullName value, Locale locale) {
-        return value.value();
+        return value.getValue();
     }
 }

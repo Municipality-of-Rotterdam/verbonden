@@ -5,6 +5,7 @@
 ### Packagestructuur
 De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.huwelijk.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
+- `nl.rotterdam.huwelijk.domain` — gedeelde domeininterfaces zoals `ValueHolder<T>`, die door meerdere feature-packages worden hergebruikt.
 - `nl.rotterdam.huwelijk.features.baps_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.beheer_common` — gedeelde basisklassen voor beheerpagina's: `BeheerBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
@@ -60,3 +61,4 @@ Elke feature-package bevat de volgende sub-packages:
 - **JPA-integratie:** maak een `AttributeConverter` aan in het `persistence`-package die de conversie tussen het value type en het databasetype afhandelt. Gebruik `@Convert(converter = ...)` op het entity-veld.
 - **Wicket-integratie:** maak een `IConverter` aan in het `ui`-package die de conversie tussen `String` en het value type afhandelt. Vang validatie-excepties af en geef nette Wicket `ConversionException`-meldingen. Registreer de converter globaal in `WicketApplication.newConverterLocator()`.
 - Value types worden gebruikt in JPA Entities, DTOs (`CreateXxxDto`, `ChangeXxxDto`, `ListXxxDto`) en `FormDto`-klassen — consistent door alle lagen heen.
+- `ValueHolder<T>` staat in `nl.rotterdam.huwelijk.domain` — een gedeeld package, niet in een feature-package — zodat meerdere features het kunnen hergebruiken.

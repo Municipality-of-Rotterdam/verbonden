@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.features.baps_administration.domain;
+package nl.rotterdam.huwelijk.domain;
 
 /**
  * Interface for value types that wrap a single value.
@@ -7,5 +7,5 @@ package nl.rotterdam.huwelijk.features.baps_administration.domain;
  */
 public interface ValueHolder<T> {
 
-    T value();
+    T getValue();
 }

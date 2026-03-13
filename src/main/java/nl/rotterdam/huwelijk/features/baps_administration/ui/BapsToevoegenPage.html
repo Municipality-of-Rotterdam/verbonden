@@ -24,23 +24,23 @@
 
     <div class="d-flex gap-3">
         <div>
-            <label wicket:id="hobbiesLabel"></label>
-            <textarea wicket:id="hobbies" rows="4"></textarea>
+            <div wicket:id="hobbies"></div>
         </div>
         <div>
-            <label wicket:id="beschrijvingLabel"></label>
-            <textarea wicket:id="beschrijving" rows="6"></textarea>
+            <div wicket:id="beschrijving"></div>
         </div>
     </div>
 
     <div class="d-flex gap-3">
-        <div>
-            <label wicket:id="beschikbareDagenLabel"></label>
-            <div wicket:id="beschikbareDagen"></div>
+        <div wicket:id="beschikbareDagen">
+            <div class="d-flex flex-column gap-2">
+                <label wicket:id="day" >
+                    <input type="checkbox" wicket:id="checkbox" />
+                    <wicket:container wicket:id="label"></wicket:container>
+                </label>
+            </div>
         </div>
-        <div>
-            <label wicket:id="actiefLabel"></label>
-            <input type="checkbox" wicket:id="actief"/>
+        <div wicket:id="actief">
         </div>
     </div>
 
