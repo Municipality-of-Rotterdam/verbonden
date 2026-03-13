@@ -13,7 +13,6 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.DayOfWeek;
@@ -37,8 +36,6 @@ public class BapsCreatePage extends AdministrationBasePage {
     }
 
     private class CreateBapsForm extends Form<BapsFormDto> {
-
-        private final ListModel<DayOfWeek> beschikbareDagenModel = new ListModel<>(new ArrayList<>());
 
         CreateBapsForm(String id) {
             super(id, Model.of(BapsFormDto.leeg()));
@@ -93,7 +90,7 @@ public class BapsCreatePage extends AdministrationBasePage {
                     f.isActief(),
                     f.getActiefVanaf(),
                     f.getActiefTotEnMet(),
-                    List.copyOf(beschikbareDagenModel.getObject())
+                    List.copyOf(f.getBeschikbareDagen())
             ));
             setResponsePage(BapsAdministrationPage.class);
         }
