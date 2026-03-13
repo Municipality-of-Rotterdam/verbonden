@@ -31,16 +31,16 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 
 import java.util.List;
 
-public class HomePage extends BurgerBasePage {
+public class MarriageIntakePage extends BurgerBasePage {
 
     private String registrationType = "geregistreerd_partnerschap";
     private String ceremonyType = "eenvoudig";
 
-    public HomePage() {
+    public MarriageIntakePage() {
         this(new PageParameters());
     }
 
-    public HomePage(PageParameters parameters) {
+    public MarriageIntakePage(PageParameters parameters) {
         // Root html element with Rotterdam theme
         RdRootTransparentContainer root = new RdRootTransparentContainer("root");
         root.add(NldsRotterdamDesignSystemThemeBehavior.INSTANCE);
@@ -76,8 +76,8 @@ public class HomePage extends BurgerBasePage {
 
         // Breadcrumb
         List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
-                new RdBreadcrumbNavRecord<>(null, "Mijn Loket", HomePage.class),
-                new RdBreadcrumbNavRecord<>(null, "Mijn dag", HomePage.class)
+                new RdBreadcrumbNavRecord<>(null, "Mijn Loket", MarriageIntakePage.class),
+                new RdBreadcrumbNavRecord<>(null, "Mijn dag", MarriageIntakePage.class)
         );
         pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", breadcrumbs));
 
@@ -139,6 +139,6 @@ public class HomePage extends BurgerBasePage {
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
         response.render(CssReferenceHeaderItem.forReference(
-                new PackageResourceReference(HomePage.class, "mijn-dag.css")));
+                new PackageResourceReference(MarriageIntakePage.class, "mijn-dag.css")));
     }
 }

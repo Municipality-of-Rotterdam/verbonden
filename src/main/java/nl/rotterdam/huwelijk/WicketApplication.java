@@ -6,7 +6,7 @@ import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsCreatePage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsUpdatePage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
-import nl.rotterdam.huwelijk.features.marriage_intake.ui.HomePage;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
@@ -51,7 +51,7 @@ public class WicketApplication extends WebApplication {
 
     @Override
     public Class<? extends Page> getHomePage() {
-        return HomePage.class;
+        return MarriageIntakePage.class;
     }
 
     @Override
