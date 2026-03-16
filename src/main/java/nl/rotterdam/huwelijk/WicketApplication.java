@@ -15,6 +15,7 @@ import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbare
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagImportPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagUpdatePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
+import nl.rotterdam.huwelijk.features.mock_digid.ui.MockDigiDLoginPage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
@@ -57,6 +58,7 @@ public class WicketApplication extends WebApplication {
                 new ResourceIsolationRequestCycleListener(
                         new FetchMetadataResourceIsolationPolicy()));
 
+        mountPage("/inloggen", MockDigiDLoginPage.class);
         mountPage("/beheer", BabsAdministrationPage.class);
         mountPage("/beheer/babs/nieuw", BabsCreatePage.class);
         mountPage("/beheer/babs/${id}", BabsUpdatePage.class);
