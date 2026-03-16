@@ -19,6 +19,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.Arrays;
 
 public class BeschikbaarheidUpdatePage extends AdministrationBasePage {
@@ -84,11 +85,11 @@ public class BeschikbaarheidUpdatePage extends AdministrationBasePage {
                     new RdFormFieldTextInput<>("startTijd",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getStartTijd,
                                     BeschikbaarheidFormDto::setStartTijd),
-                            Model.of("Starttijd")).setRequired(true).setHtmlInputType("time"),
+                            Model.of("Starttijd")).setRequired(true).setHtmlInputType("time").setModelType(LocalTime.class),
                     new RdFormFieldTextInput<>("eindTijd",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getEindTijd,
                                     BeschikbaarheidFormDto::setEindTijd),
-                            Model.of("Eindtijd")).setRequired(true).setHtmlInputType("time"),
+                            Model.of("Eindtijd")).setRequired(true).setHtmlInputType("time").setModelType(LocalTime.class),
                     new RdFormFieldTextInput<>("duurInMinuten",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getDuurInMinuten,
                                     BeschikbaarheidFormDto::setDuurInMinuten),
