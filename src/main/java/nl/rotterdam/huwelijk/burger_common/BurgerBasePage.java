@@ -19,6 +19,9 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class BurgerBasePage extends WebPage {
 
@@ -54,6 +57,11 @@ public abstract class BurgerBasePage extends WebPage {
                 .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
         pageHeader.add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
+        pageHeader.add(new Label("userName", () -> {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            return (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
+                    ? auth.getName() : "";
+        }));
         pageHeader.add(new WebMarkupContainer("logOutIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
 

@@ -7,6 +7,7 @@ import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsUpdatePage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
+import nl.rotterdam.huwelijk.features.mock_digid.ui.MockDigiDLoginPage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
@@ -69,6 +70,7 @@ public class WicketApplication extends WebApplication {
                 new ResourceIsolationRequestCycleListener(
                         new FetchMetadataResourceIsolationPolicy()));
 
+        mountPage("/inloggen", MockDigiDLoginPage.class);
         mountPage("/beheer", BapsAdministrationPage.class);
         mountPage("/beheer/baps/nieuw", BapsCreatePage.class);
         mountPage("/beheer/baps/${id}", BapsUpdatePage.class);
