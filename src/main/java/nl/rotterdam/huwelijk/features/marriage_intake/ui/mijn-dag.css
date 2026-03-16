@@ -7,40 +7,20 @@
     background-color: #f2f2f2;
     border-bottom: 1px solid #d0d0d0;
     font-size: 0.875rem;
-}
-
-.rd-top-bar__inner {
-    max-width: 75rem;
-    margin: 0 auto;
-    padding: 0.375rem 1rem;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 1rem;
     color: #333;
 }
 
-.rd-top-bar__inner a {
+.rd-top-bar a {
     color: #333;
     text-decoration: none;
 }
 
-.rd-top-bar__inner a:hover {
+.rd-top-bar a:hover {
     text-decoration: underline;
 }
 
 .rd-top-bar__sep {
     color: #bbb;
-}
-
-/* Header inner layout */
-.rd-header-inner {
-    max-width: 75rem;
-    margin: 0 auto;
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
 /* Logo link */
@@ -188,15 +168,8 @@
     color: var(--rd-color-green-500, #007a3e);
 }
 
-/* Radio option row (Registratie) */
-.rd-radio-options {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
+/* Radio option tile */
 .rd-radio-option {
-    flex: 1;
     min-width: 10rem;
     border: 1px solid #d0d0d0;
     border-radius: 4px;
@@ -211,32 +184,6 @@
 .rd-radio-option:has(input:checked) {
     border-color: var(--rd-color-green-500, #007a3e);
     background-color: #f0f8f4;
-}
-
-/* Soort: three-column grid */
-.rd-soort-options {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-}
-
-@media (max-width: 640px) {
-    .rd-soort-options {
-        grid-template-columns: 1fr;
-    }
-}
-
-.rd-soort-option {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.rd-soort-option__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.25rem;
 }
 
 .rd-soort-option__title {
@@ -276,7 +223,6 @@
     gap: 0.5rem;
     cursor: pointer;
     background: #fff;
-    margin-top: auto;
 }
 
 .rd-soort-radio-box:has(input:checked) {
@@ -284,25 +230,7 @@
     background-color: #f0f8f4;
 }
 
-/* Submit button row */
-.rd-submit-area {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-}
-
-/* Footer inner */
-.rd-footer-inner {
-    max-width: 75rem;
-    margin: 0 auto;
-    padding: 1.25rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
+/* Footer links */
 .rd-footer-links {
     display: flex;
     gap: 1.5rem;
