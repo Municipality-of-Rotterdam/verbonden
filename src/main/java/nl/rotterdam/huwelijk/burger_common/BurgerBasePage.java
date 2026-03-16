@@ -55,11 +55,20 @@ public abstract class BurgerBasePage extends WebPage {
 
         pageHeader.add(new WebMarkupContainer("globeIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
-        pageHeader.add(new WebMarkupContainer("userIcon")
+
+        WebMarkupContainer userBar = new WebMarkupContainer("userBar") {
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                setVisible(isAuthenticated());
+            }
+        };
+        userBar.add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
-        pageHeader.add(new Label("userName", this::currentUserName));
-        pageHeader.add(new WebMarkupContainer("logOutIcon")
+        userBar.add(new Label("userName", this::currentUserName));
+        userBar.add(new WebMarkupContainer("logOutIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
+        pageHeader.add(userBar);
 
         pageBody = new RdPageBodyBorder("pageBody");
         pageLayout.add(pageBody);
@@ -80,5 +89,10 @@ public abstract class BurgerBasePage extends WebPage {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
                 ? auth.getName() : "";
+    }
+
+    private boolean isAuthenticated() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
     }
 }
