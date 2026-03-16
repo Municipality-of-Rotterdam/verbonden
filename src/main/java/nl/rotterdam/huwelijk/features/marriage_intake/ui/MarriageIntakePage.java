@@ -15,6 +15,7 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -26,6 +27,11 @@ public class MarriageIntakePage extends BurgerBasePage {
 
     private String registrationType = "geregistreerd_partnerschap";
     private String ceremonyType = "eenvoudig";
+
+    @Override
+    protected IModel<String> getTitleModel() {
+        return Model.of("Mijn dag - Gemeente Rotterdam");
+    }
 
     public MarriageIntakePage() {
         this(new PageParameters());

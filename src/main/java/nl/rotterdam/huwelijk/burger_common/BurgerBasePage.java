@@ -17,6 +17,8 @@ import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.IModel;
 
 public abstract class BurgerBasePage extends WebPage {
 
@@ -27,7 +29,11 @@ public abstract class BurgerBasePage extends WebPage {
 
     protected final RdPageBodyBorder pageBody;
 
+    protected abstract IModel<String> getTitleModel();
+
     public BurgerBasePage() {
+        add(new Label("pageTitle", getTitleModel()));
+
         RdRootTransparentContainer root = new RdRootTransparentContainer("root");
         root.add(NldsRotterdamDesignSystemThemeBehavior.INSTANCE);
         add(root);
