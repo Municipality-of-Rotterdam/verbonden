@@ -6,6 +6,11 @@ import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsCreatePage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsUpdatePage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
+import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidCreatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidUpdatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationCreatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationUpdatePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
@@ -18,6 +23,7 @@ import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
@@ -46,6 +52,30 @@ public class WicketApplication extends WebApplication {
             }
         });
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
+        locator.set(LocalTime.class, new IConverter<LocalTime>() {
+            private final DateTimeFormatter formatter =
+                    new java.time.format.DateTimeFormatterBuilder()
+                            .appendPattern("HH:mm")
+                            .optionalStart().appendPattern(":ss").optionalEnd()
+                            .toFormatter();
+
+            @Override
+            public LocalTime convertToObject(String value, Locale locale) throws ConversionException {
+                if (value == null || value.isBlank()) {
+                    return null;
+                }
+                try {
+                    return LocalTime.parse(value, formatter);
+                } catch (DateTimeParseException e) {
+                    throw new ConversionException(e).setResourceKey("IConverter.Time");
+                }
+            }
+
+            @Override
+            public String convertToString(LocalTime value, Locale locale) {
+                return value != null ? value.format(DateTimeFormatter.ofPattern("HH:mm")) : "";
+            }
+        });
         return locator;
     }
 
@@ -72,5 +102,11 @@ public class WicketApplication extends WebApplication {
         mountPage("/beheer", BapsAdministrationPage.class);
         mountPage("/beheer/baps/nieuw", BapsCreatePage.class);
         mountPage("/beheer/baps/${id}", BapsUpdatePage.class);
+
+        mountPage("/beheer/locaties", LocationAdministrationPage.class);
+        mountPage("/beheer/locaties/nieuw", LocationCreatePage.class);
+        mountPage("/beheer/locaties/${id}", LocationUpdatePage.class);
+        mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/nieuw", BeschikbaarheidCreatePage.class);
+        mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/${id}", BeschikbaarheidUpdatePage.class);
     }
 }
