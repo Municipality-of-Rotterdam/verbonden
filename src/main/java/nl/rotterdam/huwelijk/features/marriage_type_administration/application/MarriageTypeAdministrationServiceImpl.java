@@ -48,6 +48,7 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
         entity.setTekst(dto.tekst());
         entity.setPrijs(dto.prijs());
         entity.setUrl(dto.url());
+        entity.setSoort(dto.soort());
         marriageTypeRepository.save(entity);
     }
 
@@ -60,6 +61,7 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
     private ChangeMarriageTypeDto toChangeDto(MarriageTypeEntity entity) {
         return new ChangeMarriageTypeDto(
                 entity.getId(),
+                entity.getSoort(),
                 entity.getTitel(),
                 entity.getTekst(),
                 entity.getPrijs(),
@@ -69,6 +71,7 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
 
     private MarriageTypeEntity toEntity(CreateMarriageTypeDto dto) {
         MarriageTypeEntity entity = new MarriageTypeEntity();
+        entity.setSoort(dto.soort());
         entity.setTitel(dto.titel());
         entity.setTekst(dto.tekst());
         entity.setPrijs(dto.prijs());

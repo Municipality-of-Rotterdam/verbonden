@@ -36,6 +36,7 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
                 PageParameters params = new PageParameters();
                 params.add("id", dto.id());
 
+                item.add(new Label("soort", dto.soort().name()));
                 item.add(new Label("titel", dto.titel()));
                 item.add(new Label("prijs", dto.prijs() != null ? dto.prijs().toPlainString() : ""));
                 item.add(new BookmarkablePageLink<>("bewerkLink",

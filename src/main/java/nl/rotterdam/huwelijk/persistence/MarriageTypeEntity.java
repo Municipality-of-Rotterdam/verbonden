@@ -1,6 +1,7 @@
 package nl.rotterdam.huwelijk.persistence;
 
 import jakarta.persistence.*;
+import nl.rotterdam.huwelijk.domain.MarriageType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,6 +25,10 @@ public class MarriageTypeEntity {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String url;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true, length = 50)
+    private MarriageType soort;
 
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
@@ -66,6 +71,14 @@ public class MarriageTypeEntity {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public MarriageType getSoort() {
+        return soort;
+    }
+
+    public void setSoort(MarriageType soort) {
+        this.soort = soort;
     }
 
     public LocalDateTime getAangemaaktOp() {

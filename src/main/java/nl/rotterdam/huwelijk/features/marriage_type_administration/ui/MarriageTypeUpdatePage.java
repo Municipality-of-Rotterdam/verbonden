@@ -3,8 +3,10 @@ package nl.rotterdam.huwelijk.features.marriage_type_administration.ui;
 import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.application.MarriageTypeAdministrationService;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.ChangeMarriageTypeDto;
+import nl.rotterdam.huwelijk.domain.MarriageType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -13,6 +15,8 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+
+import java.util.List;
 
 public class MarriageTypeUpdatePage extends AdministrationBasePage {
 
@@ -54,6 +58,9 @@ public class MarriageTypeUpdatePage extends AdministrationBasePage {
             super.onInitialize();
             IModel<MarriageTypeFormDto> model = getModel();
             add(
+                    new DropDownChoice<>("soort",
+                            LambdaModel.of(model, MarriageTypeFormDto::getSoort, MarriageTypeFormDto::setSoort),
+                            List.of(MarriageType.values())).setRequired(true),
                     new RdFormFieldTextInput<>("titel",
                             LambdaModel.of(model, MarriageTypeFormDto::getTitel, MarriageTypeFormDto::setTitel),
                             Model.of("Titel")).setRequired(true),
@@ -76,6 +83,7 @@ public class MarriageTypeUpdatePage extends AdministrationBasePage {
             MarriageTypeFormDto f = getModelObject();
             marriageTypeAdministrationService.update(new ChangeMarriageTypeDto(
                     marriageTypeId,
+                    f.getSoort(),
                     f.getTitel(),
                     f.getTekst(),
                     f.getPrijs(),
