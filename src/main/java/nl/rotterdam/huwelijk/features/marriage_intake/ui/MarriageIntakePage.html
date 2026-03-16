@@ -3,6 +3,8 @@
 </wicket:head>
 <wicket:extend>
 
+<div class="container py-4">
+
     <!-- Breadcrumb -->
     <div wicket:id="breadcrumb"></div>
 
@@ -23,12 +25,12 @@
 
         <!-- Registratie section (RdRadioGroup border) -->
         <div class="rd-card" wicket:id="registrationGroup">
-            <div class="rd-radio-options">
-                <label class="rd-radio-option" for="huwelijk-input">
+            <div class="d-flex gap-3 flex-wrap">
+                <label class="flex-fill rd-radio-option" for="huwelijk-input">
                     <input type="radio" wicket:id="huwelijk" id="huwelijk-input"/>
                     Huwelijk
                 </label>
-                <label class="rd-radio-option" for="partnerschap-input">
+                <label class="flex-fill rd-radio-option" for="partnerschap-input">
                     <input type="radio" wicket:id="geregistreerdPartnerschap" id="partnerschap-input"/>
                     Geregistreerd partnerschap
                 </label>
@@ -37,10 +39,10 @@
 
         <!-- Soort section (RdRadioGroup border) -->
         <div class="rd-card" wicket:id="ceremonyGroup">
-            <div class="rd-soort-options">
+            <div class="row g-3">
                 <!-- Gratis -->
-                <div class="rd-soort-option">
-                    <div class="rd-soort-option__header">
+                <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="rd-soort-option__title">Gratis</span>
                         <span class="rd-price-badge">&#x20AC;&nbsp;00<sup>,00</sup></span>
                     </div>
@@ -49,15 +51,15 @@
                         quos dolores et quas molestias excepturi
                         <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
                     </p>
-                    <label class="rd-soort-radio-box" for="gratis-input">
+                    <label class="rd-soort-radio-box mt-auto" for="gratis-input">
                         <input type="radio" wicket:id="gratis" id="gratis-input"/>
                         Gratis
                     </label>
                 </div>
 
                 <!-- Eenvoudig -->
-                <div class="rd-soort-option">
-                    <div class="rd-soort-option__header">
+                <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="rd-soort-option__title">Eenvoudig</span>
                         <span class="rd-price-badge">&#x20AC;&nbsp;267<sup>,81</sup></span>
                     </div>
@@ -66,15 +68,15 @@
                         quos dolores et quas molestias excepturi
                         <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
                     </p>
-                    <label class="rd-soort-radio-box" for="eenvoudig-input">
+                    <label class="rd-soort-radio-box mt-auto" for="eenvoudig-input">
                         <input type="radio" wicket:id="eenvoudig" id="eenvoudig-input"/>
                         Eenvoudig
                     </label>
                 </div>
 
                 <!-- Regulier -->
-                <div class="rd-soort-option">
-                    <div class="rd-soort-option__header">
+                <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="rd-soort-option__title">Regulier</span>
                         <span class="rd-price-badge">&#x20AC;&nbsp;461<sup>,48</sup></span>
                     </div>
@@ -83,7 +85,7 @@
                         quos dolores et quas molestias excepturi
                         <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
                     </p>
-                    <label class="rd-soort-radio-box" for="regulier-input">
+                    <label class="rd-soort-radio-box mt-auto" for="regulier-input">
                         <input type="radio" wicket:id="regulier" id="regulier-input"/>
                         Regulier
                     </label>
@@ -92,7 +94,7 @@
         </div>
 
         <!-- Submit button -->
-        <div class="rd-submit-area">
+        <div class="d-flex justify-content-end mt-4">
             <button wicket:id="submitButton" type="submit">
                 <span wicket:id="icon">ring icon</span>
                 Plan jullie dag
@@ -100,6 +102,8 @@
         </div>
 
     </form>
+
+</div>
 
 </wicket:extend>
 
