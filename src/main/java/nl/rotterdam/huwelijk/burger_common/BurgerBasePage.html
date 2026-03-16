@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org" wicket:id="root" lang="nl" dir="ltr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title wicket:id="pageTitle">Gemeente Rotterdam</title>
+</head>
+<body wicket:id="body">
+
+<!-- Page Layout -->
+<div wicket:id="pageLayout">
+
+    <!-- Page Header -->
+    <header wicket:id="pageHeader">
+
+        <!-- Top utility bar -->
+        <div class="rd-top-bar">
+            <div class="container-fluid d-flex justify-content-end align-items-center gap-3 py-2">
+                <a href="#"><span wicket:id="globeIcon"></span> Nederlands &#x25BE;</a>
+                <span class="rd-top-bar__sep">|</span>
+                <span><span wicket:id="userIcon"></span> A.J. de Vries</span>
+                <span class="rd-top-bar__sep">|</span>
+                <a href="#"><span wicket:id="logOutIcon"></span> Uitloggen</a>
+            </div>
+        </div>
+
+        <!-- Main header: logo -->
+        <div class="container py-3">
+            <div wicket:id="logo">
+                <a class="rd-logo-link" href="/">
+                    <div wicket:id="rotterdamLogoImage"></div>
+                </a>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- Page Body -->
+    <div wicket:id="pageBody">
+        <wicket:child/>
+    </div>
+
+    <!-- Page Footer -->
+    <footer wicket:id="pageFooter">
+        <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3 py-3">
+            <nav class="rd-footer-links" aria-label="Service-navigatie">
+                <a href="#">Cookies</a>
+                <a href="#">Privacy</a>
+                <a href="#">Toegankelijkheid</a>
+            </nav>
+            <div class="rd-footer-logo">
+                <div wicket:id="footerLogoImage"></div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+</body>
+</html>

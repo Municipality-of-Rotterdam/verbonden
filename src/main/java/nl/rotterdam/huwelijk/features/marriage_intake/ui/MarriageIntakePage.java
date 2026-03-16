@@ -1,29 +1,21 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
-import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_logo.RotterdamLogoImage;
-import nl.rotterdam.nl_design_system.wicket.components.body.RdBodyTransparentContainer;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
-import nl.rotterdam.nl_design_system.wicket.components.logo.RdLogoBorder;
-import nl.rotterdam.nl_design_system.wicket.components.page_body.RdPageBodyBorder;
-import nl.rotterdam.nl_design_system.wicket.components.page_footer.RdPageFooterBorder;
-import nl.rotterdam.nl_design_system.wicket.components.page_header.RdPageHeaderBorder;
-import nl.rotterdam.nl_design_system.wicket.components.page_layout.RdPageLayoutBorder;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
-import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -36,44 +28,16 @@ public class MarriageIntakePage extends BurgerBasePage {
     private String registrationType = "geregistreerd_partnerschap";
     private String ceremonyType = "eenvoudig";
 
+    @Override
+    protected IModel<String> getTitleModel() {
+        return Model.of("Mijn dag - Gemeente Rotterdam");
+    }
+
     public MarriageIntakePage() {
         this(new PageParameters());
     }
 
     public MarriageIntakePage(PageParameters parameters) {
-        // Root html element with Rotterdam theme
-        RdRootTransparentContainer root = new RdRootTransparentContainer("root");
-        root.add(NldsRotterdamDesignSystemThemeBehavior.INSTANCE);
-        add(root);
-
-        // Body element
-        add(new RdBodyTransparentContainer("body"));
-
-        // Page Layout
-        RdPageLayoutBorder pageLayout = new RdPageLayoutBorder("pageLayout");
-        add(pageLayout);
-
-        // Page Header
-        RdPageHeaderBorder pageHeader = new RdPageHeaderBorder("pageHeader");
-        pageLayout.add(pageHeader);
-
-        // Logo inside header
-        RdLogoBorder logo = new RdLogoBorder("logo");
-        logo.add(new RotterdamLogoImage("rotterdamLogoImage"));
-        pageHeader.add(logo);
-
-        // Top bar icons
-        pageHeader.add(new WebMarkupContainer("globeIcon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
-        pageHeader.add(new WebMarkupContainer("userIcon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
-        pageHeader.add(new WebMarkupContainer("logOutIcon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
-
-        // Page Body
-        RdPageBodyBorder pageBody = new RdPageBodyBorder("pageBody");
-        pageLayout.add(pageBody);
-
         // Breadcrumb
         List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
                 new RdBreadcrumbNavRecord<>(null, "Mijn Loket", MarriageIntakePage.class),
@@ -128,11 +92,6 @@ public class MarriageIntakePage extends BurgerBasePage {
                 .add(new RotterdamIconBehavior(RotterdamIconType.RING)));
 
         form.add(submitButton);
-
-        // Page Footer
-        RdPageFooterBorder pageFooter = new RdPageFooterBorder("pageFooter");
-        pageFooter.add(new RotterdamLogoImage("footerLogoImage"));
-        pageLayout.add(pageFooter);
     }
 
     @Override
