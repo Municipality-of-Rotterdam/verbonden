@@ -19,63 +19,18 @@ import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
 import org.apache.wicket.protocol.http.ResourceIsolationRequestCycleListener;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
-import org.apache.wicket.util.convert.ConversionException;
-import org.apache.wicket.util.convert.IConverter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Locale;
 
 public class WicketApplication extends WebApplication {
 
     @Override
     protected IConverterLocator newConverterLocator() {
         ConverterLocator locator = (ConverterLocator) super.newConverterLocator();
-        locator.set(LocalDate.class, new IConverter<LocalDate>() {
-            @Override
-            public LocalDate convertToObject(String value, Locale locale) throws ConversionException {
-                if (value == null || value.isBlank()) {
-                    return null;
-                }
-                try {
-                    return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE);
-                } catch (DateTimeParseException e) {
-                    throw new ConversionException(e).setResourceKey("IConverter.Date");
-                }
-            }
-
-            @Override
-            public String convertToString(LocalDate value, Locale locale) {
-                return value != null ? value.format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
-            }
-        });
+        locator.set(LocalDate.class, new LocalDateWicketConverter());
+        locator.set(LocalTime.class, new LocalTimeWicketConverter());
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
-        locator.set(LocalTime.class, new IConverter<LocalTime>() {
-            private final DateTimeFormatter formatter =
-                    new java.time.format.DateTimeFormatterBuilder()
-                            .appendPattern("HH:mm")
-                            .optionalStart().appendPattern(":ss").optionalEnd()
-                            .toFormatter();
-
-            @Override
-            public LocalTime convertToObject(String value, Locale locale) throws ConversionException {
-                if (value == null || value.isBlank()) {
-                    return null;
-                }
-                try {
-                    return LocalTime.parse(value, formatter);
-                } catch (DateTimeParseException e) {
-                    throw new ConversionException(e).setResourceKey("IConverter.Time");
-                }
-            }
-
-            @Override
-            public String convertToString(LocalTime value, Locale locale) {
-                return value != null ? value.format(DateTimeFormatter.ofPattern("HH:mm")) : "";
-            }
-        });
         return locator;
     }
 
