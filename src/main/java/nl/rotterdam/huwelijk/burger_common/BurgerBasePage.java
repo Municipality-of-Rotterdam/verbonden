@@ -57,11 +57,7 @@ public abstract class BurgerBasePage extends WebPage {
                 .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
         pageHeader.add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
-        pageHeader.add(new Label("userName", () -> {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            return (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
-                    ? auth.getName() : "";
-        }));
+        pageHeader.add(new Label("userName", this::currentUserName));
         pageHeader.add(new WebMarkupContainer("logOutIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
 
@@ -78,5 +74,11 @@ public abstract class BurgerBasePage extends WebPage {
         super.renderHead(response);
         response.render(BOOTSTRAP_GRID_HEADER_ITEM);
         response.render(BOOTSTRAP_UTILITIES_HEADER_ITEM);
+    }
+
+    private String currentUserName() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
+                ? auth.getName() : "";
     }
 }
