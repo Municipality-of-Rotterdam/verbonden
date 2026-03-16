@@ -86,9 +86,10 @@ public abstract class BurgerBasePage extends WebPage {
     }
 
     private String currentUserName() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
-                ? auth.getName() : "";
+        if (!isAuthenticated()) {
+            return "";
+        }
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
     private boolean isAuthenticated() {
