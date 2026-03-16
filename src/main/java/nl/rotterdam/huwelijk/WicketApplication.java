@@ -7,6 +7,9 @@ import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsUpdatePage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeCreatePage;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeUpdatePage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
@@ -72,5 +75,8 @@ public class WicketApplication extends WebApplication {
         mountPage("/beheer", BapsAdministrationPage.class);
         mountPage("/beheer/baps/nieuw", BapsCreatePage.class);
         mountPage("/beheer/baps/${id}", BapsUpdatePage.class);
+        mountPage("/beheer/huwelijkstypen", MarriageTypeAdministrationPage.class);
+        mountPage("/beheer/huwelijkstypen/nieuw", MarriageTypeCreatePage.class);
+        mountPage("/beheer/huwelijkstypen/${id}", MarriageTypeUpdatePage.class);
     }
 }

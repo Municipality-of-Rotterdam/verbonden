@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Huwelijkstypen beheer</title>
+</head>
+<body>
+<h1>Huwelijkstypen beheer</h1>
+
+<p>
+    <a wicket:id="nieuwHuwelijkstypeLink">Nieuw huwelijkstype toevoegen</a>
+</p>
+
+<table>
+    <thead>
+    <tr>
+        <th>Titel</th>
+        <th>Prijs</th>
+        <th>Acties</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr wicket:id="huwelijkstypen">
+        <td wicket:id="titel"></td>
+        <td wicket:id="prijs"></td>
+        <td>
+            <a wicket:id="bewerkLink">Bewerken</a>
+            &nbsp;
+            <a wicket:id="verwijderLink">Verwijderen</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
