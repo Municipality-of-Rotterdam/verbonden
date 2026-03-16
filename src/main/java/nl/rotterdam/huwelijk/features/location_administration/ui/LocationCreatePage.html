@@ -5,18 +5,20 @@
     <title>Nieuwe trouwlocatie toevoegen</title>
 </head>
 <body>
-<h1>Nieuwe trouwlocatie toevoegen</h1>
+<wicket:extend>
+    <h1>Nieuwe trouwlocatie toevoegen</h1>
 
-<p><a wicket:id="terugLink">Terug naar overzicht</a></p>
+    <p><a wicket:id="terugLink">Terug naar overzicht</a></p>
 
-<div wicket:id="feedback"></div>
+    <div wicket:id="feedback"></div>
 
-<form wicket:id="locatieForm" class="d-flex flex-column gap-3">
-    <div wicket:id="naam"></div>
-    <div wicket:id="fotoUrl"></div>
-    <div>
-        <button wicket:id="opslaan" type="submit"></button>
-    </div>
-</form>
+    <form wicket:id="locatieForm" class="d-flex flex-column gap-3">
+        <div wicket:id="naam"></div>
+        <div wicket:id="fotoUrl"></div>
+        <div>
+            <button wicket:id="opslaan" type="submit"></button>
+        </div>
+    </form>
+</wicket:extend>
 </body>
 </html>
