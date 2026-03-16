@@ -19,6 +19,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 
@@ -93,19 +94,26 @@ public class BeschikbaarheidUpdatePage extends AdministrationBasePage {
                     new RdFormFieldTextInput<>("duurInMinuten",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getDuurInMinuten,
                                     BeschikbaarheidFormDto::setDuurInMinuten),
-                            Model.of("Duur (minuten)")).setRequired(true).setHtmlInputType("number"),
+                            Model.of("Duur (minuten)")).setRequired(true)
+                            .setHtmlInputType("number")
+                            .setModelType(Integer.class),
+
                     new RdFormFieldTextInput<>("prijs",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getPrijs,
                                     BeschikbaarheidFormDto::setPrijs),
-                            Model.of("Prijs (euro)")).setRequired(true).setHtmlInputType("number"),
+                            Model.of("Prijs (euro)")).setRequired(true).setHtmlInputType("number")
+                            .setModelType(BigDecimal.class),
                     new RdFormFieldTextInput<>("ingangsdatum",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getIngangsdatum,
                                     BeschikbaarheidFormDto::setIngangsdatum),
-                            Model.of("Ingangsdatum")).setRequired(true).setHtmlInputType("date"),
+                            Model.of("Ingangsdatum")).setRequired(true)
+                            .setHtmlInputType("date")
+                            .setModelType(LocalDate.class),
                     new RdFormFieldTextInput<>("einddatum",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getEinddatum,
                                     BeschikbaarheidFormDto::setEinddatum),
-                            Model.of("Einddatum")).setRequired(true).setHtmlInputType("date"),
+                            Model.of("Einddatum")).setRequired(true).setHtmlInputType("date")
+                            .setModelType(LocalDate.class),
                     new RdButton("opslaan", Model.of("Opslaan"))
             );
         }
