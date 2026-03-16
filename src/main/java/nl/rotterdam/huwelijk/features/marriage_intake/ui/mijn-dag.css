@@ -23,6 +23,14 @@
     color: #bbb;
 }
 
+/* Icons in the top bar: keep them in line with the text */
+.rd-top-bar rods-icon-globe,
+.rd-top-bar rods-icon-user,
+.rd-top-bar rods-icon-log-out {
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
 /* Logo link */
 .rd-logo-link {
     display: flex;
@@ -39,24 +47,6 @@
 }
 
 /* Primary navigation */
-.rd-header-nav {
-    display: flex;
-    align-items: flex-end;
-    gap: 2rem;
-}
-
-.rd-header-nav a {
-    text-decoration: none;
-    color: #222;
-    font-size: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 3px solid transparent;
-}
-
-.rd-header-nav a:hover,
-.rd-header-nav a:focus {
-    text-decoration: underline;
-}
 
 /* Page body content constraint */
 .utrecht-page-body__content {
