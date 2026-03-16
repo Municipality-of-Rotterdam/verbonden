@@ -104,7 +104,6 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/inloggen"))
                 )
-                .formLogin(form -> form.disable())
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/uitloggen", "GET"))
                         .logoutSuccessUrl("/inloggen")
