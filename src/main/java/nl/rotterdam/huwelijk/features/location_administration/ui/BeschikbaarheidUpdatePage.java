@@ -80,7 +80,7 @@ public class BeschikbaarheidUpdatePage extends AdministrationBasePage {
                             LambdaModel.of(model, BeschikbaarheidFormDto::getDagVanDeWeek,
                                     BeschikbaarheidFormDto::setDagVanDeWeek),
                             Arrays.asList(DayOfWeek.values()),
-                            new EnumChoiceRenderer<>(this)).setRequired(true),
+                            new DayOfWeekChoiceRenderer()).setRequired(true),
                     new RdFormFieldTextInput<>("startTijd",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getStartTijd,
                                     BeschikbaarheidFormDto::setStartTijd),
