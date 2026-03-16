@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org" wicket:id="root" lang="nl" dir="ltr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gemeente Rotterdam</title>
+</head>
+<body wicket:id="body">
+
+<!-- Page Layout -->
+<div wicket:id="pageLayout">
+
+    <!-- Page Header -->
+    <header wicket:id="pageHeader">
+
+        <!-- Top utility bar -->
+        <div class="rd-top-bar">
+            <div class="rd-top-bar__inner">
+                <a href="#"><span wicket:id="globeIcon"></span> Nederlands &#x25BE;</a>
+                <span class="rd-top-bar__sep">|</span>
+                <span><span wicket:id="userIcon"></span> A.J. de Vries</span>
+                <span class="rd-top-bar__sep">|</span>
+                <a href="#"><span wicket:id="logOutIcon"></span> Uitloggen</a>
+            </div>
+        </div>
+
+        <!-- Main header: logo + primary nav -->
+        <div class="rd-header-inner">
+            <div wicket:id="logo">
+                <a class="rd-logo-link" href="/">
+                    <div wicket:id="rotterdamLogoImage"></div>
+                </a>
+            </div>
+
+            <nav class="rd-header-nav" aria-label="Hoofdnavigatie">
+                <a href="#">Link 1</a>
+                <a href="#">Link 2</a>
+                <a href="#">Link 3</a>
+            </nav>
+        </div>
+
+    </header>
+
+    <!-- Page Body -->
+    <div wicket:id="pageBody">
+        <wicket:child/>
+    </div>
+
+    <!-- Page Footer -->
+    <footer wicket:id="pageFooter">
+        <div class="rd-footer-inner">
+            <nav class="rd-footer-links" aria-label="Service-navigatie">
+                <a href="#">Cookies</a>
+                <a href="#">Privacy</a>
+                <a href="#">Toegankelijkheid</a>
+            </nav>
+            <div class="rd-footer-logo">
+                <div wicket:id="footerLogoImage"></div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+</body>
+</html>
