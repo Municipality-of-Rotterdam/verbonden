@@ -43,9 +43,9 @@ public class BapsAdministrationPage extends AdministrationBasePage {
     public BapsAdministrationPage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
-        add(feedback);
+        pageBody.add(feedback);
 
-        add(new BookmarkablePageLink<>("nieuwBapsLink", BapsCreatePage.class));
+        pageBody.add(new BookmarkablePageLink<>("nieuwBapsLink", BapsCreatePage.class));
 
         Form<?> importForm = new Form<>("importForm");
         importForm.add(new RdAjaxButton("importeerButton") {
@@ -66,9 +66,9 @@ public class BapsAdministrationPage extends AdministrationBasePage {
                 target.add(feedback);
             }
         });
-        add(importForm);
+        pageBody.add(importForm);
 
-        add(buildBapsTable());
+        pageBody.add(buildBapsTable());
     }
 
     private RdDataTable<ListBapsDto, String> buildBapsTable() {

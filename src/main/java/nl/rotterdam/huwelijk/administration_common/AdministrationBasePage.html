@@ -35,14 +35,13 @@
 
     </header>
 
-    <!-- Page Body: side nav + child content -->
-    <div wicket:id="pageBody">
-        <div class="container-fluid py-4">
-            <div class="d-flex gap-4">
-                <nav wicket:id="sideNav"></nav>
-                <main class="flex-grow-1">
-                    <wicket:child/>
-                </main>
+    <!-- Content: side nav + page body -->
+    <div class="container-fluid py-4">
+        <div class="d-flex gap-4">
+            <nav wicket:id="sideNav"></nav>
+            <!-- Page Body -->
+            <div wicket:id="pageBody">
+                <wicket:child/>
             </div>
         </div>
     </div>

@@ -32,8 +32,8 @@ public class LocationAdministrationPage extends AdministrationBasePage {
     private LocationAdministrationService locationAdministrationService;
 
     public LocationAdministrationPage() {
-        add(new BookmarkablePageLink<>("nieuweLocatieLink", LocationCreatePage.class));
-        add(buildLocatieTable());
+        pageBody.add(new BookmarkablePageLink<>("nieuweLocatieLink", LocationCreatePage.class));
+        pageBody.add(buildLocatieTable());
     }
 
     private RdDataTable<ListLocatieDto, String> buildLocatieTable() {

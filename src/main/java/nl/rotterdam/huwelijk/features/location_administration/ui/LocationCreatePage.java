@@ -22,7 +22,7 @@ public class LocationCreatePage extends AdministrationBasePage {
     public LocationCreatePage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
-        add(
+        pageBody.add(
                 new BookmarkablePageLink<>("terugLink", LocationAdministrationPage.class),
                 feedback,
                 new CreateLocatieForm("locatieForm")

@@ -31,6 +31,8 @@ public abstract class AdministrationBasePage extends WebPage {
     private static final CssReferenceHeaderItem BOOTSTRAP_UTILITIES_HEADER_ITEM =
             CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-utilities.min.css"));
 
+    protected final RdPageBodyBorder pageBody;
+
     public AdministrationBasePage() {
         add(PatchingNldsRotterdamDesignSystemThemeBehavior.INSTANCE);
         add(new RdRootTransparentContainer("root"));
@@ -53,13 +55,13 @@ public abstract class AdministrationBasePage extends WebPage {
         pageHeader.add(new WebMarkupContainer("logOutIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
 
-        RdPageBodyBorder pageBody = new RdPageBodyBorder("pageBody");
-        pageLayout.add(pageBody);
-
-        pageBody.add(new RdSideNavPanel("sideNav", List.of(
+        pageLayout.add(new RdSideNavPanel("sideNav", List.of(
                 new RdSideNavRecord(null, "BAPS Beheer", BapsAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Trouwlocaties Beheer", LocationAdministrationPage.class, null, null, null)
         )));
+
+        pageBody = new RdPageBodyBorder("pageBody");
+        pageLayout.add(pageBody);
 
         RdPageFooterBorder pageFooter = new RdPageFooterBorder("pageFooter");
         pageFooter.add(new RotterdamLogoImage("footerLogoImage"));

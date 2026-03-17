@@ -59,7 +59,7 @@ public class LocationUpdatePage extends AdministrationBasePage {
         PageParameters nieuwBeschikbaarheidParams = new PageParameters();
         nieuwBeschikbaarheidParams.add("locatieId", id);
 
-        add(
+        pageBody.add(
                 new BookmarkablePageLink<>("terugLink", LocationAdministrationPage.class),
                 feedback,
                 new ChangeLocatieForm("locatieForm", dto),

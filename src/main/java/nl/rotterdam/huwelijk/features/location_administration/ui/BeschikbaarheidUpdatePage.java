@@ -50,7 +50,7 @@ public class BeschikbaarheidUpdatePage extends AdministrationBasePage {
 
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
-        add(
+        pageBody.add(
                 new BookmarkablePageLink<>("terugLink", LocationUpdatePage.class, terugParams),
                 feedback,
                 new ChangeBeschikbaarheidForm("beschikbaarheidForm", dto, locatieId)
