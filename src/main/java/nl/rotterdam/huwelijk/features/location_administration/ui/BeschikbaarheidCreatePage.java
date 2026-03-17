@@ -6,7 +6,6 @@ import nl.rotterdam.huwelijk.features.location_administration.domain.CreateBesch
 import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.EnumChoiceRenderer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -60,16 +59,20 @@ public class BeschikbaarheidCreatePage extends AdministrationBasePage {
             super.onInitialize();
             IModel<BeschikbaarheidFormDto> model = getModel();
             add(
-                    new DropDownChoice<>("huwelijkstype",
+                    new RdFormFieldSelect<>("huwelijkstype",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getHuwelijkstype,
                                     BeschikbaarheidFormDto::setHuwelijkstype),
+                            Model.of("Huwelijkstype"),
                             Arrays.asList(HuwelijksType.values()),
-                            new EnumChoiceRenderer<>(this)).setRequired(true),
-                    new DropDownChoice<>("dagVanDeWeek",
+                            new EnumChoiceRenderer<>(this))
+                            .setRequired(true),
+                    new RdFormFieldSelect<>("dagVanDeWeek",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getDagVanDeWeek,
                                     BeschikbaarheidFormDto::setDagVanDeWeek),
+                            Model.of("Dag van de week"),
                             Arrays.asList(DayOfWeek.values()),
-                            new DayOfWeekChoiceRenderer()).setRequired(true),
+                            new DayOfWeekChoiceRenderer())
+                            .setRequired(true),
                     new RdFormFieldTextInput<>("startTijd",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getStartTijd,
                                     BeschikbaarheidFormDto::setStartTijd),
