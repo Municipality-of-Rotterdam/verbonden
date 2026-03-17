@@ -13,7 +13,7 @@ public interface LocatieRepository extends JpaRepository<TrouwlocatieEntity, Lon
 
     @Query("""
             SELECT new nl.rotterdam.huwelijk.features.location_administration.domain.ListLocatieDto(
-                l.id, l.naam, l.fotoUrl)
+                l.id, l.naam, l.fotoUrl, l.omschrijving, l.detailUrl)
             FROM TrouwlocatieEntity l
             """)
     Page<ListLocatieDto> findAllProjected(Pageable pageable);

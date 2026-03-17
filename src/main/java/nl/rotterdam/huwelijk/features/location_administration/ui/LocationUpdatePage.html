@@ -15,6 +15,8 @@
     <form wicket:id="locatieForm" class="d-flex flex-column gap-3">
         <div wicket:id="naam"></div>
         <div wicket:id="fotoUrl"></div>
+        <div wicket:id="omschrijving"></div>
+        <div wicket:id="detailUrl"></div>
         <div>
             <button wicket:id="opslaan" type="submit"></button>
         </div>
@@ -26,38 +28,13 @@
         <a wicket:id="nieuwBeschikbaarheidLink">Beschikbaarheid toevoegen</a>
     </p>
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Huwelijkstype</th>
-            <th>Dag</th>
-            <th>Start</th>
-            <th>Eind</th>
-            <th>Duur (min)</th>
-            <th>Prijs</th>
-            <th>Ingangsdatum</th>
-            <th>Einddatum</th>
-            <th>Acties</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr wicket:id="beschikbaarheden">
-            <td wicket:id="huwelijkstype"></td>
-            <td wicket:id="dagVanDeWeek"></td>
-            <td wicket:id="startTijd"></td>
-            <td wicket:id="eindTijd"></td>
-            <td wicket:id="duurInMinuten"></td>
-            <td wicket:id="prijs"></td>
-            <td wicket:id="ingangsdatum"></td>
-            <td wicket:id="einddatum"></td>
-            <td>
-                <a wicket:id="bewerkBeschikbaarheidLink">Bewerken</a>
-                &nbsp;
-                <a wicket:id="verwijderBeschikbaarheidLink">Verwijderen</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <table wicket:id="beschikbaarheidTable"></table>
+
+    <wicket:fragment wicket:id="beschikbaarheidActiesFragment">
+        <a wicket:id="bewerkBeschikbaarheidLink">Bewerken</a>
+        &nbsp;
+        <a wicket:id="verwijderBeschikbaarheidLink">Verwijderen</a>
+    </wicket:fragment>
 </wicket:extend>
 </body>
 </html>

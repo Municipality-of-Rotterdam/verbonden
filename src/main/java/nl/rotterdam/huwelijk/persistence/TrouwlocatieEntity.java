@@ -20,6 +20,12 @@ public class TrouwlocatieEntity {
     @Column(name = "foto_url")
     private String fotoUrl;
 
+    @Column(columnDefinition = "TEXT")
+    private String omschrijving;
+
+    @Column(name = "detail_url")
+    private String detailUrl;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
@@ -48,6 +54,22 @@ public class TrouwlocatieEntity {
 
     public void setFotoUrl(String fotoUrl) {
         this.fotoUrl = fotoUrl;
+    }
+
+    public String getOmschrijving() {
+        return omschrijving;
+    }
+
+    public void setOmschrijving(String omschrijving) {
+        this.omschrijving = omschrijving;
+    }
+
+    public String getDetailUrl() {
+        return detailUrl;
+    }
+
+    public void setDetailUrl(String detailUrl) {
+        this.detailUrl = detailUrl;
     }
 
     public LocalDateTime getAangemaaktOp() {

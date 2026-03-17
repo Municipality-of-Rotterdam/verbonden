@@ -8,6 +8,8 @@ public class LocatieFormDto implements Serializable {
 
     private String naam = "";
     private String fotoUrl = "";
+    private String omschrijving = "";
+    private String detailUrl = "";
 
     public String getNaam() {
         return naam;
@@ -25,6 +27,22 @@ public class LocatieFormDto implements Serializable {
         this.fotoUrl = fotoUrl;
     }
 
+    public String getOmschrijving() {
+        return omschrijving;
+    }
+
+    public void setOmschrijving(String omschrijving) {
+        this.omschrijving = omschrijving;
+    }
+
+    public String getDetailUrl() {
+        return detailUrl;
+    }
+
+    public void setDetailUrl(String detailUrl) {
+        this.detailUrl = detailUrl;
+    }
+
     public static LocatieFormDto leeg() {
         return new LocatieFormDto();
     }
@@ -33,6 +51,8 @@ public class LocatieFormDto implements Serializable {
         LocatieFormDto form = new LocatieFormDto();
         form.setNaam(dto.naam());
         form.setFotoUrl(dto.fotoUrl());
+        form.setOmschrijving(dto.omschrijving());
+        form.setDetailUrl(dto.detailUrl());
         return form;
     }
 }

@@ -18,7 +18,7 @@ public interface BeschikbaarheidRepository extends JpaRepository<LocatieBeschikb
                 b.duurInMinuten, b.prijs, b.ingangsdatum, b.einddatum)
             FROM LocatieBeschikbaarheidEntity b
             WHERE b.locatie.id = :locatieId
-            ORDER BY b.huwelijkstype, b.dagVanDeWeek, b.startTijd
+            ORDER BY b.dagVanDeWeek, b.startTijd, b.ingangsdatum
             """)
     List<ListBeschikbaarheidDto> findByLocatieId(@Param("locatieId") long locatieId);
 }

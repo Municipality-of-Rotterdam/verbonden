@@ -4,6 +4,7 @@ import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.huwelijk.features.location_administration.domain.CreateLocatieDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_text_area.RdFormFieldTextArea;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -46,6 +47,14 @@ public class LocationCreatePage extends AdministrationBasePage {
                             LambdaModel.of(model, LocatieFormDto::getFotoUrl, LocatieFormDto::setFotoUrl),
                             Model.of("Foto URL"),
                             Model.of("URL naar de foto van de trouwlocatie")),
+                    new RdFormFieldTextArea<>("omschrijving",
+                            LambdaModel.of(model, LocatieFormDto::getOmschrijving, LocatieFormDto::setOmschrijving),
+                            Model.of("Omschrijving"),
+                            Model.of("Beschrijving van de trouwlocatie (HTML toegestaan)")),
+                    new RdFormFieldTextInput<>("detailUrl",
+                            LambdaModel.of(model, LocatieFormDto::getDetailUrl, LocatieFormDto::setDetailUrl),
+                            Model.of("Detail URL"),
+                            Model.of("URL naar de detailpagina van de trouwlocatie")),
                     new RdButton("opslaan", Model.of("Toevoegen"))
             );
         }
@@ -55,7 +64,9 @@ public class LocationCreatePage extends AdministrationBasePage {
             LocatieFormDto f = getModelObject();
             locationAdministrationService.create(new CreateLocatieDto(
                     f.getNaam(),
-                    f.getFotoUrl()
+                    f.getFotoUrl(),
+                    f.getOmschrijving(),
+                    f.getDetailUrl()
             ));
             setResponsePage(LocationAdministrationPage.class);
         }

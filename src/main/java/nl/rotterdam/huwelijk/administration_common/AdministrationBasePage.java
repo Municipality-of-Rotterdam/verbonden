@@ -4,31 +4,72 @@ import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReferenc
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_logo.RotterdamLogoImage;
+import nl.rotterdam.nl_design_system.wicket.components.body.RdBodyTransparentContainer;
+import nl.rotterdam.nl_design_system.wicket.components.logo.RdLogoBorder;
+import nl.rotterdam.nl_design_system.wicket.components.page_body.RdPageBodyBorder;
+import nl.rotterdam.nl_design_system.wicket.components.page_footer.RdPageFooterBorder;
+import nl.rotterdam.nl_design_system.wicket.components.page_header.RdPageHeaderBorder;
+import nl.rotterdam.nl_design_system.wicket.components.page_layout.RdPageLayoutBorder;
+import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
 import nl.rotterdam.nl_design_system.wicket.components.side_nav.RdSideNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.side_nav.RdSideNavRecord;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 
 import java.util.List;
 
 public abstract class AdministrationBasePage extends WebPage {
 
+    private static final CssReferenceHeaderItem BOOTSTRAP_GRID_HEADER_ITEM =
+            CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-grid.min.css"));
     private static final CssReferenceHeaderItem BOOTSTRAP_UTILITIES_HEADER_ITEM =
             CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-utilities.min.css"));
 
     public AdministrationBasePage() {
         add(PatchingNldsRotterdamDesignSystemThemeBehavior.INSTANCE);
-        add(new RdSideNavPanel("sideNav", List.of(
+        add(new RdRootTransparentContainer("root"));
+        add(new RdBodyTransparentContainer("body"));
+
+        RdPageLayoutBorder pageLayout = new RdPageLayoutBorder("pageLayout");
+        add(pageLayout);
+
+        RdPageHeaderBorder pageHeader = new RdPageHeaderBorder("pageHeader");
+        pageLayout.add(pageHeader);
+
+        RdLogoBorder logo = new RdLogoBorder("logo");
+        logo.add(new RotterdamLogoImage("rotterdamLogoImage"));
+        pageHeader.add(logo);
+
+        pageHeader.add(new WebMarkupContainer("globeIcon")
+                .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
+        pageHeader.add(new WebMarkupContainer("userIcon")
+                .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
+        pageHeader.add(new WebMarkupContainer("logOutIcon")
+                .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
+
+        RdPageBodyBorder pageBody = new RdPageBodyBorder("pageBody");
+        pageLayout.add(pageBody);
+
+        pageBody.add(new RdSideNavPanel("sideNav", List.of(
                 new RdSideNavRecord(null, "BAPS Beheer", BapsAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Trouwlocaties Beheer", LocationAdministrationPage.class, null, null, null)
         )));
+
+        RdPageFooterBorder pageFooter = new RdPageFooterBorder("pageFooter");
+        pageFooter.add(new RotterdamLogoImage("footerLogoImage"));
+        pageLayout.add(pageFooter);
     }
 
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
+        response.render(BOOTSTRAP_GRID_HEADER_ITEM);
         response.render(BOOTSTRAP_UTILITIES_HEADER_ITEM);
     }
 }

@@ -48,6 +48,8 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
         TrouwlocatieEntity entity = new TrouwlocatieEntity();
         entity.setNaam(dto.naam());
         entity.setFotoUrl(dto.fotoUrl());
+        entity.setOmschrijving(dto.omschrijving());
+        entity.setDetailUrl(dto.detailUrl());
         return locatieRepository.save(entity).getId();
     }
 
@@ -58,6 +60,8 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
                 .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + dto.id()));
         entity.setNaam(dto.naam());
         entity.setFotoUrl(dto.fotoUrl());
+        entity.setOmschrijving(dto.omschrijving());
+        entity.setDetailUrl(dto.detailUrl());
         locatieRepository.save(entity);
     }
 
@@ -126,7 +130,8 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
     }
 
     private ChangeLocatieDto toChangeDto(TrouwlocatieEntity entity) {
-        return new ChangeLocatieDto(entity.getId(), entity.getNaam(), entity.getFotoUrl());
+        return new ChangeLocatieDto(entity.getId(), entity.getNaam(), entity.getFotoUrl(),
+                entity.getOmschrijving(), entity.getDetailUrl());
     }
 
     private ChangeBeschikbaarheidDto toChangeBeschikbaarheidDto(LocatieBeschikbaarheidEntity entity) {
