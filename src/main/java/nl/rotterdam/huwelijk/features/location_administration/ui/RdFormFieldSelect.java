@@ -5,6 +5,7 @@ import nl.rotterdam.nl_design_system.wicket.components.select.RdSelect;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 
+import java.util.Collections;
 import java.util.List;
 
 class RdFormFieldSelect<T> extends RdFormFieldBorder<T, RdSelect<T>> {
@@ -27,12 +28,16 @@ class RdFormFieldSelect<T> extends RdFormFieldBorder<T, RdSelect<T>> {
 
     @Override
     protected RdSelect<T> newInput(IModel<T> model) {
-        return new RdSelect<>("input", model, choices, renderer);
+        // choices and renderer are not yet assigned at this point (super() is still running),
+        // so we create the RdSelect with an empty placeholder and configure it in onInitialize().
+        return new RdSelect<>("input", model, Collections.emptyList());
     }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
+        getInput().setChoices(choices);
+        getInput().setChoiceRenderer(renderer);
         getInput().setRequired(required);
     }
 }
