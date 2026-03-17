@@ -5,7 +5,7 @@ import nl.rotterdam.huwelijk.features.location_administration.application.Locati
 import nl.rotterdam.huwelijk.features.location_administration.domain.ChangeLocatieDto;
 import nl.rotterdam.huwelijk.features.location_administration.domain.ListBeschikbaarheidDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
-import nl.rotterdam.nl_design_system.wicket.components.form_field_text_area.RdFormFieldTextArea;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.Session;
