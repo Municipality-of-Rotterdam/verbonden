@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.baps_administration.application;
 
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import nl.rotterdam.huwelijk.features.baps_administration.domain.BapsImportResult;
 import nl.rotterdam.huwelijk.persistence.BapsEntity;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@AutoConfigureEmbeddedDatabase
 class BapsImportServiceImplTestIntegration {
 
     @Autowired

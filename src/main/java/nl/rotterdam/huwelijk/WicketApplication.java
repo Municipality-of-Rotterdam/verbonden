@@ -6,6 +6,11 @@ import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsCreatePage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsUpdatePage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
 import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
+import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidCreatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidUpdatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationCreatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationUpdatePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
@@ -14,37 +19,17 @@ import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
 import org.apache.wicket.protocol.http.ResourceIsolationRequestCycleListener;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
-import org.apache.wicket.util.convert.ConversionException;
-import org.apache.wicket.util.convert.IConverter;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Locale;
+import java.time.LocalTime;
 
 public class WicketApplication extends WebApplication {
 
     @Override
     protected IConverterLocator newConverterLocator() {
         ConverterLocator locator = (ConverterLocator) super.newConverterLocator();
-        locator.set(LocalDate.class, new IConverter<LocalDate>() {
-            @Override
-            public LocalDate convertToObject(String value, Locale locale) throws ConversionException {
-                if (value == null || value.isBlank()) {
-                    return null;
-                }
-                try {
-                    return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE);
-                } catch (DateTimeParseException e) {
-                    throw new ConversionException(e).setResourceKey("IConverter.Date");
-                }
-            }
-
-            @Override
-            public String convertToString(LocalDate value, Locale locale) {
-                return value != null ? value.format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
-            }
-        });
+        locator.set(LocalDate.class, new LocalDateWicketConverter());
+        locator.set(LocalTime.class, new LocalTimeWicketConverter());
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
         return locator;
     }
@@ -72,5 +57,11 @@ public class WicketApplication extends WebApplication {
         mountPage("/beheer", BapsAdministrationPage.class);
         mountPage("/beheer/baps/nieuw", BapsCreatePage.class);
         mountPage("/beheer/baps/${id}", BapsUpdatePage.class);
+
+        mountPage("/beheer/locaties", LocationAdministrationPage.class);
+        mountPage("/beheer/locaties/nieuw", LocationCreatePage.class);
+        mountPage("/beheer/locaties/${id}", LocationUpdatePage.class);
+        mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/nieuw", BeschikbaarheidCreatePage.class);
+        mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/${id}", BeschikbaarheidUpdatePage.class);
     }
 }

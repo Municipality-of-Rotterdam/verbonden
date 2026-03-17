@@ -27,7 +27,7 @@ public class BapsCreatePage extends AdministrationBasePage {
     public BapsCreatePage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
-        add(
+        pageBody.add(
                 new BookmarkablePageLink<>("terugLink", BapsAdministrationPage.class),
                 feedback,
                 new CreateBapsForm("bapsForm")

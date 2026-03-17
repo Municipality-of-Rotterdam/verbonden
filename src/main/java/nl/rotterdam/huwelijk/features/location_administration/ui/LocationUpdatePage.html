@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Trouwlocatie wijzigen</title>
+</head>
+<body>
+<wicket:extend>
+    <h1>Trouwlocatie wijzigen</h1>
+
+    <p><a wicket:id="terugLink">Terug naar overzicht</a></p>
+
+    <div wicket:id="feedback"></div>
+
+    <form wicket:id="locatieForm" class="d-flex flex-column gap-3">
+        <div wicket:id="naam"></div>
+        <div wicket:id="fotoUrl"></div>
+        <div wicket:id="omschrijving"></div>
+        <div wicket:id="detailUrl"></div>
+        <div>
+            <button wicket:id="opslaan" type="submit"></button>
+        </div>
+    </form>
+
+    <h2>Beschikbaarheden</h2>
+
+    <p>
+        <a wicket:id="nieuwBeschikbaarheidLink">Beschikbaarheid toevoegen</a>
+    </p>
+
+    <table wicket:id="beschikbaarheidTable"></table>
+
+    <wicket:fragment wicket:id="beschikbaarheidActiesFragment">
+        <a wicket:id="bewerkBeschikbaarheidLink">Bewerken</a>
+        &nbsp;
+        <a wicket:id="verwijderBeschikbaarheidLink">Verwijderen</a>
+    </wicket:fragment>
+</wicket:extend>
+</body>
+</html>
