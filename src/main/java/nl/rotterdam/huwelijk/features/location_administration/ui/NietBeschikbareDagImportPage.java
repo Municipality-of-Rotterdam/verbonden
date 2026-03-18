@@ -8,12 +8,16 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NietBeschikbareDagImportPage extends AdministrationBasePage {
 
@@ -44,12 +48,14 @@ public class NietBeschikbareDagImportPage extends AdministrationBasePage {
 
         private final long locatieId;
         private final RdFormFieldFileUpload bestand;
+        private final IModel<List<FileUpload>> uploads;
 
         ImportForm(String id, long locatieId) {
             super(id);
             this.locatieId = locatieId;
             setMultiPart(true);
-            bestand = new RdFormFieldFileUpload("bestand", Model.of("xlsx-bestand"));
+            uploads = new ListModel<>();
+            bestand = new RdFormFieldFileUpload("bestand", uploads, Model.of("xlsx-bestand"));
             add(
                     bestand,
                     new RdButton("importeren", Model.of("Importeren"))
