@@ -63,6 +63,9 @@ public class LocationUpdatePage extends AdministrationBasePage {
         PageParameters nieuwNietBeschikbareDagParams = new PageParameters();
         nieuwNietBeschikbareDagParams.add("locatieId", id);
 
+        PageParameters importNietBeschikbareDagenParams = new PageParameters();
+        importNietBeschikbareDagenParams.add("locatieId", id);
+
         pageBody.add(
                 new BookmarkablePageLink<>("terugLink", LocationAdministrationPage.class),
                 feedback,
@@ -72,6 +75,8 @@ public class LocationUpdatePage extends AdministrationBasePage {
                 buildBeschikbaarheidTable(id),
                 new BookmarkablePageLink<>("nieuwNietBeschikbareDagLink",
                         NietBeschikbareDagCreatePage.class, nieuwNietBeschikbareDagParams),
+                new BookmarkablePageLink<>("importNietBeschikbareDagenLink",
+                        NietBeschikbareDagImportPage.class, importNietBeschikbareDagenParams),
                 buildNietBeschikbareDagenTable(id)
         );
     }

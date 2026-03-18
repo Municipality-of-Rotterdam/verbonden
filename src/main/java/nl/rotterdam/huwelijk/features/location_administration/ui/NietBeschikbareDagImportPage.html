@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Niet beschikbare dagen importeren</title>
+</head>
+<body>
+<wicket:extend>
+    <h1>Niet beschikbare dagen importeren vanuit xlsx</h1>
+
+    <p><a wicket:id="terugLink">Terug naar trouwlocatie</a></p>
+
+    <p>
+        Upload een xlsx-bestand met de volgende kolommen (rij 1 is de kopregel):
+    </p>
+    <ul>
+        <li>Kolom A: Datum (als Excel-datum of tekst in formaat <code>yyyy-MM-dd</code>)</li>
+        <li>Kolom B: Reden</li>
+    </ul>
+    <p>Reeds bestaande datums worden overgeslagen.</p>
+
+    <div wicket:id="feedback"></div>
+
+    <form wicket:id="importForm" class="d-flex flex-column gap-3" enctype="multipart/form-data">
+        <div class="utrecht-form-field">
+            <label class="utrecht-form-label" for="bestand">xlsx-bestand</label>
+            <input wicket:id="bestand" type="file" accept=".xlsx" class="utrecht-textbox"/>
+        </div>
+        <div>
+            <button type="submit" class="utrecht-button utrecht-button--primary-action">Importeren</button>
+        </div>
+    </form>
+</wicket:extend>
+</body>
+</html>
