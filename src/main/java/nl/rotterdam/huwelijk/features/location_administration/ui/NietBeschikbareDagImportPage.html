@@ -10,24 +10,19 @@
 
     <p><a wicket:id="terugLink">Terug naar trouwlocatie</a></p>
 
-    <p>
-        Upload een xlsx-bestand met de volgende kolommen (rij 1 is de kopregel):
-    </p>
-    <ul>
-        <li>Kolom A: Datum (als Excel-datum of tekst in formaat <code>yyyy-MM-dd</code>)</li>
-        <li>Kolom B: Reden</li>
+    <p>Upload een xlsx-bestand met de volgende kolommen (rij 1 is de kopregel):</p>
+    <ul class="utrecht-unordered-list">
+        <li class="utrecht-unordered-list__item">Kolom A: Datum (als Excel-datum of tekst in formaat <code>yyyy-MM-dd</code>)</li>
+        <li class="utrecht-unordered-list__item">Kolom B: Reden</li>
     </ul>
     <p>Reeds bestaande datums worden overgeslagen.</p>
 
     <div wicket:id="feedback"></div>
 
-    <form wicket:id="importForm" class="d-flex flex-column gap-3" enctype="multipart/form-data">
-        <div class="utrecht-form-field">
-            <label class="utrecht-form-label" for="bestand">xlsx-bestand</label>
-            <input wicket:id="bestand" type="file" accept=".xlsx" class="utrecht-textbox"/>
-        </div>
+    <form wicket:id="importForm" class="d-flex flex-column gap-3">
+        <div wicket:id="bestand"></div>
         <div>
-            <button type="submit" class="utrecht-button utrecht-button--primary-action">Importeren</button>
+            <button wicket:id="importeren" type="submit"></button>
         </div>
     </form>
 </wicket:extend>

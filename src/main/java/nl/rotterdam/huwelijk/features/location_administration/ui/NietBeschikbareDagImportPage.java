@@ -3,11 +3,12 @@ package nl.rotterdam.huwelijk.features.location_administration.ui;
 import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.location_administration.application.NietBeschikbareDagImportService;
 import nl.rotterdam.huwelijk.features.location_administration.domain.NietBeschikbareDagImportResult;
+import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
-import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
@@ -42,15 +43,17 @@ public class NietBeschikbareDagImportPage extends AdministrationBasePage {
     private class ImportForm extends Form<Void> {
 
         private final long locatieId;
-        private final FileUploadField bestand;
+        private final RdFormFieldFileUpload bestand;
 
         ImportForm(String id, long locatieId) {
             super(id);
             this.locatieId = locatieId;
             setMultiPart(true);
-            bestand = new FileUploadField("bestand");
-            bestand.setRequired(true);
-            add(bestand);
+            bestand = new RdFormFieldFileUpload("bestand", Model.of("xlsx-bestand"));
+            add(
+                    bestand,
+                    new RdButton("importeren", Model.of("Importeren"))
+            );
         }
 
         @Override
