@@ -1,6 +1,10 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
+import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
@@ -20,13 +24,17 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.List;
 
 public class MarriageIntakePage extends BurgerBasePage {
 
-    private String registrationType = "geregistreerd_partnerschap";
-    private String ceremonyType = "eenvoudig";
+    @SpringBean
+    private MarriageIntakeService marriageIntakeService;
+
+    private RegistratieType registratieType = RegistratieType.GEREGISTREERD_PARTNERSCHAP;
+    private CeremonieSoort ceremonieSoort = CeremonieSoort.EENVOUDIG;
 
     @Override
     protected IModel<String> getTitleModel() {
@@ -53,38 +61,42 @@ public class MarriageIntakePage extends BurgerBasePage {
         pageBody.add(form);
 
         // Registratie radio group
-        RdRadioGroup<String> registrationGroup = new RdRadioGroup<>(
+        RdRadioGroup<RegistratieType> registrationGroup = new RdRadioGroup<>(
                 "registrationGroup",
-                new PropertyModel<>(this, "registrationType"),
+                new PropertyModel<>(this, "registratieType"),
                 Model.of("Registratie"),
                 Model.of("Wil je weten wat het verschil is tussen een huwelijk en geregistreerd partnerschap,"
                         + " kijk dan even op onze pagina op rotterdam.nl/registratie")
         );
         form.add(registrationGroup);
-        RadioGroup<String> regRadioGroup = registrationGroup.getRadioGroup();
-        registrationGroup.add(new RdRadioButton<>("huwelijk", Model.of("huwelijk"), regRadioGroup));
+        RadioGroup<RegistratieType> regRadioGroup = registrationGroup.getRadioGroup();
+        registrationGroup.add(new RdRadioButton<>("huwelijk", Model.of(RegistratieType.HUWELIJK), regRadioGroup));
         registrationGroup.add(new RdRadioButton<>("geregistreerdPartnerschap",
-                Model.of("geregistreerd_partnerschap"), regRadioGroup));
+                Model.of(RegistratieType.GEREGISTREERD_PARTNERSCHAP), regRadioGroup));
 
         // Soort radio group
-        RdRadioGroup<String> ceremonyGroup = new RdRadioGroup<>(
+        RdRadioGroup<CeremonieSoort> ceremonyGroup = new RdRadioGroup<>(
                 "ceremonyGroup",
-                new PropertyModel<>(this, "ceremonyType"),
+                new PropertyModel<>(this, "ceremonieSoort"),
                 Model.of("Soort"),
                 Model.of("Wil je weten wat het verschil is tussen een huwelijk en geregistreerd partnerschap,"
                         + " kijk dan even op onze pagina op rotterdam.nl/registratie")
         );
         form.add(ceremonyGroup);
-        RadioGroup<String> cerRadioGroup = ceremonyGroup.getRadioGroup();
-        ceremonyGroup.add(new RdRadioButton<>("gratis", Model.of("gratis"), cerRadioGroup));
-        ceremonyGroup.add(new RdRadioButton<>("eenvoudig", Model.of("eenvoudig"), cerRadioGroup));
-        ceremonyGroup.add(new RdRadioButton<>("regulier", Model.of("regulier"), cerRadioGroup));
+        RadioGroup<CeremonieSoort> cerRadioGroup = ceremonyGroup.getRadioGroup();
+        ceremonyGroup.add(new RdRadioButton<>("gratis", Model.of(CeremonieSoort.GRATIS), cerRadioGroup));
+        ceremonyGroup.add(new RdRadioButton<>("eenvoudig", Model.of(CeremonieSoort.EENVOUDIG), cerRadioGroup));
+        ceremonyGroup.add(new RdRadioButton<>("regulier", Model.of(CeremonieSoort.REGULIER), cerRadioGroup));
 
         // Submit button
         RdButton submitButton = new RdButton("submitButton") {
             @Override
             public void onSubmit() {
-                // Navigate to next step (to be implemented)
+                long dossierId = marriageIntakeService.create(
+                        new CreateDossierDto(registratieType, ceremonieSoort));
+                PageParameters params = new PageParameters();
+                params.add("dossierId", dossierId);
+                setResponsePage(DeDagPage.class, params);
             }
         };
         submitButton.setAppearance(RdButtonAppearance.PRIMARY_ACTION);

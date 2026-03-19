@@ -1,0 +1,158 @@
+<wicket:extend>
+
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <div wicket:id="breadcrumb"></div>
+
+    <!-- Tab navigation -->
+    <nav class="rd-tabs" aria-label="Stappen" role="tablist">
+        <button class="rd-tab rd-tab--active" type="button" role="tab" aria-selected="true" aria-current="step">D&#233; dag</button>
+        <button class="rd-tab" type="button" role="tab" aria-selected="false">Jullie gegevens</button>
+        <button class="rd-tab" type="button" role="tab" aria-selected="false">De getuigen</button>
+        <button class="rd-tab" type="button" role="tab" aria-selected="false">Extra&#x27;s</button>
+    </nav>
+
+    <!-- Two-column layout: main content + sidebar -->
+    <div class="row g-4">
+
+        <!-- Main content -->
+        <div class="col-12 col-lg-8">
+
+            <!-- Heading with "Naar Jullie gegevens" button -->
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+                <h1 wicket:id="heading">Heading</h1>
+                <a wicket:id="naarJullieGegevensButton" class="rd-secondary-button">
+                    <span wicket:id="koppelIcon"></span>
+                    Naar Jullie gegevens
+                </a>
+            </div>
+
+            <!-- Intro text -->
+            <p class="rd-intro-text">
+                Kies eerst wat voor soort dag jullie willen en ga daarna jullie dag plannen.
+                Begin bij het onderdeel wat jullie het belangrijkst vinden.
+                Bijvoorbeeld: Vinden jullie een datum het belangrijkst? Begin dan bij de datum.
+                En kies daarna de rest. Een datum heeft invloed op de agenda van een trouwambtenaar.
+            </p>
+
+            <!-- Three clickable image cards -->
+            <div class="row g-3 mt-2">
+
+                <!-- Datum card -->
+                <div class="col-12 col-md-4">
+                    <a wicket:id="datumLink" class="rd-keuze-card">
+                        <div class="rd-keuze-card__image rd-keuze-card__image--datum"></div>
+                        <div class="rd-keuze-card__overlay">
+                            <span class="rd-keuze-card__title">Kies jullie gewenste datum</span>
+                            <span class="rd-keuze-card__arrow">&#8594;</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Locatie card -->
+                <div class="col-12 col-md-4">
+                    <a wicket:id="locatieLink" class="rd-keuze-card">
+                        <div class="rd-keuze-card__image rd-keuze-card__image--locatie"></div>
+                        <div class="rd-keuze-card__overlay">
+                            <span class="rd-keuze-card__title">Kies jullie trouwlocatie</span>
+                            <span class="rd-keuze-card__arrow">&#8594;</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Trouwambtenaar card -->
+                <div class="col-12 col-md-4">
+                    <a wicket:id="bapsLink" class="rd-keuze-card">
+                        <div class="rd-keuze-card__image rd-keuze-card__image--baps"></div>
+                        <div class="rd-keuze-card__overlay">
+                            <span class="rd-keuze-card__title">Kies de gewenste trouwambtenaar</span>
+                            <span class="rd-keuze-card__arrow">&#8594;</span>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Sidebar: Jullie keuzes -->
+        <div class="col-12 col-lg-4">
+            <div class="rd-keuzes-panel">
+
+                <h2 class="rd-keuzes-panel__heading">Jullie keuzes</h2>
+
+                <!-- Dé dag section -->
+                <div class="rd-keuzes-section">
+                    <h3 class="rd-keuzes-section__heading">D&#233; dag</h3>
+
+                    <a href="#" class="rd-keuzes-item rd-keuzes-item--link">
+                        <span wicket:id="registratieTypeLabel">type</span>
+                    </a>
+
+                    <div class="rd-keuzes-item d-flex justify-content-between align-items-center">
+                        <a href="#" class="rd-keuzes-item__label">
+                            <span wicket:id="ceremonieSoortLabel">soort</span>
+                        </a>
+                        <span class="rd-keuzes-item__prijs">
+                            &#x20AC;&nbsp;<span wicket:id="ceremoniePrijs">prijs</span>
+                        </span>
+                    </div>
+
+                    <a href="#" class="rd-keuzes-item rd-keuzes-item--link rd-keuzes-item--muted">
+                        Datum nog kiezen
+                    </a>
+
+                    <div class="rd-keuzes-item d-flex justify-content-between align-items-center">
+                        <a href="#" class="rd-keuzes-item__label rd-keuzes-item--muted">
+                            Locatie nog kiezen
+                        </a>
+                        <span class="rd-keuzes-item__prijs">&#x20AC;&nbsp;00,00</span>
+                    </div>
+                </div>
+
+                <hr class="rd-keuzes-divider"/>
+
+                <!-- Gegevens & Getuigen section -->
+                <div class="rd-keuzes-section">
+                    <h3 class="rd-keuzes-section__heading">Gegevens &amp; Getuigen</h3>
+
+                    <div class="rd-keuzes-item rd-keuzes-item--status">
+                        <span class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
+                        <a href="#">Jullie gegevens</a>
+                    </div>
+
+                    <div class="rd-keuzes-item rd-keuzes-item--status">
+                        <span class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
+                        <a href="#">Getuigen</a>
+                    </div>
+                </div>
+
+                <hr class="rd-keuzes-divider"/>
+
+                <!-- Extra's section -->
+                <div class="rd-keuzes-section">
+                    <h3 class="rd-keuzes-section__heading">Extra&#x27;s</h3>
+                    <p class="rd-keuzes-empty">Nog geen extra&#x27;s gekozen</p>
+                </div>
+
+                <hr class="rd-keuzes-divider"/>
+
+                <!-- Confirm button -->
+                <button class="rd-bevestig-button" type="button">
+                    Bevestig jullie keuzes
+                </button>
+
+                <!-- Info box -->
+                <div class="rd-keuzes-info" role="note">
+                    <span class="rd-keuzes-info__icon" aria-hidden="true">&#9432;</span>
+                    Jullie keuze blijft 3 dagen gereserveerd.
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</wicket:extend>
