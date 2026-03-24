@@ -6,7 +6,7 @@
 De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.huwelijk.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
 - `nl.rotterdam.huwelijk.domain` — gedeelde domeininterfaces zoals `ValueHolder<T>`, die door meerdere feature-packages worden hergebruikt.
-- `nl.rotterdam.huwelijk.features.baps_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
+- `nl.rotterdam.huwelijk.features.babs_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
 - `nl.rotterdam.huwelijk.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.

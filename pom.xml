@@ -130,7 +130,7 @@
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
-        <!-- Jsoup for web scraping (BAPS import from rotterdam.nl) -->
+        <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
