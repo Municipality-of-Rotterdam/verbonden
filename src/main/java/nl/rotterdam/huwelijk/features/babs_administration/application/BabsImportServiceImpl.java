@@ -1,9 +1,9 @@
-package nl.rotterdam.huwelijk.features.baps_administration.application;
+package nl.rotterdam.huwelijk.features.babs_administration.application;
 
-import nl.rotterdam.huwelijk.features.baps_administration.domain.BapsImportResult;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
-import nl.rotterdam.huwelijk.features.baps_administration.repository.BapsRepository;
-import nl.rotterdam.huwelijk.persistence.BapsEntity;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.BabsImportResult;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.huwelijk.features.babs_administration.repository.BabsRepository;
+import nl.rotterdam.huwelijk.persistence.BabsEntity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,20 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-class BapsImportServiceImpl implements BapsImportService {
+class BabsImportServiceImpl implements BabsImportService {
 
-    private static final Logger log = LoggerFactory.getLogger(BapsImportServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(BabsImportServiceImpl.class);
     private static final String ROTTERDAM_TROUWAMBTENAAR_URL = "https://www.rotterdam.nl/trouwambtenaar";
 
-    private final BapsRepository bapsRepository;
+    private final BabsRepository babsRepository;
 
-    BapsImportServiceImpl(BapsRepository bapsRepository) {
-        this.bapsRepository = bapsRepository;
+    BabsImportServiceImpl(BabsRepository babsRepository) {
+        this.babsRepository = babsRepository;
     }
 
     @Override
     @Transactional
-    public BapsImportResult importeerVanRotterdam() {
+    public BabsImportResult importeerVanRotterdam() {
         int imported = 0;
         int errors = 0;
         List<String> messages = new ArrayList<>();
@@ -43,7 +43,7 @@ class BapsImportServiceImpl implements BapsImportService {
                     .get();
         } catch (IOException e) {
             log.error("Kon Rotterdam trouwambtenaar pagina niet ophalen: {}", e.getMessage());
-            return new BapsImportResult(0, 1,
+            return new BabsImportResult(0, 1,
                     List.of("Kon pagina niet ophalen: " + e.getMessage()));
         }
 
@@ -76,28 +76,28 @@ class BapsImportServiceImpl implements BapsImportService {
 
         if (ambtenaarUrls.isEmpty()) {
             messages.add("Geen trouwambtenaar-links gevonden op de overzichtspagina.");
-            return new BapsImportResult(0, 0, messages);
+            return new BabsImportResult(0, 0, messages);
         }
 
         for (String url : ambtenaarUrls) {
             try {
-                BapsEntity baps = parseerBapsVanPagina(url);
-                if (baps != null) {
-                    bapsRepository.save(baps);
+                BabsEntity babs = parseerBabsVanPagina(url);
+                if (babs != null) {
+                    babsRepository.save(babs);
                     imported++;
-                    messages.add("Geïmporteerd: " + baps.getNaam());
+                    messages.add("Geïmporteerd: " + babs.getNaam());
                 }
             } catch (IOException e) {
                 errors++;
                 messages.add("Fout bij importeren van " + url + ": " + e.getMessage());
-                log.warn("Kon BAPS niet importeren van {}: {}", url, e.getMessage());
+                log.warn("Kon BABS niet importeren van {}: {}", url, e.getMessage());
             }
         }
 
-        return new BapsImportResult(imported, errors, messages);
+        return new BabsImportResult(imported, errors, messages);
     }
 
-    BapsEntity parseerBapsVanPagina(String url) throws IOException {
+    BabsEntity parseerBabsVanPagina(String url) throws IOException {
         System.out.println("Importeren van: " + url);
         Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (compatible; HuwelijkPOC)")
@@ -109,8 +109,8 @@ class BapsImportServiceImpl implements BapsImportService {
             return null;
         }
 
-        BapsEntity baps = new BapsEntity();
-        baps.setNaam(new PersonFullName(heading.text().trim()));
+        BabsEntity babs = new BabsEntity();
+        babs.setNaam(new PersonFullName(heading.text().trim()));
 
         // Foto
         Element img = doc.selectFirst("img[class^=styles_profilePicture]");
@@ -118,12 +118,12 @@ class BapsImportServiceImpl implements BapsImportService {
             String src = img.absUrl("src");
 
             if (!src.isEmpty()) {
-                baps.setFotoUrl(src);
+                babs.setFotoUrl(src);
             }
         }
 
-        baps.setDetailUrl(url);
-        baps.setActief(true);
-        return baps;
+        babs.setDetailUrl(url);
+        babs.setActief(true);
+        return babs;
     }
 }

@@ -1,10 +1,10 @@
-package nl.rotterdam.huwelijk.features.baps_administration.domain;
+package nl.rotterdam.huwelijk.features.babs_administration.domain;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record ListBapsDto(
+public record ListBabsDto(
         Long id,
         PersonFullName naam,
         boolean actief,

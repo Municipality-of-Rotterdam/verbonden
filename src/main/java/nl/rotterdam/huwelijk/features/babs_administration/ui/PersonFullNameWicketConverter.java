@@ -1,8 +1,8 @@
-package nl.rotterdam.huwelijk.features.baps_administration.ui;
+package nl.rotterdam.huwelijk.features.babs_administration.ui;
 
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullNameTooLongException;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullNameTooShortException;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullNameTooLongException;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullNameTooShortException;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 import org.jspecify.annotations.Nullable;

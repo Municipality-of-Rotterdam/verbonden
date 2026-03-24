@@ -1,7 +1,7 @@
 package nl.rotterdam.huwelijk.persistence;
 
 import jakarta.persistence.*;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "baps")
-public class BapsEntity {
+@Table(name = "babs")
+public class BabsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +37,7 @@ public class BapsEntity {
     private LocalDate actiefTotEnMet;
 
     @ElementCollection
-    @CollectionTable(name = "baps_beschikbare_dagen", joinColumns = @JoinColumn(name = "baps_id"))
+    @CollectionTable(name = "babs_beschikbare_dagen", joinColumns = @JoinColumn(name = "babs_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "dag", nullable = false)
     private List<DayOfWeek> beschikbareDagen = new ArrayList<>();
