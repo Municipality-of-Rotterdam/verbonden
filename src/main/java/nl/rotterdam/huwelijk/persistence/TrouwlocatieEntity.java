@@ -32,6 +32,9 @@ public class TrouwlocatieEntity {
     @OneToMany(mappedBy = "locatie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LocatieBeschikbaarheidEntity> beschikbaarheden = new ArrayList<>();
 
+    @OneToMany(mappedBy = "locatie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LocatieNietBeschikbareDagEntity> nietBeschikbareDagen = new ArrayList<>();
+
     public Long getId() {
         return id;
     }
@@ -86,5 +89,13 @@ public class TrouwlocatieEntity {
 
     public void setBeschikbaarheden(List<LocatieBeschikbaarheidEntity> beschikbaarheden) {
         this.beschikbaarheden = beschikbaarheden != null ? beschikbaarheden : new ArrayList<>();
+    }
+
+    public List<LocatieNietBeschikbareDagEntity> getNietBeschikbareDagen() {
+        return nietBeschikbareDagen;
+    }
+
+    public void setNietBeschikbareDagen(List<LocatieNietBeschikbareDagEntity> nietBeschikbareDagen) {
+        this.nietBeschikbareDagen = nietBeschikbareDagen != null ? nietBeschikbareDagen : new ArrayList<>();
     }
 }

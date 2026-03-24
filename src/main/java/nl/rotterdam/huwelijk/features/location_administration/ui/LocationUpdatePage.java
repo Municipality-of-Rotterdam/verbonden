@@ -4,6 +4,7 @@ import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.huwelijk.features.location_administration.domain.ChangeLocatieDto;
 import nl.rotterdam.huwelijk.features.location_administration.domain.ListBeschikbaarheidDto;
+import nl.rotterdam.huwelijk.features.location_administration.domain.ListNietBeschikbareDagDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
@@ -59,13 +60,24 @@ public class LocationUpdatePage extends AdministrationBasePage {
         PageParameters nieuwBeschikbaarheidParams = new PageParameters();
         nieuwBeschikbaarheidParams.add("locatieId", id);
 
+        PageParameters nieuwNietBeschikbareDagParams = new PageParameters();
+        nieuwNietBeschikbareDagParams.add("locatieId", id);
+
+        PageParameters importNietBeschikbareDagenParams = new PageParameters();
+        importNietBeschikbareDagenParams.add("locatieId", id);
+
         pageBody.add(
                 new BookmarkablePageLink<>("terugLink", LocationAdministrationPage.class),
                 feedback,
                 new ChangeLocatieForm("locatieForm", dto),
                 new BookmarkablePageLink<>("nieuwBeschikbaarheidLink",
                         BeschikbaarheidCreatePage.class, nieuwBeschikbaarheidParams),
-                buildBeschikbaarheidTable(id)
+                buildBeschikbaarheidTable(id),
+                new BookmarkablePageLink<>("nieuwNietBeschikbareDagLink",
+                        NietBeschikbareDagCreatePage.class, nieuwNietBeschikbareDagParams),
+                new BookmarkablePageLink<>("importNietBeschikbareDagenLink",
+                        NietBeschikbareDagImportPage.class, importNietBeschikbareDagenParams),
+                buildNietBeschikbareDagenTable(id)
         );
     }
 
@@ -227,6 +239,94 @@ public class LocationUpdatePage extends AdministrationBasePage {
                 @Override
                 public void onClick() {
                     locationAdministrationService.deleteBeschikbaarheid(getModelObject().id());
+                    PageParameters params = new PageParameters();
+                    params.add("id", locatieId);
+                    setResponsePage(LocationUpdatePage.class, params);
+                }
+            });
+        }
+    }
+
+    private RdDataTable<ListNietBeschikbareDagDto, String> buildNietBeschikbareDagenTable(long locatieId) {
+        List<IColumn<ListNietBeschikbareDagDto, String>> columns = new ArrayList<>();
+
+        columns.add(new AbstractColumn<>(Model.of("Datum"), "datum") {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListNietBeschikbareDagDto>> cellItem,
+                                     String componentId, IModel<ListNietBeschikbareDagDto> rowModel) {
+                LocalDate d = rowModel.getObject().datum();
+                cellItem.add(new Label(componentId, Model.of(d != null ? d.toString() : "")));
+            }
+        });
+
+        columns.add(new AbstractColumn<>(Model.of("Reden"), "reden") {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListNietBeschikbareDagDto>> cellItem,
+                                     String componentId, IModel<ListNietBeschikbareDagDto> rowModel) {
+                cellItem.add(new Label(componentId, rowModel.map(ListNietBeschikbareDagDto::reden)));
+            }
+        });
+
+        columns.add(new AbstractColumn<>(Model.of("Acties")) {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListNietBeschikbareDagDto>> cellItem,
+                                     String componentId, IModel<ListNietBeschikbareDagDto> rowModel) {
+                cellItem.add(new NietBeschikbareDagActiesFragment(componentId, rowModel, locatieId));
+            }
+        });
+
+        SortableDataProvider<ListNietBeschikbareDagDto, String> provider = new SortableDataProvider<>() {
+            private transient List<ListNietBeschikbareDagDto> cachedList;
+
+            private List<ListNietBeschikbareDagDto> getList() {
+                if (cachedList == null) {
+                    cachedList = new ArrayList<>(locationAdministrationService.findNietBeschikbareDagen(locatieId));
+                }
+                return cachedList;
+            }
+
+            @Override
+            public Iterator<? extends ListNietBeschikbareDagDto> iterator(long first, long count) {
+                List<ListNietBeschikbareDagDto> list = new ArrayList<>(getList());
+                if (getSort() != null && "datum".equals(getSort().getProperty())) {
+                    Comparator<ListNietBeschikbareDagDto> comparator = Comparator.comparing(
+                            ListNietBeschikbareDagDto::datum, Comparator.nullsLast(Comparator.naturalOrder()));
+                    list.sort(getSort().isAscending() ? comparator : comparator.reversed());
+                }
+                return list.stream().skip(first).limit(count > 0 ? count : list.size()).iterator();
+            }
+
+            @Override
+            public long size() {
+                return getList().size();
+            }
+
+            @Override
+            public IModel<ListNietBeschikbareDagDto> model(ListNietBeschikbareDagDto dto) {
+                return Model.of(dto);
+            }
+        };
+        provider.setSort("datum", SortOrder.ASCENDING);
+
+        return new RdDataTable<>("nietBeschikbareDagenTable", columns, provider, 100);
+    }
+
+    private final class NietBeschikbareDagActiesFragment extends Fragment {
+
+        NietBeschikbareDagActiesFragment(String id, IModel<ListNietBeschikbareDagDto> model, long locatieId) {
+            super(id, "nietBeschikbareDagActiesFragment", LocationUpdatePage.this, model);
+
+            ListNietBeschikbareDagDto dag = model.getObject();
+            PageParameters bewerkParams = new PageParameters();
+            bewerkParams.add("locatieId", locatieId);
+            bewerkParams.add("id", dag.id());
+            add(new BookmarkablePageLink<>("bewerkNietBeschikbareDagLink",
+                    NietBeschikbareDagUpdatePage.class, bewerkParams));
+
+            add(new Link<>("verwijderNietBeschikbareDagLink", model) {
+                @Override
+                public void onClick() {
+                    locationAdministrationService.deleteNietBeschikbareDag(getModelObject().id());
                     PageParameters params = new PageParameters();
                     params.add("id", locatieId);
                     setResponsePage(LocationUpdatePage.class, params);

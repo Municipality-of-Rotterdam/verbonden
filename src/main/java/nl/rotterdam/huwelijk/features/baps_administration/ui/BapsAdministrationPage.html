@@ -10,22 +10,20 @@
 
     <div wicket:id="feedback"></div>
 
-    <p>
-        <a wicket:id="nieuwBapsLink">Nieuwe BAPS toevoegen</a>
-    </p>
-
-    <form wicket:id="importForm">
-        <button wicket:id="importeerButton" type="submit">
-            Importeer van rotterdam.nl
-        </button>
-    </form>
+    <div class="d-flex gap-2 mb-3">
+        <a wicket:id="nieuwBapsLink" class="utrecht-button utrecht-button--primary-action">Nieuwe BAPS toevoegen</a>
+        <form wicket:id="importForm">
+            <button wicket:id="importeerButton" type="submit">
+                Importeer van rotterdam.nl
+            </button>
+        </form>
+    </div>
 
     <table wicket:id="bapsTable"></table>
 
     <wicket:fragment wicket:id="actiesFragment">
-        <a wicket:id="bewerkLink">Bewerken</a>
-        &nbsp;
-        <a wicket:id="toggleActiefLink"></a>
+        <a wicket:id="bewerkLink" class="utrecht-button utrecht-button--secondary-action">Bewerken</a>
+        <a wicket:id="toggleActiefLink" class="utrecht-button utrecht-button--secondary-action"></a>
     </wicket:fragment>
 </wicket:extend>
 </body>

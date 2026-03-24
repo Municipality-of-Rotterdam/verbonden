@@ -8,7 +8,7 @@
 <wicket:extend>
     <h1>Trouwlocatie wijzigen</h1>
 
-    <p><a wicket:id="terugLink">Terug naar overzicht</a></p>
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar overzicht</a></p>
 
     <div wicket:id="feedback"></div>
 
@@ -25,15 +25,28 @@
     <h2>Beschikbaarheden</h2>
 
     <p>
-        <a wicket:id="nieuwBeschikbaarheidLink">Beschikbaarheid toevoegen</a>
+        <a wicket:id="nieuwBeschikbaarheidLink" class="utrecht-button utrecht-button--primary-action">Beschikbaarheid toevoegen</a>
     </p>
 
     <table wicket:id="beschikbaarheidTable"></table>
 
     <wicket:fragment wicket:id="beschikbaarheidActiesFragment">
-        <a wicket:id="bewerkBeschikbaarheidLink">Bewerken</a>
-        &nbsp;
-        <a wicket:id="verwijderBeschikbaarheidLink">Verwijderen</a>
+        <a wicket:id="bewerkBeschikbaarheidLink" class="utrecht-button utrecht-button--subtle">Bewerken</a>
+        <a wicket:id="verwijderBeschikbaarheidLink" class="utrecht-button utrecht-button--subtle">Verwijderen</a>
+    </wicket:fragment>
+
+    <h2>Niet beschikbare dagen</h2>
+
+    <div class="d-flex gap-2 mb-3">
+        <a wicket:id="nieuwNietBeschikbareDagLink" class="utrecht-button utrecht-button--primary-action">Niet beschikbare dag toevoegen</a>
+        <a wicket:id="importNietBeschikbareDagenLink" class="utrecht-button utrecht-button--html-button">Importeren vanuit xlsx</a>
+    </div>
+
+    <table wicket:id="nietBeschikbareDagenTable"></table>
+
+    <wicket:fragment wicket:id="nietBeschikbareDagActiesFragment">
+        <a wicket:id="bewerkNietBeschikbareDagLink" class="utrecht-button utrecht-button--subtle">Bewerken</a>
+        <a wicket:id="verwijderNietBeschikbareDagLink" class="utrecht-button utrecht-button--subtle">Verwijderen</a>
     </wicket:fragment>
 </wicket:extend>
 </body>

@@ -2,19 +2,26 @@ package nl.rotterdam.huwelijk.features.location_administration.application;
 
 import nl.rotterdam.huwelijk.features.location_administration.domain.ChangeBeschikbaarheidDto;
 import nl.rotterdam.huwelijk.features.location_administration.domain.ChangeLocatieDto;
+import nl.rotterdam.huwelijk.features.location_administration.domain.ChangeNietBeschikbareDagDto;
 import nl.rotterdam.huwelijk.features.location_administration.domain.CreateBeschikbaarheidDto;
 import nl.rotterdam.huwelijk.features.location_administration.domain.CreateLocatieDto;
+import nl.rotterdam.huwelijk.features.location_administration.domain.CreateNietBeschikbareDagDto;
 import nl.rotterdam.huwelijk.features.location_administration.domain.ListBeschikbaarheidDto;
 import nl.rotterdam.huwelijk.features.location_administration.domain.ListLocatieDto;
+import nl.rotterdam.huwelijk.features.location_administration.domain.ListNietBeschikbareDagDto;
 import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
+import nl.rotterdam.huwelijk.features.location_administration.repository.NietBeschikbareDagRepository;
 import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
+import nl.rotterdam.huwelijk.persistence.LocatieNietBeschikbareDagEntity;
 import nl.rotterdam.huwelijk.persistence.TrouwlocatieEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,11 +30,14 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
 
     private final LocatieRepository locatieRepository;
     private final BeschikbaarheidRepository beschikbaarheidRepository;
+    private final NietBeschikbareDagRepository nietBeschikbareDagRepository;
 
     LocationAdministrationServiceImpl(LocatieRepository locatieRepository,
-                                      BeschikbaarheidRepository beschikbaarheidRepository) {
+                                      BeschikbaarheidRepository beschikbaarheidRepository,
+                                      NietBeschikbareDagRepository nietBeschikbareDagRepository) {
         this.locatieRepository = locatieRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
+        this.nietBeschikbareDagRepository = nietBeschikbareDagRepository;
     }
 
     @Override
@@ -129,6 +139,55 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
         beschikbaarheidRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ListNietBeschikbareDagDto> findNietBeschikbareDagen(long locatieId) {
+        return nietBeschikbareDagRepository.findByLocatieId(locatieId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ChangeNietBeschikbareDagDto> findNietBeschikbareDagById(long id) {
+        return nietBeschikbareDagRepository.findById(id).map(this::toChangeNietBeschikbareDagDto);
+    }
+
+    @Override
+    @Transactional
+    public long createNietBeschikbareDag(CreateNietBeschikbareDagDto dto) {
+        TrouwlocatieEntity locatie = locatieRepository.findById(dto.locatieId())
+                .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + dto.locatieId()));
+        LocatieNietBeschikbareDagEntity entity = new LocatieNietBeschikbareDagEntity();
+        entity.setLocatie(locatie);
+        entity.setDatum(dto.datum());
+        entity.setReden(dto.reden());
+        entity.setLaatsteWijzigDatum(LocalDateTime.now());
+        entity.setUserid(currentUserid());
+        return nietBeschikbareDagRepository.save(entity).getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateNietBeschikbareDag(ChangeNietBeschikbareDagDto dto) {
+        LocatieNietBeschikbareDagEntity entity = nietBeschikbareDagRepository.findById(dto.id())
+                .orElseThrow(() -> new IllegalArgumentException("Niet beschikbare dag niet gevonden: " + dto.id()));
+        entity.setDatum(dto.datum());
+        entity.setReden(dto.reden());
+        entity.setLaatsteWijzigDatum(LocalDateTime.now());
+        entity.setUserid(currentUserid());
+        nietBeschikbareDagRepository.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteNietBeschikbareDag(long id) {
+        nietBeschikbareDagRepository.deleteById(id);
+    }
+
+    private static String currentUserid() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.getName() != null ? auth.getName() : "onbekend";
+    }
+
     private ChangeLocatieDto toChangeDto(TrouwlocatieEntity entity) {
         return new ChangeLocatieDto(entity.getId(), entity.getNaam(), entity.getFotoUrl(),
                 entity.getOmschrijving(), entity.getDetailUrl());
@@ -145,6 +204,14 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
                 entity.getPrijs(),
                 entity.getIngangsdatum(),
                 entity.getEinddatum()
+        );
+    }
+
+    private ChangeNietBeschikbareDagDto toChangeNietBeschikbareDagDto(LocatieNietBeschikbareDagEntity entity) {
+        return new ChangeNietBeschikbareDagDto(
+                entity.getId(),
+                entity.getDatum(),
+                entity.getReden()
         );
     }
 }

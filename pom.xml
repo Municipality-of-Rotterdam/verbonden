@@ -137,6 +137,13 @@
             <version>1.18.3</version>
         </dependency>
 
+        <!-- Apache POI for xlsx import -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.4.0</version>
+        </dependency>
+
         <!-- Wicket Webjars integration -->
         <dependency>
             <groupId>de.agilecoders.wicket.webjars</groupId>
