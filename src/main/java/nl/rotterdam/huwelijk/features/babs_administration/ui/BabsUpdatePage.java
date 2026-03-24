@@ -3,6 +3,7 @@ package nl.rotterdam.huwelijk.features.babs_administration.ui;
 import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.babs_administration.application.BabsAdministrationService;
 import nl.rotterdam.huwelijk.features.babs_administration.domain.ChangeBabsDto;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
@@ -66,7 +67,8 @@ public class BabsUpdatePage extends AdministrationBasePage {
             add(
                     new RdFormFieldTextInput<>("naam",
                             LambdaModel.of(model, BabsFormDto::getNaam, BabsFormDto::setNaam),
-                            Model.of("Naam")).setRequired(true),
+                            Model.of("Naam")).setRequired(true)
+                            .setModelType(PersonFullName.class),
                     new RdFormFieldTextInput<>("fotoUrl",
                             LambdaModel.of(model, BabsFormDto::getFotoUrl, BabsFormDto::setFotoUrl),
                             Model.of("Foto URL"),
