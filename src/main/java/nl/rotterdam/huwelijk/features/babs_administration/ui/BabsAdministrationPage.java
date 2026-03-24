@@ -1,10 +1,10 @@
-package nl.rotterdam.huwelijk.features.baps_administration.ui;
+package nl.rotterdam.huwelijk.features.babs_administration.ui;
 
 import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
-import nl.rotterdam.huwelijk.features.baps_administration.application.BapsAdministrationService;
-import nl.rotterdam.huwelijk.features.baps_administration.application.BapsImportService;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.BapsImportResult;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.ListBapsDto;
+import nl.rotterdam.huwelijk.features.babs_administration.application.BabsAdministrationService;
+import nl.rotterdam.huwelijk.features.babs_administration.application.BabsImportService;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.BabsImportResult;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.ListBabsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -32,28 +32,28 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class BapsAdministrationPage extends AdministrationBasePage {
+public class BabsAdministrationPage extends AdministrationBasePage {
 
     @SpringBean
-    private BapsAdministrationService bapsAdministrationService;
+    private BabsAdministrationService babsAdministrationService;
 
     @SpringBean
-    private BapsImportService bapsImportService;
+    private BabsImportService babsImportService;
 
-    public BapsAdministrationPage() {
+    public BabsAdministrationPage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         pageBody.add(feedback);
 
-        pageBody.add(new BookmarkablePageLink<>("nieuwBapsLink", BapsCreatePage.class));
+        pageBody.add(new BookmarkablePageLink<>("nieuwBabsLink", BabsCreatePage.class));
 
         Form<?> importForm = new Form<>("importForm");
         importForm.add(new RdAjaxButton("importeerButton") {
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
-                BapsImportResult result = bapsImportService.importeerVanRotterdam();
+                BabsImportResult result = babsImportService.importeerVanRotterdam();
                 if (result.errors() == 0) {
-                    success("Import voltooid: " + result.imported() + " BAPS geïmporteerd.");
+                    success("Import voltooid: " + result.imported() + " BABS geïmporteerd.");
                 } else {
                     warn("Import klaar: " + result.imported() + " geïmporteerd, "
                             + result.errors() + " fouten.");
@@ -68,26 +68,26 @@ public class BapsAdministrationPage extends AdministrationBasePage {
         });
         pageBody.add(importForm);
 
-        pageBody.add(buildBapsTable());
+        pageBody.add(buildBabsTable());
     }
 
-    private RdDataTable<ListBapsDto, String> buildBapsTable() {
-        List<IColumn<ListBapsDto, String>> columns = new ArrayList<>();
+    private RdDataTable<ListBabsDto, String> buildBabsTable() {
+        List<IColumn<ListBabsDto, String>> columns = new ArrayList<>();
 
         columns.add(new AbstractColumn<>(Model.of("Naam"), "naam") {
             @Override
-            public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListBabsDto>> cellItem,
                                      String componentId,
-                                     IModel<ListBapsDto> rowModel) {
-                cellItem.add(new Label(componentId, rowModel.map(ListBapsDto::naam)));
+                                     IModel<ListBabsDto> rowModel) {
+                cellItem.add(new Label(componentId, rowModel.map(ListBabsDto::naam)));
             }
         });
 
         columns.add(new AbstractColumn<>(Model.of("Status")) {
             @Override
-            public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListBabsDto>> cellItem,
                                      String componentId,
-                                     IModel<ListBapsDto> rowModel) {
+                                     IModel<ListBabsDto> rowModel) {
                 cellItem.add(new Label(componentId,
                         Model.of(rowModel.getObject().actief() ? "Actief" : "Inactief")));
             }
@@ -95,10 +95,10 @@ public class BapsAdministrationPage extends AdministrationBasePage {
 
         columns.add(new AbstractColumn<>(Model.of("Actief Vanaf")) {
             @Override
-            public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListBabsDto>> cellItem,
                                      String componentId,
-                                     IModel<ListBapsDto> rowModel) {
-                ListBapsDto dto = rowModel.getObject();
+                                     IModel<ListBabsDto> rowModel) {
+                ListBabsDto dto = rowModel.getObject();
                 String waarde = dto.actiefVanaf() != null ? dto.actiefVanaf().toString() : "";
                 cellItem.add(new Label(componentId, Model.of(waarde)));
             }
@@ -106,10 +106,10 @@ public class BapsAdministrationPage extends AdministrationBasePage {
 
         columns.add(new AbstractColumn<>(Model.of("Actief Tot en Met")) {
             @Override
-            public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListBabsDto>> cellItem,
                                      String componentId,
-                                     IModel<ListBapsDto> rowModel) {
-                ListBapsDto dto = rowModel.getObject();
+                                     IModel<ListBabsDto> rowModel) {
+                ListBabsDto dto = rowModel.getObject();
                 String waarde = dto.actiefTotEnMet() != null ? dto.actiefTotEnMet().toString() : "";
                 cellItem.add(new Label(componentId, Model.of(waarde)));
             }
@@ -117,16 +117,16 @@ public class BapsAdministrationPage extends AdministrationBasePage {
 
         columns.add(new AbstractColumn<>(Model.of("Acties")) {
             @Override
-            public void populateItem(Item<ICellPopulator<ListBapsDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListBabsDto>> cellItem,
                                      String componentId,
-                                     IModel<ListBapsDto> rowModel) {
+                                     IModel<ListBabsDto> rowModel) {
                 cellItem.add(new ActiesFragment(componentId, rowModel));
             }
         });
 
-        SortableDataProvider<ListBapsDto, String> provider = new SortableDataProvider<>() {
+        SortableDataProvider<ListBabsDto, String> provider = new SortableDataProvider<>() {
             @Override
-            public Iterator<? extends ListBapsDto> iterator(long first, long count) {
+            public Iterator<? extends ListBabsDto> iterator(long first, long count) {
                 boolean ascending = getSort() == null || getSort().isAscending();
                 String sortProperty = getSort() != null ? getSort().getProperty() : "naam";
                 Sort.Direction direction = ascending ? Sort.Direction.ASC : Sort.Direction.DESC;
@@ -134,45 +134,45 @@ public class BapsAdministrationPage extends AdministrationBasePage {
                 int pageNumber = pageSize > 0 ? (int) (first / pageSize) : 0;
                 PageRequest pageRequest = PageRequest.of(pageNumber, pageSize,
                         Sort.by(direction, sortProperty));
-                Page<ListBapsDto> page = bapsAdministrationService.findAll(pageRequest);
+                Page<ListBabsDto> page = babsAdministrationService.findAll(pageRequest);
                 return page.iterator();
             }
 
             @Override
             public long size() {
-                return bapsAdministrationService.count();
+                return babsAdministrationService.count();
             }
 
             @Override
-            public IModel<ListBapsDto> model(ListBapsDto dto) {
+            public IModel<ListBabsDto> model(ListBabsDto dto) {
                 return Model.of(dto);
             }
         };
         provider.setSort("naam", SortOrder.ASCENDING);
 
-        return new RdDataTable<>("bapsTable", columns, provider, 20);
+        return new RdDataTable<>("babsTable", columns, provider, 20);
     }
 
     // ---------------------------------------------------------------------------
-    // Fragment for row action buttons, defined in BapsAdministrationPage.html
+    // Fragment for row action buttons, defined in BabsAdministrationPage.html
     // ---------------------------------------------------------------------------
 
     private final class ActiesFragment extends Fragment {
 
-        ActiesFragment(String id, IModel<ListBapsDto> model) {
-            super(id, "actiesFragment", BapsAdministrationPage.this, model);
+        ActiesFragment(String id, IModel<ListBabsDto> model) {
+            super(id, "actiesFragment", BabsAdministrationPage.this, model);
 
-            ListBapsDto dto = model.getObject();
+            ListBabsDto dto = model.getObject();
             PageParameters params = new PageParameters();
             params.add("id", dto.id());
 
-            add(new BookmarkablePageLink<>("bewerkLink", BapsUpdatePage.class, params));
+            add(new BookmarkablePageLink<>("bewerkLink", BabsUpdatePage.class, params));
 
             add(new Link<>("toggleActiefLink", model) {
                 @Override
                 public void onClick() {
-                    bapsAdministrationService.toggleActief(getModelObject().id());
-                    setResponsePage(BapsAdministrationPage.class);
+                    babsAdministrationService.toggleActief(getModelObject().id());
+                    setResponsePage(BabsAdministrationPage.class);
                 }
 
                 @Override

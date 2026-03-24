@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.features.baps_administration.ui;
+package nl.rotterdam.huwelijk.features.babs_administration.ui;
 
 import nl.rotterdam.nl_design_system.wicket.components.checkbox.RdCheckboxBehavior;
 import nl.rotterdam.nl_design_system.wicket.components.checkbox_group.RdCheckboxGroup;

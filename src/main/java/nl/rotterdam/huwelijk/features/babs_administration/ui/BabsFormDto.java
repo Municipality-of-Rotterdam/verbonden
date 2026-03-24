@@ -1,7 +1,7 @@
-package nl.rotterdam.huwelijk.features.baps_administration.ui;
+package nl.rotterdam.huwelijk.features.babs_administration.ui;
 
-import nl.rotterdam.huwelijk.features.baps_administration.domain.ChangeBapsDto;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.ChangeBabsDto;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;
@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mutable form model object for BAPS forms.
+ * Mutable form model object for BABS forms.
  * Fields are private with getters and setters, so Wicket's {@link org.apache.wicket.model.LambdaModel}
- * can bind to them via method references (e.g. {@code BapsFormDto::getNaam}, {@code BapsFormDto::setNaam}).
+ * can bind to them via method references (e.g. {@code BabsFormDto::getNaam}, {@code BabsFormDto::setNaam}).
  * Java lambdas cannot directly point to public fields the way method references can point to methods,
  * so getters and setters are necessary for clean LambdaModel bindings.
  */
-public class BapsFormDto implements Serializable {
+public class BabsFormDto implements Serializable {
 
     private PersonFullName naam = null;
     private String fotoUrl = "";
@@ -47,14 +47,14 @@ public class BapsFormDto implements Serializable {
     public LocalDate getActiefTotEnMet() { return actiefTotEnMet; }
     public void setActiefTotEnMet(LocalDate actiefTotEnMet) { this.actiefTotEnMet = actiefTotEnMet; }
 
-    /** Lege instantie voor een nieuw aan te maken BAPS. */
-    public static BapsFormDto leeg() {
-        return new BapsFormDto();
+    /** Lege instantie voor een nieuw aan te maken BABS. */
+    public static BabsFormDto leeg() {
+        return new BabsFormDto();
     }
 
-    /** Vult een instantie met de waarden uit een bestaande {@link ChangeBapsDto}. */
-    public static BapsFormDto vanDto(ChangeBapsDto dto) {
-        BapsFormDto form = new BapsFormDto();
+    /** Vult een instantie met de waarden uit een bestaande {@link ChangeBabsDto}. */
+    public static BabsFormDto vanDto(ChangeBabsDto dto) {
+        BabsFormDto form = new BabsFormDto();
         form.setNaam(dto.naam());
         form.setFotoUrl(dto.fotoUrl());
         form.setDetailUrl(dto.detailUrl());

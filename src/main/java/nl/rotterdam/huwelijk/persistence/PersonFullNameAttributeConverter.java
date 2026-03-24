@@ -2,7 +2,7 @@ package nl.rotterdam.huwelijk.persistence;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 
 @Converter(autoApply = false)
 public class PersonFullNameAttributeConverter implements AttributeConverter<PersonFullName, String> {

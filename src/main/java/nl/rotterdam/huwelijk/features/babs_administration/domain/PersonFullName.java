@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.features.baps_administration.domain;
+package nl.rotterdam.huwelijk.features.babs_administration.domain;
 
 import nl.rotterdam.huwelijk.domain.ValueHolder;
 

@@ -1,10 +1,11 @@
-package nl.rotterdam.huwelijk.features.baps_administration.domain;
+package nl.rotterdam.huwelijk.features.babs_administration.domain;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
-public record CreateBapsDto(
+public record ChangeBabsDto(
+        Long id,
         PersonFullName naam,
         String fotoUrl,
         String detailUrl,
