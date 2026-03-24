@@ -3,6 +3,6 @@ package nl.rotterdam.huwelijk.features.babs_administration.domain;
 public class PersonFullNameTooShortException extends RuntimeException {
 
     public PersonFullNameTooShortException(String value) {
-        super("Naam is te kort: '" + value + "' (minimaal " + PersonFullName.MAXIMUM_LENGTH + " tekens vereist)");
+        super("Naam is te kort: '" + value + "' (minimaal " + PersonFullName.MINIMUM_LENGTH + " tekens vereist)");
     }
 }
