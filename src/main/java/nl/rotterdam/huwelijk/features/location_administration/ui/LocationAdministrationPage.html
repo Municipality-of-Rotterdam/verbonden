@@ -12,11 +12,13 @@
         <a wicket:id="nieuweLocatieLink" class="utrecht-button utrecht-button--primary-action">Nieuwe trouwlocatie toevoegen</a>
     </p>
 
-    <table wicket:id="locatieTable"></table>
+    <form wicket:id="actionsForm">
+        <table wicket:id="locatieTable"></table>
+    </form>
 
     <wicket:fragment wicket:id="actiesFragment">
-        <a wicket:id="bewerkLink" class="utrecht-button utrecht-button--subtle">Bewerken</a>
-        <a wicket:id="verwijderLink" class="utrecht-button utrecht-button--subtle">Verwijderen</a>
+        <button wicket:id="bewerkLink"><span wicket:id="icon"></span></button>
+        <button wicket:id="verwijderLink"><span wicket:id="icon"></span></button>
     </wicket:fragment>
 </wicket:extend>
 </body>

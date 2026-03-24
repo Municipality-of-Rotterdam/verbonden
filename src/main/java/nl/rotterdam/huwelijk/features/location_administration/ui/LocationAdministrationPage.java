@@ -3,14 +3,20 @@ package nl.rotterdam.huwelijk.features.location_administration.ui;
 import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.huwelijk.features.location_administration.domain.ListLocatieDto;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
+import nl.rotterdam.nl_design_system.wicket.components.icon_button.RdIconAjaxButtonBorder;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -36,7 +42,7 @@ public class LocationAdministrationPage extends AdministrationBasePage {
         pageBody.add(buildLocatieTable());
     }
 
-    private RdDataTable<ListLocatieDto, String> buildLocatieTable() {
+    private Component buildLocatieTable() {
         List<IColumn<ListLocatieDto, String>> columns = new ArrayList<>();
 
         columns.add(new AbstractColumn<>(Model.of("Naam"), "naam") {
@@ -83,27 +89,55 @@ public class LocationAdministrationPage extends AdministrationBasePage {
         };
         provider.setSort("naam", SortOrder.ASCENDING);
 
-        return new RdDataTable<>("locatieTable", columns, provider, 20);
+        return new Form<Void>("actionsForm").add(new RdDataTable<>("locatieTable", columns, provider, 20));
     }
 
     private final class ActiesFragment extends Fragment {
 
-        ActiesFragment(String id, IModel<ListLocatieDto> model) {
-            super(id, "actiesFragment", LocationAdministrationPage.this, model);
+        ActiesFragment(String id, IModel<ListLocatieDto> dtoModel) {
+            super(id, "actiesFragment", LocationAdministrationPage.this, dtoModel);
 
-            ListLocatieDto dto = model.getObject();
+            ListLocatieDto dto = dtoModel.getObject();
             PageParameters params = new PageParameters();
             params.add("id", dto.id());
 
-            add(new BookmarkablePageLink<>("bewerkLink", LocationUpdatePage.class, params));
+            add(
+                    new RdIconAjaxButtonBorder("bewerkLink", Model.of("Wijzigen")) {
 
-            add(new Link<>("verwijderLink", model) {
-                @Override
-                public void onClick() {
-                    locationAdministrationService.delete(getModelObject().id());
-                    setResponsePage(LocationAdministrationPage.class);
-                }
-            });
+                        @Override
+                        protected void onInitialize() {
+                            super.onInitialize();
+                            add(new WebMarkupContainer("icon")
+                                    .add(RotterdamIconBehavior.EDIT));
+                        }
+
+                        @Override
+                        protected void onSubmit(AjaxRequestTarget target) {
+
+                            ListLocatieDto dto = dtoModel.getObject();
+                            PageParameters params = new PageParameters()
+                                    .add("id", dto.id());
+
+                            setResponsePage(LocationUpdatePage.class, params);
+                        }
+                    },
+
+                    new RdIconAjaxButtonBorder("verwijderLink", Model.of("Verwijderen")) {
+                        @Override
+                        protected void onSubmit(AjaxRequestTarget target) {
+                            locationAdministrationService.delete(dtoModel.getObject().id());
+                            setResponsePage(LocationAdministrationPage.class);
+                        }
+
+
+                        @Override
+                        protected void onInitialize() {
+                            super.onInitialize();
+                            add(new WebMarkupContainer("icon")
+                                    .add(RotterdamIconBehavior.TRASH));
+                        }
+                    }.add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
+            );
         }
     }
 }
