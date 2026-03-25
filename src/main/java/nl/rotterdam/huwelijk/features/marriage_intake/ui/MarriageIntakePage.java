@@ -12,6 +12,8 @@ import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
@@ -30,6 +32,14 @@ public class MarriageIntakePage extends IntakeBasePage {
     private RegistratieType registratieType = RegistratieType.GEREGISTREERD_PARTNERSCHAP;
     private CeremonieSoort ceremonieSoort = CeremonieSoort.EENVOUDIG;
 
+    private RdRadioGroup<RegistratieType> registrationGroup;
+    private RdRadioGroup<CeremonieSoort> ceremonyGroup;
+
+    @Override
+    protected IntakeStep getActiveStep() {
+        return IntakeStep.DE_DAG;
+    }
+
     @Override
     protected IModel<String> getTitleModel() {
         return new ResourceModel("intake.page.title.marriageintake");
@@ -37,7 +47,7 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return Model.of((DossierSamenvattingDto) null);
+        return () -> new DossierSamenvattingDto(0, registratieType, ceremonieSoort);
     }
 
     public MarriageIntakePage() {
@@ -51,7 +61,7 @@ public class MarriageIntakePage extends IntakeBasePage {
         pageBody.add(form);
 
         // Registratie radio group
-        RdRadioGroup<RegistratieType> registrationGroup = new RdRadioGroup<>(
+        registrationGroup = new RdRadioGroup<>(
                 "registrationGroup",
                 new PropertyModel<>(this, "registratieType"),
                 new ResourceModel("intake.registratie.legend"),
@@ -64,7 +74,7 @@ public class MarriageIntakePage extends IntakeBasePage {
                 Model.of(RegistratieType.GEREGISTREERD_PARTNERSCHAP), regRadioGroup));
 
         // Soort radio group
-        RdRadioGroup<CeremonieSoort> ceremonyGroup = new RdRadioGroup<>(
+        ceremonyGroup = new RdRadioGroup<>(
                 "ceremonyGroup",
                 new PropertyModel<>(this, "ceremonieSoort"),
                 new ResourceModel("intake.soort.legend"),
@@ -92,6 +102,22 @@ public class MarriageIntakePage extends IntakeBasePage {
                 .add(new RotterdamIconBehavior(RotterdamIconType.RING)));
 
         form.add(submitButton);
+    }
+
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
+        addSidebarUpdateBehavior(registrationGroup);
+        addSidebarUpdateBehavior(ceremonyGroup);
+    }
+
+    private void addSidebarUpdateBehavior(RdRadioGroup<?> group) {
+        group.getRadioGroup().add(new AjaxFormChoiceComponentUpdatingBehavior() {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                target.add(keuzesSidebar);
+            }
+        });
     }
 }
 

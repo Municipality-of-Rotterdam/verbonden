@@ -1,34 +1,55 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LambdaModel;
+
+import java.util.function.Function;
 
 public class IntakeSidebarPanel extends Panel {
 
     public IntakeSidebarPanel(String id, IModel<DossierSamenvattingDto> dossierModel) {
         super(id, dossierModel);
+        setOutputMarkupId(true);
+    }
+
+    @SuppressWarnings("unchecked")
+    private IModel<DossierSamenvattingDto> getDossierModel() {
+        return (IModel<DossierSamenvattingDto>) getDefaultModel();
     }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
 
-        DossierSamenvattingDto dossier = (DossierSamenvattingDto) getDefaultModelObject();
+        WebMarkupContainer dossierGegevens = new WebMarkupContainer("dossierGegevens") {
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                setVisible(getDossierModel().getObject() != null);
+            }
+        };
 
-        WebMarkupContainer dossierGegevens = new WebMarkupContainer("dossierGegevens");
-        dossierGegevens.setVisible(dossier != null);
-        if (dossier != null) {
-            dossierGegevens.add(new Label("registratieTypeLabel", dossier.registratieType().getLabel()));
-            dossierGegevens.add(new Label("ceremonieSoortLabel", dossier.ceremonieSoort().getLabel()));
-            dossierGegevens.add(new Label("ceremoniePrijs", dossier.ceremonieSoort().getPrijs()));
-        } else {
-            dossierGegevens.add(new Label("registratieTypeLabel", ""));
-            dossierGegevens.add(new Label("ceremonieSoortLabel", ""));
-            dossierGegevens.add(new Label("ceremoniePrijs", ""));
-        }
+        IModel<String> registratieModel = LambdaModel.of(() -> dossierValue(DossierSamenvattingDto::registratieType, RegistratieType::getLabel));
+        IModel<String> ceremonieSoortModel = LambdaModel.of(() -> dossierValue(DossierSamenvattingDto::ceremonieSoort, CeremonieSoort::getLabel));
+        IModel<String> ceremoniePrijsModel = LambdaModel.of(() -> dossierValue(DossierSamenvattingDto::ceremonieSoort, CeremonieSoort::getPrijs));
+
+        dossierGegevens.add(new Label("registratieTypeLabel", registratieModel));
+        dossierGegevens.add(new Label("ceremonieSoortLabel", ceremonieSoortModel));
+        dossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
         add(dossierGegevens);
+    }
+
+    private <I, O> String dossierValue(Function<DossierSamenvattingDto, I> extractor, Function<I, O> mapper) {
+        DossierSamenvattingDto d = getDossierModel().getObject();
+        if (d == null) {
+            return "";
+        }
+        return String.valueOf(mapper.apply(extractor.apply(d)));
     }
 }

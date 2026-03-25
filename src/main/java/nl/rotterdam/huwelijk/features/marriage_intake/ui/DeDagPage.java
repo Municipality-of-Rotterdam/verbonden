@@ -21,6 +21,11 @@ public class DeDagPage extends IntakeBasePage {
     private long dossierId;
 
     @Override
+    protected IntakeStep getActiveStep() {
+        return IntakeStep.DE_DAG;
+    }
+
+    @Override
     protected IModel<String> getTitleModel() {
         return new ResourceModel("intake.page.title.dedag");
     }
