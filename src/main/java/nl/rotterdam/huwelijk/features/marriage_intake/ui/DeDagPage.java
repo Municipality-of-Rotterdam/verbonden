@@ -1,12 +1,11 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
@@ -40,33 +39,24 @@ public class DeDagPage extends IntakeBasePage {
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
-        pageBody.add(new Link<Void>("naarJullieGegevensButton") {
-            @Override
-            public void onClick() {
-                // Navigatie naar stap "Jullie gegevens" volgt in een volgende iteratie
-            }
-        }.add(new WebMarkupContainer("koppelIcon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.RING))));
+        Form<Void> form = new Form<>("form");
+        pageBody.add(form);
 
-        // Placeholder links for sub-pages (to be implemented in a future iteration)
-        pageBody.add(new Link<Void>("datumLink") {
+        form.add(createCeremonyButton("kleinButton", CeremonieSoort.KLEIN));
+        form.add(createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT));
+        form.add(createCeremonyButton("grootButton", CeremonieSoort.GROOT));
+    }
+
+    private Button createCeremonyButton(String id, CeremonieSoort soort) {
+        return new Button(id) {
             @Override
-            public void onClick() {
-                // Navigatie naar datum-kiezer volgt in een volgende iteratie
+            public void onSubmit() {
+                marriageIntakeService.updateCeremonie(dossierId, soort);
+                PageParameters params = new PageParameters();
+                params.add("dossierId", dossierId);
+                setResponsePage(DeDagPage.class, params);
             }
-        });
-        pageBody.add(new Link<Void>("locatieLink") {
-            @Override
-            public void onClick() {
-                // Navigatie naar locatie-kiezer volgt in een volgende iteratie
-            }
-        });
-        pageBody.add(new Link<Void>("bapsLink") {
-            @Override
-            public void onClick() {
-                // Navigatie naar trouwambtenaar-kiezer volgt in een volgende iteratie
-            }
-        });
+        };
     }
 }
 

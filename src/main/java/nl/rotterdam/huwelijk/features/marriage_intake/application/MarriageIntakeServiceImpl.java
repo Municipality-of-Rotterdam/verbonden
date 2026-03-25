@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.application;
 
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.DossierRepository;
@@ -23,6 +24,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         entity.setRegistratieType(dto.registratieType());
         entity.setCeremonieSoort(dto.ceremonieSoort());
         return dossierRepository.save(entity).getId();
+    }
+
+    @Override
+    @Transactional
+    public void updateCeremonie(long dossierId, CeremonieSoort ceremonieSoort) {
+        dossierRepository.findById(dossierId)
+                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId))
+                .setCeremonieSoort(ceremonieSoort);
     }
 
     @Override

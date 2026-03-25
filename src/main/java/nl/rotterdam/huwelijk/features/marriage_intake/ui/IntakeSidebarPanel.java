@@ -1,6 +1,5 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
-import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 import org.apache.wicket.markup.html.basic.Label;
@@ -35,13 +34,10 @@ public class IntakeSidebarPanel extends Panel {
             }
         };
 
-        IModel<String> registratieModel = LambdaModel.of(() -> dossierValue(DossierSamenvattingDto::registratieType, RegistratieType::getLabel));
-        IModel<String> ceremonieSoortModel = LambdaModel.of(() -> dossierValue(DossierSamenvattingDto::ceremonieSoort, CeremonieSoort::getLabel));
-        IModel<String> ceremoniePrijsModel = LambdaModel.of(() -> dossierValue(DossierSamenvattingDto::ceremonieSoort, CeremonieSoort::getPrijs));
+        IModel<String> registratieModel = LambdaModel.of(
+                () -> dossierValue(DossierSamenvattingDto::registratieType, RegistratieType::getLabel));
 
         dossierGegevens.add(new Label("registratieTypeLabel", registratieModel));
-        dossierGegevens.add(new Label("ceremonieSoortLabel", ceremonieSoortModel));
-        dossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
         add(dossierGegevens);
     }
 

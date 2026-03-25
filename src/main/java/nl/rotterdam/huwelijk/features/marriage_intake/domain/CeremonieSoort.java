@@ -2,9 +2,9 @@ package nl.rotterdam.huwelijk.features.marriage_intake.domain;
 
 public enum CeremonieSoort {
 
-    GRATIS("Gratis", "0,00"),
-    EENVOUDIG("Eenvoudig", "267,81"),
-    REGULIER("Regulier", "461,48");
+    KLEIN("Klein", "0,00"),
+    MIDDELGROOT("Middelgroot", "216,60"),
+    GROOT("Groot", "624,40");
 
     private final String label;
     private final String prijs;

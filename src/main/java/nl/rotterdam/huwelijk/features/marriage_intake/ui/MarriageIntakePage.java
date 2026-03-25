@@ -5,16 +5,12 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.model.IModel;
@@ -30,10 +26,8 @@ public class MarriageIntakePage extends IntakeBasePage {
     private MarriageIntakeService marriageIntakeService;
 
     private RegistratieType registratieType = RegistratieType.GEREGISTREERD_PARTNERSCHAP;
-    private CeremonieSoort ceremonieSoort = CeremonieSoort.EENVOUDIG;
 
     private RdRadioGroup<RegistratieType> registrationGroup;
-    private RdRadioGroup<CeremonieSoort> ceremonyGroup;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -47,7 +41,7 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return () -> new DossierSamenvattingDto(0, registratieType, ceremonieSoort);
+        return () -> new DossierSamenvattingDto(0, registratieType, CeremonieSoort.KLEIN);
     }
 
     public MarriageIntakePage() {
@@ -73,46 +67,29 @@ public class MarriageIntakePage extends IntakeBasePage {
         registrationGroup.add(new RdRadioButton<>("geregistreerdPartnerschap",
                 Model.of(RegistratieType.GEREGISTREERD_PARTNERSCHAP), regRadioGroup));
 
-        // Soort radio group
-        ceremonyGroup = new RdRadioGroup<>(
-                "ceremonyGroup",
-                new PropertyModel<>(this, "ceremonieSoort"),
-                new ResourceModel("intake.soort.legend"),
-                new ResourceModel("intake.soort.description")
-        );
-        form.add(ceremonyGroup);
-        RadioGroup<CeremonieSoort> cerRadioGroup = ceremonyGroup.getRadioGroup();
-        ceremonyGroup.add(new RdRadioButton<>("gratis", Model.of(CeremonieSoort.GRATIS), cerRadioGroup));
-        ceremonyGroup.add(new RdRadioButton<>("eenvoudig", Model.of(CeremonieSoort.EENVOUDIG), cerRadioGroup));
-        ceremonyGroup.add(new RdRadioButton<>("regulier", Model.of(CeremonieSoort.REGULIER), cerRadioGroup));
+        // Ceremony submit buttons — each creates the dossier with the chosen ceremony type
+        form.add(createCeremonyButton("kleinButton", CeremonieSoort.KLEIN));
+        form.add(createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT));
+        form.add(createCeremonyButton("grootButton", CeremonieSoort.GROOT));
+    }
 
-        // Submit button
-        RdButton submitButton = new RdButton("submitButton") {
+    private Button createCeremonyButton(String id, CeremonieSoort soort) {
+        return new Button(id) {
             @Override
             public void onSubmit() {
                 long dossierId = marriageIntakeService.create(
-                        new CreateDossierDto(registratieType, ceremonieSoort));
+                        new CreateDossierDto(registratieType, soort));
                 PageParameters params = new PageParameters();
                 params.add("dossierId", dossierId);
                 setResponsePage(DeDagPage.class, params);
             }
         };
-        submitButton.setAppearance(RdButtonAppearance.PRIMARY_ACTION);
-        submitButton.add(new WebMarkupContainer("icon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.RING)));
-
-        form.add(submitButton);
     }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
-        addSidebarUpdateBehavior(registrationGroup);
-        addSidebarUpdateBehavior(ceremonyGroup);
-    }
-
-    private void addSidebarUpdateBehavior(RdRadioGroup<?> group) {
-        group.getRadioGroup().add(new AjaxFormChoiceComponentUpdatingBehavior() {
+        registrationGroup.getRadioGroup().add(new AjaxFormChoiceComponentUpdatingBehavior() {
             @Override
             protected void onUpdate(AjaxRequestTarget target) {
                 target.add(keuzesSidebar);

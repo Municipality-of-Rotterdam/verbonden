@@ -462,21 +462,145 @@
     background-color: #f5f5f5;
 }
 
-/* Info box */
-.rd-keuzes-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    border: 1px solid #5b9bd5;
-    border-radius: 4px;
-    background: #eaf4fb;
-    font-size: 0.875rem;
-    color: #1a3a5c;
+/* =============================================================
+   Ceremony selection section
+   ============================================================= */
+
+.rd-ceremony-heading {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.25rem;
 }
 
-.rd-keuzes-info__icon {
-    font-size: 1rem;
+/* Ceremony option column */
+.rd-soort-optie {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rd-soort-optie__bullets {
+    list-style: disc;
+    padding-left: 1.25rem;
+    margin: 0;
+    font-size: 0.9375rem;
+    flex: 1;
+}
+
+.rd-soort-optie__bullets li {
+    margin-bottom: 0.25rem;
+}
+
+/* "Eerste mogelijkheid" date box */
+.rd-eerste-mogelijkheid {
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    padding: 0.625rem 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.rd-eerste-mogelijkheid__label {
+    font-size: 0.8125rem;
+    color: #555;
+}
+
+.rd-eerste-mogelijkheid__datum {
+    font-weight: 700;
+    color: var(--rd-color-green-500, #007a3e);
+    font-size: 0.9375rem;
+}
+
+/* Ceremony select button (green) */
+.rd-ceremony-select-button {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    background-color: var(--rd-color-green-700, #005a2d);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: auto;
+}
+
+.rd-ceremony-select-button:hover {
+    background-color: var(--rd-color-green-800, #004022);
+}
+
+/* "Vanaf" prefix next to price badge */
+.rd-price-badge-prefix {
+    font-size: 0.875rem;
+    color: var(--rd-color-green-500, #007a3e);
+}
+
+/* =============================================================
+   Partner akkoord card
+   ============================================================= */
+
+.rd-partner-akkoord {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background: #fff;
+}
+
+.rd-partner-akkoord__heading {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+}
+
+.rd-partner-akkoord__tekst {
+    font-size: 0.9375rem;
+    margin: 0 0 1rem;
+    color: #333;
+}
+
+.rd-partner-akkoord__buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.rd-digid-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 2.5rem;
+    background-color: #1b1b1b;
+    border-radius: 3px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
     flex-shrink: 0;
-    color: #5b9bd5;
+}
+
+.rd-digid-logo span {
+    color: #f7941d;
+}
+
+.rd-digid-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.625rem 1.25rem;
+    background-color: var(--rd-color-green-700, #005a2d);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.rd-digid-button:hover {
+    background-color: var(--rd-color-green-800, #004022);
+    color: #fff;
 }

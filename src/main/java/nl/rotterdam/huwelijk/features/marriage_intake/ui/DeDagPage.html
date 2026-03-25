@@ -1,56 +1,114 @@
 <wicket:extend>
 
-    <!-- Heading with "Naar Jullie gegevens" button -->
-    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
-        <h1 wicket:id="heading">Heading</h1>
-        <a wicket:id="naarJullieGegevensButton" class="rd-secondary-button">
-            <span wicket:id="koppelIcon"></span>
-            <wicket:message key="intake.button.naar.jullie.gegevens">Naar Jullie gegevens</wicket:message>
-        </a>
-    </div>
+    <!-- Page heading (rendered by RdHeading) -->
+    <h1 wicket:id="heading">Heading</h1>
 
-    <!-- Intro text -->
-    <p class="rd-intro-text">
-        <wicket:message key="intake.intro.dedag">Kies eerst wat voor soort dag jullie willen en ga daarna jullie dag plannen.</wicket:message>
-    </p>
+    <!-- Form with ceremony selection -->
+    <form wicket:id="form">
 
-    <!-- Three clickable image cards -->
-    <div class="row g-3 mt-2">
+        <!-- Ceremony section heading -->
+        <h2 class="rd-ceremony-heading">
+            <wicket:message key="intake.soort.heading">Wat voor ceremonie willen jullie?</wicket:message>
+        </h2>
+        <p class="rd-intro-text">
+            <wicket:message key="intake.soort.description">Al uw keuzes hebben invloed op elkaar.</wicket:message>
+        </p>
 
-        <!-- Datum card -->
-        <div class="col-12 col-md-4">
-            <a wicket:id="datumLink" class="rd-keuze-card">
-                <div class="rd-keuze-card__image rd-keuze-card__image--datum"></div>
-                <div class="rd-keuze-card__overlay">
-                    <span class="rd-keuze-card__title"><wicket:message key="intake.card.datum.title">Kies jullie gewenste datum</wicket:message></span>
-                    <span class="rd-keuze-card__arrow">&#8594;</span>
+        <!-- Three ceremony columns -->
+        <div class="row g-3">
+
+            <!-- Klein -->
+            <div class="col-12 col-md-4 d-flex">
+                <div class="rd-soort-optie w-100">
+                    <h3 class="rd-soort-option__title">
+                        <wicket:message key="intake.soort.klein.title">Klein</wicket:message>
+                    </h3>
+                    <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.klein.prijs">00,00</wicket:message></span>
+                    <ul class="rd-soort-optie__bullets">
+                        <li><wicket:message key="intake.soort.klein.beschrijving.1">Beschrijving 1</wicket:message></li>
+                        <li><wicket:message key="intake.soort.klein.beschrijving.2">Beschrijving 2</wicket:message></li>
+                        <li><wicket:message key="intake.soort.klein.beschrijving.3">Beschrijving 3</wicket:message></li>
+                        <li><wicket:message key="intake.soort.klein.beschrijving.4">Beschrijving 4</wicket:message></li>
+                    </ul>
+                    <div class="rd-eerste-mogelijkheid">
+                        <span class="rd-eerste-mogelijkheid__label">
+                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
+                        </span>
+                        <span class="rd-eerste-mogelijkheid__datum">
+                            <wicket:message key="intake.soort.klein.datum">27-09-2026</wicket:message>
+                        </span>
+                    </div>
+                    <button type="submit" wicket:id="kleinButton" class="rd-ceremony-select-button">
+                        <wicket:message key="intake.soort.klein.title">Klein</wicket:message>
+                    </button>
                 </div>
-            </a>
+            </div>
+
+            <!-- Middelgroot -->
+            <div class="col-12 col-md-4 d-flex">
+                <div class="rd-soort-optie w-100">
+                    <h3 class="rd-soort-option__title">
+                        <wicket:message key="intake.soort.middelgroot.title">Middelgroot</wicket:message>
+                    </h3>
+                    <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.middelgroot.prijs">216,60</wicket:message></span>
+                    <ul class="rd-soort-optie__bullets">
+                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.1">Beschrijving 1</wicket:message></li>
+                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.2">Beschrijving 2</wicket:message></li>
+                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.3">Beschrijving 3</wicket:message></li>
+                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.4">Beschrijving 4</wicket:message></li>
+                    </ul>
+                    <div class="rd-eerste-mogelijkheid">
+                        <span class="rd-eerste-mogelijkheid__label">
+                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
+                        </span>
+                        <span class="rd-eerste-mogelijkheid__datum">
+                            <wicket:message key="intake.soort.middelgroot.datum">04-05-2026</wicket:message>
+                        </span>
+                    </div>
+                    <button type="submit" wicket:id="middelgrootButton" class="rd-ceremony-select-button">
+                        <wicket:message key="intake.soort.middelgroot.title">Middelgroot</wicket:message>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Groot -->
+            <div class="col-12 col-md-4 d-flex">
+                <div class="rd-soort-optie w-100">
+                    <h3 class="rd-soort-option__title">
+                        <wicket:message key="intake.soort.groot.title">Groot</wicket:message>
+                    </h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rd-price-badge-prefix">
+                            <wicket:message key="intake.soort.groot.prijs.prefix">Vanaf</wicket:message>
+                        </span>
+                        <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.groot.prijs">624,40</wicket:message></span>
+                    </div>
+                    <ul class="rd-soort-optie__bullets">
+                        <li><wicket:message key="intake.soort.groot.beschrijving.1">Beschrijving 1</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.2">Beschrijving 2</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.3">Beschrijving 3</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.4">Beschrijving 4</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.5">Beschrijving 5</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.6">Beschrijving 6</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.7">Beschrijving 7</wicket:message></li>
+                    </ul>
+                    <div class="rd-eerste-mogelijkheid">
+                        <span class="rd-eerste-mogelijkheid__label">
+                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
+                        </span>
+                        <span class="rd-eerste-mogelijkheid__datum">
+                            <wicket:message key="intake.soort.groot.datum">10-04-2026</wicket:message>
+                        </span>
+                    </div>
+                    <button type="submit" wicket:id="grootButton" class="rd-ceremony-select-button">
+                        <wicket:message key="intake.soort.groot.title">Groot</wicket:message>
+                    </button>
+                </div>
+            </div>
+
         </div>
 
-        <!-- Locatie card -->
-        <div class="col-12 col-md-4">
-            <a wicket:id="locatieLink" class="rd-keuze-card">
-                <div class="rd-keuze-card__image rd-keuze-card__image--locatie"></div>
-                <div class="rd-keuze-card__overlay">
-                    <span class="rd-keuze-card__title"><wicket:message key="intake.card.locatie.title">Kies jullie trouwlocatie</wicket:message></span>
-                    <span class="rd-keuze-card__arrow">&#8594;</span>
-                </div>
-            </a>
-        </div>
-
-        <!-- Trouwambtenaar card -->
-        <div class="col-12 col-md-4">
-            <a wicket:id="bapsLink" class="rd-keuze-card">
-                <div class="rd-keuze-card__image rd-keuze-card__image--baps"></div>
-                <div class="rd-keuze-card__overlay">
-                    <span class="rd-keuze-card__title"><wicket:message key="intake.card.baps.title">Kies de gewenste trouwambtenaar</wicket:message></span>
-                    <span class="rd-keuze-card__arrow">&#8594;</span>
-                </div>
-            </a>
-        </div>
-
-    </div>
+    </form>
 
 </wicket:extend>
 
