@@ -1,34 +1,28 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
-import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
-import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
-import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
-import org.apache.wicket.markup.head.CssReferenceHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.util.List;
-
-public class MarriageIntakePage extends BurgerBasePage {
+public class MarriageIntakePage extends IntakeBasePage {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
@@ -38,7 +32,12 @@ public class MarriageIntakePage extends BurgerBasePage {
 
     @Override
     protected IModel<String> getTitleModel() {
-        return Model.of("Mijn dag - Gemeente Rotterdam");
+        return new ResourceModel("intake.page.title.marriageintake");
+    }
+
+    @Override
+    protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
+        return Model.of((DossierSamenvattingDto) null);
     }
 
     public MarriageIntakePage() {
@@ -46,17 +45,8 @@ public class MarriageIntakePage extends BurgerBasePage {
     }
 
     public MarriageIntakePage(PageParameters parameters) {
-        // Breadcrumb
-        List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
-                new RdBreadcrumbNavRecord<>(null, "Mijn Loket", MarriageIntakePage.class),
-                new RdBreadcrumbNavRecord<>(null, "Mijn dag", MarriageIntakePage.class)
-        );
-        pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", breadcrumbs));
+        pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
-        // Page heading
-        pageBody.add(new RdHeading("heading", "Maak jullie dag om nooit te vergeten", 1));
-
-        // Form
         Form<Void> form = new Form<>("form");
         pageBody.add(form);
 
@@ -64,9 +54,8 @@ public class MarriageIntakePage extends BurgerBasePage {
         RdRadioGroup<RegistratieType> registrationGroup = new RdRadioGroup<>(
                 "registrationGroup",
                 new PropertyModel<>(this, "registratieType"),
-                Model.of("Registratie"),
-                Model.of("Wil je weten wat het verschil is tussen een huwelijk en geregistreerd partnerschap,"
-                        + " kijk dan even op onze pagina op rotterdam.nl/registratie")
+                new ResourceModel("intake.registratie.legend"),
+                new ResourceModel("intake.registratie.description")
         );
         form.add(registrationGroup);
         RadioGroup<RegistratieType> regRadioGroup = registrationGroup.getRadioGroup();
@@ -78,9 +67,8 @@ public class MarriageIntakePage extends BurgerBasePage {
         RdRadioGroup<CeremonieSoort> ceremonyGroup = new RdRadioGroup<>(
                 "ceremonyGroup",
                 new PropertyModel<>(this, "ceremonieSoort"),
-                Model.of("Soort"),
-                Model.of("Wil je weten wat het verschil is tussen een huwelijk en geregistreerd partnerschap,"
-                        + " kijk dan even op onze pagina op rotterdam.nl/registratie")
+                new ResourceModel("intake.soort.legend"),
+                new ResourceModel("intake.soort.description")
         );
         form.add(ceremonyGroup);
         RadioGroup<CeremonieSoort> cerRadioGroup = ceremonyGroup.getRadioGroup();
@@ -105,11 +93,5 @@ public class MarriageIntakePage extends BurgerBasePage {
 
         form.add(submitButton);
     }
-
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-        response.render(CssReferenceHeaderItem.forReference(
-                new PackageResourceReference(MarriageIntakePage.class, "mijn-dag.css")));
-    }
 }
+

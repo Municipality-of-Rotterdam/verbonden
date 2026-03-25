@@ -1,21 +1,10 @@
 <wicket:extend>
 
-<div class="container py-4">
-
-    <!-- Breadcrumb -->
-    <div wicket:id="breadcrumb"></div>
-
-    <!-- Tab navigation -->
-    <nav class="rd-tabs" aria-label="Stappen">
-        <button class="rd-tab rd-tab--active" type="button" aria-current="step">D&#233; dag</button>
-        <button class="rd-tab" type="button">Jullie gegevens</button>
-        <button class="rd-tab" type="button">De getuigen</button>
-        <button class="rd-tab" type="button">Extra&#x27;s</button>
-    </nav>
-
     <!-- Page heading (rendered by RdHeading) -->
     <h1 wicket:id="heading">Heading</h1>
-    <p class="rd-intro-text">Kies eerst wat voor soort dag jullie willen en ga daarna jullie dag plannen.</p>
+    <p class="rd-intro-text">
+        <wicket:message key="intake.intro.marriageintake">Kies eerst wat voor soort dag jullie willen en ga daarna jullie dag plannen.</wicket:message>
+    </p>
 
     <!-- Form -->
     <form wicket:id="form">
@@ -25,11 +14,11 @@
             <div class="d-flex gap-3 flex-wrap">
                 <label class="flex-fill rd-radio-option" for="huwelijk-input">
                     <input type="radio" wicket:id="huwelijk" id="huwelijk-input"/>
-                    Huwelijk
+                    <wicket:message key="intake.registratie.huwelijk">Huwelijk</wicket:message>
                 </label>
                 <label class="flex-fill rd-radio-option" for="partnerschap-input">
                     <input type="radio" wicket:id="geregistreerdPartnerschap" id="partnerschap-input"/>
-                    Geregistreerd partnerschap
+                    <wicket:message key="intake.registratie.partnerschap">Geregistreerd partnerschap</wicket:message>
                 </label>
             </div>
         </div>
@@ -40,51 +29,48 @@
                 <!-- Gratis -->
                 <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="rd-soort-option__title">Gratis</span>
-                        <span class="rd-price-badge">&#x20AC;&nbsp;00<sup>,00</sup></span>
+                        <span class="rd-soort-option__title"><wicket:message key="intake.soort.gratis.title">Gratis</wicket:message></span>
+                        <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.gratis.prijs">00,00</wicket:message></span>
                     </div>
                     <p class="rd-soort-option__desc">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
-                        quos dolores et quas molestias excepturi
+                        <wicket:message key="intake.soort.beschrijving">At vero eos et accusamus</wicket:message>
                         <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
                     </p>
                     <label class="rd-soort-radio-box mt-auto" for="gratis-input">
                         <input type="radio" wicket:id="gratis" id="gratis-input"/>
-                        Gratis
+                        <wicket:message key="intake.soort.gratis.title">Gratis</wicket:message>
                     </label>
                 </div>
 
                 <!-- Eenvoudig -->
                 <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="rd-soort-option__title">Eenvoudig</span>
-                        <span class="rd-price-badge">&#x20AC;&nbsp;267<sup>,81</sup></span>
+                        <span class="rd-soort-option__title"><wicket:message key="intake.soort.eenvoudig.title">Eenvoudig</wicket:message></span>
+                        <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.eenvoudig.prijs">267,81</wicket:message></span>
                     </div>
                     <p class="rd-soort-option__desc">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
-                        quos dolores et quas molestias excepturi
+                        <wicket:message key="intake.soort.beschrijving">At vero eos et accusamus</wicket:message>
                         <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
                     </p>
                     <label class="rd-soort-radio-box mt-auto" for="eenvoudig-input">
                         <input type="radio" wicket:id="eenvoudig" id="eenvoudig-input"/>
-                        Eenvoudig
+                        <wicket:message key="intake.soort.eenvoudig.title">Eenvoudig</wicket:message>
                     </label>
                 </div>
 
                 <!-- Regulier -->
                 <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="rd-soort-option__title">Regulier</span>
-                        <span class="rd-price-badge">&#x20AC;&nbsp;461<sup>,48</sup></span>
+                        <span class="rd-soort-option__title"><wicket:message key="intake.soort.regulier.title">Regulier</wicket:message></span>
+                        <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.regulier.prijs">461,48</wicket:message></span>
                     </div>
                     <p class="rd-soort-option__desc">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
-                        quos dolores et quas molestias excepturi
+                        <wicket:message key="intake.soort.beschrijving">At vero eos et accusamus</wicket:message>
                         <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
                     </p>
                     <label class="rd-soort-radio-box mt-auto" for="regulier-input">
                         <input type="radio" wicket:id="regulier" id="regulier-input"/>
-                        Regulier
+                        <wicket:message key="intake.soort.regulier.title">Regulier</wicket:message>
                     </label>
                 </div>
             </div>
@@ -94,13 +80,11 @@
         <div class="d-flex justify-content-end mt-4">
             <button wicket:id="submitButton" type="submit">
                 <span wicket:id="icon">ring icon</span>
-                Plan jullie dag
+                <wicket:message key="intake.button.plan">Plan jullie dag</wicket:message>
             </button>
         </div>
 
     </form>
-
-</div>
 
 </wicket:extend>
 

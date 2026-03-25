@@ -1,0 +1,88 @@
+<wicket:panel>
+
+<div class="rd-keuzes-panel">
+
+    <h2 class="rd-keuzes-panel__heading">
+        <wicket:message key="intake.sidebar.title">Jullie keuzes</wicket:message>
+    </h2>
+
+    <!-- Dé dag section -->
+    <div class="rd-keuzes-section">
+        <h3 class="rd-keuzes-section__heading">
+            <wicket:message key="intake.sidebar.section.dedag">Dé dag</wicket:message>
+        </h3>
+
+        <!-- Visible when dossier is present -->
+        <div wicket:id="dossierGegevens">
+            <a href="#" class="rd-keuzes-item rd-keuzes-item--link">
+                <span wicket:id="registratieTypeLabel">type</span>
+            </a>
+            <div class="rd-keuzes-item d-flex justify-content-between align-items-center">
+                <a href="#" class="rd-keuzes-item__label">
+                    <span wicket:id="ceremonieSoortLabel">soort</span>
+                </a>
+                <span class="rd-keuzes-item__prijs">
+                    &#x20AC;&nbsp;<span wicket:id="ceremoniePrijs">prijs</span>
+                </span>
+            </div>
+        </div>
+
+        <a href="#" class="rd-keuzes-item rd-keuzes-item--link rd-keuzes-item--muted">
+            <wicket:message key="intake.sidebar.datum.nogniet">Datum nog kiezen</wicket:message>
+        </a>
+
+        <div class="rd-keuzes-item d-flex justify-content-between align-items-center">
+            <a href="#" class="rd-keuzes-item__label rd-keuzes-item--muted">
+                <wicket:message key="intake.sidebar.locatie.nogniet">Locatie nog kiezen</wicket:message>
+            </a>
+            <span class="rd-keuzes-item__prijs">&#x20AC;&nbsp;<wicket:message key="intake.sidebar.locatie.prijs">00,00</wicket:message></span>
+        </div>
+    </div>
+
+    <hr class="rd-keuzes-divider"/>
+
+    <!-- Gegevens & Getuigen section -->
+    <div class="rd-keuzes-section">
+        <h3 class="rd-keuzes-section__heading">
+            <wicket:message key="intake.sidebar.section.gegevens">Gegevens &amp; Getuigen</wicket:message>
+        </h3>
+
+        <div class="rd-keuzes-item rd-keuzes-item--status">
+            <span class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
+            <a href="#"><wicket:message key="intake.sidebar.gegevens.link">Jullie gegevens</wicket:message></a>
+        </div>
+
+        <div class="rd-keuzes-item rd-keuzes-item--status">
+            <span class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
+            <a href="#"><wicket:message key="intake.sidebar.getuigen.link">Getuigen</wicket:message></a>
+        </div>
+    </div>
+
+    <hr class="rd-keuzes-divider"/>
+
+    <!-- Extra's section -->
+    <div class="rd-keuzes-section">
+        <h3 class="rd-keuzes-section__heading">
+            <wicket:message key="intake.sidebar.section.extras">Extra's</wicket:message>
+        </h3>
+        <p class="rd-keuzes-empty">
+            <wicket:message key="intake.sidebar.extras.nogniet">Nog geen extra's gekozen</wicket:message>
+        </p>
+    </div>
+
+    <hr class="rd-keuzes-divider"/>
+
+    <!-- Confirm button -->
+    <button class="rd-bevestig-button" type="button">
+        <wicket:message key="intake.sidebar.bevestig">Bevestig jullie keuzes</wicket:message>
+    </button>
+
+    <!-- Info box -->
+    <div class="rd-keuzes-info" role="note">
+        <span class="rd-keuzes-info__icon" aria-hidden="true">&#9432;</span>
+        <wicket:message key="intake.sidebar.reservering.info">Jullie keuze blijft 3 dagen gereserveerd.</wicket:message>
+    </div>
+
+</div>
+
+</wicket:panel>
