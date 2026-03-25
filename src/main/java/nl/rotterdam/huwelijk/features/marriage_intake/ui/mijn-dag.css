@@ -604,3 +604,50 @@
     background-color: var(--rd-color-green-800, #004022);
     color: #fff;
 }
+
+/* =============================================================
+   Sidebar info box
+   ============================================================= */
+
+.rd-keuzes-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid #5b9bd5;
+    border-radius: 4px;
+    background: #eaf4fb;
+    font-size: 0.875rem;
+    color: #1a3a5c;
+    margin-top: 0.75rem;
+}
+
+.rd-keuzes-info__icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    color: #5b9bd5;
+}
+
+/* Sidebar bevestig form — strip form chrome so button fills width */
+.rd-keuzes-panel form {
+    margin: 0;
+    padding: 0;
+}
+
+/* =============================================================
+   RdButton overrides for ceremony selection columns
+   ============================================================= */
+
+/* Make ceremony select RdButton full-width */
+.rd-soort-optie .utrecht-button {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Make sidebar bevestig RdButton full-width */
+.rd-keuzes-panel .utrecht-button {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0;
+}
+

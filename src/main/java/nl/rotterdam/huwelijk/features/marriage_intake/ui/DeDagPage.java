@@ -1,11 +1,9 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
-import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
@@ -39,24 +37,24 @@ public class DeDagPage extends IntakeBasePage {
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
-        Form<Void> form = new Form<>("form");
-        pageBody.add(form);
-
-        form.add(createCeremonyButton("kleinButton", CeremonieSoort.KLEIN));
-        form.add(createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT));
-        form.add(createCeremonyButton("grootButton", CeremonieSoort.GROOT));
-    }
-
-    private Button createCeremonyButton(String id, CeremonieSoort soort) {
-        return new Button(id) {
+        pageBody.add(new Link<Void>("datumLink") {
             @Override
-            public void onSubmit() {
-                marriageIntakeService.updateCeremonie(dossierId, soort);
-                PageParameters params = new PageParameters();
-                params.add("dossierId", dossierId);
-                setResponsePage(DeDagPage.class, params);
+            public void onClick() {
+                // Navigation to date picker — to be implemented in a future iteration
             }
-        };
+        });
+        pageBody.add(new Link<Void>("locatieLink") {
+            @Override
+            public void onClick() {
+                // Navigation to location picker — to be implemented in a future iteration
+            }
+        });
+        pageBody.add(new Link<Void>("bapsLink") {
+            @Override
+            public void onClick() {
+                // Navigation to BAPS picker — to be implemented in a future iteration
+            }
+        });
     }
 }
 

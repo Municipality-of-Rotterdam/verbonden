@@ -5,12 +5,12 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.model.IModel;
@@ -68,13 +68,16 @@ public class MarriageIntakePage extends IntakeBasePage {
                 Model.of(RegistratieType.GEREGISTREERD_PARTNERSCHAP), regRadioGroup));
 
         // Ceremony submit buttons — each creates the dossier with the chosen ceremony type
-        form.add(createCeremonyButton("kleinButton", CeremonieSoort.KLEIN));
-        form.add(createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT));
-        form.add(createCeremonyButton("grootButton", CeremonieSoort.GROOT));
+        form.add(createCeremonyButton("kleinButton", CeremonieSoort.KLEIN,
+                new ResourceModel("intake.soort.klein.title")));
+        form.add(createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT,
+                new ResourceModel("intake.soort.middelgroot.title")));
+        form.add(createCeremonyButton("grootButton", CeremonieSoort.GROOT,
+                new ResourceModel("intake.soort.groot.title")));
     }
 
-    private Button createCeremonyButton(String id, CeremonieSoort soort) {
-        return new Button(id) {
+    private RdButton createCeremonyButton(String id, CeremonieSoort soort, IModel<String> labelModel) {
+        return new RdButton(id, labelModel) {
             @Override
             public void onSubmit() {
                 long dossierId = marriageIntakeService.create(
