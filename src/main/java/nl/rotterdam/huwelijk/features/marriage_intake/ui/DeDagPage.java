@@ -55,14 +55,14 @@ public class DeDagPage extends IntakeBasePage {
         locatieLink.setEnabled(false);
         pageBody.add(locatieLink);
 
-        Link<Void> bapsLink = new Link<Void>("bapsLink") {
+        Link<Void> babsLink = new Link<Void>("babsLink") {
             @Override
             public void onClick() {
-                // Navigation to BAPS picker — to be implemented in a future iteration
+                // Navigation to BABS picker — to be implemented in a future iteration
             }
         };
-        bapsLink.setEnabled(false);
-        pageBody.add(bapsLink);
+        babsLink.setEnabled(false);
+        pageBody.add(babsLink);
     }
 }
 
