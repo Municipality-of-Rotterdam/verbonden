@@ -1,0 +1,49 @@
+<wicket:extend>
+
+    <!-- Page heading (rendered by RdHeading) -->
+    <h1 wicket:id="heading">Heading</h1>
+
+    <!-- Intro text -->
+    <p class="rd-intro-text">
+        <wicket:message key="intake.intro.dedag">Kies eerst wat voor soort dag jullie willen en ga daarna jullie dag plannen.</wicket:message>
+    </p>
+
+    <!-- Three clickable image cards -->
+    <div class="row g-3 mt-2">
+
+        <!-- Datum card -->
+        <div class="col-12 col-md-4">
+            <a wicket:id="datumLink" class="rd-keuze-card">
+                <div class="rd-keuze-card__image rd-keuze-card__image--datum"></div>
+                <div class="rd-keuze-card__overlay">
+                    <span class="rd-keuze-card__title"><wicket:message key="intake.card.datum.title">Kies jullie gewenste datum</wicket:message></span>
+                    <span class="rd-keuze-card__arrow">&#8594;</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Locatie card -->
+        <div class="col-12 col-md-4">
+            <a wicket:id="locatieLink" class="rd-keuze-card">
+                <div class="rd-keuze-card__image rd-keuze-card__image--locatie"></div>
+                <div class="rd-keuze-card__overlay">
+                    <span class="rd-keuze-card__title"><wicket:message key="intake.card.locatie.title">Kies jullie trouwlocatie</wicket:message></span>
+                    <span class="rd-keuze-card__arrow">&#8594;</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Trouwambtenaar card -->
+        <div class="col-12 col-md-4">
+            <a wicket:id="bapsLink" class="rd-keuze-card">
+                <div class="rd-keuze-card__image rd-keuze-card__image--baps"></div>
+                <div class="rd-keuze-card__overlay">
+                    <span class="rd-keuze-card__title"><wicket:message key="intake.card.baps.title">Kies de gewenste trouwambtenaar</wicket:message></span>
+                    <span class="rd-keuze-card__arrow">&#8594;</span>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+</wicket:extend>

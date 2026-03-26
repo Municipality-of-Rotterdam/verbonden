@@ -1,36 +1,49 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
-import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
-import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
-import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
+import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
-import org.apache.wicket.markup.head.CssReferenceHeaderItem;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.List;
 
-public class MarriageIntakePage extends BurgerBasePage {
+public class MarriageIntakePage extends IntakeBasePage {
 
-    private String registrationType = "geregistreerd_partnerschap";
-    private String ceremonyType = "eenvoudig";
+    @SpringBean
+    private MarriageIntakeService marriageIntakeService;
+
+    private RegistratieType registratieType = RegistratieType.GEREGISTREERD_PARTNERSCHAP;
+
+    private RdRadioGroup<RegistratieType> registrationGroup;
+
+    @Override
+    protected IntakeStep getActiveStep() {
+        return IntakeStep.DE_DAG;
+    }
 
     @Override
     protected IModel<String> getTitleModel() {
-        return Model.of("Mijn dag - Gemeente Rotterdam");
+        return new ResourceModel("intake.page.title.marriageintake");
+    }
+
+    @Override
+    protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
+        return () -> new DossierSamenvattingDto(0, registratieType, CeremonieSoort.KLEIN, null, null, false, false, List.of());
     }
 
     public MarriageIntakePage() {
@@ -38,66 +51,61 @@ public class MarriageIntakePage extends BurgerBasePage {
     }
 
     public MarriageIntakePage(PageParameters parameters) {
-        // Breadcrumb
-        List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
-                new RdBreadcrumbNavRecord<>(null, "Mijn Loket", MarriageIntakePage.class),
-                new RdBreadcrumbNavRecord<>(null, "Mijn dag", MarriageIntakePage.class)
-        );
-        pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", breadcrumbs));
+        pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
-        // Page heading
-        pageBody.add(new RdHeading("heading", "Maak jullie dag om nooit te vergeten", 1));
-
-        // Form
         Form<Void> form = new Form<>("form");
         pageBody.add(form);
 
         // Registratie radio group
-        RdRadioGroup<String> registrationGroup = new RdRadioGroup<>(
+        registrationGroup = new RdRadioGroup<>(
                 "registrationGroup",
-                new PropertyModel<>(this, "registrationType"),
-                Model.of("Registratie"),
-                Model.of("Wil je weten wat het verschil is tussen een huwelijk en geregistreerd partnerschap,"
-                        + " kijk dan even op onze pagina op rotterdam.nl/registratie")
+                new PropertyModel<>(this, "registratieType"),
+                new ResourceModel("intake.registratie.legend"),
+                new ResourceModel("intake.registratie.description")
         );
         form.add(registrationGroup);
-        RadioGroup<String> regRadioGroup = registrationGroup.getRadioGroup();
-        registrationGroup.add(new RdRadioButton<>("huwelijk", Model.of("huwelijk"), regRadioGroup));
+        RadioGroup<RegistratieType> regRadioGroup = registrationGroup.getRadioGroup();
+        registrationGroup.add(new RdRadioButton<>("huwelijk", Model.of(RegistratieType.HUWELIJK), regRadioGroup));
         registrationGroup.add(new RdRadioButton<>("geregistreerdPartnerschap",
-                Model.of("geregistreerd_partnerschap"), regRadioGroup));
+                Model.of(RegistratieType.GEREGISTREERD_PARTNERSCHAP), regRadioGroup));
 
-        // Soort radio group
-        RdRadioGroup<String> ceremonyGroup = new RdRadioGroup<>(
-                "ceremonyGroup",
-                new PropertyModel<>(this, "ceremonyType"),
-                Model.of("Soort"),
-                Model.of("Wil je weten wat het verschil is tussen een huwelijk en geregistreerd partnerschap,"
-                        + " kijk dan even op onze pagina op rotterdam.nl/registratie")
-        );
-        form.add(ceremonyGroup);
-        RadioGroup<String> cerRadioGroup = ceremonyGroup.getRadioGroup();
-        ceremonyGroup.add(new RdRadioButton<>("gratis", Model.of("gratis"), cerRadioGroup));
-        ceremonyGroup.add(new RdRadioButton<>("eenvoudig", Model.of("eenvoudig"), cerRadioGroup));
-        ceremonyGroup.add(new RdRadioButton<>("regulier", Model.of("regulier"), cerRadioGroup));
+        // Ceremony submit buttons — each creates the dossier with the chosen ceremony type
+        form.add(createCeremonyButton("kleinButton", CeremonieSoort.KLEIN,
+                new ResourceModel("intake.soort.klein.title")));
 
-        // Submit button
-        RdButton submitButton = new RdButton("submitButton") {
+        RdButton middelgrootButton = createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT,
+                new ResourceModel("intake.soort.middelgroot.title"));
+        middelgrootButton.setEnabled(false);
+        form.add(middelgrootButton);
+
+        RdButton grootButton = createCeremonyButton("grootButton", CeremonieSoort.GROOT,
+                new ResourceModel("intake.soort.groot.title"));
+        grootButton.setEnabled(false);
+        form.add(grootButton);
+    }
+
+    private RdButton createCeremonyButton(String id, CeremonieSoort soort, IModel<String> labelModel) {
+        return new RdButton(id, labelModel) {
             @Override
             public void onSubmit() {
-                // Navigate to next step (to be implemented)
+                long dossierId = marriageIntakeService.create(
+                        new CreateDossierDto(registratieType, soort));
+                PageParameters params = new PageParameters();
+                params.add("dossierId", dossierId);
+                setResponsePage(DeDagPage.class, params);
             }
         };
-        submitButton.setAppearance(RdButtonAppearance.PRIMARY_ACTION);
-        submitButton.add(new WebMarkupContainer("icon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.RING)));
-
-        form.add(submitButton);
     }
 
     @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-        response.render(CssReferenceHeaderItem.forReference(
-                new PackageResourceReference(MarriageIntakePage.class, "mijn-dag.css")));
+    protected void onInitialize() {
+        super.onInitialize();
+        registrationGroup.getRadioGroup().add(new AjaxFormChoiceComponentUpdatingBehavior() {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                target.add(keuzesSidebar);
+            }
+        });
     }
 }
+
