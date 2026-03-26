@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>BABS Beheer</title>
+</head>
+<body>
+<wicket:extend>
+    <h1>BABS Beheer – Buitengewoon Ambtenaren van de Burgerlijke Stand</h1>
+
+    <div wicket:id="feedback"></div>
+
+    <div class="d-flex gap-2 mb-3">
+        <a wicket:id="nieuwBabsLink" class="utrecht-button utrecht-button--primary-action">Nieuwe BABS toevoegen</a>
+        <form wicket:id="importForm">
+            <button wicket:id="importeerButton" type="submit">
+                Importeer van rotterdam.nl
+            </button>
+        </form>
+    </div>
+
+    <table wicket:id="babsTable"></table>
+
+    <wicket:fragment wicket:id="actiesFragment">
+        <a wicket:id="bewerkLink" class="utrecht-button utrecht-button--secondary-action">Bewerken</a>
+        <a wicket:id="toggleActiefLink" class="utrecht-button utrecht-button--secondary-action"></a>
+    </wicket:fragment>
+</wicket:extend>
+</body>
+</html>

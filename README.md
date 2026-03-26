@@ -78,7 +78,8 @@ beheer.gebruikers=beheerder:rotterdam
 ./mvnw verify
 ```
 
-De tests gebruiken een H2 in-memory database (PostgreSQL-compatibiliteitsmodus)
+De tests gebruiken een embedded PostgreSQL 18 database
+(via [embedded-database-spring-test](https://github.com/zonkyio/embedded-database-spring-test))
 en vereisen geen draaiende Docker-container.
 
 ## Licentie
