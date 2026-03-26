@@ -1,11 +1,11 @@
 package nl.rotterdam.huwelijk;
 
 import de.agilecoders.wicket.webjars.WicketWebjars;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsCreatePage;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsUpdatePage;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsCreatePage;
+import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsUpdatePage;
+import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsAdministrationPage;
+import nl.rotterdam.huwelijk.features.babs_administration.ui.PersonFullNameWicketConverter;
 import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidCreatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidUpdatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
@@ -58,9 +58,9 @@ public class WicketApplication extends WebApplication {
                 new ResourceIsolationRequestCycleListener(
                         new FetchMetadataResourceIsolationPolicy()));
 
-        mountPage("/beheer", BapsAdministrationPage.class);
-        mountPage("/beheer/baps/nieuw", BapsCreatePage.class);
-        mountPage("/beheer/baps/${id}", BapsUpdatePage.class);
+        mountPage("/beheer", BabsAdministrationPage.class);
+        mountPage("/beheer/babs/nieuw", BabsCreatePage.class);
+        mountPage("/beheer/babs/${id}", BabsUpdatePage.class);
 
         mountPage("/beheer/locaties", LocationAdministrationPage.class);
         mountPage("/beheer/locaties/nieuw", LocationCreatePage.class);
