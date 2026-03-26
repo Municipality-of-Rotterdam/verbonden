@@ -2,6 +2,7 @@ package nl.rotterdam.huwelijk.features.marriage_intake.application;
 
 import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
+import nl.rotterdam.huwelijk.features.location_administration.repository.HuwelijkstypeLocatieRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.NietBeschikbareDagRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
@@ -28,17 +29,20 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final BeschikbaarheidRepository beschikbaarheidRepository;
     private final NietBeschikbareDagRepository nietBeschikbareDagRepository;
     private final LocatieRepository locatieRepository;
+    private final HuwelijkstypeLocatieRepository huwelijkstypeLocatieRepository;
     private final AfspraakRepository afspraakRepository;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
                               BeschikbaarheidRepository beschikbaarheidRepository,
                               NietBeschikbareDagRepository nietBeschikbareDagRepository,
                               LocatieRepository locatieRepository,
+                              HuwelijkstypeLocatieRepository huwelijkstypeLocatieRepository,
                               AfspraakRepository afspraakRepository) {
         this.dossierRepository = dossierRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
         this.nietBeschikbareDagRepository = nietBeschikbareDagRepository;
         this.locatieRepository = locatieRepository;
+        this.huwelijkstypeLocatieRepository = huwelijkstypeLocatieRepository;
         this.afspraakRepository = afspraakRepository;
     }
 
@@ -86,7 +90,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = dossierRepository.findById(dossierId)
                 .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = locatieRepository.findAll();
+        List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
 
         Set<LocalDate> beschikbaar = new HashSet<>();
         LocalDate vandaag = LocalDate.now();
@@ -113,7 +117,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = dossierRepository.findById(dossierId)
                 .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = locatieRepository.findAll();
+        List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
 
         Set<LocalTime> tijden = new TreeSet<>();
         for (TrouwlocatieEntity locatie : locaties) {
@@ -128,7 +132,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = dossierRepository.findById(dossierId)
                 .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = locatieRepository.findAll();
+        List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
 
         for (TrouwlocatieEntity locatie : locaties) {
             List<LocatieBeschikbaarheidEntity> slots = beschikbaarheidRepository.findBeschikbareSlots(
@@ -154,8 +158,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         throw new IllegalStateException("Geen beschikbaar tijdslot gevonden voor " + datum + " " + startTijd);
     }
 
+    private List<TrouwlocatieEntity> resolveLocaties(HuwelijksType huwelijksType) {
+        return huwelijkstypeLocatieRepository.findById(huwelijksType)
+                .map(mapping -> List.of(mapping.getLocatie()))
+                .orElseGet(locatieRepository::findAll);
+    }
+
     private boolean heeftVrijSlot(long locatieId, HuwelijksType huwelijksType, LocalDate datum) {
-        if (nietBeschikbareDagRepository.existsByLocatieIdAndDatum(locatieId, datum)) {
+        if (nietBeschikbareDagRepository.existsByLocatie_IdAndDatum(locatieId, datum)) {
             return false;
         }
         List<LocatieBeschikbaarheidEntity> beschikbaarheden = beschikbaarheidRepository
@@ -176,7 +186,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     }
 
     private List<LocalTime> vrijeTijdslotenVoor(long locatieId, HuwelijksType huwelijksType, LocalDate datum) {
-        if (nietBeschikbareDagRepository.existsByLocatieIdAndDatum(locatieId, datum)) {
+        if (nietBeschikbareDagRepository.existsByLocatie_IdAndDatum(locatieId, datum)) {
             return List.of();
         }
         List<LocatieBeschikbaarheidEntity> beschikbaarheden = beschikbaarheidRepository

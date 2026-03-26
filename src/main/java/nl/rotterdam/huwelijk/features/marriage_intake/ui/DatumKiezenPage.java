@@ -5,6 +5,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntake
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.head.CssHeaderItem;
@@ -16,6 +17,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -32,9 +34,10 @@ import java.util.*;
 
 public class DatumKiezenPage extends BurgerBasePage {
 
-    private static final DayOfWeek[] KOLOM_VOLGORDE =
-            {DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY,
-                    DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY};
+    private static final DayOfWeek[] KOLOM_VOLGORDE = {
+            DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY,
+            DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY
+    };
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
@@ -47,6 +50,9 @@ public class DatumKiezenPage extends BurgerBasePage {
     private WebMarkupContainer kalenderPanel;
     private WebMarkupContainer tijdslotPanel;
     private WebMarkupContainer bevestigBar;
+
+    /** Fetched once per request cycle; detached afterwards by Wicket. */
+    private IModel<Set<LocalDate>> beschikbareDatumsModel;
 
     @Override
     protected IModel<String> getTitleModel() {
@@ -62,12 +68,19 @@ public class DatumKiezenPage extends BurgerBasePage {
     protected void onInitialize() {
         super.onInitialize();
 
-        List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
+        beschikbareDatumsModel = new LoadableDetachableModel<>() {
+            @Override
+            protected Set<LocalDate> load() {
+                return marriageIntakeService.findBeschikbareDatums(dossierId, huidigeMaand);
+            }
+        };
+
+        List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> crumbs = List.of(
                 new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijnloket"), MarriageIntakePage.class),
                 new RdBreadcrumbNavRecord<>(null, getString("intake.tab.dedag"), DeDagPage.class),
                 new RdBreadcrumbNavRecord<>(null, getString("datum.kiezen.breadcrumb"), DatumKiezenPage.class)
         );
-        pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", breadcrumbs));
+        pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", crumbs));
 
         PageParameters terugParams = new PageParameters();
         terugParams.add("dossierId", dossierId);
@@ -88,15 +101,20 @@ public class DatumKiezenPage extends BurgerBasePage {
         pageBody.add(bevestigBar);
     }
 
+    // -------------------------------------------------------------------------
+    // Calendar panel
+    // -------------------------------------------------------------------------
+
     private WebMarkupContainer buildKalenderPanel() {
         WebMarkupContainer panel = new WebMarkupContainer("kalenderPanel");
 
-        AjaxLink<Void> vorigeMailnd = new AjaxLink<>("vorigeMaand") {
+        AjaxLink<Void> vorigeMaand = new AjaxLink<>("vorigeMaand") {
             @Override
             public void onClick(AjaxRequestTarget target) {
                 huidigeMaand = huidigeMaand.minusMonths(1);
                 geselecteerdeDatum = null;
                 geselecteerdeTijd = null;
+                beschikbareDatumsModel.detach();
                 target.add(kalenderPanel, tijdslotPanel, bevestigBar);
             }
 
@@ -106,13 +124,12 @@ public class DatumKiezenPage extends BurgerBasePage {
                 setEnabled(huidigeMaand.isAfter(YearMonth.now()));
             }
         };
-        panel.add(vorigeMailnd);
+        panel.add(vorigeMaand);
 
         panel.add(new Label("maandLabel", () -> {
-            String maand = huidigeMaand.getMonth()
-                    .getDisplayName(TextStyle.FULL, new Locale("nl"))
-                    .toLowerCase();
-            return maand + ", " + huidigeMaand.getYear();
+            String naam = huidigeMaand.getMonth()
+                    .getDisplayName(TextStyle.FULL, new Locale("nl")).toLowerCase();
+            return naam + ", " + huidigeMaand.getYear();
         }));
 
         panel.add(new AjaxLink<Void>("volgendeMaand") {
@@ -121,20 +138,20 @@ public class DatumKiezenPage extends BurgerBasePage {
                 huidigeMaand = huidigeMaand.plusMonths(1);
                 geselecteerdeDatum = null;
                 geselecteerdeTijd = null;
+                beschikbareDatumsModel.detach();
                 target.add(kalenderPanel, tijdslotPanel, bevestigBar);
             }
         });
 
-        panel.add(buildKalenderGrid());
+        panel.add(buildKalenderRijen());
         return panel;
     }
 
-    private ListView<List<LocalDate>> buildKalenderGrid() {
+    private ListView<List<LocalDate>> buildKalenderRijen() {
         return new ListView<>("kalenderRijen", () -> bouwMaandRijen(huidigeMaand)) {
             @Override
             protected void populateItem(ListItem<List<LocalDate>> rijItem) {
-                Set<LocalDate> beschikbaar = marriageIntakeService
-                        .findBeschikbareDatums(dossierId, huidigeMaand);
+                Set<LocalDate> beschikbaar = beschikbareDatumsModel.getObject();
                 rijItem.add(new ListView<>("dag", rijItem.getModel()) {
                     @Override
                     protected void populateItem(ListItem<LocalDate> dagItem) {
@@ -148,34 +165,36 @@ public class DatumKiezenPage extends BurgerBasePage {
                         dagItem.add(AttributeModifier.replace("class",
                                 buildDagClass(isLeeg, isVerleden, isBeschikbaar, isGeselecteerd)));
 
-                        Label dagNummer = new Label("dagNummer",
-                                datum != null ? String.valueOf(datum.getDayOfMonth()) : "");
+                        WebMarkupContainer dagLink = new WebMarkupContainer("dagLink");
+                        dagLink.add(new Label("dagNummer",
+                                datum != null ? String.valueOf(datum.getDayOfMonth()) : ""));
                         Label vandaagLabel = new Label("vandaagLabel",
                                 new ResourceModel("datum.kiezen.vandaag"));
                         vandaagLabel.setVisible(isVandaag);
+                        dagLink.add(vandaagLabel);
 
                         if (isBeschikbaar) {
-                            AjaxLink<LocalDate> link = new AjaxLink<>("dagLink", Model.of(datum)) {
+                            dagLink.add(AttributeModifier.replace("href", "#"));
+                            dagLink.add(new AjaxEventBehavior("click") {
                                 @Override
-                                public void onClick(AjaxRequestTarget target) {
-                                    geselecteerdeDatum = getModelObject();
+                                protected void onEvent(AjaxRequestTarget target) {
+                                    geselecteerdeDatum = datum;
                                     geselecteerdeTijd = null;
                                     target.add(kalenderPanel, tijdslotPanel, bevestigBar);
                                 }
-                            };
-                            link.add(dagNummer, vandaagLabel);
-                            dagItem.add(link);
-                        } else {
-                            WebMarkupContainer placeholder = new WebMarkupContainer("dagLink");
-                            placeholder.setVisible(false);
-                            placeholder.add(dagNummer, vandaagLabel);
-                            dagItem.add(placeholder);
+                            });
                         }
+
+                        dagItem.add(dagLink);
                     }
                 });
             }
         };
     }
+
+    // -------------------------------------------------------------------------
+    // Time-slot panel
+    // -------------------------------------------------------------------------
 
     private WebMarkupContainer buildTijdslotPanel() {
         WebMarkupContainer panel = new WebMarkupContainer("tijdslotPanel") {
@@ -188,8 +207,8 @@ public class DatumKiezenPage extends BurgerBasePage {
 
         panel.add(new Label("geselecteerdeDatumLabel", () -> {
             if (geselecteerdeDatum == null) return "";
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE d MMMM, yyyy", new Locale("nl"));
-            return geselecteerdeDatum.format(formatter);
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("EEEE d MMMM, yyyy", new Locale("nl"));
+            return geselecteerdeDatum.format(fmt);
         }));
 
         panel.add(new ListView<LocalTime>("tijdsloten",
@@ -218,6 +237,10 @@ public class DatumKiezenPage extends BurgerBasePage {
 
         return panel;
     }
+
+    // -------------------------------------------------------------------------
+    // Confirm bar
+    // -------------------------------------------------------------------------
 
     private WebMarkupContainer buildBevestigBar() {
         WebMarkupContainer bar = new WebMarkupContainer("bevestigBar") {
@@ -248,30 +271,25 @@ public class DatumKiezenPage extends BurgerBasePage {
             }
         };
         bar.add(bevestigForm);
-        bevestigForm.add(new Label("bevestigLabel", new ResourceModel("datum.kiezen.bevestig")));
 
         return bar;
     }
 
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
     private static List<List<LocalDate>> bouwMaandRijen(YearMonth maand) {
-        LocalDate eersteVanMaand = maand.atDay(1);
-        int verschuiving = kolomIndex(eersteVanMaand.getDayOfWeek());
+        LocalDate eerste = maand.atDay(1);
+        int verschuiving = kolomIndex(eerste.getDayOfWeek());
 
         List<LocalDate> cells = new ArrayList<>();
-        for (int i = 0; i < verschuiving; i++) {
-            cells.add(null);
-        }
-        for (int dag = 1; dag <= maand.lengthOfMonth(); dag++) {
-            cells.add(maand.atDay(dag));
-        }
-        while (cells.size() % 7 != 0) {
-            cells.add(null);
-        }
+        for (int i = 0; i < verschuiving; i++) cells.add(null);
+        for (int dag = 1; dag <= maand.lengthOfMonth(); dag++) cells.add(maand.atDay(dag));
+        while (cells.size() % 7 != 0) cells.add(null);
 
         List<List<LocalDate>> rijen = new ArrayList<>();
-        for (int i = 0; i < cells.size(); i += 7) {
-            rijen.add(cells.subList(i, i + 7));
-        }
+        for (int i = 0; i < cells.size(); i += 7) rijen.add(cells.subList(i, i + 7));
         return rijen;
     }
 

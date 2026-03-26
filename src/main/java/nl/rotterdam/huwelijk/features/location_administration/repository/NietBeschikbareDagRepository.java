@@ -26,5 +26,5 @@ public interface NietBeschikbareDagRepository extends JpaRepository<LocatieNietB
     @Query("SELECT d.datum FROM LocatieNietBeschikbareDagEntity d WHERE d.locatie.id = :locatieId")
     Set<LocalDate> findDatumsByLocatieId(@Param("locatieId") long locatieId);
 
-    boolean existsByLocatieIdAndDatum(long locatieId, LocalDate datum);
+    boolean existsByLocatie_IdAndDatum(long locatieId, LocalDate datum);
 }

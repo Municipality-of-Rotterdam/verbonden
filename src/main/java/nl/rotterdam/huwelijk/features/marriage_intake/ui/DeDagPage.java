@@ -40,7 +40,9 @@ public class DeDagPage extends IntakeBasePage {
         pageBody.add(new Link<Void>("datumLink") {
             @Override
             public void onClick() {
-                // Navigation to date picker — to be implemented in a future iteration
+                PageParameters params = new PageParameters();
+                params.add("dossierId", dossierId);
+                setResponsePage(DatumKiezenPage.class, params);
             }
         });
 
