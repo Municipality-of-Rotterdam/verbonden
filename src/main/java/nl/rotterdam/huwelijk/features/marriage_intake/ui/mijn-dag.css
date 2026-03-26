@@ -288,6 +288,16 @@
     background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 60%, transparent 100%);
 }
 
+/* Disabled keuze-card: Wicket renders a disabled Link as <a> without href */
+a.rd-keuze-card:not([href]) {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+}
+
 .rd-keuze-card__image {
     width: 100%;
     height: 100%;
@@ -642,6 +652,12 @@
 .rd-soort-optie .utrecht-button {
     width: 100%;
     justify-content: center;
+}
+
+/* Dim ceremony option column when its submit button is disabled */
+.rd-soort-optie:has(.utrecht-button[disabled]) {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 /* Make sidebar bevestig RdButton full-width */

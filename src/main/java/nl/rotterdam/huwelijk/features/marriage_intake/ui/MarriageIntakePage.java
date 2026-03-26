@@ -70,10 +70,16 @@ public class MarriageIntakePage extends IntakeBasePage {
         // Ceremony submit buttons — each creates the dossier with the chosen ceremony type
         form.add(createCeremonyButton("kleinButton", CeremonieSoort.KLEIN,
                 new ResourceModel("intake.soort.klein.title")));
-        form.add(createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT,
-                new ResourceModel("intake.soort.middelgroot.title")));
-        form.add(createCeremonyButton("grootButton", CeremonieSoort.GROOT,
-                new ResourceModel("intake.soort.groot.title")));
+
+        RdButton middelgrootButton = createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT,
+                new ResourceModel("intake.soort.middelgroot.title"));
+        middelgrootButton.setEnabled(false);
+        form.add(middelgrootButton);
+
+        RdButton grootButton = createCeremonyButton("grootButton", CeremonieSoort.GROOT,
+                new ResourceModel("intake.soort.groot.title"));
+        grootButton.setEnabled(false);
+        form.add(grootButton);
     }
 
     private RdButton createCeremonyButton(String id, CeremonieSoort soort, IModel<String> labelModel) {

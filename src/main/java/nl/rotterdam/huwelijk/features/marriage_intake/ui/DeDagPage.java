@@ -43,18 +43,24 @@ public class DeDagPage extends IntakeBasePage {
                 // Navigation to date picker — to be implemented in a future iteration
             }
         });
-        pageBody.add(new Link<Void>("locatieLink") {
+
+        Link<Void> locatieLink = new Link<Void>("locatieLink") {
             @Override
             public void onClick() {
                 // Navigation to location picker — to be implemented in a future iteration
             }
-        });
-        pageBody.add(new Link<Void>("bapsLink") {
+        };
+        locatieLink.setEnabled(false);
+        pageBody.add(locatieLink);
+
+        Link<Void> bapsLink = new Link<Void>("bapsLink") {
             @Override
             public void onClick() {
                 // Navigation to BAPS picker — to be implemented in a future iteration
             }
-        });
+        };
+        bapsLink.setEnabled(false);
+        pageBody.add(bapsLink);
     }
 }
 
