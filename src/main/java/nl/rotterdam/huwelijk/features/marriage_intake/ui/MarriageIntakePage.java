@@ -20,6 +20,8 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+import java.util.List;
+
 public class MarriageIntakePage extends IntakeBasePage {
 
     @SpringBean
@@ -41,7 +43,7 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return () -> new DossierSamenvattingDto(0, registratieType, CeremonieSoort.KLEIN);
+        return () -> new DossierSamenvattingDto(0, registratieType, CeremonieSoort.KLEIN, null, null, false, false, List.of());
     }
 
     public MarriageIntakePage() {

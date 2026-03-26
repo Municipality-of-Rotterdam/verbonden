@@ -8,6 +8,8 @@ import nl.rotterdam.huwelijk.persistence.HuwelijksDossierEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
@@ -38,7 +40,15 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Transactional(readOnly = true)
     public DossierSamenvattingDto findById(long id) {
         return dossierRepository.findById(id)
-                .map(e -> new DossierSamenvattingDto(e.getId(), e.getRegistratieType(), e.getCeremonieSoort()))
+                .map(e -> new DossierSamenvattingDto(
+                        e.getId(),
+                        e.getRegistratieType(),
+                        e.getCeremonieSoort(),
+                        null,
+                        null,
+                        false,
+                        false,
+                        List.of()))
                 .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + id));
     }
 }
