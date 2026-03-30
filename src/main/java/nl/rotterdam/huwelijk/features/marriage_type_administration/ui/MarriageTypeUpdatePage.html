@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Huwelijkstype wijzigen</title>
+</head>
+<body>
+<wicket:extend>
+<h1>Huwelijkstype wijzigen</h1>
+
+<p><a wicket:id="terugLink">Terug naar overzicht</a></p>
+
+<div wicket:id="feedback"></div>
+
+<form wicket:id="huwelijkstypeForm" class="d-flex flex-column gap-3">
+
+    <div>
+        <label for="soort">Soort</label>
+        <select wicket:id="soort" id="soort"></select>
+    </div>
+    <div wicket:id="titel"></div>
+    <div wicket:id="tekst"></div>
+    <div wicket:id="prijs"></div>
+    <div wicket:id="url"></div>
+
+    <div>
+        <button wicket:id="opslaan" type="submit"></button>
+    </div>
+
+</form>
+</wicket:extend>
+</body>
+</html>

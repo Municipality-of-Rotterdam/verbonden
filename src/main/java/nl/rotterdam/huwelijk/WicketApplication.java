@@ -16,6 +16,9 @@ import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbare
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagImportPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagUpdatePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeCreatePage;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeUpdatePage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
@@ -58,6 +61,9 @@ public class WicketApplication extends WebApplication {
                 new ResourceIsolationRequestCycleListener(
                         new FetchMetadataResourceIsolationPolicy()));
 
+        mountPage("/beheer/huwelijkstypen", MarriageTypeAdministrationPage.class);
+        mountPage("/beheer/huwelijkstypen/nieuw", MarriageTypeCreatePage.class);
+        mountPage("/beheer/huwelijkstypen/${id}", MarriageTypeUpdatePage.class);
         mountPage("/beheer", BabsAdministrationPage.class);
         mountPage("/beheer/babs/nieuw", BabsCreatePage.class);
         mountPage("/beheer/babs/${id}", BabsUpdatePage.class);
