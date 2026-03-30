@@ -5,6 +5,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "huwelijks_dossier")
@@ -13,6 +14,16 @@ public class HuwelijksDossierEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "uuid", nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
+    @PrePersist
+    private void generateUuid() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+        }
+    }
 
     @Enumerated(EnumType.STRING)
     @Column(name = "registratie_type", nullable = false)
@@ -31,6 +42,14 @@ public class HuwelijksDossierEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public RegistratieType getRegistratieType() {

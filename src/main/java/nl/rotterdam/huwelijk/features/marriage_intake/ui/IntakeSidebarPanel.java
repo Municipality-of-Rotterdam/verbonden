@@ -54,7 +54,7 @@ public class IntakeSidebarPanel extends Panel {
             protected void onConfigure() {
                 super.onConfigure();
                 DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d != null && d.id() > 0);
+                setVisible(d != null && d.id() != null);
             }
         };
         IModel<String> ceremonieSoortModel = LambdaModel.of(

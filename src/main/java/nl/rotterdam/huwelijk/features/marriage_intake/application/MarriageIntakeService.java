@@ -9,18 +9,19 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public interface MarriageIntakeService {
 
-    long create(CreateDossierDto dto);
+    UUID create(CreateDossierDto dto);
 
-    void updateCeremonie(long dossierId, CeremonieSoort ceremonieSoort);
+    void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort);
 
-    DossierSamenvattingDto findById(long id);
+    DossierSamenvattingDto findByDossierId(UUID id);
 
-    Set<LocalDate> findBeschikbareDatums(long dossierId, YearMonth maand);
+    Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand);
 
-    List<LocalTime> findBeschikbareTijden(long dossierId, LocalDate datum);
+    List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum);
 
-    void slaAfspraakOp(long dossierId, LocalDate datum, LocalTime startTijd);
+    void slaAfspraakOp(UUID dossierId, LocalDate datum, LocalTime startTijd);
 }

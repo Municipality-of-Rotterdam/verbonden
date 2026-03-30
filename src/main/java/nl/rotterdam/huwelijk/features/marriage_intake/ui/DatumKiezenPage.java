@@ -31,6 +31,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
+import java.util.UUID;
 
 public class DatumKiezenPage extends BurgerBasePage {
 
@@ -42,7 +43,7 @@ public class DatumKiezenPage extends BurgerBasePage {
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
 
-    private long dossierId;
+    private UUID dossierId;
     private YearMonth huidigeMaand;
     private LocalDate geselecteerdeDatum;
     private LocalTime geselecteerdeTijd;
@@ -60,7 +61,7 @@ public class DatumKiezenPage extends BurgerBasePage {
     }
 
     public DatumKiezenPage(PageParameters params) {
-        this.dossierId = params.get("dossierId").toLong();
+        this.dossierId = UUID.fromString(params.get("dossierId").toString());
         this.huidigeMaand = YearMonth.now();
     }
 
@@ -83,7 +84,7 @@ public class DatumKiezenPage extends BurgerBasePage {
         pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", crumbs));
 
         PageParameters terugParams = new PageParameters();
-        terugParams.add("dossierId", dossierId);
+        terugParams.add("dossierId", dossierId.toString());
         pageBody.add(new BookmarkablePageLink<>("terugLink", DeDagPage.class, terugParams));
 
         pageBody.add(new Label("heading", new ResourceModel("datum.kiezen.heading")));
@@ -266,7 +267,7 @@ public class DatumKiezenPage extends BurgerBasePage {
             protected void onSubmit() {
                 marriageIntakeService.slaAfspraakOp(dossierId, geselecteerdeDatum, geselecteerdeTijd);
                 PageParameters params = new PageParameters();
-                params.add("dossierId", dossierId);
+                params.add("dossierId", dossierId.toString());
                 setResponsePage(DeDagPage.class, params);
             }
         };

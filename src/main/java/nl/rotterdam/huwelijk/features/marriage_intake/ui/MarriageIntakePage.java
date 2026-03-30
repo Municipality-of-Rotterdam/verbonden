@@ -21,6 +21,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.List;
+import java.util.UUID;
 
 public class MarriageIntakePage extends IntakeBasePage {
 
@@ -43,7 +44,7 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return () -> new DossierSamenvattingDto(0, registratieType, CeremonieSoort.KLEIN, null, null, false, false, List.of());
+        return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, false, false, List.of());
     }
 
     public MarriageIntakePage() {
@@ -88,10 +89,10 @@ public class MarriageIntakePage extends IntakeBasePage {
         return new RdButton(id, labelModel) {
             @Override
             public void onSubmit() {
-                long dossierId = marriageIntakeService.create(
+                UUID dossierId = marriageIntakeService.create(
                         new CreateDossierDto(registratieType, soort));
                 PageParameters params = new PageParameters();
-                params.add("dossierId", dossierId);
+                params.add("dossierId", dossierId.toString());
                 setResponsePage(DeDagPage.class, params);
             }
         };

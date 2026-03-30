@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.UUID;
 
 @Service
 class MarriageIntakeServiceImpl implements MarriageIntakeService {
@@ -48,33 +49,30 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional
-    public long create(CreateDossierDto dto) {
+    public UUID create(CreateDossierDto dto) {
         HuwelijksDossierEntity entity = new HuwelijksDossierEntity();
         entity.setRegistratieType(dto.registratieType());
         entity.setCeremonieSoort(dto.ceremonieSoort());
-        return dossierRepository.save(entity).getId();
+        return dossierRepository.save(entity).getUuid();
     }
 
     @Override
     @Transactional
-    public void updateCeremonie(long dossierId, CeremonieSoort ceremonieSoort) {
-        dossierRepository.findById(dossierId)
-                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId))
-                .setCeremonieSoort(ceremonieSoort);
+    public void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort) {
+        getDossier(dossierId).setCeremonieSoort(ceremonieSoort);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public DossierSamenvattingDto findById(long id) {
-        HuwelijksDossierEntity e = dossierRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + id));
+    public DossierSamenvattingDto findByDossierId(UUID id) {
+        HuwelijksDossierEntity e = getDossier(id);
 
-        LocalDate datumHuwelijk = afspraakRepository.findFirstByDossier_Id(id)
+        LocalDate datumHuwelijk = afspraakRepository.findFirstByDossier_Id(e.getId())
                 .map(AfspraakEntity::getDatum)
                 .orElse(null);
 
         return new DossierSamenvattingDto(
-                e.getId(),
+                e.getUuid(),
                 e.getRegistratieType(),
                 e.getCeremonieSoort(),
                 datumHuwelijk,
@@ -86,9 +84,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<LocalDate> findBeschikbareDatums(long dossierId, YearMonth maand) {
-        HuwelijksDossierEntity dossier = dossierRepository.findById(dossierId)
-                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
+    public Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
         List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
 
@@ -113,9 +110,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LocalTime> findBeschikbareTijden(long dossierId, LocalDate datum) {
-        HuwelijksDossierEntity dossier = dossierRepository.findById(dossierId)
-                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
+    public List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
         List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
 
@@ -128,9 +124,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional
-    public void slaAfspraakOp(long dossierId, LocalDate datum, LocalTime startTijd) {
-        HuwelijksDossierEntity dossier = dossierRepository.findById(dossierId)
-                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
+    public void slaAfspraakOp(UUID dossierId, LocalDate datum, LocalTime startTijd) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
         List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
 
@@ -142,7 +137,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 if (isSlotVrij(slot, datum, startTijd)) {
                     LocalTime eindTijd = startTijd.plusMinutes(slot.getDuurInMinuten());
 
-                    afspraakRepository.deleteByDossier_Id(dossierId);
+                    afspraakRepository.deleteByDossier_Id(dossier.getId());
 
                     AfspraakEntity afspraak = new AfspraakEntity();
                     afspraak.setDossier(dossier);
@@ -228,6 +223,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             bezet.add(a.getStartTijd());
         }
         return bezet;
+    }
+
+    private HuwelijksDossierEntity getDossier(UUID uuid) {
+        return dossierRepository.findByUuid(uuid)
+                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + uuid));
     }
 
     private static HuwelijksType toHuwelijksType(CeremonieSoort ceremonieSoort) {
