@@ -62,13 +62,31 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                         e.getSoort(),
                         e.getTitel(),
                         e.getPrijs(),
+                        e.getSoort() == CeremonieSoort.GROOT ? "Vanaf" : null,
                         Arrays.stream(e.getTekst().split("\n"))
                                 .map(String::trim)
                                 .filter(s -> !s.isEmpty())
                                 .toList(),
+                        computeEersteGelegenheid(e.getSoort()),
                         e.isActive()
                 ))
                 .toList();
+    }
+
+    private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {
+        HuwelijksType huwelijksType = toHuwelijksType(ceremonieSoort);
+        List<TrouwlocatieEntity> locaties = resolveLocaties(ceremonieSoort);
+        LocalDate datum = LocalDate.now().plusDays(1);
+        LocalDate limiet = datum.plusYears(1);
+        while (!datum.isAfter(limiet)) {
+            for (TrouwlocatieEntity locatie : locaties) {
+                if (heeftVrijSlot(locatie.getId(), huwelijksType, datum)) {
+                    return datum;
+                }
+            }
+            datum = datum.plusDays(1);
+        }
+        return null;
     }
 
     @Override
