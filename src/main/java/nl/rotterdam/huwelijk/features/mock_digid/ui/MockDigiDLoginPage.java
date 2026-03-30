@@ -12,7 +12,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.markup.repeater.data.ListDataProvider;
+import org.apache.wicket.extensions.markup.html.repeater.util.SortOrder;
+import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -24,6 +25,8 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class MockDigiDLoginPage extends BurgerBasePage {
@@ -77,8 +80,33 @@ public class MockDigiDLoginPage extends BurgerBasePage {
             }
         });
 
-        return new RdDataTable<>("testBurgersTable", columns,
-                new ListDataProvider<>(TEST_BURGERS), TEST_BURGERS.size());
+        SortableDataProvider<TestBurger, String> provider = new SortableDataProvider<>() {
+            @Override
+            public Iterator<? extends TestBurger> iterator(long first, long count) {
+                List<TestBurger> list = new ArrayList<>(TEST_BURGERS);
+                if (getSort() != null) {
+                    Comparator<TestBurger> comparator = switch (getSort().getProperty()) {
+                        case "beschrijving" -> Comparator.comparing(TestBurger::beschrijving);
+                        default -> Comparator.comparing(TestBurger::bsn);
+                    };
+                    list.sort(getSort().isAscending() ? comparator : comparator.reversed());
+                }
+                return list.stream().skip(first).limit(count > 0 ? count : list.size()).iterator();
+            }
+
+            @Override
+            public long size() {
+                return TEST_BURGERS.size();
+            }
+
+            @Override
+            public IModel<TestBurger> model(TestBurger burger) {
+                return Model.of(burger);
+            }
+        };
+        provider.setSort("bsn", SortOrder.ASCENDING);
+
+        return new RdDataTable<>("testBurgersTable", columns, provider, TEST_BURGERS.size());
     }
 
     private class LoginFragment extends Fragment {
