@@ -30,6 +30,9 @@ public class MarriageTypeEntity {
     @Column(nullable = false, unique = true, length = 50)
     private CeremonieSoort soort;
 
+    @OneToOne(mappedBy = "marriageType", fetch = FetchType.LAZY, optional = true)
+    private MarriageTypeLocationEntity location;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
