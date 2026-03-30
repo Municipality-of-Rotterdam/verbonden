@@ -3,8 +3,12 @@ package nl.rotterdam.huwelijk.features.marriage_type_administration.application;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.ChangeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.CreateMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.ListMarriageTypeDto;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeRepository;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeEntity;
+import nl.rotterdam.huwelijk.persistence.MarriageTypeLocationEntity;
+import nl.rotterdam.huwelijk.persistence.TrouwlocatieEntity;
+import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +19,15 @@ import java.util.Optional;
 class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministrationService {
 
     private final MarriageTypeRepository marriageTypeRepository;
+    private final MarriageTypeLocationRepository marriageTypeLocationRepository;
+    private final LocatieRepository locatieRepository;
 
-    MarriageTypeAdministrationServiceImpl(MarriageTypeRepository marriageTypeRepository) {
+    MarriageTypeAdministrationServiceImpl(MarriageTypeRepository marriageTypeRepository,
+                                          MarriageTypeLocationRepository marriageTypeLocationRepository,
+                                          LocatieRepository locatieRepository) {
         this.marriageTypeRepository = marriageTypeRepository;
+        this.marriageTypeLocationRepository = marriageTypeLocationRepository;
+        this.locatieRepository = locatieRepository;
     }
 
     @Override
@@ -36,7 +46,16 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
     @Transactional
     public long create(CreateMarriageTypeDto dto) {
         MarriageTypeEntity entity = toEntity(dto);
-        return marriageTypeRepository.save(entity).getId();
+        MarriageTypeEntity saved = marriageTypeRepository.save(entity);
+        if (dto.locatieId() != null) {
+            TrouwlocatieEntity locatie = locatieRepository.findById(dto.locatieId())
+                    .orElseThrow(() -> new IllegalArgumentException("Locatie niet gevonden: " + dto.locatieId()));
+            MarriageTypeLocationEntity location = new MarriageTypeLocationEntity();
+            location.setMarriageType(saved);
+            location.setLocatie(locatie);
+            marriageTypeLocationRepository.save(location);
+        }
+        return saved.getId();
     }
 
     @Override
@@ -50,6 +69,16 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
         entity.setUrl(dto.url());
         entity.setSoort(dto.soort());
         marriageTypeRepository.save(entity);
+
+        marriageTypeLocationRepository.deleteByMarriageTypeId(entity.getId());
+        if (dto.locatieId() != null) {
+            TrouwlocatieEntity locatie = locatieRepository.findById(dto.locatieId())
+                    .orElseThrow(() -> new IllegalArgumentException("Locatie niet gevonden: " + dto.locatieId()));
+            MarriageTypeLocationEntity location = new MarriageTypeLocationEntity();
+            location.setMarriageType(entity);
+            location.setLocatie(locatie);
+            marriageTypeLocationRepository.save(location);
+        }
     }
 
     @Override
@@ -59,13 +88,17 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
     }
 
     private ChangeMarriageTypeDto toChangeDto(MarriageTypeEntity entity) {
+        Long locatieId = marriageTypeLocationRepository.findById(entity.getId())
+                .map(mtl -> mtl.getLocatie().getId())
+                .orElse(null);
         return new ChangeMarriageTypeDto(
                 entity.getId(),
                 entity.getSoort(),
                 entity.getTitel(),
                 entity.getTekst(),
                 entity.getPrijs(),
-                entity.getUrl()
+                entity.getUrl(),
+                locatieId
         );
     }
 

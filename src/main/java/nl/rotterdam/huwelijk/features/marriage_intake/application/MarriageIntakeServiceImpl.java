@@ -2,7 +2,6 @@ package nl.rotterdam.huwelijk.features.marriage_intake.application;
 
 import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
-import nl.rotterdam.huwelijk.features.location_administration.repository.HuwelijkstypeLocatieRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.NietBeschikbareDagRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
@@ -10,6 +9,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.DossierRepository;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.huwelijk.persistence.AfspraakEntity;
 import nl.rotterdam.huwelijk.persistence.HuwelijksDossierEntity;
 import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
@@ -30,20 +30,20 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final BeschikbaarheidRepository beschikbaarheidRepository;
     private final NietBeschikbareDagRepository nietBeschikbareDagRepository;
     private final LocatieRepository locatieRepository;
-    private final HuwelijkstypeLocatieRepository huwelijkstypeLocatieRepository;
+    private final MarriageTypeLocationRepository marriageTypeLocationRepository;
     private final AfspraakRepository afspraakRepository;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
                               BeschikbaarheidRepository beschikbaarheidRepository,
                               NietBeschikbareDagRepository nietBeschikbareDagRepository,
                               LocatieRepository locatieRepository,
-                              HuwelijkstypeLocatieRepository huwelijkstypeLocatieRepository,
+                              MarriageTypeLocationRepository marriageTypeLocationRepository,
                               AfspraakRepository afspraakRepository) {
         this.dossierRepository = dossierRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
         this.nietBeschikbareDagRepository = nietBeschikbareDagRepository;
         this.locatieRepository = locatieRepository;
-        this.huwelijkstypeLocatieRepository = huwelijkstypeLocatieRepository;
+        this.marriageTypeLocationRepository = marriageTypeLocationRepository;
         this.afspraakRepository = afspraakRepository;
     }
 
@@ -87,7 +87,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
+        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
 
         Set<LocalDate> beschikbaar = new HashSet<>();
         LocalDate vandaag = LocalDate.now();
@@ -113,7 +113,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
+        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
 
         Set<LocalTime> tijden = new TreeSet<>();
         for (TrouwlocatieEntity locatie : locaties) {
@@ -127,7 +127,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public void slaAfspraakOp(UUID dossierId, LocalDate datum, LocalTime startTijd) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = resolveLocaties(huwelijksType);
+        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
 
         for (TrouwlocatieEntity locatie : locaties) {
             List<LocatieBeschikbaarheidEntity> slots = beschikbaarheidRepository.findBeschikbareSlots(
@@ -153,8 +153,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         throw new IllegalStateException("Geen beschikbaar tijdslot gevonden voor " + datum + " " + startTijd);
     }
 
-    private List<TrouwlocatieEntity> resolveLocaties(HuwelijksType huwelijksType) {
-        return huwelijkstypeLocatieRepository.findById(huwelijksType)
+    private List<TrouwlocatieEntity> resolveLocaties(CeremonieSoort ceremonieSoort) {
+        return marriageTypeLocationRepository.findByMarriageType_Soort(ceremonieSoort)
                 .map(mapping -> List.of(mapping.getLocatie()))
                 .orElseGet(locatieRepository::findAll);
     }

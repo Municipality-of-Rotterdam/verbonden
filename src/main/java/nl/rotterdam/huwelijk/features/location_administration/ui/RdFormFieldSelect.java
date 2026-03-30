@@ -13,6 +13,7 @@ class RdFormFieldSelect<T> extends RdFormFieldBorder<T, RdSelect<T>> {
     private final List<? extends T> choices;
     private final IChoiceRenderer<? super T> renderer;
     private boolean required;
+    private boolean nullValid;
 
     RdFormFieldSelect(String id, IModel<T> model, IModel<String> label,
                       List<? extends T> choices, IChoiceRenderer<? super T> renderer) {
@@ -23,6 +24,11 @@ class RdFormFieldSelect<T> extends RdFormFieldBorder<T, RdSelect<T>> {
 
     RdFormFieldSelect<T> setRequired(boolean required) {
         this.required = required;
+        return this;
+    }
+
+    RdFormFieldSelect<T> setNullValid(boolean nullValid) {
+        this.nullValid = nullValid;
         return this;
     }
 
@@ -39,5 +45,6 @@ class RdFormFieldSelect<T> extends RdFormFieldBorder<T, RdSelect<T>> {
         getInput().setChoices(choices);
         getInput().setChoiceRenderer(renderer);
         getInput().setRequired(required);
+        getInput().setNullValid(nullValid);
     }
 }
