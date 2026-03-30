@@ -15,6 +15,7 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class MarriageTypeCreatePage extends AdministrationBasePage {
@@ -25,7 +26,7 @@ public class MarriageTypeCreatePage extends AdministrationBasePage {
     public MarriageTypeCreatePage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
-        add(
+        pageBody.add(
                 new BookmarkablePageLink<>("terugLink", MarriageTypeAdministrationPage.class),
                 feedback,
                 new CreateMarriageTypeForm("huwelijkstypeForm")
@@ -55,7 +56,8 @@ public class MarriageTypeCreatePage extends AdministrationBasePage {
                     new RdFormFieldTextInput<>("prijs",
                             LambdaModel.of(model, MarriageTypeFormDto::getPrijs, MarriageTypeFormDto::setPrijs),
                             Model.of("Prijs"),
-                            Model.of("Prijs in euro's, bijv. 267.81")).setRequired(true),
+                            Model.of("Prijs in euro's, bijv. 267.81")).setRequired(true)
+                            .setModelType(BigDecimal.class),
                     new RdFormFieldTextInput<>("url",
                             LambdaModel.of(model, MarriageTypeFormDto::getUrl, MarriageTypeFormDto::setUrl),
                             Model.of("URL")).setRequired(true),
