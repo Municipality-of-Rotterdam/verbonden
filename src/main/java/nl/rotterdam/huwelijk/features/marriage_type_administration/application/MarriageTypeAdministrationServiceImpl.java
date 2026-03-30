@@ -68,6 +68,7 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
         entity.setPrijs(dto.prijs());
         entity.setUrl(dto.url());
         entity.setSoort(dto.soort());
+        entity.setActive(dto.active());
         marriageTypeRepository.save(entity);
 
         marriageTypeLocationRepository.deleteByMarriageTypeId(entity.getId());
@@ -98,7 +99,8 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
                 entity.getTekst(),
                 entity.getPrijs(),
                 entity.getUrl(),
-                locatieId
+                locatieId,
+                entity.isActive()
         );
     }
 
@@ -109,6 +111,7 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
         entity.setTekst(dto.tekst());
         entity.setPrijs(dto.prijs());
         entity.setUrl(dto.url());
+        entity.setActive(dto.active());
         return entity;
     }
 }

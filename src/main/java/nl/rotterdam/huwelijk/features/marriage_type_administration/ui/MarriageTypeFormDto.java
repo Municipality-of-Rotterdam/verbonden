@@ -16,6 +16,7 @@ public class MarriageTypeFormDto implements Serializable {
     private BigDecimal prijs = null;
     private String url = "";
     private ListLocatieDto locatie = null;
+    private boolean active = true;
 
     public CeremonieSoort getSoort() { return soort; }
     public void setSoort(CeremonieSoort soort) { this.soort = soort; }
@@ -35,6 +36,9 @@ public class MarriageTypeFormDto implements Serializable {
     public ListLocatieDto getLocatie() { return locatie; }
     public void setLocatie(ListLocatieDto locatie) { this.locatie = locatie; }
 
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+
     public static MarriageTypeFormDto leeg() {
         return new MarriageTypeFormDto();
     }
@@ -52,6 +56,7 @@ public class MarriageTypeFormDto implements Serializable {
                     .findFirst()
                     .ifPresent(form::setLocatie);
         }
+        form.setActive(dto.active());
         return form;
     }
 }

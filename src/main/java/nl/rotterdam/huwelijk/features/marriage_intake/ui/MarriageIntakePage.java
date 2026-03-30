@@ -4,6 +4,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntake
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
@@ -11,8 +12,11 @@ import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButto
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -20,10 +24,17 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class MarriageIntakePage extends IntakeBasePage {
+
+    private static final DecimalFormat PRIJS_FORMAT =
+            new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL")));
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
@@ -70,32 +81,45 @@ public class MarriageIntakePage extends IntakeBasePage {
         registrationGroup.add(new RdRadioButton<>("geregistreerdPartnerschap",
                 Model.of(RegistratieType.GEREGISTREERD_PARTNERSCHAP), regRadioGroup));
 
-        // Ceremony submit buttons — each creates the dossier with the chosen ceremony type
-        form.add(createCeremonyButton("kleinButton", CeremonieSoort.KLEIN,
-                new ResourceModel("intake.soort.klein.title")));
+        // Load ceremony types from database
+        List<IntakeMarriageTypeDto> marriageTypes = marriageIntakeService.findAllMarriageTypes();
 
-        RdButton middelgrootButton = createCeremonyButton("middelgrootButton", CeremonieSoort.MIDDELGROOT,
-                new ResourceModel("intake.soort.middelgroot.title"));
-        middelgrootButton.setEnabled(false);
-        form.add(middelgrootButton);
+        form.add(new ListView<IntakeMarriageTypeDto>("ceremonyTypesList", marriageTypes) {
+            @Override
+            protected void populateItem(ListItem<IntakeMarriageTypeDto> item) {
+                IntakeMarriageTypeDto dto = item.getModelObject();
 
-        RdButton grootButton = createCeremonyButton("grootButton", CeremonieSoort.GROOT,
-                new ResourceModel("intake.soort.groot.title"));
-        grootButton.setEnabled(false);
-        form.add(grootButton);
+                item.add(new Label("titel", dto.titel()));
+                item.add(new Label("prijs", formatPrijs(dto.prijs())));
+
+                item.add(new ListView<String>("bullets", dto.bulletPoints()) {
+                    @Override
+                    protected void populateItem(ListItem<String> bulletItem) {
+                        bulletItem.add(new Label("bullet", bulletItem.getModel()));
+                    }
+                });
+
+                RdButton button = new RdButton("kiesButton", Model.of(dto.titel())) {
+                    @Override
+                    public void onSubmit() {
+                        UUID dossierId = marriageIntakeService.create(
+                                new CreateDossierDto(registratieType, dto.soort()));
+                        PageParameters params = new PageParameters();
+                        params.add("dossierId", dossierId.toString());
+                        setResponsePage(DeDagPage.class, params);
+                    }
+                };
+                button.setEnabled(dto.active());
+                item.add(button);
+            }
+        });
     }
 
-    private RdButton createCeremonyButton(String id, CeremonieSoort soort, IModel<String> labelModel) {
-        return new RdButton(id, labelModel) {
-            @Override
-            public void onSubmit() {
-                UUID dossierId = marriageIntakeService.create(
-                        new CreateDossierDto(registratieType, soort));
-                PageParameters params = new PageParameters();
-                params.add("dossierId", dossierId.toString());
-                setResponsePage(DeDagPage.class, params);
-            }
-        };
+    private static String formatPrijs(BigDecimal prijs) {
+        if (prijs == null) {
+            return "";
+        }
+        return PRIJS_FORMAT.format(prijs);
     }
 
     @Override
@@ -109,4 +133,3 @@ public class MarriageIntakePage extends IntakeBasePage {
         });
     }
 }
-

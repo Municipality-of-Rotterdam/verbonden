@@ -81,6 +81,16 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
             }
         });
 
+        columns.add(new AbstractColumn<>(Model.of("Actief"), "active") {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListMarriageTypeDto>> cellItem,
+                                     String componentId,
+                                     IModel<ListMarriageTypeDto> rowModel) {
+                cellItem.add(new Label(componentId,
+                        rowModel.map(dto -> dto.active() ? "Ja" : "Nee")));
+            }
+        });
+
         columns.add(new AbstractColumn<>(Model.of("Acties")) {
             @Override
             public void populateItem(Item<ICellPopulator<ListMarriageTypeDto>> cellItem,
@@ -133,6 +143,7 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
                     ListMarriageTypeDto::prijs, Comparator.nullsLast(Comparator.naturalOrder()));
             case "locatieNaam" -> Comparator.comparing(
                     ListMarriageTypeDto::locatieNaam, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "active" -> Comparator.comparing(ListMarriageTypeDto::active);
             default -> Comparator.comparing(
                     ListMarriageTypeDto::titel, Comparator.nullsLast(Comparator.naturalOrder()));
         };

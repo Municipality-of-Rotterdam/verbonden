@@ -3,6 +3,7 @@ package nl.rotterdam.huwelijk.features.marriage_intake.application;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,6 +13,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface MarriageIntakeService {
+
+    List<IntakeMarriageTypeDto> findAllMarriageTypes();
 
     UUID create(CreateDossierDto dto);
 

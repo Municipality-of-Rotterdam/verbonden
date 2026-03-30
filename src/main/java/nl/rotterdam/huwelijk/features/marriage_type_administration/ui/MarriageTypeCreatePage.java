@@ -9,6 +9,7 @@ import nl.rotterdam.huwelijk.features.marriage_type_administration.application.M
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.CreateMarriageTypeDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import org.apache.wicket.markup.html.form.*;
@@ -82,6 +83,9 @@ public class MarriageTypeCreatePage extends AdministrationBasePage {
                             new LambdaChoiceRenderer<>(ListLocatieDto::naam, l -> Long.toString(l.id())))
                             .setNullValid(true)
                             .setRequired(false),
+                    new RdFormFieldCheckbox("active",
+                            LambdaModel.of(model, MarriageTypeFormDto::isActive, MarriageTypeFormDto::setActive),
+                            Model.of("Actief")),
                     new RdButton("opslaan", Model.of("Toevoegen"))
             );
         }
@@ -95,7 +99,8 @@ public class MarriageTypeCreatePage extends AdministrationBasePage {
                     f.getTekst(),
                     f.getPrijs(),
                     f.getUrl(),
-                    f.getLocatie() != null ? f.getLocatie().id() : null
+                    f.getLocatie() != null ? f.getLocatie().id() : null,
+                    f.isActive()
             ));
             setResponsePage(MarriageTypeAdministrationPage.class);
         }

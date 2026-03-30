@@ -30,6 +30,9 @@ public class MarriageTypeEntity {
     @Column(nullable = false, unique = true, length = 50)
     private CeremonieSoort soort;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     @OneToOne(mappedBy = "marriageType", fetch = FetchType.LAZY, optional = true)
     private MarriageTypeLocationEntity location;
 
@@ -90,5 +93,13 @@ public class MarriageTypeEntity {
 
     public void setAangemaaktOp(LocalDateTime aangemaaktOp) {
         this.aangemaaktOp = aangemaaktOp;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

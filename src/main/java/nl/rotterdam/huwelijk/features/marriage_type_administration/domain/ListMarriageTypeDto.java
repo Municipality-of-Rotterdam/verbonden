@@ -10,6 +10,7 @@ public record ListMarriageTypeDto(
         CeremonieSoort soort,
         String titel,
         BigDecimal prijs,
-        String locatieNaam
+        String locatieNaam,
+        boolean active
 ) implements Serializable {
 }

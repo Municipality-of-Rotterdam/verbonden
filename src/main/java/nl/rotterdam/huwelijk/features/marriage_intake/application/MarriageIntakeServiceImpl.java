@@ -7,12 +7,15 @@ import nl.rotterdam.huwelijk.features.location_administration.repository.NietBes
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeRepository;
 import nl.rotterdam.huwelijk.persistence.AfspraakEntity;
 import nl.rotterdam.huwelijk.persistence.HuwelijksDossierEntity;
 import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
+import nl.rotterdam.huwelijk.persistence.MarriageTypeEntity;
 import nl.rotterdam.huwelijk.persistence.TrouwlocatieEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final NietBeschikbareDagRepository nietBeschikbareDagRepository;
     private final LocatieRepository locatieRepository;
     private final MarriageTypeLocationRepository marriageTypeLocationRepository;
+    private final MarriageTypeRepository marriageTypeRepository;
     private final AfspraakRepository afspraakRepository;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
@@ -38,13 +42,33 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               NietBeschikbareDagRepository nietBeschikbareDagRepository,
                               LocatieRepository locatieRepository,
                               MarriageTypeLocationRepository marriageTypeLocationRepository,
+                              MarriageTypeRepository marriageTypeRepository,
                               AfspraakRepository afspraakRepository) {
         this.dossierRepository = dossierRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
         this.nietBeschikbareDagRepository = nietBeschikbareDagRepository;
         this.locatieRepository = locatieRepository;
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
+        this.marriageTypeRepository = marriageTypeRepository;
         this.afspraakRepository = afspraakRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<IntakeMarriageTypeDto> findAllMarriageTypes() {
+        return marriageTypeRepository.findAll().stream()
+                .sorted(Comparator.comparing(MarriageTypeEntity::getSoort))
+                .map(e -> new IntakeMarriageTypeDto(
+                        e.getSoort(),
+                        e.getTitel(),
+                        e.getPrijs(),
+                        Arrays.stream(e.getTekst().split("\n"))
+                                .map(String::trim)
+                                .filter(s -> !s.isEmpty())
+                                .toList(),
+                        e.isActive()
+                ))
+                .toList();
     }
 
     @Override

@@ -10,6 +10,7 @@ public record CreateMarriageTypeDto(
         String tekst,
         BigDecimal prijs,
         String url,
-        Long locatieId
+        Long locatieId,
+        boolean active
 ) {
 }

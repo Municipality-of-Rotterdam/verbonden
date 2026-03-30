@@ -48,91 +48,21 @@
             <wicket:message key="intake.soort.description">Al uw keuzes hebben invloed op elkaar.</wicket:message>
         </p>
 
-        <!-- Three ceremony columns -->
+        <!-- Three ceremony columns (dynamic, from database) -->
         <div class="row g-3">
 
-            <!-- Klein -->
-            <div class="col-12 col-md-4 d-flex">
-                <div class="rd-soort-optie w-100">
-                    <h3 class="rd-soort-option__title">
-                        <wicket:message key="intake.soort.klein.title">Klein</wicket:message>
-                    </h3>
-                    <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.klein.prijs">00,00</wicket:message></span>
-                    <ul class="rd-soort-optie__bullets">
-                        <li><wicket:message key="intake.soort.klein.beschrijving.1">Beschrijving 1</wicket:message></li>
-                        <li><wicket:message key="intake.soort.klein.beschrijving.2">Beschrijving 2</wicket:message></li>
-                        <li><wicket:message key="intake.soort.klein.beschrijving.3">Beschrijving 3</wicket:message></li>
-                        <li><wicket:message key="intake.soort.klein.beschrijving.4">Beschrijving 4</wicket:message></li>
-                    </ul>
-                    <div class="rd-eerste-mogelijkheid">
-                        <span class="rd-eerste-mogelijkheid__label">
-                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
-                        </span>
-                        <span class="rd-eerste-mogelijkheid__datum">
-                            <wicket:message key="intake.soort.klein.datum">27-09-2026</wicket:message>
-                        </span>
+            <wicket:container wicket:id="ceremonyTypesList">
+                <div class="col-12 col-md-4 d-flex">
+                    <div class="rd-soort-optie w-100">
+                        <h3 class="rd-soort-option__title" wicket:id="titel">Titel</h3>
+                        <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:container wicket:id="prijs">0,00</wicket:container></span>
+                        <ul class="rd-soort-optie__bullets" wicket:id="bullets">
+                            <li wicket:id="bullet">Beschrijving</li>
+                        </ul>
+                        <button type="submit" wicket:id="kiesButton"></button>
                     </div>
-                    <button type="submit" wicket:id="kleinButton"></button>
                 </div>
-            </div>
-
-            <!-- Middelgroot -->
-            <div class="col-12 col-md-4 d-flex">
-                <div class="rd-soort-optie w-100">
-                    <h3 class="rd-soort-option__title">
-                        <wicket:message key="intake.soort.middelgroot.title">Middelgroot</wicket:message>
-                    </h3>
-                    <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.middelgroot.prijs">216,60</wicket:message></span>
-                    <ul class="rd-soort-optie__bullets">
-                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.1">Beschrijving 1</wicket:message></li>
-                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.2">Beschrijving 2</wicket:message></li>
-                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.3">Beschrijving 3</wicket:message></li>
-                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.4">Beschrijving 4</wicket:message></li>
-                    </ul>
-                    <div class="rd-eerste-mogelijkheid">
-                        <span class="rd-eerste-mogelijkheid__label">
-                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
-                        </span>
-                        <span class="rd-eerste-mogelijkheid__datum">
-                            <wicket:message key="intake.soort.middelgroot.datum">04-05-2026</wicket:message>
-                        </span>
-                    </div>
-                    <button type="submit" wicket:id="middelgrootButton"></button>
-                </div>
-            </div>
-
-            <!-- Groot -->
-            <div class="col-12 col-md-4 d-flex">
-                <div class="rd-soort-optie w-100">
-                    <h3 class="rd-soort-option__title">
-                        <wicket:message key="intake.soort.groot.title">Groot</wicket:message>
-                    </h3>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="rd-price-badge-prefix">
-                            <wicket:message key="intake.soort.groot.prijs.prefix">Vanaf</wicket:message>
-                        </span>
-                        <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.groot.prijs">624,40</wicket:message></span>
-                    </div>
-                    <ul class="rd-soort-optie__bullets">
-                        <li><wicket:message key="intake.soort.groot.beschrijving.1">Beschrijving 1</wicket:message></li>
-                        <li><wicket:message key="intake.soort.groot.beschrijving.2">Beschrijving 2</wicket:message></li>
-                        <li><wicket:message key="intake.soort.groot.beschrijving.3">Beschrijving 3</wicket:message></li>
-                        <li><wicket:message key="intake.soort.groot.beschrijving.4">Beschrijving 4</wicket:message></li>
-                        <li><wicket:message key="intake.soort.groot.beschrijving.5">Beschrijving 5</wicket:message></li>
-                        <li><wicket:message key="intake.soort.groot.beschrijving.6">Beschrijving 6</wicket:message></li>
-                        <li><wicket:message key="intake.soort.groot.beschrijving.7">Beschrijving 7</wicket:message></li>
-                    </ul>
-                    <div class="rd-eerste-mogelijkheid">
-                        <span class="rd-eerste-mogelijkheid__label">
-                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
-                        </span>
-                        <span class="rd-eerste-mogelijkheid__datum">
-                            <wicket:message key="intake.soort.groot.datum">10-04-2026</wicket:message>
-                        </span>
-                    </div>
-                    <button type="submit" wicket:id="grootButton"></button>
-                </div>
-            </div>
+            </wicket:container>
 
         </div>
 
