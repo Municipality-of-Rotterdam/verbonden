@@ -1,11 +1,20 @@
 package nl.rotterdam.huwelijk;
 
 import de.agilecoders.wicket.webjars.WicketWebjars;
-import nl.rotterdam.huwelijk.features.baps_administration.domain.PersonFullName;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsCreatePage;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsUpdatePage;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.BapsAdministrationPage;
-import nl.rotterdam.huwelijk.features.baps_administration.ui.PersonFullNameWicketConverter;
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsCreatePage;
+import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsUpdatePage;
+import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsAdministrationPage;
+import nl.rotterdam.huwelijk.features.babs_administration.ui.PersonFullNameWicketConverter;
+import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidCreatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidUpdatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationCreatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.LocationUpdatePage;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeDagPage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagCreatePage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagImportPage;
+import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagUpdatePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeCreatePage;
@@ -17,37 +26,17 @@ import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
 import org.apache.wicket.protocol.http.ResourceIsolationRequestCycleListener;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
-import org.apache.wicket.util.convert.ConversionException;
-import org.apache.wicket.util.convert.IConverter;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.Locale;
+import java.time.LocalTime;
 
 public class WicketApplication extends WebApplication {
 
     @Override
     protected IConverterLocator newConverterLocator() {
         ConverterLocator locator = (ConverterLocator) super.newConverterLocator();
-        locator.set(LocalDate.class, new IConverter<LocalDate>() {
-            @Override
-            public LocalDate convertToObject(String value, Locale locale) throws ConversionException {
-                if (value == null || value.isBlank()) {
-                    return null;
-                }
-                try {
-                    return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE);
-                } catch (DateTimeParseException e) {
-                    throw new ConversionException(e).setResourceKey("IConverter.Date");
-                }
-            }
-
-            @Override
-            public String convertToString(LocalDate value, Locale locale) {
-                return value != null ? value.format(DateTimeFormatter.ISO_LOCAL_DATE) : "";
-            }
-        });
+        locator.set(LocalDate.class, new LocalDateWicketConverter());
+        locator.set(LocalTime.class, new LocalTimeWicketConverter());
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
         return locator;
     }
@@ -78,5 +67,19 @@ public class WicketApplication extends WebApplication {
         mountPage("/beheer/huwelijkstypen", MarriageTypeAdministrationPage.class);
         mountPage("/beheer/huwelijkstypen/nieuw", MarriageTypeCreatePage.class);
         mountPage("/beheer/huwelijkstypen/${id}", MarriageTypeUpdatePage.class);
+        mountPage("/beheer", BabsAdministrationPage.class);
+        mountPage("/beheer/babs/nieuw", BabsCreatePage.class);
+        mountPage("/beheer/babs/${id}", BabsUpdatePage.class);
+
+        mountPage("/beheer/locaties", LocationAdministrationPage.class);
+        mountPage("/beheer/locaties/nieuw", LocationCreatePage.class);
+        mountPage("/beheer/locaties/${id}", LocationUpdatePage.class);
+        mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/nieuw", BeschikbaarheidCreatePage.class);
+        mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/${id}", BeschikbaarheidUpdatePage.class);
+
+        mountPage("/mijn-dag/${dossierId}", DeDagPage.class);
+        mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/nieuw", NietBeschikbareDagCreatePage.class);
+        mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/${id}", NietBeschikbareDagUpdatePage.class);
+        mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/importeren", NietBeschikbareDagImportPage.class);
     }
 }

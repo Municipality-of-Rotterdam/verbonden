@@ -7,25 +7,15 @@
     background-color: #f2f2f2;
     border-bottom: 1px solid #d0d0d0;
     font-size: 0.875rem;
-}
-
-.rd-top-bar__inner {
-    max-width: 75rem;
-    margin: 0 auto;
-    padding: 0.375rem 1rem;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 1rem;
     color: #333;
 }
 
-.rd-top-bar__inner a {
+.rd-top-bar a {
     color: #333;
     text-decoration: none;
 }
 
-.rd-top-bar__inner a:hover {
+.rd-top-bar a:hover {
     text-decoration: underline;
 }
 
@@ -33,14 +23,12 @@
     color: #bbb;
 }
 
-/* Header inner layout */
-.rd-header-inner {
-    max-width: 75rem;
-    margin: 0 auto;
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+/* Icons in the top bar: keep them in line with the text */
+.rd-top-bar rods-icon-globe,
+.rd-top-bar rods-icon-user,
+.rd-top-bar rods-icon-log-out {
+    font-size: 1rem;
+    vertical-align: middle;
 }
 
 /* Logo link */
@@ -59,28 +47,10 @@
 }
 
 /* Primary navigation */
-.rd-header-nav {
-    display: flex;
-    align-items: flex-end;
-    gap: 2rem;
-}
-
-.rd-header-nav a {
-    text-decoration: none;
-    color: #222;
-    font-size: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 3px solid transparent;
-}
-
-.rd-header-nav a:hover,
-.rd-header-nav a:focus {
-    text-decoration: underline;
-}
 
 /* Page body content constraint */
 .utrecht-page-body__content {
-    max-width: 47.5rem;
+    max-width: 70rem;
     margin: 0 auto;
     padding: 1.5rem 1rem 3rem;
 }
@@ -188,15 +158,8 @@
     color: var(--rd-color-green-500, #007a3e);
 }
 
-/* Radio option row (Registratie) */
-.rd-radio-options {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
+/* Radio option tile */
 .rd-radio-option {
-    flex: 1;
     min-width: 10rem;
     border: 1px solid #d0d0d0;
     border-radius: 4px;
@@ -211,32 +174,6 @@
 .rd-radio-option:has(input:checked) {
     border-color: var(--rd-color-green-500, #007a3e);
     background-color: #f0f8f4;
-}
-
-/* Soort: three-column grid */
-.rd-soort-options {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-}
-
-@media (max-width: 640px) {
-    .rd-soort-options {
-        grid-template-columns: 1fr;
-    }
-}
-
-.rd-soort-option {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.rd-soort-option__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.25rem;
 }
 
 .rd-soort-option__title {
@@ -276,7 +213,6 @@
     gap: 0.5rem;
     cursor: pointer;
     background: #fff;
-    margin-top: auto;
 }
 
 .rd-soort-radio-box:has(input:checked) {
@@ -284,25 +220,7 @@
     background-color: #f0f8f4;
 }
 
-/* Submit button row */
-.rd-submit-area {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-}
-
-/* Footer inner */
-.rd-footer-inner {
-    max-width: 75rem;
-    margin: 0 auto;
-    padding: 1.25rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
+/* Footer links */
 .rd-footer-links {
     display: flex;
     gap: 1.5rem;
@@ -324,3 +242,428 @@
     font-size: 0.875rem;
     font-weight: 700;
 }
+
+/* =============================================================
+   DeDagPage – secondary button ("Naar Jullie gegevens")
+   ============================================================= */
+
+.rd-secondary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #333;
+    border-radius: 3px;
+    background: #fff;
+    color: #333;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.rd-secondary-button:hover {
+    background-color: #f5f5f5;
+    text-decoration: none;
+    color: #111;
+}
+
+/* =============================================================
+   DeDagPage – clickable image cards
+   ============================================================= */
+
+.rd-keuze-card {
+    display: block;
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
+    aspect-ratio: 3 / 4;
+}
+
+.rd-keuze-card:hover .rd-keuze-card__overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 60%, transparent 100%);
+}
+
+/* Disabled keuze-card: Wicket renders a disabled Link as <a> without href */
+a.rd-keuze-card:not([href]) {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+}
+
+.rd-keuze-card__image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Placeholder background images for each card */
+.rd-keuze-card__image--datum {
+    background-color: #4a7a6e;
+    background-image: linear-gradient(135deg, #3d6b5f 0%, #6aad97 100%);
+}
+
+.rd-keuze-card__image--locatie {
+    background-color: #8a6a3e;
+    background-image: linear-gradient(135deg, #7a5a2e 0%, #c49a6c 100%);
+}
+
+.rd-keuze-card__image--baps {
+    background-color: #3e5a7a;
+    background-image: linear-gradient(135deg, #2e4a6a 0%, #6c8caa 100%);
+}
+
+.rd-keuze-card__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.rd-keuze-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #fff;
+}
+
+.rd-keuze-card__arrow {
+    font-size: 1.25rem;
+    color: #fff;
+}
+
+/* =============================================================
+   DeDagPage – "Jullie keuzes" sidebar panel
+   ============================================================= */
+
+.rd-keuzes-panel {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    background: #fff;
+    padding: 1.25rem;
+}
+
+.rd-keuzes-panel__heading {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.rd-keuzes-section {
+    margin-bottom: 0.75rem;
+}
+
+.rd-keuzes-section__heading {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: #222;
+}
+
+.rd-keuzes-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.9375rem;
+}
+
+.rd-keuzes-item a,
+.rd-keuzes-item--link {
+    color: var(--rd-color-green-500, #007a3e);
+    text-decoration: none;
+    font-size: 0.9375rem;
+}
+
+.rd-keuzes-item a:hover,
+.rd-keuzes-item--link:hover {
+    text-decoration: underline;
+}
+
+.rd-keuzes-item--muted,
+.rd-keuzes-item--muted a {
+    color: #666;
+}
+
+.rd-keuzes-item__label {
+    flex: 1;
+}
+
+.rd-keuzes-item__prijs {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rd-keuzes-item--status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Empty circle status icon */
+.rd-status-icon--empty {
+    display: inline-block;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Filled (done) status icon */
+.rd-status-icon--done {
+    display: inline-block;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: var(--rd-color-green-500, #007a3e);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.rd-keuzes-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 0.75rem 0;
+}
+
+.rd-keuzes-empty {
+    font-size: 0.875rem;
+    color: #888;
+    margin: 0;
+}
+
+/* "Bevestig jullie keuzes" button */
+.rd-bevestig-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 1px solid #333;
+    border-radius: 3px;
+    background: #fff;
+    color: #333;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.rd-bevestig-button:hover {
+    background-color: #f5f5f5;
+}
+
+/* =============================================================
+   Ceremony selection section
+   ============================================================= */
+
+.rd-ceremony-heading {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.25rem;
+}
+
+/* Ceremony option column */
+.rd-soort-optie {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rd-soort-optie__bullets {
+    list-style: disc;
+    padding-left: 1.25rem;
+    margin: 0;
+    font-size: 0.9375rem;
+    flex: 1;
+}
+
+.rd-soort-optie__bullets li {
+    margin-bottom: 0.25rem;
+}
+
+/* "Eerste mogelijkheid" date box */
+.rd-eerste-mogelijkheid {
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    padding: 0.625rem 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.rd-eerste-mogelijkheid__label {
+    font-size: 0.8125rem;
+    color: #555;
+}
+
+.rd-eerste-mogelijkheid__datum {
+    font-weight: 700;
+    color: var(--rd-color-green-500, #007a3e);
+    font-size: 0.9375rem;
+}
+
+/* Ceremony select button (green) */
+.rd-ceremony-select-button {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    background-color: var(--rd-color-green-700, #005a2d);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: auto;
+}
+
+.rd-ceremony-select-button:hover {
+    background-color: var(--rd-color-green-800, #004022);
+}
+
+/* "Vanaf" prefix next to price badge */
+.rd-price-badge-prefix {
+    font-size: 0.875rem;
+    color: var(--rd-color-green-500, #007a3e);
+}
+
+/* =============================================================
+   Partner akkoord card
+   ============================================================= */
+
+.rd-partner-akkoord {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background: #fff;
+}
+
+.rd-partner-akkoord__heading {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+}
+
+.rd-partner-akkoord__tekst {
+    font-size: 0.9375rem;
+    margin: 0 0 1rem;
+    color: #333;
+}
+
+.rd-partner-akkoord__buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.rd-digid-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 2.5rem;
+    background-color: #1b1b1b;
+    border-radius: 3px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.rd-digid-logo span {
+    color: #f7941d;
+}
+
+.rd-digid-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.625rem 1.25rem;
+    background-color: var(--rd-color-green-700, #005a2d);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.rd-digid-button:hover {
+    background-color: var(--rd-color-green-800, #004022);
+    color: #fff;
+}
+
+/* =============================================================
+   Sidebar info box
+   ============================================================= */
+
+.rd-keuzes-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid #5b9bd5;
+    border-radius: 4px;
+    background: #eaf4fb;
+    font-size: 0.875rem;
+    color: #1a3a5c;
+    margin-top: 0.75rem;
+}
+
+.rd-keuzes-info__icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    color: #5b9bd5;
+}
+
+/* Sidebar bevestig form — strip form chrome so button fills width */
+.rd-keuzes-panel form {
+    margin: 0;
+    padding: 0;
+}
+
+/* =============================================================
+   RdButton overrides for ceremony selection columns
+   ============================================================= */
+
+/* Make ceremony select RdButton full-width */
+.rd-soort-optie .utrecht-button {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Dim ceremony option column when its submit button is disabled */
+.rd-soort-optie:has(.utrecht-button[disabled]) {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Make sidebar bevestig RdButton full-width */
+.rd-keuzes-panel .utrecht-button {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0;
+}
+

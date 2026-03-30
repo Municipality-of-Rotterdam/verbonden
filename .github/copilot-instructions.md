@@ -6,7 +6,7 @@
 De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.huwelijk.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
 - `nl.rotterdam.huwelijk.domain` — gedeelde domeininterfaces zoals `ValueHolder<T>`, die door meerdere feature-packages worden hergebruikt.
-- `nl.rotterdam.huwelijk.features.baps_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
+- `nl.rotterdam.huwelijk.features.babs_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.huwelijk.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
 - `nl.rotterdam.huwelijk.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
@@ -33,6 +33,7 @@ Elke feature-package bevat de volgende sub-packages:
 ### Wicket
 - Injecteer altijd een service **interface** (niet de implementatie) via `@SpringBean`, zodat Wicket een JDK dynamic proxy kan aanmaken (voorkomt CGLIB-/Objenesis-problemen zonder no-arg constructor).
 - Activeer het Rotterdam NLDS-thema via `PatchingNldsRotterdamDesignSystemThemeBehavior.INSTANCE` direct op de page (niet via een `TransparentWebMarkupContainer` op `<html>`), zodat `<wicket:fragment>`-tags vindbaar blijven.
+- **`RdFormFieldTextInput` met een niet-`String` modeltype:** wanneer het HTML-inputtype een custom Java-type vereist (bijv. `setHtmlInputType("time")` → `LocalTime`, `setHtmlInputType("date")` → `LocalDate`, `setHtmlInputType("number")` → `Integer`/`BigDecimal`), roep dan altijd `setModelType(Xxx.class)` aan zodat Wicket het type correct kan converteren bij formulier-submit. Voorbeeld: `.setHtmlInputType("time").setModelType(LocalTime.class)`.
 - Gebruik voor formulieren een **`FormDto`** klasse (mutable POJO, implementeert `Serializable`) als model object van het `Form`. Maak een `Model<FormDto> model = Model.of(formDto)` aan en gebruik dat als model van het `Form` én als eerste argument voor `LambdaModel.of(model, f -> f.veld, (f, v) -> f.veld = v)` voor elk veld. Gebruik `ListModel` voor `List`-velden (`Model.of(new ArrayList<>())` werkt niet betrouwbaar voor lijsten in Wicket).
 - **Formulieren worden OO opgebouwd via een inner class** die `Form<XxxFormDto>` uitbreidt. Gebruik nooit een anonieme klasse of een formulier dat in een variabele wordt gestopt. De inner class:
   - Is `private` en heet `CreateXxxForm` (aanmaken) of `ChangeXxxForm` (wijzigen).

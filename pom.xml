@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.11</version>
+        <version>3.5.12</version>
         <relativePath/>
     </parent>
 
@@ -42,6 +42,11 @@
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-core</artifactId>
                 <version>${wicket.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.28.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.wicket</groupId>
@@ -125,11 +130,18 @@
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
-        <!-- Jsoup for web scraping (BAPS import from rotterdam.nl) -->
+        <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.18.3</version>
+        </dependency>
+
+        <!-- Apache POI for xlsx import -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.4.0</version>
         </dependency>
 
         <!-- Wicket Webjars integration -->
@@ -171,13 +183,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-database-spring-test</artifactId>
+            <version>2.8.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
