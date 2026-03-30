@@ -17,11 +17,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class MockDigiDLoginPage extends BurgerBasePage {
 
-    private record TestBurger(String bsn, String beschrijving) {}
+    private record TestBurger(String bsn, String beschrijving) implements Serializable {}
 
     private static final List<TestBurger> TEST_BURGERS = List.of(
             new TestBurger("999990007", "Woont in Rotterdam, vrijgezel, man"),
