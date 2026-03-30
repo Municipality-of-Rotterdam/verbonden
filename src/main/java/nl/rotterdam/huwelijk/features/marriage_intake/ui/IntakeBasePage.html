@@ -1,0 +1,41 @@
+<wicket:extend>
+
+<div class="container py-4">
+
+    <!-- Breadcrumb -->
+    <div wicket:id="breadcrumb"></div>
+
+    <!-- Tab navigation -->
+    <nav class="rd-tabs" aria-label="Stappen" role="tablist">
+        <button wicket:id="tabDedag" class="rd-tab" type="button" role="tab" aria-selected="false">
+            <wicket:message key="intake.tab.dedag">Dé dag</wicket:message>
+        </button>
+        <button wicket:id="tabJullieGegevens" class="rd-tab" type="button" role="tab" aria-selected="false">
+            <wicket:message key="intake.tab.jullie.gegevens">Jullie gegevens</wicket:message>
+        </button>
+        <button wicket:id="tabGetuigen" class="rd-tab" type="button" role="tab" aria-selected="false">
+            <wicket:message key="intake.tab.getuigen">De getuigen</wicket:message>
+        </button>
+        <button wicket:id="tabExtras" class="rd-tab" type="button" role="tab" aria-selected="false">
+            <wicket:message key="intake.tab.extras">Extra's</wicket:message>
+        </button>
+    </nav>
+
+    <!-- Two-column layout: main content + sidebar -->
+    <div class="row g-4">
+
+        <!-- Main content (filled by sub-pages) -->
+        <div class="col-12 col-lg-8">
+            <wicket:child/>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-12 col-lg-4">
+            <div wicket:id="keuzesSidebar"></div>
+        </div>
+
+    </div>
+
+</div>
+
+</wicket:extend>

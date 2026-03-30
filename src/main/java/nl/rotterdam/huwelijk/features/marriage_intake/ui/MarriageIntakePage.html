@@ -1,21 +1,10 @@
 <wicket:extend>
 
-<div class="container py-4">
-
-    <!-- Breadcrumb -->
-    <div wicket:id="breadcrumb"></div>
-
-    <!-- Tab navigation -->
-    <nav class="rd-tabs" aria-label="Stappen">
-        <button class="rd-tab rd-tab--active" type="button" aria-current="step">D&#233; dag</button>
-        <button class="rd-tab" type="button">Jullie gegevens</button>
-        <button class="rd-tab" type="button">De getuigen</button>
-        <button class="rd-tab" type="button">Extra&#x27;s</button>
-    </nav>
-
     <!-- Page heading (rendered by RdHeading) -->
     <h1 wicket:id="heading">Heading</h1>
-    <p class="rd-intro-text">Kies eerst wat voor soort dag jullie willen en ga daarna jullie dag plannen.</p>
+    <p class="rd-intro-text">
+        <wicket:message key="intake.intro.marriageintake">Intro tekst</wicket:message>
+    </p>
 
     <!-- Form -->
     <form wicket:id="form">
@@ -25,82 +14,129 @@
             <div class="d-flex gap-3 flex-wrap">
                 <label class="flex-fill rd-radio-option" for="huwelijk-input">
                     <input type="radio" wicket:id="huwelijk" id="huwelijk-input"/>
-                    Huwelijk
+                    <wicket:message key="intake.registratie.huwelijk">Huwelijk</wicket:message>
                 </label>
                 <label class="flex-fill rd-radio-option" for="partnerschap-input">
                     <input type="radio" wicket:id="geregistreerdPartnerschap" id="partnerschap-input"/>
-                    Geregistreerd partnerschap
+                    <wicket:message key="intake.registratie.partnerschap">Geregistreerd partnerschap</wicket:message>
                 </label>
             </div>
         </div>
 
-        <!-- Soort section (RdRadioGroup border) -->
-        <div class="rd-card" wicket:id="ceremonyGroup">
-            <div class="row g-3">
-                <!-- Gratis -->
-                <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="rd-soort-option__title">Gratis</span>
-                        <span class="rd-price-badge">&#x20AC;&nbsp;00<sup>,00</sup></span>
-                    </div>
-                    <p class="rd-soort-option__desc">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
-                        quos dolores et quas molestias excepturi
-                        <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
-                    </p>
-                    <label class="rd-soort-radio-box mt-auto" for="gratis-input">
-                        <input type="radio" wicket:id="gratis" id="gratis-input"/>
-                        Gratis
-                    </label>
-                </div>
-
-                <!-- Eenvoudig -->
-                <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="rd-soort-option__title">Eenvoudig</span>
-                        <span class="rd-price-badge">&#x20AC;&nbsp;267<sup>,81</sup></span>
-                    </div>
-                    <p class="rd-soort-option__desc">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
-                        quos dolores et quas molestias excepturi
-                        <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
-                    </p>
-                    <label class="rd-soort-radio-box mt-auto" for="eenvoudig-input">
-                        <input type="radio" wicket:id="eenvoudig" id="eenvoudig-input"/>
-                        Eenvoudig
-                    </label>
-                </div>
-
-                <!-- Regulier -->
-                <div class="col-12 col-md-4 d-flex flex-column gap-2 rd-soort-option">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="rd-soort-option__title">Regulier</span>
-                        <span class="rd-price-badge">&#x20AC;&nbsp;461<sup>,48</sup></span>
-                    </div>
-                    <p class="rd-soort-option__desc">
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiirrupti
-                        quos dolores et quas molestias excepturi
-                        <a href="https://www.rotterdam.nl/">rotterdam.nl/</a>
-                    </p>
-                    <label class="rd-soort-radio-box mt-auto" for="regulier-input">
-                        <input type="radio" wicket:id="regulier" id="regulier-input"/>
-                        Regulier
-                    </label>
-                </div>
+            <!-- Partner akkoord section -->
+            <!-- DigiD button is intentionally non-functional at this stage of the POC -->
+        <div class="rd-partner-akkoord">
+            <h2 class="rd-partner-akkoord__heading">
+                <wicket:message key="intake.partnerakkoord.heading">Partner akkoord</wicket:message>
+            </h2>
+            <p class="rd-partner-akkoord__tekst">
+                <wicket:message key="intake.partnerakkoord.description">Beschrijving partner akkoord</wicket:message>
+            </p>
+            <div class="rd-partner-akkoord__buttons">
+                <span class="rd-digid-logo">Digi<span>D</span></span>
+                <button type="button" class="rd-digid-button">
+                    <wicket:message key="intake.partnerakkoord.digid.button">Inloggen met DigiD</wicket:message>
+                </button>
             </div>
         </div>
 
-        <!-- Submit button -->
-        <div class="d-flex justify-content-end mt-4">
-            <button wicket:id="submitButton" type="submit">
-                <span wicket:id="icon">ring icon</span>
-                Plan jullie dag
-            </button>
+        <!-- Ceremony section heading (outside cards) -->
+        <h2 class="rd-ceremony-heading">
+            <wicket:message key="intake.soort.heading">Wat voor ceremonie willen jullie?</wicket:message>
+        </h2>
+        <p class="rd-intro-text">
+            <wicket:message key="intake.soort.description">Al uw keuzes hebben invloed op elkaar.</wicket:message>
+        </p>
+
+        <!-- Three ceremony columns -->
+        <div class="row g-3">
+
+            <!-- Klein -->
+            <div class="col-12 col-md-4 d-flex">
+                <div class="rd-soort-optie w-100">
+                    <h3 class="rd-soort-option__title">
+                        <wicket:message key="intake.soort.klein.title">Klein</wicket:message>
+                    </h3>
+                    <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.klein.prijs">00,00</wicket:message></span>
+                    <ul class="rd-soort-optie__bullets">
+                        <li><wicket:message key="intake.soort.klein.beschrijving.1">Beschrijving 1</wicket:message></li>
+                        <li><wicket:message key="intake.soort.klein.beschrijving.2">Beschrijving 2</wicket:message></li>
+                        <li><wicket:message key="intake.soort.klein.beschrijving.3">Beschrijving 3</wicket:message></li>
+                        <li><wicket:message key="intake.soort.klein.beschrijving.4">Beschrijving 4</wicket:message></li>
+                    </ul>
+                    <div class="rd-eerste-mogelijkheid">
+                        <span class="rd-eerste-mogelijkheid__label">
+                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
+                        </span>
+                        <span class="rd-eerste-mogelijkheid__datum">
+                            <wicket:message key="intake.soort.klein.datum">27-09-2026</wicket:message>
+                        </span>
+                    </div>
+                    <button type="submit" wicket:id="kleinButton"></button>
+                </div>
+            </div>
+
+            <!-- Middelgroot -->
+            <div class="col-12 col-md-4 d-flex">
+                <div class="rd-soort-optie w-100">
+                    <h3 class="rd-soort-option__title">
+                        <wicket:message key="intake.soort.middelgroot.title">Middelgroot</wicket:message>
+                    </h3>
+                    <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.middelgroot.prijs">216,60</wicket:message></span>
+                    <ul class="rd-soort-optie__bullets">
+                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.1">Beschrijving 1</wicket:message></li>
+                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.2">Beschrijving 2</wicket:message></li>
+                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.3">Beschrijving 3</wicket:message></li>
+                        <li><wicket:message key="intake.soort.middelgroot.beschrijving.4">Beschrijving 4</wicket:message></li>
+                    </ul>
+                    <div class="rd-eerste-mogelijkheid">
+                        <span class="rd-eerste-mogelijkheid__label">
+                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
+                        </span>
+                        <span class="rd-eerste-mogelijkheid__datum">
+                            <wicket:message key="intake.soort.middelgroot.datum">04-05-2026</wicket:message>
+                        </span>
+                    </div>
+                    <button type="submit" wicket:id="middelgrootButton"></button>
+                </div>
+            </div>
+
+            <!-- Groot -->
+            <div class="col-12 col-md-4 d-flex">
+                <div class="rd-soort-optie w-100">
+                    <h3 class="rd-soort-option__title">
+                        <wicket:message key="intake.soort.groot.title">Groot</wicket:message>
+                    </h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rd-price-badge-prefix">
+                            <wicket:message key="intake.soort.groot.prijs.prefix">Vanaf</wicket:message>
+                        </span>
+                        <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:message key="intake.soort.groot.prijs">624,40</wicket:message></span>
+                    </div>
+                    <ul class="rd-soort-optie__bullets">
+                        <li><wicket:message key="intake.soort.groot.beschrijving.1">Beschrijving 1</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.2">Beschrijving 2</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.3">Beschrijving 3</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.4">Beschrijving 4</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.5">Beschrijving 5</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.6">Beschrijving 6</wicket:message></li>
+                        <li><wicket:message key="intake.soort.groot.beschrijving.7">Beschrijving 7</wicket:message></li>
+                    </ul>
+                    <div class="rd-eerste-mogelijkheid">
+                        <span class="rd-eerste-mogelijkheid__label">
+                            <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
+                        </span>
+                        <span class="rd-eerste-mogelijkheid__datum">
+                            <wicket:message key="intake.soort.groot.datum">10-04-2026</wicket:message>
+                        </span>
+                    </div>
+                    <button type="submit" wicket:id="grootButton"></button>
+                </div>
+            </div>
+
         </div>
 
     </form>
-
-</div>
 
 </wicket:extend>
 

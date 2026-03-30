@@ -3,6 +3,7 @@ package nl.rotterdam.huwelijk.administration_common;
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
+import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
@@ -56,8 +57,9 @@ public abstract class AdministrationBasePage extends WebPage {
                 .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
 
         pageLayout.add(new RdSideNavPanel("sideNav", List.of(
-                new RdSideNavRecord(null, "BABS Beheer", BabsAdministrationPage.class, null, null, null),
-                new RdSideNavRecord(null, "Trouwlocaties Beheer", LocationAdministrationPage.class, null, null, null)
+                new RdSideNavRecord(null, "BABS ", BabsAdministrationPage.class, null, null, null),
+                new RdSideNavRecord(null, "Trouwlocaties", LocationAdministrationPage.class, null, null, null),
+                new RdSideNavRecord(null, "Huwelijkstypen", MarriageTypeAdministrationPage.class, null, null, null)
         )));
 
         pageBody = new RdPageBodyBorder("pageBody");

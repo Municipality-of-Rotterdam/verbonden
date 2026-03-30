@@ -1,0 +1,110 @@
+<wicket:panel>
+
+<div class="rd-keuzes-panel">
+
+    <h2 class="rd-keuzes-panel__heading">
+        <wicket:message key="intake.sidebar.title">Jullie keuzes</wicket:message>
+    </h2>
+
+    <!-- Dé dag section -->
+    <div class="rd-keuzes-section">
+        <h3 class="rd-keuzes-section__heading">
+            <wicket:message key="intake.sidebar.section.dedag">Dé dag</wicket:message>
+        </h3>
+
+        <div wicket:id="dossierGegevens">
+            <!-- Registratie type (live updating on MarriageIntakePage via AJAX) -->
+            <a href="#" class="rd-keuzes-item rd-keuzes-item--link">
+                <span wicket:id="registratieTypeLabel">type</span>
+            </a>
+
+            <!-- Ceremony soort + prijs (only shown when a real dossier exists) -->
+            <div wicket:id="ceremonieDossierGegevens"
+                 class="rd-keuzes-item d-flex justify-content-between align-items-center">
+                <a href="#" class="rd-keuzes-item__label">
+                    <span wicket:id="ceremonieSoortLabel">soort</span>
+                </a>
+                <span class="rd-keuzes-item__prijs">
+                    &#x20AC;&nbsp;<span wicket:id="ceremoniePrijs">prijs</span>
+                </span>
+            </div>
+
+            <!-- Datum: shown when a date has been chosen -->
+            <a href="#" wicket:id="datumGekozen" class="rd-keuzes-item rd-keuzes-item--link">
+                <span wicket:id="datumLabel">datum</span>
+            </a>
+            <!-- Datum: placeholder when no date chosen yet -->
+            <a href="#" wicket:id="datumNogKiezen" class="rd-keuzes-item rd-keuzes-item--link rd-keuzes-item--muted">
+                <wicket:message key="intake.sidebar.datum.nogniet">Datum nog kiezen</wicket:message>
+            </a>
+
+            <!-- Locatie: shown when a location has been chosen -->
+            <div wicket:id="locatieGekozen"
+                 class="rd-keuzes-item d-flex justify-content-between align-items-center">
+                <a href="#" class="rd-keuzes-item__label">
+                    <span wicket:id="locatieLabel">locatie</span>
+                </a>
+            </div>
+            <!-- Locatie: placeholder when no location chosen yet -->
+            <div wicket:id="locatieNogKiezen"
+                 class="rd-keuzes-item d-flex justify-content-between align-items-center">
+                <a href="#" class="rd-keuzes-item__label rd-keuzes-item--muted">
+                    <wicket:message key="intake.sidebar.locatie.nogniet">Locatie nog kiezen</wicket:message>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <hr class="rd-keuzes-divider"/>
+
+    <!-- Gegevens & Getuigen section -->
+    <div class="rd-keuzes-section">
+        <h3 class="rd-keuzes-section__heading">
+            <wicket:message key="intake.sidebar.section.gegevens">Gegevens &amp; Getuigen</wicket:message>
+        </h3>
+
+        <div wicket:id="gegevensStatusIcon" class="rd-keuzes-item rd-keuzes-item--status">
+            <span wicket:id="gegevensStatusCheck" class="rd-status-icon rd-status-icon--check" aria-hidden="true"></span>
+            <span wicket:id="gegevensStatusEmpty" class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
+            <a href="#"><wicket:message key="intake.sidebar.gegevens.link">Jullie gegevens</wicket:message></a>
+        </div>
+        <div wicket:id="getuigenStatusIcon" class="rd-keuzes-item rd-keuzes-item--status">
+            <span wicket:id="getuigenStatusCheck" class="rd-status-icon rd-status-icon--check" aria-hidden="true"></span>
+            <span wicket:id="getuigenStatusEmpty" class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
+            <a href="#"><wicket:message key="intake.sidebar.getuigen.link">Getuigen</wicket:message></a>
+        </div>
+    </div>
+
+    <hr class="rd-keuzes-divider"/>
+
+    <!-- Extra's section -->
+    <div class="rd-keuzes-section">
+        <h3 class="rd-keuzes-section__heading">
+            <wicket:message key="intake.sidebar.section.extras">Extra&#x2019;s</wicket:message>
+        </h3>
+        <p wicket:id="extrasNogNiet" class="rd-keuzes-empty">
+            <wicket:message key="intake.sidebar.extras.nogniet">Nog geen extra&#x2019;s gekozen</wicket:message>
+        </p>
+        <div wicket:id="extrasList">
+            <div class="rd-keuzes-item rd-keuzes-item--extra">
+                <span wicket:id="extraLabel">extra</span>
+            </div>
+        </div>
+    </div>
+
+    <hr class="rd-keuzes-divider"/>
+
+    <!-- Confirm button (RdButton inside its own form) -->
+    <form wicket:id="bevestigForm">
+        <button wicket:id="bevestigButton" type="submit"></button>
+    </form>
+
+    <!-- Info box -->
+    <div class="rd-keuzes-info" role="note">
+        <span class="rd-keuzes-info__icon" aria-hidden="true">&#9432;</span>
+        <wicket:message key="intake.sidebar.reservering.info">Jullie keuze blijft 3 dagen gereserveerd.</wicket:message>
+    </div>
+
+</div>
+
+</wicket:panel>
