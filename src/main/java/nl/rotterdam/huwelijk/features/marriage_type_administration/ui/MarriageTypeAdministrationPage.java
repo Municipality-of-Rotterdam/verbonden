@@ -20,9 +20,9 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
     private MarriageTypeAdministrationService marriageTypeAdministrationService;
 
     public MarriageTypeAdministrationPage() {
-        add(new BookmarkablePageLink<>("nieuwHuwelijkstypeLink", MarriageTypeCreatePage.class));
+        pageBody.add(new BookmarkablePageLink<>("nieuwHuwelijkstypeLink", MarriageTypeCreatePage.class));
 
-        add(new ListView<>("huwelijkstypen",
+        pageBody.add(new ListView<>("huwelijkstypen",
                 new LoadableDetachableModel<List<ListMarriageTypeDto>>() {
                     @Override
                     protected List<ListMarriageTypeDto> load() {
@@ -41,7 +41,7 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
                 item.add(new Label("prijs", dto.prijs() != null ? dto.prijs().toPlainString() : ""));
                 item.add(new BookmarkablePageLink<>("bewerkLink",
                         MarriageTypeUpdatePage.class, params));
-                item.add(new Link<ListMarriageTypeDto>("verwijderLink", item.getModel()) {
+                item.add(new Link<>("verwijderLink", item.getModel()) {
                     @Override
                     public void onClick() {
                         marriageTypeAdministrationService.delete(getModelObject().id());
