@@ -1,21 +1,21 @@
 package nl.rotterdam.huwelijk.features.marriage_type_administration.ui;
 
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.ChangeMarriageTypeDto;
-import nl.rotterdam.huwelijk.domain.MarriageType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class MarriageTypeFormDto implements Serializable {
 
-    private MarriageType soort = null;
+    private CeremonieSoort soort = null;
     private String titel = "";
     private String tekst = "";
     private BigDecimal prijs = null;
     private String url = "";
 
-    public MarriageType getSoort() { return soort; }
-    public void setSoort(MarriageType soort) { this.soort = soort; }
+    public CeremonieSoort getSoort() { return soort; }
+    public void setSoort(CeremonieSoort soort) { this.soort = soort; }
 
     public String getTitel() { return titel; }
     public void setTitel(String titel) { this.titel = titel; }

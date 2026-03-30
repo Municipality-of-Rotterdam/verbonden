@@ -1,7 +1,7 @@
 package nl.rotterdam.huwelijk.persistence;
 
 import jakarta.persistence.*;
-import nl.rotterdam.huwelijk.domain.MarriageType;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,7 +28,7 @@ public class MarriageTypeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true, length = 50)
-    private MarriageType soort;
+    private CeremonieSoort soort;
 
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
@@ -73,11 +73,11 @@ public class MarriageTypeEntity {
         this.url = url;
     }
 
-    public MarriageType getSoort() {
+    public CeremonieSoort getSoort() {
         return soort;
     }
 
-    public void setSoort(MarriageType soort) {
+    public void setSoort(CeremonieSoort soort) {
         this.soort = soort;
     }
 

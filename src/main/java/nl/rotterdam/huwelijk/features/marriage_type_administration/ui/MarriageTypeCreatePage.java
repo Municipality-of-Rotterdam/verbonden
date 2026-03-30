@@ -2,8 +2,8 @@ package nl.rotterdam.huwelijk.features.marriage_type_administration.ui;
 
 import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.application.MarriageTypeAdministrationService;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.CreateMarriageTypeDto;
-import nl.rotterdam.huwelijk.domain.MarriageType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -45,7 +45,7 @@ public class MarriageTypeCreatePage extends AdministrationBasePage {
             add(
                     new DropDownChoice<>("soort",
                             LambdaModel.of(model, MarriageTypeFormDto::getSoort, MarriageTypeFormDto::setSoort),
-                            List.of(MarriageType.values())).setRequired(true),
+                            List.of(CeremonieSoort.values())).setRequired(true),
                     new RdFormFieldTextInput<>("titel",
                             LambdaModel.of(model, MarriageTypeFormDto::getTitel, MarriageTypeFormDto::setTitel),
                             Model.of("Titel")).setRequired(true),

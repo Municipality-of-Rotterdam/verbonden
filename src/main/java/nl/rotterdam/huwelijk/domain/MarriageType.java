@@ -1,7 +1,2 @@
 package nl.rotterdam.huwelijk.domain;
-
-public enum MarriageType {
-    FREE,
-    SIMPLE,
-    REGULAR
-}
+// MarriageType has been replaced by CeremonieSoort in nl.rotterdam.huwelijk.features.marriage_intake.domain

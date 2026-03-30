@@ -1,12 +1,12 @@
 package nl.rotterdam.huwelijk.features.marriage_type_administration.domain;
 
-import nl.rotterdam.huwelijk.domain.MarriageType;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 
 import java.math.BigDecimal;
 
 public record ChangeMarriageTypeDto(
         long id,
-        MarriageType soort,
+        CeremonieSoort soort,
         String titel,
         String tekst,
         BigDecimal prijs,
