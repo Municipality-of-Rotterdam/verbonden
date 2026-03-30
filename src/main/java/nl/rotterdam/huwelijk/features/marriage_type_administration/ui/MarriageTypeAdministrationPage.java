@@ -7,6 +7,7 @@ import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rott
 import nl.rotterdam.nl_design_system.wicket.components.icon_button.RdIconAjaxButtonBorder;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -39,7 +40,7 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
         pageBody.add(buildHuwelijkstypeTable());
     }
 
-    private Form<Void> buildHuwelijkstypeTable() {
+    private Component buildHuwelijkstypeTable() {
         List<IColumn<ListMarriageTypeDto, String>> columns = new ArrayList<>();
 
         columns.add(new AbstractColumn<>(Model.of("Soort"), "soort") {
