@@ -1,4 +1,4 @@
-package nl.rotterdam.huwelijk.features.location_administration.ui;
+package nl.rotterdam.huwelijk.administration_common;
 
 import nl.rotterdam.nl_design_system.wicket.components.form_field.RdFormFieldBorder;
 import nl.rotterdam.nl_design_system.wicket.components.select.RdSelect;
@@ -8,26 +8,26 @@ import org.apache.wicket.model.IModel;
 import java.util.Collections;
 import java.util.List;
 
-class RdFormFieldSelect<T> extends RdFormFieldBorder<T, RdSelect<T>> {
+public class RdFormFieldSelect<T> extends RdFormFieldBorder<T, RdSelect<T>> {
 
     private final List<? extends T> choices;
     private final IChoiceRenderer<? super T> renderer;
     private boolean required;
     private boolean nullValid;
 
-    RdFormFieldSelect(String id, IModel<T> model, IModel<String> label,
-                      List<? extends T> choices, IChoiceRenderer<? super T> renderer) {
+    public RdFormFieldSelect(String id, IModel<T> model, IModel<String> label,
+                             List<? extends T> choices, IChoiceRenderer<? super T> renderer) {
         super(id, model, label);
         this.choices = choices;
         this.renderer = renderer;
     }
 
-    RdFormFieldSelect<T> setRequired(boolean required) {
+    public RdFormFieldSelect<T> setRequired(boolean required) {
         this.required = required;
         return this;
     }
 
-    RdFormFieldSelect<T> setNullValid(boolean nullValid) {
+    public RdFormFieldSelect<T> setNullValid(boolean nullValid) {
         this.nullValid = nullValid;
         return this;
     }
