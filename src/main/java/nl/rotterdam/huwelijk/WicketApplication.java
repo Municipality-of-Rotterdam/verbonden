@@ -19,6 +19,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeCreatePage;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeUpdatePage;
+import nl.rotterdam.huwelijk.features.mock_digid.ui.MockDigiDLoginPage;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
@@ -61,6 +62,7 @@ public class WicketApplication extends WebApplication {
                 new ResourceIsolationRequestCycleListener(
                         new FetchMetadataResourceIsolationPolicy()));
 
+        mountPage("/inloggen", MockDigiDLoginPage.class);
         mountPage("/beheer/huwelijkstypen", MarriageTypeAdministrationPage.class);
         mountPage("/beheer/huwelijkstypen/nieuw", MarriageTypeCreatePage.class);
         mountPage("/beheer/huwelijkstypen/${id}", MarriageTypeUpdatePage.class);
