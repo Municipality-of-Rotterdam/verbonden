@@ -494,7 +494,6 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     padding-left: 1.25rem;
     margin: 0;
     font-size: 0.9375rem;
-    flex: 1;
 }
 
 .rd-soort-optie__bullets li {
@@ -509,6 +508,7 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    margin-top: auto;
 }
 
 .rd-eerste-mogelijkheid__label {
