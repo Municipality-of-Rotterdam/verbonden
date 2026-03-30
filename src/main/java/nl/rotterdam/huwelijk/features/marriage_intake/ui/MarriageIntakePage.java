@@ -12,6 +12,7 @@ import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButto
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
@@ -27,6 +28,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -35,6 +37,9 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     private static final DecimalFormat PRIJS_FORMAT =
             new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL")));
+
+    private static final DateTimeFormatter DATUM_FORMAT =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
@@ -90,8 +95,16 @@ public class MarriageIntakePage extends IntakeBasePage {
                 IntakeMarriageTypeDto dto = item.getModelObject();
 
                 item.add(new Label("titel", dto.titel()));
-                item.add(new Label("prijs", formatPrijs(dto.prijs())));
 
+                // "Vanaf" prefix — only rendered for GROOT
+                Label prijsPrefix = new Label("prijsPrefix", dto.prijsPrefix());
+                prijsPrefix.setVisible(dto.prijsPrefix() != null);
+                item.add(prijsPrefix);
+
+                // Price badge (text only; CSS class utrecht-status-badge applied in HTML)
+                item.add(new Label("prijs", "€\u00a0" + formatPrijs(dto.prijs())));
+
+                // Bullet points
                 item.add(new ListView<String>("bullets", dto.bulletPoints()) {
                     @Override
                     protected void populateItem(ListItem<String> bulletItem) {
@@ -99,6 +112,16 @@ public class MarriageIntakePage extends IntakeBasePage {
                     }
                 });
 
+                // "Eerste mogelijkheid" block — hidden when no date is available
+                WebMarkupContainer eersteGelegenheidBox =
+                        new WebMarkupContainer("eersteGelegenheidBox");
+                boolean heeftDatum = dto.eersteGelegenheid() != null;
+                eersteGelegenheidBox.setVisible(heeftDatum);
+                eersteGelegenheidBox.add(new Label("eersteGelegenheid",
+                        heeftDatum ? dto.eersteGelegenheid().format(DATUM_FORMAT) : ""));
+                item.add(eersteGelegenheidBox);
+
+                // Submit button — disabled when ceremony type is inactive
                 RdButton button = new RdButton("kiesButton", Model.of(dto.titel())) {
                     @Override
                     public void onSubmit() {

@@ -55,10 +55,26 @@
                 <div class="col-12 col-md-4 d-flex">
                     <div class="rd-soort-optie w-100">
                         <h3 class="rd-soort-option__title" wicket:id="titel">Titel</h3>
-                        <span class="rd-price-badge">&#x20AC;&nbsp;<wicket:container wicket:id="prijs">0,00</wicket:container></span>
+
+                        <!-- Price: optional "Vanaf" prefix + status badge -->
+                        <div class="d-flex align-items-center gap-2">
+                            <span wicket:id="prijsPrefix" class="rd-price-badge-prefix">Vanaf</span>
+                            <span wicket:id="prijs" class="utrecht-status-badge rd-price-badge"></span>
+                        </div>
+
+                        <!-- Bullet points (flex:1 in CSS pushes date + button to bottom) -->
                         <ul class="rd-soort-optie__bullets" wicket:id="bullets">
                             <li wicket:id="bullet">Beschrijving</li>
                         </ul>
+
+                        <!-- Eerste mogelijkheid (text for now; dates come from the service) -->
+                        <div class="rd-eerste-mogelijkheid" wicket:id="eersteGelegenheidBox">
+                            <span class="rd-eerste-mogelijkheid__label">
+                                <wicket:message key="intake.soort.eerste.mogelijkheid">Eerste mogelijkheid</wicket:message>
+                            </span>
+                            <span class="rd-eerste-mogelijkheid__datum" wicket:id="eersteGelegenheid">-</span>
+                        </div>
+
                         <button type="submit" wicket:id="kiesButton"></button>
                     </div>
                 </div>
