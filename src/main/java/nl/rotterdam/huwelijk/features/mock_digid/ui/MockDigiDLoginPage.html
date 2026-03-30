@@ -5,22 +5,11 @@
     <h2 class="utrecht-heading-2">Inloggen met DigiD</h2>
     <p class="utrecht-paragraph">Dit is een testomgeving. Kies een testpersoon om in te loggen.</p>
 
-    <table class="utrecht-table">
-        <thead class="utrecht-table__head">
-            <tr class="utrecht-table__row">
-                <th class="utrecht-table__header-cell">Burgerservicenummer</th>
-                <th class="utrecht-table__header-cell">Omschrijving</th>
-                <th class="utrecht-table__header-cell"></th>
-            </tr>
-        </thead>
-        <tbody class="utrecht-table__body">
-            <tr wicket:id="testBurgers" class="utrecht-table__row">
-                <td class="utrecht-table__cell" wicket:id="bsn">999990007</td>
-                <td class="utrecht-table__cell" wicket:id="beschrijving">Omschrijving</td>
-                <td class="utrecht-table__cell"><a wicket:id="loginLink">Log in</a></td>
-            </tr>
-        </tbody>
-    </table>
+    <table wicket:id="testBurgersTable"></table>
+
+    <wicket:fragment wicket:id="loginFragment">
+        <a wicket:id="loginLink">Log in</a>
+    </wicket:fragment>
 
 </div>
 

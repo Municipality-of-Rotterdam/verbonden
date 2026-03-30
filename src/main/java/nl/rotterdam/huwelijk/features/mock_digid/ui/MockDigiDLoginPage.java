@@ -4,10 +4,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakePage;
+import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
+import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.list.ListItem;
-import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -18,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MockDigiDLoginPage extends BurgerBasePage {
@@ -38,20 +44,53 @@ public class MockDigiDLoginPage extends BurgerBasePage {
     }
 
     public MockDigiDLoginPage() {
-        pageBody.add(new ListView<TestBurger>("testBurgers", TEST_BURGERS) {
+        pageBody.add(buildTestBurgersTable());
+    }
+
+    private RdDataTable<TestBurger, String> buildTestBurgersTable() {
+        List<IColumn<TestBurger, String>> columns = new ArrayList<>();
+
+        columns.add(new AbstractColumn<>(Model.of("Burgerservicenummer")) {
             @Override
-            protected void populateItem(ListItem<TestBurger> item) {
-                TestBurger burger = item.getModelObject();
-                item.add(new Label("bsn", burger.bsn()));
-                item.add(new Label("beschrijving", burger.beschrijving()));
-                item.add(new Link<Void>("loginLink") {
-                    @Override
-                    public void onClick() {
-                        loginAs(burger.bsn());
-                    }
-                });
+            public void populateItem(Item<ICellPopulator<TestBurger>> cellItem,
+                                     String componentId,
+                                     IModel<TestBurger> rowModel) {
+                cellItem.add(new Label(componentId, rowModel.map(TestBurger::bsn)));
             }
         });
+
+        columns.add(new AbstractColumn<>(Model.of("Omschrijving")) {
+            @Override
+            public void populateItem(Item<ICellPopulator<TestBurger>> cellItem,
+                                     String componentId,
+                                     IModel<TestBurger> rowModel) {
+                cellItem.add(new Label(componentId, rowModel.map(TestBurger::beschrijving)));
+            }
+        });
+
+        columns.add(new AbstractColumn<>(Model.of("")) {
+            @Override
+            public void populateItem(Item<ICellPopulator<TestBurger>> cellItem,
+                                     String componentId,
+                                     IModel<TestBurger> rowModel) {
+                cellItem.add(new LoginFragment(componentId, rowModel));
+            }
+        });
+
+        return new RdDataTable<>("testBurgersTable", columns,
+                new ListDataProvider<>(TEST_BURGERS), TEST_BURGERS.size());
+    }
+
+    private class LoginFragment extends Fragment {
+        LoginFragment(String id, IModel<TestBurger> model) {
+            super(id, "loginFragment", MockDigiDLoginPage.this);
+            add(new Link<Void>("loginLink") {
+                @Override
+                public void onClick() {
+                    loginAs(model.getObject().bsn());
+                }
+            });
+        }
     }
 
     private void loginAs(String bsn) {
