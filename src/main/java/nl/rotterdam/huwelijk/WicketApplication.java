@@ -61,9 +61,6 @@ public class WicketApplication extends WebApplication {
                 new ResourceIsolationRequestCycleListener(
                         new FetchMetadataResourceIsolationPolicy()));
 
-        mountPage("/beheer", BapsAdministrationPage.class);
-        mountPage("/beheer/baps/nieuw", BapsCreatePage.class);
-        mountPage("/beheer/baps/${id}", BapsUpdatePage.class);
         mountPage("/beheer/huwelijkstypen", MarriageTypeAdministrationPage.class);
         mountPage("/beheer/huwelijkstypen/nieuw", MarriageTypeCreatePage.class);
         mountPage("/beheer/huwelijkstypen/${id}", MarriageTypeUpdatePage.class);
