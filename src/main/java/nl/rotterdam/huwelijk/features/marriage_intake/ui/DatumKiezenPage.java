@@ -31,7 +31,6 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
-import java.util.UUID;
 
 public class DatumKiezenPage extends BurgerBasePage {
 
