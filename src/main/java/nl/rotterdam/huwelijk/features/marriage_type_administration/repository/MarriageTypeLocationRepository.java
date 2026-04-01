@@ -11,6 +11,4 @@ import java.util.Optional;
 public interface MarriageTypeLocationRepository extends JpaRepository<MarriageTypeLocationEntity, Long> {
 
     Optional<MarriageTypeLocationEntity> findByMarriageType_Soort(CeremonieSoort soort);
-
-    void deleteByMarriageTypeId(long marriageTypeId);
 }

@@ -3,7 +3,6 @@ package nl.rotterdam.huwelijk.features.marriage_type_administration.application;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.ChangeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.CreateMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.ListMarriageTypeDto;
-import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeRepository;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeEntity;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeLocationEntity;
@@ -19,14 +18,11 @@ import java.util.Optional;
 class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministrationService {
 
     private final MarriageTypeRepository marriageTypeRepository;
-    private final MarriageTypeLocationRepository marriageTypeLocationRepository;
     private final LocatieRepository locatieRepository;
 
     MarriageTypeAdministrationServiceImpl(MarriageTypeRepository marriageTypeRepository,
-                                          MarriageTypeLocationRepository marriageTypeLocationRepository,
                                           LocatieRepository locatieRepository) {
         this.marriageTypeRepository = marriageTypeRepository;
-        this.marriageTypeLocationRepository = marriageTypeLocationRepository;
         this.locatieRepository = locatieRepository;
     }
 
@@ -46,16 +42,15 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
     @Transactional
     public long create(CreateMarriageTypeDto dto) {
         MarriageTypeEntity entity = toEntity(dto);
-        MarriageTypeEntity saved = marriageTypeRepository.save(entity);
         if (dto.locatieId() != null) {
             TrouwlocatieEntity locatie = locatieRepository.findById(dto.locatieId())
                     .orElseThrow(() -> new IllegalArgumentException("Locatie niet gevonden: " + dto.locatieId()));
             MarriageTypeLocationEntity location = new MarriageTypeLocationEntity();
-            location.setMarriageType(saved);
+            location.setMarriageType(entity);
             location.setLocatie(locatie);
-            marriageTypeLocationRepository.save(location);
+            entity.setLocation(location);
         }
-        return saved.getId();
+        return marriageTypeRepository.save(entity).getId();
     }
 
     @Override
@@ -69,17 +64,22 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
         entity.setUrl(dto.url());
         entity.setSoort(dto.soort());
         entity.setActive(dto.active());
-        marriageTypeRepository.save(entity);
 
-        marriageTypeLocationRepository.deleteByMarriageTypeId(entity.getId());
         if (dto.locatieId() != null) {
             TrouwlocatieEntity locatie = locatieRepository.findById(dto.locatieId())
                     .orElseThrow(() -> new IllegalArgumentException("Locatie niet gevonden: " + dto.locatieId()));
-            MarriageTypeLocationEntity location = new MarriageTypeLocationEntity();
-            location.setMarriageType(entity);
-            location.setLocatie(locatie);
-            marriageTypeLocationRepository.save(location);
+            MarriageTypeLocationEntity existingLocation = entity.getLocation();
+            if (existingLocation == null) {
+                existingLocation = new MarriageTypeLocationEntity();
+                existingLocation.setMarriageType(entity);
+                entity.setLocation(existingLocation);
+            }
+            existingLocation.setLocatie(locatie);
+        } else {
+            entity.setLocation(null);
         }
+
+        marriageTypeRepository.save(entity);
     }
 
     @Override
@@ -89,9 +89,9 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
     }
 
     private ChangeMarriageTypeDto toChangeDto(MarriageTypeEntity entity) {
-        Long locatieId = marriageTypeLocationRepository.findById(entity.getId())
-                .map(mtl -> mtl.getLocatie().getId())
-                .orElse(null);
+        Long locatieId = entity.getLocation() != null
+                ? entity.getLocation().getLocatie().getId()
+                : null;
         return new ChangeMarriageTypeDto(
                 entity.getId(),
                 entity.getSoort(),

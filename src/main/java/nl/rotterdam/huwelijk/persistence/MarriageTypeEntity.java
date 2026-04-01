@@ -33,7 +33,8 @@ public class MarriageTypeEntity {
     @Column(nullable = false)
     private boolean active = true;
 
-    @OneToOne(mappedBy = "marriageType", fetch = FetchType.LAZY, optional = true)
+    @OneToOne(mappedBy = "marriageType", fetch = FetchType.LAZY, optional = true,
+            cascade = CascadeType.ALL, orphanRemoval = true)
     private MarriageTypeLocationEntity location;
 
     @Column(name = "aangemaakt_op", nullable = false)
@@ -101,5 +102,13 @@ public class MarriageTypeEntity {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public MarriageTypeLocationEntity getLocation() {
+        return location;
+    }
+
+    public void setLocation(MarriageTypeLocationEntity location) {
+        this.location = location;
     }
 }
