@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
@@ -148,6 +149,32 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             }
         }
         return beschikbaar;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<LocalDateTime> findBeschikbareSlots(UUID dossierId, YearMonth maand) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
+        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
+
+        List<LocalDateTime> slots = new ArrayList<>();
+        LocalDate vandaag = LocalDate.now();
+        LocalDate start = maand.atDay(1);
+        LocalDate einde = maand.atEndOfMonth();
+
+        for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
+            if (!datum.isAfter(vandaag)) {
+                continue;
+            }
+            Set<LocalTime> tijdenVoorDatum = new TreeSet<>();
+            for (TrouwlocatieEntity locatie : locaties) {
+                tijdenVoorDatum.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
+            }
+            LocalDate finalDatum = datum;
+            tijdenVoorDatum.forEach(tijd -> slots.add(LocalDateTime.of(finalDatum, tijd)));
+        }
+        return slots;
     }
 
     @Override

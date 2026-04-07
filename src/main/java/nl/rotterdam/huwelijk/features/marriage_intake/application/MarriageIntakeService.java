@@ -6,6 +6,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvatting
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
@@ -23,6 +24,8 @@ public interface MarriageIntakeService {
     DossierSamenvattingDto findByDossierId(UUID id);
 
     Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand);
+
+    List<LocalDateTime> findBeschikbareSlots(UUID dossierId, YearMonth maand);
 
     List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum);
 

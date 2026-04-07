@@ -26,6 +26,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -51,8 +52,8 @@ public class DatumKiezenPage extends BurgerBasePage {
     private WebMarkupContainer tijdslotPanel;
     private WebMarkupContainer bevestigBar;
 
-    /** Fetched once per request cycle; detached afterwards by Wicket. */
-    private IModel<Set<LocalDate>> beschikbareDatumsModel;
+    /** All available date+time slots for the current month; detached after each request cycle. */
+    private IModel<List<LocalDateTime>> beschikbareSlotsModel;
 
     @Override
     protected IModel<String> getTitleModel() {
@@ -68,10 +69,10 @@ public class DatumKiezenPage extends BurgerBasePage {
     protected void onInitialize() {
         super.onInitialize();
 
-        beschikbareDatumsModel = new LoadableDetachableModel<>() {
+        beschikbareSlotsModel = new LoadableDetachableModel<>() {
             @Override
-            protected Set<LocalDate> load() {
-                return marriageIntakeService.findBeschikbareDatums(dossierId, huidigeMaand);
+            protected List<LocalDateTime> load() {
+                return marriageIntakeService.findBeschikbareSlots(dossierId, huidigeMaand);
             }
         };
 
@@ -114,7 +115,7 @@ public class DatumKiezenPage extends BurgerBasePage {
                 huidigeMaand = huidigeMaand.minusMonths(1);
                 geselecteerdeDatum = null;
                 geselecteerdeTijd = null;
-                beschikbareDatumsModel.detach();
+                beschikbareSlotsModel.detach();
                 target.add(kalenderPanel, tijdslotPanel, bevestigBar);
             }
 
@@ -138,7 +139,7 @@ public class DatumKiezenPage extends BurgerBasePage {
                 huidigeMaand = huidigeMaand.plusMonths(1);
                 geselecteerdeDatum = null;
                 geselecteerdeTijd = null;
-                beschikbareDatumsModel.detach();
+                beschikbareSlotsModel.detach();
                 target.add(kalenderPanel, tijdslotPanel, bevestigBar);
             }
         });
@@ -151,7 +152,9 @@ public class DatumKiezenPage extends BurgerBasePage {
         return new ListView<>("kalenderRijen", () -> bouwMaandRijen(huidigeMaand)) {
             @Override
             protected void populateItem(ListItem<List<LocalDate>> rijItem) {
-                Set<LocalDate> beschikbaar = beschikbareDatumsModel.getObject();
+                List<LocalDateTime> slots = beschikbareSlotsModel.getObject();
+                Set<LocalDate> beschikbaar = new HashSet<>();
+                slots.forEach(s -> beschikbaar.add(s.toLocalDate()));
                 rijItem.add(new ListView<>("dag", rijItem.getModel()) {
                     @Override
                     protected void populateItem(ListItem<LocalDate> dagItem) {
@@ -212,9 +215,13 @@ public class DatumKiezenPage extends BurgerBasePage {
         }));
 
         panel.add(new ListView<LocalTime>("tijdsloten",
-                () -> geselecteerdeDatum != null
-                        ? marriageIntakeService.findBeschikbareTijden(dossierId, geselecteerdeDatum)
-                        : List.of()) {
+                () -> {
+                    if (geselecteerdeDatum == null) return List.of();
+                    return beschikbareSlotsModel.getObject().stream()
+                            .filter(s -> s.toLocalDate().equals(geselecteerdeDatum))
+                            .map(LocalDateTime::toLocalTime)
+                            .toList();
+                }) {
             @Override
             protected void populateItem(ListItem<LocalTime> item) {
                 LocalTime tijd = item.getModelObject();
