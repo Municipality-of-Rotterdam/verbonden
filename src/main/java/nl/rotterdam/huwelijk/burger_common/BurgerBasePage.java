@@ -19,6 +19,9 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class BurgerBasePage extends WebPage {
 
@@ -52,10 +55,20 @@ public abstract class BurgerBasePage extends WebPage {
 
         pageHeader.add(new WebMarkupContainer("globeIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
-        pageHeader.add(new WebMarkupContainer("userIcon")
+
+        WebMarkupContainer userBar = new WebMarkupContainer("userBar") {
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                setVisible(isAuthenticated());
+            }
+        };
+        userBar.add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
-        pageHeader.add(new WebMarkupContainer("logOutIcon")
+        userBar.add(new Label("userName", this::currentUserName));
+        userBar.add(new WebMarkupContainer("logOutIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
+        pageHeader.add(userBar);
 
         pageBody = new RdPageBodyBorder("pageBody");
         pageLayout.add(pageBody);
@@ -70,5 +83,17 @@ public abstract class BurgerBasePage extends WebPage {
         super.renderHead(response);
         response.render(BOOTSTRAP_GRID_HEADER_ITEM);
         response.render(BOOTSTRAP_UTILITIES_HEADER_ITEM);
+    }
+
+    private String currentUserName() {
+        if (!isAuthenticated()) {
+            return "";
+        }
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    private boolean isAuthenticated() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
     }
 }
