@@ -16,6 +16,7 @@ import nl.rotterdam.huwelijk.persistence.AfspraakEntity;
 import nl.rotterdam.huwelijk.persistence.HuwelijksDossierEntity;
 import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeEntity;
+import nl.rotterdam.huwelijk.persistence.MarriageTypeLocationEntity;
 import nl.rotterdam.huwelijk.persistence.TrouwlocatieEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,18 +60,27 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public List<IntakeMarriageTypeDto> findAllMarriageTypes() {
         return marriageTypeRepository.findAll().stream()
                 .sorted(Comparator.comparing(MarriageTypeEntity::getSoort))
-                .map(e -> new IntakeMarriageTypeDto(
-                        e.getSoort(),
-                        e.getTitel(),
-                        e.getPrijs(),
-                        e.getSoort() == CeremonieSoort.GROOT ? "Vanaf" : null,
-                        Arrays.stream(e.getTekst().split("\n"))
-                                .map(String::trim)
-                                .filter(s -> !s.isEmpty())
-                                .toList(),
-                        computeEersteGelegenheid(e.getSoort()),
-                        e.isActive()
-                ))
+                .map(e -> {
+                    Optional<MarriageTypeLocationEntity> locationMapping =
+                            marriageTypeLocationRepository.findByMarriageType_Soort(e.getSoort());
+                    TrouwlocatieEntity locatie = locationMapping.map(MarriageTypeLocationEntity::getLocatie).orElse(null);
+                    Long locatieId = locatie != null ? locatie.getId() : null;
+                    String locatieNaam = locatie != null ? locatie.getNaam() : null;
+                    return new IntakeMarriageTypeDto(
+                            e.getSoort(),
+                            e.getTitel(),
+                            e.getPrijs(),
+                            e.getSoort() == CeremonieSoort.GROOT ? "Vanaf" : null,
+                            Arrays.stream(e.getTekst().split("\n"))
+                                    .map(String::trim)
+                                    .filter(s -> !s.isEmpty())
+                                    .toList(),
+                            computeEersteGelegenheid(e.getSoort()),
+                            e.isActive(),
+                            locatieId,
+                            locatieNaam
+                    );
+                })
                 .toList();
     }
 
@@ -96,6 +106,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity entity = new HuwelijksDossierEntity();
         entity.setRegistratieType(dto.registratieType());
         entity.setCeremonieSoort(dto.ceremonieSoort());
+        if (dto.locatieId() != null) {
+            locatieRepository.findById(dto.locatieId()).ifPresent(entity::setLocatie);
+        }
         return dossierRepository.save(entity).getUuid();
     }
 
@@ -114,12 +127,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .map(AfspraakEntity::getDatum)
                 .orElse(null);
 
+        String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
+
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
                 e.getCeremonieSoort(),
                 datumHuwelijk,
-                null,
+                locatieNaam,
                 false,
                 false,
                 List.of());

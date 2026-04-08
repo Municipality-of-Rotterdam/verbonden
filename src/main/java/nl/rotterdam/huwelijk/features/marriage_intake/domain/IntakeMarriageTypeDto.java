@@ -12,6 +12,8 @@ public record IntakeMarriageTypeDto(
         String prijsPrefix,
         List<String> bulletPoints,
         LocalDate eersteGelegenheid,
-        boolean active
+        boolean active,
+        Long locatieId,
+        String locatieNaam
 ) implements Serializable {
 }

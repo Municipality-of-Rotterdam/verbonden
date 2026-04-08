@@ -59,6 +59,7 @@ public class WicketApplication extends WebApplication {
 
         getApplicationSettings().setInternalErrorPage(BurgerErrorPage.class);
         getApplicationSettings().setPageExpiredErrorPage(BurgerErrorPage.class);
+        getApplicationSettings().setAccessDeniedPage(BurgerErrorPage.class);
 
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
         // Spring Security's CSRF filter is disabled in SecurityConfig to avoid conflicts

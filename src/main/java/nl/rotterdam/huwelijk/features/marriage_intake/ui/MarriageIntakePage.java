@@ -126,7 +126,7 @@ public class MarriageIntakePage extends IntakeBasePage {
                     @Override
                     public void onSubmit() {
                         UUID dossierId = marriageIntakeService.create(
-                                new CreateDossierDto(registratieType, dto.soort()));
+                                new CreateDossierDto(registratieType, dto.soort(), dto.locatieId()));
                         PageParameters params = new PageParameters();
                         params.add("dossierId", dossierId.toString());
                         setResponsePage(DeDagPage.class, params);

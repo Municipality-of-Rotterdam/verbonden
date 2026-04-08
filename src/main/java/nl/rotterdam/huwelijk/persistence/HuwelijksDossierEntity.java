@@ -33,6 +33,10 @@ public class HuwelijksDossierEntity {
     @Column(name = "ceremonie_soort", nullable = false)
     private CeremonieSoort ceremonieSoort;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "locatie_id")
+    private TrouwlocatieEntity locatie;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
@@ -66,6 +70,14 @@ public class HuwelijksDossierEntity {
 
     public void setCeremonieSoort(CeremonieSoort ceremonieSoort) {
         this.ceremonieSoort = ceremonieSoort;
+    }
+
+    public TrouwlocatieEntity getLocatie() {
+        return locatie;
+    }
+
+    public void setLocatie(TrouwlocatieEntity locatie) {
+        this.locatie = locatie;
     }
 
     public LocalDateTime getAangemaaktOp() {
