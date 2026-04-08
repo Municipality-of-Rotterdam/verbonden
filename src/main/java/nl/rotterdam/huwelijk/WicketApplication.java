@@ -1,6 +1,7 @@
 package nl.rotterdam.huwelijk;
 
 import de.agilecoders.wicket.webjars.WicketWebjars;
+import nl.rotterdam.huwelijk.burger_common.BurgerErrorPage;
 import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsUpdatePage;
@@ -55,6 +56,9 @@ public class WicketApplication extends WebApplication {
         getComponentInstantiationListeners().add(new SpringComponentInjector(this));
 
         getMarkupSettings().setStripWicketTags(true);
+
+        getApplicationSettings().setInternalErrorPage(BurgerErrorPage.class);
+        getApplicationSettings().setPageExpiredErrorPage(BurgerErrorPage.class);
 
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
         // Spring Security's CSRF filter is disabled in SecurityConfig to avoid conflicts
