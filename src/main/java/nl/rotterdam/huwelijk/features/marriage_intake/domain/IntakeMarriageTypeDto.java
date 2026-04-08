@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.domain;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -12,5 +13,5 @@ public record IntakeMarriageTypeDto(
         List<String> bulletPoints,
         LocalDate eersteGelegenheid,
         boolean active
-) {
+) implements Serializable {
 }
