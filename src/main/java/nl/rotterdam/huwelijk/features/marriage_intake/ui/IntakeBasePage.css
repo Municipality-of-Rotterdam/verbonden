@@ -1,59 +1,6 @@
-/* =============================================================
-   Mijn Dag page styles
-   ============================================================= */
 
-/* Top utility bar */
-.rd-top-bar {
-    background-color: #f2f2f2;
-    border-bottom: 1px solid #d0d0d0;
-    font-size: 0.875rem;
-    color: #333;
-}
 
-.rd-top-bar a {
-    color: #333;
-    text-decoration: none;
-}
 
-.rd-top-bar a:hover {
-    text-decoration: underline;
-}
-
-.rd-top-bar__sep {
-    color: #bbb;
-}
-
-/* Icons in the top bar: keep them in line with the text */
-.rd-top-bar rods-icon-globe,
-.rd-top-bar rods-icon-user,
-.rd-top-bar rods-icon-log-out {
-    font-size: 1rem;
-    vertical-align: middle;
-}
-
-/* Logo link */
-.rd-logo-link {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    text-decoration: none;
-    color: inherit;
-}
-
-.rd-logo-text {
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-/* Primary navigation */
-
-/* Page body content constraint */
-.utrecht-page-body__content {
-    max-width: 70rem;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
-}
 
 /* Breadcrumb spacing and list reset */
 .utrecht-breadcrumb-nav {
@@ -642,5 +589,13 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     width: 100%;
     justify-content: center;
     margin-bottom: 0;
+}
+
+
+/* Page body content constraint */
+.utrecht-page-body__content {
+    max-width: 70rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
 }
 
