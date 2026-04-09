@@ -8,7 +8,6 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -21,7 +20,6 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.DayOfWeek;
@@ -33,6 +31,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
 
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakeHeaderItems.MARRIAGE_INTAKE_CSS;
+
 public class DatumKiezenPage extends BurgerBasePage {
 
     private static final DayOfWeek[] KOLOM_VOLGORDE = {
@@ -43,7 +43,7 @@ public class DatumKiezenPage extends BurgerBasePage {
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
 
-    private UUID dossierId;
+    private final UUID dossierId;
     private YearMonth huidigeMaand;
     private LocalDate geselecteerdeDatum;
     private LocalTime geselecteerdeTijd;
@@ -129,7 +129,7 @@ public class DatumKiezenPage extends BurgerBasePage {
 
         panel.add(new Label("maandLabel", () -> {
             String naam = huidigeMaand.getMonth()
-                    .getDisplayName(TextStyle.FULL, new Locale("nl")).toLowerCase();
+                    .getDisplayName(TextStyle.FULL, getSession().getLocale()).toLowerCase();
             return naam + ", " + huidigeMaand.getYear();
         }));
 
@@ -166,7 +166,7 @@ public class DatumKiezenPage extends BurgerBasePage {
                         boolean isVandaag = datum != null && datum.equals(LocalDate.now());
 
                         dagItem.add(AttributeModifier.replace("class",
-                                buildDagClass(isLeeg, isVerleden, isBeschikbaar, isGeselecteerd)));
+                                buildDagClass(isLeeg, isBeschikbaar, isGeselecteerd)));
 
                         WebMarkupContainer dagLink = new WebMarkupContainer("dagLink");
                         dagLink.add(new Label("dagNummer",
@@ -210,11 +210,11 @@ public class DatumKiezenPage extends BurgerBasePage {
 
         panel.add(new Label("geselecteerdeDatumLabel", () -> {
             if (geselecteerdeDatum == null) return "";
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("EEEE d MMMM, yyyy", new Locale("nl"));
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("EEEE d MMMM, yyyy", getSession().getLocale());
             return geselecteerdeDatum.format(fmt);
         }));
 
-        panel.add(new ListView<LocalTime>("tijdsloten",
+        panel.add(new ListView<>("tijdsloten",
                 () -> {
                     if (geselecteerdeDatum == null) return List.of();
                     return beschikbareSlotsModel.getObject().stream()
@@ -260,7 +260,7 @@ public class DatumKiezenPage extends BurgerBasePage {
 
         bar.add(new Label("samenvattingLabel", () -> {
             if (geselecteerdeDatum == null || geselecteerdeTijd == null) return "";
-            DateTimeFormatter datumFmt = DateTimeFormatter.ofPattern("EEEE d MMMM", new Locale("nl"));
+            DateTimeFormatter datumFmt = DateTimeFormatter.ofPattern("EEEE d MMMM", getSession().getLocale());
             return getString("datum.kiezen.samenvatting.prefix")
                     + " " + geselecteerdeDatum.format(datumFmt)
                     + " " + getString("datum.kiezen.samenvatting.om")
@@ -307,7 +307,7 @@ public class DatumKiezenPage extends BurgerBasePage {
         return 0;
     }
 
-    private static String buildDagClass(boolean leeg, boolean verleden,
+    private static String buildDagClass(boolean leeg,
                                         boolean beschikbaar, boolean geselecteerd) {
         if (leeg) return "kalender-dag kalender-dag--leeg";
         if (geselecteerd) return "kalender-dag kalender-dag--geselecteerd";
@@ -318,7 +318,6 @@ public class DatumKiezenPage extends BurgerBasePage {
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
-        response.render(CssHeaderItem.forReference(
-                new PackageResourceReference(IntakeBasePage.class, "IntakeBasePage.css")));
+        response.render(MARRIAGE_INTAKE_CSS);
     }
 }
