@@ -69,6 +69,7 @@ public class WicketApplication extends WebApplication {
                         new FetchMetadataResourceIsolationPolicy()));
 
         mountPage("/inloggen", MockDigiDLoginPage.class);
+        mountPage("/error", BurgerErrorPage.class);
         mountPage("/beheer/huwelijkstypen", MarriageTypeAdministrationPage.class);
         mountPage("/beheer/huwelijkstypen/nieuw", MarriageTypeCreatePage.class);
         mountPage("/beheer/huwelijkstypen/${id}", MarriageTypeUpdatePage.class);
