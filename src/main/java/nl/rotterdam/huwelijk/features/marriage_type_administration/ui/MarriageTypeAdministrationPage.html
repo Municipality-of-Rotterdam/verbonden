@@ -7,34 +7,21 @@
 <body>
 <wicket:extend>
 
-<h1>Huwelijkstypen beheer</h1>
+    <h1>Huwelijkstypen beheer</h1>
 
-<p>
-    <a wicket:id="nieuwHuwelijkstypeLink">Nieuw huwelijkstype toevoegen</a>
-</p>
+    <p>
+        <a wicket:id="nieuwHuwelijkstypeLink" class="utrecht-button utrecht-button--primary-action">Nieuw huwelijkstype toevoegen</a>
+    </p>
 
-<table>
-    <thead>
-    <tr>
-        <th>Soort</th>
-        <th>Titel</th>
-        <th>Prijs</th>
-        <th>Acties</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr wicket:id="huwelijkstypen">
-        <td wicket:id="soort"></td>
-        <td wicket:id="titel"></td>
-        <td wicket:id="prijs"></td>
-        <td>
-            <a wicket:id="bewerkLink">Bewerken</a>
-            &nbsp;
-            <a wicket:id="verwijderLink">Verwijderen</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <form wicket:id="actionsForm">
+        <table wicket:id="huwelijkstypeTable"></table>
+    </form>
+
+    <wicket:fragment wicket:id="actiesFragment">
+        <button wicket:id="bewerkLink"><span wicket:id="icon"></span></button>
+        <button wicket:id="verwijderLink"><span wicket:id="icon"></span></button>
+    </wicket:fragment>
+
 </wicket:extend>
 </body>
 </html>

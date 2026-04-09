@@ -5,6 +5,9 @@ import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.Create
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.ListMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeRepository;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeEntity;
+import nl.rotterdam.huwelijk.persistence.MarriageTypeLocationEntity;
+import nl.rotterdam.huwelijk.persistence.TrouwlocatieEntity;
+import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +18,12 @@ import java.util.Optional;
 class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministrationService {
 
     private final MarriageTypeRepository marriageTypeRepository;
+    private final LocatieRepository locatieRepository;
 
-    MarriageTypeAdministrationServiceImpl(MarriageTypeRepository marriageTypeRepository) {
+    MarriageTypeAdministrationServiceImpl(MarriageTypeRepository marriageTypeRepository,
+                                          LocatieRepository locatieRepository) {
         this.marriageTypeRepository = marriageTypeRepository;
+        this.locatieRepository = locatieRepository;
     }
 
     @Override
@@ -36,6 +42,14 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
     @Transactional
     public long create(CreateMarriageTypeDto dto) {
         MarriageTypeEntity entity = toEntity(dto);
+        if (dto.locatieId() != null) {
+            TrouwlocatieEntity locatie = locatieRepository.findById(dto.locatieId())
+                    .orElseThrow(() -> new IllegalArgumentException("Locatie niet gevonden: " + dto.locatieId()));
+            MarriageTypeLocationEntity location = new MarriageTypeLocationEntity();
+            location.setMarriageType(entity);
+            location.setLocatie(locatie);
+            entity.setLocation(location);
+        }
         return marriageTypeRepository.save(entity).getId();
     }
 
@@ -49,6 +63,22 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
         entity.setPrijs(dto.prijs());
         entity.setUrl(dto.url());
         entity.setSoort(dto.soort());
+        entity.setActive(dto.active());
+
+        if (dto.locatieId() != null) {
+            TrouwlocatieEntity locatie = locatieRepository.findById(dto.locatieId())
+                    .orElseThrow(() -> new IllegalArgumentException("Locatie niet gevonden: " + dto.locatieId()));
+            MarriageTypeLocationEntity existingLocation = entity.getLocation();
+            if (existingLocation == null) {
+                existingLocation = new MarriageTypeLocationEntity();
+                existingLocation.setMarriageType(entity);
+                entity.setLocation(existingLocation);
+            }
+            existingLocation.setLocatie(locatie);
+        } else {
+            entity.setLocation(null);
+        }
+
         marriageTypeRepository.save(entity);
     }
 
@@ -59,13 +89,18 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
     }
 
     private ChangeMarriageTypeDto toChangeDto(MarriageTypeEntity entity) {
+        Long locatieId = entity.getLocation() != null
+                ? entity.getLocation().getLocatie().getId()
+                : null;
         return new ChangeMarriageTypeDto(
                 entity.getId(),
                 entity.getSoort(),
                 entity.getTitel(),
                 entity.getTekst(),
                 entity.getPrijs(),
-                entity.getUrl()
+                entity.getUrl(),
+                locatieId,
+                entity.isActive()
         );
     }
 
@@ -76,6 +111,7 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
         entity.setTekst(dto.tekst());
         entity.setPrijs(dto.prijs());
         entity.setUrl(dto.url());
+        entity.setActive(dto.active());
         return entity;
     }
 }

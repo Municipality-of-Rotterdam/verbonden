@@ -1,10 +1,15 @@
 package nl.rotterdam.huwelijk.features.marriage_type_administration.ui;
 
 import nl.rotterdam.huwelijk.administration_common.AdministrationBasePage;
+import nl.rotterdam.huwelijk.administration_common.RdFormFieldSelect;
+import nl.rotterdam.huwelijk.features.location_administration.application.LocationAdministrationService;
+import nl.rotterdam.huwelijk.features.location_administration.domain.ListLocatieDto;
+
 import nl.rotterdam.huwelijk.features.marriage_type_administration.application.MarriageTypeAdministrationService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.domain.CreateMarriageTypeDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import org.apache.wicket.markup.html.form.*;
@@ -23,20 +28,28 @@ public class MarriageTypeCreatePage extends AdministrationBasePage {
     @SpringBean
     private MarriageTypeAdministrationService marriageTypeAdministrationService;
 
+    @SpringBean
+    private LocationAdministrationService locationAdministrationService;
+
     public MarriageTypeCreatePage() {
+        List<ListLocatieDto> alleLocaties = locationAdministrationService.findAllLocaties();
+
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         pageBody.add(
                 new BookmarkablePageLink<>("terugLink", MarriageTypeAdministrationPage.class),
                 feedback,
-                new CreateMarriageTypeForm("huwelijkstypeForm")
+                new CreateMarriageTypeForm("huwelijkstypeForm", alleLocaties)
         );
     }
 
     private class CreateMarriageTypeForm extends Form<MarriageTypeFormDto> {
 
-        CreateMarriageTypeForm(String id) {
+        private final List<ListLocatieDto> alleLocaties;
+
+        CreateMarriageTypeForm(String id, List<ListLocatieDto> alleLocaties) {
             super(id, Model.of(MarriageTypeFormDto.leeg()));
+            this.alleLocaties = alleLocaties;
         }
 
         @Override
@@ -63,6 +76,16 @@ public class MarriageTypeCreatePage extends AdministrationBasePage {
                     new RdFormFieldTextInput<>("url",
                             LambdaModel.of(model, MarriageTypeFormDto::getUrl, MarriageTypeFormDto::setUrl),
                             Model.of("URL")).setRequired(true),
+                    new RdFormFieldSelect<>("locatie",
+                            LambdaModel.of(model, MarriageTypeFormDto::getLocatie, MarriageTypeFormDto::setLocatie),
+                            Model.of("Vaste locatie"),
+                            alleLocaties,
+                            new LambdaChoiceRenderer<>(ListLocatieDto::naam, l -> Long.toString(l.id())))
+                            .setNullValid(true)
+                            .setRequired(false),
+                    new RdFormFieldCheckbox("active",
+                            LambdaModel.of(model, MarriageTypeFormDto::isActive, MarriageTypeFormDto::setActive),
+                            Model.of("Actief")),
                     new RdButton("opslaan", Model.of("Toevoegen"))
             );
         }
@@ -75,7 +98,9 @@ public class MarriageTypeCreatePage extends AdministrationBasePage {
                     f.getTitel(),
                     f.getTekst(),
                     f.getPrijs(),
-                    f.getUrl()
+                    f.getUrl(),
+                    f.getLocatie() != null ? f.getLocatie().id() : null,
+                    f.isActive()
             ));
             setResponsePage(MarriageTypeAdministrationPage.class);
         }

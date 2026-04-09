@@ -19,6 +19,8 @@ public interface LocationAdministrationService {
 
     Page<ListLocatieDto> findAll(Pageable pageable);
 
+    List<ListLocatieDto> findAllLocaties();
+
     Optional<ChangeLocatieDto> findById(long id);
 
     long create(CreateLocatieDto dto);

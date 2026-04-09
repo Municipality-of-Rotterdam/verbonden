@@ -48,6 +48,12 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
 
     @Override
     @Transactional(readOnly = true)
+    public List<ListLocatieDto> findAllLocaties() {
+        return locatieRepository.findAllProjectedUnpaged();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<ChangeLocatieDto> findById(long id) {
         return locatieRepository.findById(id).map(this::toChangeDto);
     }
