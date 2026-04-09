@@ -319,6 +319,6 @@ public class DatumKiezenPage extends BurgerBasePage {
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
         response.render(CssHeaderItem.forReference(
-                new PackageResourceReference(IntakeBasePage.class, "mijn-dag.css")));
+                new PackageResourceReference(IntakeBasePage.class, "IntakeBasePage.css")));
     }
 }
