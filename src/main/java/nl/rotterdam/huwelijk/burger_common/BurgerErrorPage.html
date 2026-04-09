@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <title>Er is een fout opgetreden</title>
+</head>
+<body>
+<wicket:extend>
+
+    <div class="container py-5">
+
+        <p class="rd-lead-paragraph">
+            <strong wicket:id="errorCode">500</strong>
+        </p>
+
+        <h1 class="mb-3">Er is een fout opgetreden</h1>
+
+        <p wicket:id="errorMessage">Er is een onverwachte fout opgetreden. Probeer het later opnieuw.</p>
+
+        <a href="/" class="rd-button rd-button--secondary mt-4">Terug naar de beginpagina</a>
+
+    </div>
+
+</wicket:extend>
+</body>
+</html>

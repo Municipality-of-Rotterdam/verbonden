@@ -10,6 +10,8 @@ public record ChangeMarriageTypeDto(
         String titel,
         String tekst,
         BigDecimal prijs,
-        String url
+        String url,
+        Long locatieId,
+        boolean active
 ) {
 }

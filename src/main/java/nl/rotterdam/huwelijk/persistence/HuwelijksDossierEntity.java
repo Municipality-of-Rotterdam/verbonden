@@ -5,6 +5,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "huwelijks_dossier")
@@ -14,6 +15,16 @@ public class HuwelijksDossierEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "uuid", nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
+    @PrePersist
+    private void generateUuid() {
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+        }
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(name = "registratie_type", nullable = false)
     private RegistratieType registratieType;
@@ -21,6 +32,10 @@ public class HuwelijksDossierEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "ceremonie_soort", nullable = false)
     private CeremonieSoort ceremonieSoort;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "locatie_id")
+    private TrouwlocatieEntity locatie;
 
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
@@ -31,6 +46,14 @@ public class HuwelijksDossierEntity {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public RegistratieType getRegistratieType() {
@@ -47,6 +70,14 @@ public class HuwelijksDossierEntity {
 
     public void setCeremonieSoort(CeremonieSoort ceremonieSoort) {
         this.ceremonieSoort = ceremonieSoort;
+    }
+
+    public TrouwlocatieEntity getLocatie() {
+        return locatie;
+    }
+
+    public void setLocatie(TrouwlocatieEntity locatie) {
+        this.locatie = locatie;
     }
 
     public LocalDateTime getAangemaaktOp() {

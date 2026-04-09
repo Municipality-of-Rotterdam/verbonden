@@ -13,8 +13,10 @@ public interface MarriageTypeRepository extends JpaRepository<MarriageTypeEntity
 
     @Query("""
             SELECT new nl.rotterdam.huwelijk.features.marriage_type_administration.domain.ListMarriageTypeDto(
-                m.id, m.soort, m.titel, m.prijs)
+                m.id, m.soort, m.titel, m.prijs, l.naam, m.active)
             FROM MarriageTypeEntity m
+            LEFT JOIN m.location mtl
+            LEFT JOIN mtl.locatie l
             ORDER BY m.titel ASC
             """)
     List<ListMarriageTypeDto> findAllProjected();

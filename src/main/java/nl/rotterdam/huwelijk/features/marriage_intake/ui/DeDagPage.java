@@ -10,12 +10,14 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+import java.util.UUID;
+
 public class DeDagPage extends IntakeBasePage {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
 
-    private long dossierId;
+    private UUID dossierId;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -29,18 +31,20 @@ public class DeDagPage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return Model.of(marriageIntakeService.findById(dossierId));
+        return Model.of(marriageIntakeService.findByDossierId(dossierId));
     }
 
     public DeDagPage(PageParameters parameters) {
-        this.dossierId = parameters.get("dossierId").toLong();
+        this.dossierId = UUID.fromString(parameters.get("dossierId").toString());
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
         pageBody.add(new Link<Void>("datumLink") {
             @Override
             public void onClick() {
-                // Navigation to date picker — to be implemented in a future iteration
+                PageParameters params = new PageParameters();
+                params.add("dossierId", dossierId.toString());
+                setResponsePage(DatumKiezenPage.class, params);
             }
         });
 
@@ -53,14 +57,14 @@ public class DeDagPage extends IntakeBasePage {
         locatieLink.setEnabled(false);
         pageBody.add(locatieLink);
 
-        Link<Void> bapsLink = new Link<Void>("bapsLink") {
+        Link<Void> babsLink = new Link<Void>("babsLink") {
             @Override
             public void onClick() {
-                // Navigation to BAPS picker — to be implemented in a future iteration
+                // Navigation to BABS picker — to be implemented in a future iteration
             }
         };
-        bapsLink.setEnabled(false);
-        pageBody.add(bapsLink);
+        babsLink.setEnabled(false);
+        pageBody.add(babsLink);
     }
 }
 

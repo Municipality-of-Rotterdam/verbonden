@@ -317,7 +317,7 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     background-image: linear-gradient(135deg, #7a5a2e 0%, #c49a6c 100%);
 }
 
-.rd-keuze-card__image--baps {
+.rd-keuze-card__image--babs {
     background-color: #3e5a7a;
     background-image: linear-gradient(135deg, #2e4a6a 0%, #6c8caa 100%);
 }
@@ -494,7 +494,6 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     padding-left: 1.25rem;
     margin: 0;
     font-size: 0.9375rem;
-    flex: 1;
 }
 
 .rd-soort-optie__bullets li {
@@ -509,6 +508,7 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    margin-top: auto;
 }
 
 .rd-eerste-mogelijkheid__label {
@@ -667,3 +667,247 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     margin-bottom: 0;
 }
 
+
+/* ============================================================
+   Datum kiezen page
+   ============================================================ */
+
+.datum-kiezen__terug-link {
+    font-size: 0.875rem;
+    color: var(--rotterdam-color-primary, #00811f);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.datum-kiezen__terug-link:hover {
+    text-decoration: underline;
+}
+
+.datum-kiezen__heading {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+/* Two-panel container */
+.datum-kiezen__panels {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.datum-kiezen__kalender-panel,
+.datum-kiezen__tijdslot-panel {
+    background: #fff;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    padding: 1.25rem;
+}
+
+.datum-kiezen__kalender-panel {
+    flex: 0 0 auto;
+    width: 300px;
+}
+
+.datum-kiezen__tijdslot-panel {
+    flex: 1 1 auto;
+    min-width: 260px;
+}
+
+.datum-kiezen__panel-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.datum-kiezen__panel-subtitle {
+    font-size: 0.8125rem;
+    color: #555;
+    margin-bottom: 0.75rem;
+}
+
+/* Month navigation */
+.datum-kiezen__maand-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.datum-kiezen__maand-knop {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #333;
+    text-decoration: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    background: #fff;
+}
+
+.datum-kiezen__maand-knop:hover {
+    background: #f0f0f0;
+}
+
+.datum-kiezen__maand-label {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-transform: capitalize;
+}
+
+/* Calendar table */
+.datum-kiezen__kalender {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.datum-kiezen__kalender thead th {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #555;
+    padding: 0.25rem 0;
+}
+
+.kalender-dag {
+    text-align: center;
+    padding: 2px;
+}
+
+.kalender-dag a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0 auto;
+    border-radius: 50%;
+    font-size: 0.8125rem;
+    text-decoration: none;
+    color: #333;
+    cursor: default;
+}
+
+.kalender-dag--leeg a {
+    visibility: hidden;
+}
+
+.kalender-dag--onbeschikbaar a {
+    color: #b0b0b0;
+    cursor: not-allowed;
+}
+
+.kalender-dag--beschikbaar a {
+    cursor: pointer;
+    color: #333;
+}
+
+.kalender-dag--beschikbaar a:hover {
+    background: #e8f5e9;
+}
+
+.kalender-dag--geselecteerd a {
+    background: var(--rotterdam-color-primary, #00811f);
+    color: #fff;
+    cursor: pointer;
+}
+
+.kalender-dag__vandaag-label {
+    font-size: 0.55rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-top: 1px;
+    color: inherit;
+}
+
+/* Time slots */
+.datum-kiezen__tijdsloten {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.tijdslot {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #333;
+    text-decoration: none;
+    background: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tijdslot:hover {
+    border-color: var(--rotterdam-color-primary, #00811f);
+    background: #e8f5e9;
+}
+
+.tijdslot--geselecteerd {
+    background: var(--rotterdam-color-primary, #00811f);
+    border-color: var(--rotterdam-color-primary, #00811f);
+    color: #fff;
+}
+
+.tijdslot--geselecteerd:hover {
+    background: var(--rotterdam-color-primary, #00811f);
+    color: #fff;
+}
+
+/* Bottom confirm bar */
+.datum-kiezen__bevestig-bar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: #f9f9f9;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+}
+
+.datum-kiezen__samenvatting {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.125rem;
+}
+
+.datum-kiezen__samenvatting-label {
+    font-size: 0.75rem;
+    color: #555;
+    font-weight: 600;
+}
+
+.datum-kiezen__samenvatting-tekst {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.datum-kiezen__bevestig-knop {
+    background: var(--rotterdam-color-primary, #00811f);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.datum-kiezen__bevestig-knop:hover {
+    background: #006618;
+}
