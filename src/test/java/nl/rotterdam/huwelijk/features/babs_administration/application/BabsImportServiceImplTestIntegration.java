@@ -2,6 +2,7 @@ package nl.rotterdam.huwelijk.features.babs_administration.application;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import nl.rotterdam.huwelijk.features.babs_administration.domain.BabsImportResult;
+import nl.rotterdam.huwelijk.integration_test.HuwelijkIntegrationTest;
 import nl.rotterdam.huwelijk.persistence.BabsEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@AutoConfigureEmbeddedDatabase
+
+@HuwelijkIntegrationTest
 class BabsImportServiceImplTestIntegration {
 
     @Autowired

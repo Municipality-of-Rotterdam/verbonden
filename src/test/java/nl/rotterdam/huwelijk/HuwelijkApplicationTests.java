@@ -1,11 +1,9 @@
 package nl.rotterdam.huwelijk;
 
-import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import nl.rotterdam.huwelijk.integration_test.HuwelijkIntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@AutoConfigureEmbeddedDatabase
+@HuwelijkIntegrationTest
 class HuwelijkApplicationTests {
 
     @Test
