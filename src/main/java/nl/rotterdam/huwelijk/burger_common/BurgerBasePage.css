@@ -1,0 +1,39 @@
+.rods-theme {
+    footer.utrecht-page-footer {
+        background-color: var(--rods-color-base-white);
+    }
+    .utrecht-page-footer__content {
+        border-top: 3px solid var(--rods-color-base-green);
+        background-color: var(--rods-color-base-white);
+    }
+
+    .utrecht-page-footer__navigation .utrecht-link-list {
+        column-gap: 1rem;
+        flex-direction: row;
+    }
+}
+
+
+/* Footer links */
+.rd-footer-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.rd-footer-links a {
+    text-decoration: underline;
+    font-size: 0.9rem;
+    color:  var(--rods-color-base-green);
+}
+
+.rd-footer-links a:hover {
+    text-decoration: underline;
+}
+
+.rd-footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+}

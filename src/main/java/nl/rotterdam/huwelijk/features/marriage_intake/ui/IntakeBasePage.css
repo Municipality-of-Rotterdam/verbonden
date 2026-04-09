@@ -220,29 +220,6 @@
     background-color: #f0f8f4;
 }
 
-/* Footer links */
-.rd-footer-links {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.rd-footer-links a {
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-
-.rd-footer-links a:hover {
-    text-decoration: underline;
-}
-
-.rd-footer-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 700;
-}
-
 /* =============================================================
    DeDagPage – secondary button ("Naar Jullie gegevens")
    ============================================================= */
