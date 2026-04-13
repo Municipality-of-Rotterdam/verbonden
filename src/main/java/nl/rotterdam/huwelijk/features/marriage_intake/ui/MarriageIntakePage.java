@@ -60,7 +60,7 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, false, false, List.of());
+        return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, List.of());
     }
 
     public MarriageIntakePage() {
