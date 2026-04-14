@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "babs")
+@Table(name = "babsen")
 public class BabsEntity {
 
     @Id
@@ -37,7 +37,7 @@ public class BabsEntity {
     private LocalDate actiefTotEnMet;
 
     @ElementCollection
-    @CollectionTable(name = "babs_beschikbare_dagen", joinColumns = @JoinColumn(name = "babs_id"))
+    @CollectionTable(name = "babsen_beschikbare_dagen", joinColumns = @JoinColumn(name = "babs_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "dag", nullable = false)
     private List<DayOfWeek> beschikbareDagen = new ArrayList<>();

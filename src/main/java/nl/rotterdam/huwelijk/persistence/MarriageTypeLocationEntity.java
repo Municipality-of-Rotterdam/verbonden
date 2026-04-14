@@ -3,7 +3,7 @@ package nl.rotterdam.huwelijk.persistence;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "marriage_type_location")
+@Table(name = "huwelijkstypen_locaties")
 public class MarriageTypeLocationEntity {
 
     @Id

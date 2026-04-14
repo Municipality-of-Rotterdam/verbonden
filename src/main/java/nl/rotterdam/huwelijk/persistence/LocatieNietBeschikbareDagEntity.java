@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "locatie_niet_beschikbare_dag")
+@Table(name = "trouwlocaties_niet_beschikbare_dagen")
 public class LocatieNietBeschikbareDagEntity {
 
     @Id
