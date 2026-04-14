@@ -14,6 +14,7 @@ import nl.rotterdam.huwelijk.persistence.AfspraakEntity;
 import nl.rotterdam.huwelijk.persistence.HuwelijksDossierEntity;
 import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
 import nl.rotterdam.huwelijk.persistence.LocatieNietBeschikbareDagEntity;
+import nl.rotterdam.huwelijk.persistence.MarriageTypeLocationEntity;
 import nl.rotterdam.huwelijk.persistence.TrouwlocatieEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,7 @@ class BeschikbareSlotsIntegrationTest {
 
     private TrouwlocatieEntity vindGekoppeldeLocatie(CeremonieSoort soort) {
         return marriageTypeLocationRepository.findByMarriageType_Soort(soort)
-                .map(mapping -> mapping.getLocatie())
+                .map(MarriageTypeLocationEntity::getLocatie)
                 .orElseThrow(() -> new IllegalStateException(
                         "Geen locatie gekoppeld aan " + soort));
     }
@@ -267,7 +268,6 @@ class BeschikbareSlotsIntegrationTest {
         List<LocalTime> tijden = marriageIntakeService.findBeschikbareTijden(regulierDossier, volgendeMaandag);
         assertThat(tijden).isNotEmpty();
         assertThat(tijden).allMatch(t -> !t.isBefore(LocalTime.of(14, 0)));
-        assertThat(tijden).noneMatch(t -> t.isBefore(LocalTime.of(14, 0)));
     }
 
     @Test
