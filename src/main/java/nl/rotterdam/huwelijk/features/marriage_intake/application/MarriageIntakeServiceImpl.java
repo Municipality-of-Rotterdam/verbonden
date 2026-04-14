@@ -85,19 +85,39 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .toList();
     }
 
+    private static final Map<String, PartnerGegevensDto> MOCK_PERSONEN = Map.of(
+            "999990007", new PartnerGegevensDto("Van Muiswinkel", "Erik Jan",
+                    LocalDate.of(1984, 5, 29), "Rotterdam", "Nederlandse", "Ongehuwd",
+                    "06-12345678", "evm1984@gmail.com"),
+            "999990019", new PartnerGegevensDto("De Vries", "Sanne Maria",
+                    LocalDate.of(1992, 3, 14), "Den Haag", "Nederlandse", "Ongehuwd",
+                    "06-11223344", "sanne.devries@gmail.com"),
+            "999990020", new PartnerGegevensDto("Jansen", "Pieter",
+                    LocalDate.of(1988, 7, 22), "Groningen", "Nederlandse", "Gehuwd",
+                    "06-55667788", "pieter.jansen@gmail.com"),
+            "999990202", new PartnerGegevensDto("Bakker", "Willem Adriaan",
+                    LocalDate.of(1975, 11, 3), "Assen", "Nederlandse", "Gescheiden",
+                    "06-99887766", "w.bakker@gmail.com"),
+            "999990032", new PartnerGegevensDto("Dëhlano", "Chavéliën",
+                    LocalDate.of(2001, 6, 18), "Paramaribo", "Nederlandse", "Ongehuwd",
+                    "06-44556677", "chaveliën@gmail.com")
+    );
+
+    private static final PartnerGegevensDto MOCK_PARTNER_2 = new PartnerGegevensDto(
+            "Hofstede", "Jan-Diederik, deIII",
+            LocalDate.of(1999, 1, 1), "Rotterdam", "Nederlandse", "Ongehuwd",
+            "06-87654321", "jd3_swagboy@gmail.com");
+
     @Override
     @Transactional(readOnly = true)
-    public List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId) {
+    public List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId, String bsn) {
         // Partner data is not yet stored in the dossier entity.
-        // Return mock data so the UI can be developed and demonstrated.
-        return List.of(
-                new PartnerGegevensDto("Van Muiswinkel", "Erik Jan",
-                        LocalDate.of(1984, 5, 29), "Rotterdam", "Nederlandse", "Ongehuwd",
-                        "06-12345678", "evm1984@gmail.com"),
-                new PartnerGegevensDto("Hofstede", "Jan-Diederik, deIII",
-                        LocalDate.of(1999, 1, 1), "Rotterdam", "Nederlandse", "Ongehuwd",
-                        "06-87654321", "jd3_swagboy@gmail.com")
-        );
+        // The first partner is looked up from mock BRP data by BSN.
+        // The second partner is static mock data.
+        PartnerGegevensDto partner1 = MOCK_PERSONEN.getOrDefault(bsn,
+                new PartnerGegevensDto("Onbekend", bsn,
+                        null, "", "Onbekend", "Onbekend", "", ""));
+        return List.of(partner1, MOCK_PARTNER_2);
     }
 
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {

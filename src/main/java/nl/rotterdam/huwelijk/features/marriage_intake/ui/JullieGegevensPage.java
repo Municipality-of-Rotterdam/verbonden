@@ -12,6 +12,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -46,7 +47,8 @@ public class JullieGegevensPage extends IntakeBasePage {
 
         pageBody.add(new RdHeading("heading", getString("jullie.gegevens.heading"), 1));
 
-        List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
+        List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId,
+                SecurityContextHolder.getContext().getAuthentication().getName());
 
         pageBody.add(new ListView<>("partnerCards", partners) {
             @Override
