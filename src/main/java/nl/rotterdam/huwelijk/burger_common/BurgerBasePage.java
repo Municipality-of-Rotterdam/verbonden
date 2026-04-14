@@ -14,21 +14,25 @@ import nl.rotterdam.nl_design_system.wicket.components.page_layout.RdPageLayoutB
 import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class BurgerBasePage extends WebPage {
 
-    private static final CssReferenceHeaderItem BOOTSTRAP_GRID_HEADER_ITEM =
+    private static final HeaderItem BOOTSTRAP_GRID_HEADER_ITEM =
             CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-grid.min.css"));
-    private static final CssReferenceHeaderItem BOOTSTRAP_UTILITIES_HEADER_ITEM =
+    private static final HeaderItem BOOTSTRAP_UTILITIES_HEADER_ITEM =
             CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-utilities.min.css"));
+
+    private static final HeaderItem BURGER_BASE_PAGE_HEADER_ITEM = CssHeaderItem.forReference(new PackageResourceReference(BurgerBasePage.class, "BurgerBasePage.css"));
 
     protected final RdPageBodyBorder pageBody;
 
@@ -83,6 +87,7 @@ public abstract class BurgerBasePage extends WebPage {
         super.renderHead(response);
         response.render(BOOTSTRAP_GRID_HEADER_ITEM);
         response.render(BOOTSTRAP_UTILITIES_HEADER_ITEM);
+        response.render(BURGER_BASE_PAGE_HEADER_ITEM);
     }
 
     private String currentUserName() {
