@@ -8,6 +8,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
@@ -82,6 +83,21 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                     );
                 })
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId) {
+        // Partner data is not yet stored in the dossier entity.
+        // Return mock data so the UI can be developed and demonstrated.
+        return List.of(
+                new PartnerGegevensDto("Van Muiswinkel", "Erik Jan",
+                        LocalDate.of(1984, 5, 29), "Rotterdam", "Nederlandse", "Ongehuwd",
+                        "06-12345678", "evm1984@gmail.com"),
+                new PartnerGegevensDto("Hofstede", "Jan-Diederik, deIII",
+                        LocalDate.of(1999, 1, 1), "Rotterdam", "Nederlandse", "Ongehuwd",
+                        "06-87654321", "jd3_swagboy@gmail.com")
+        );
     }
 
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {

@@ -835,3 +835,96 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
 .datum-kiezen__bevestig-knop:hover {
     background: #006618;
 }
+
+/* =============================================================
+   JullieGegevensPage – partner cards
+   ============================================================= */
+
+.rd-partner-card {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 1.5rem;
+    background: #fff;
+}
+
+.rd-partner-card__achternaam {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: #222;
+}
+
+.rd-partner-card__voornamen {
+    display: inline-block;
+    background-color: var(--rd-color-green-500, #007a3e);
+    color: #fff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.rd-partner-card__details {
+    font-size: 0.9375rem;
+    color: #333;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+}
+
+.rd-partner-card__details span + span::before {
+    content: none;
+}
+
+.rd-partner-card__details span {
+    display: block;
+}
+
+.rd-partner-card__field {
+    margin-bottom: 1rem;
+}
+
+.rd-partner-card__label {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #222;
+}
+
+.rd-partner-card__input-display {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9375rem;
+    color: #333;
+    background: #fff;
+}
+
+.rd-partner-card__actions {
+    margin-top: 1rem;
+}
+
+.rd-partner-card__action-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 3px;
+    background: var(--rd-color-green-700, #005a2d);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.rd-partner-card__action-button:hover {
+    background: var(--rd-color-green-800, #004022);
+}
+
+.rd-partner-card__action-icon {
+    font-size: 1rem;
+}

@@ -1,0 +1,65 @@
+<wicket:extend>
+
+    <!-- Page heading -->
+    <h1 wicket:id="heading">Jullie gegevens &amp; verklaring naamgebruik</h1>
+
+    <!-- Intro text -->
+    <p class="rd-intro-text">
+        <wicket:message key="jullie.gegevens.intro">
+            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.
+        </wicket:message>
+    </p>
+
+    <!-- Partner cards -->
+    <div class="row g-4">
+        <div wicket:id="partnerCards" class="col-12 col-md-6">
+            <div class="rd-partner-card">
+
+                <!-- Achternaam -->
+                <h3 class="rd-partner-card__achternaam" wicket:id="achternaam">Achternaam</h3>
+
+                <!-- Voornamen badge -->
+                <span class="rd-partner-card__voornamen" wicket:id="voornamen">Voornamen</span>
+
+                <!-- Personal details -->
+                <div class="rd-partner-card__details">
+                    <span wicket:id="geboortedatum">01-01-2000</span>
+                    <span wicket:id="geboorteplaats">Plaats</span>
+                    <span wicket:id="nationaliteit">Nationaliteit</span>
+                    <br/>
+                    <span wicket:id="burgerlijkeStaat">Burgerlijke staat</span>
+                </div>
+
+                <!-- Telefoonnummer -->
+                <div class="rd-partner-card__field">
+                    <label class="rd-partner-card__label">
+                        <wicket:message key="jullie.gegevens.telefoonnummer">Telefoonnummer</wicket:message>
+                    </label>
+                    <div class="rd-partner-card__input-display">
+                        <span wicket:id="telefoonnummer">06-12345678</span>
+                    </div>
+                </div>
+
+                <!-- E-mailadres -->
+                <div class="rd-partner-card__field">
+                    <label class="rd-partner-card__label">
+                        <wicket:message key="jullie.gegevens.emailadres">E-mailadres</wicket:message>
+                    </label>
+                    <div class="rd-partner-card__input-display">
+                        <span wicket:id="emailadres">naam@voorbeeld.nl</span>
+                    </div>
+                </div>
+
+                <!-- Kies je achternaam button -->
+                <div class="rd-partner-card__actions">
+                    <span class="rd-partner-card__action-button">
+                        <span class="rd-partner-card__action-icon" aria-hidden="true">&#x1F517;</span>
+                        <wicket:message key="jullie.gegevens.kies.achternaam">Kies je achternaam</wicket:message>
+                    </span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</wicket:extend>
