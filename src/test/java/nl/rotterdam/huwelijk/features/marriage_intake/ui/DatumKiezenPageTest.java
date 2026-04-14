@@ -1,63 +1,55 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
+import nl.rotterdam.huwelijk.features.location_administration.application.LocationAdministrationService;
+import nl.rotterdam.huwelijk.features.location_administration.domain.CreateBeschikbaarheidDto;
 import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksType;
-import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
-import nl.rotterdam.huwelijk.features.location_administration.repository.NietBeschikbareDagRepository;
+import nl.rotterdam.huwelijk.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
-import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
-import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.huwelijk.integration_test.BaseWicketTest;
-import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
-import nl.rotterdam.huwelijk.persistence.MarriageTypeLocationEntity;
-import nl.rotterdam.huwelijk.persistence.TrouwlocatieEntity;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Transactional
 class DatumKiezenPageTest extends BaseWicketTest {
 
     @Autowired
     private MarriageIntakeService marriageIntakeService;
 
     @Autowired
-    private BeschikbaarheidRepository beschikbaarheidRepository;
-
-    @Autowired
-    private NietBeschikbareDagRepository nietBeschikbareDagRepository;
-
-    @Autowired
-    private AfspraakRepository afspraakRepository;
-
-    @Autowired
-    private MarriageTypeLocationRepository marriageTypeLocationRepository;
+    private LocationAdministrationService locationAdministrationService;
 
     @BeforeEach
     void setUpData() {
-        afspraakRepository.deleteAll();
-        nietBeschikbareDagRepository.deleteAll();
-        beschikbaarheidRepository.deleteAll();
+        for (ListLocatieDto locatie : locationAdministrationService.findAllLocaties()) {
+            locationAdministrationService.findBeschikbaarheden(locatie.id())
+                    .forEach(b -> locationAdministrationService.deleteBeschikbaarheid(b.id()));
+            locationAdministrationService.findNietBeschikbareDagen(locatie.id())
+                    .forEach(d -> locationAdministrationService.deleteNietBeschikbareDag(d.id()));
+        }
     }
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
     void paginaRendertMetKalender() {
-        TrouwlocatieEntity locatie = vindGekoppeldeLocatie(CeremonieSoort.KLEIN);
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
 
-        maakBeschikbaarheid(locatie, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
@@ -77,9 +69,9 @@ class DatumKiezenPageTest extends BaseWicketTest {
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
     void kalenderToontBeschikbareDagen() {
-        TrouwlocatieEntity locatie = vindGekoppeldeLocatie(CeremonieSoort.KLEIN);
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
 
-        maakBeschikbaarheid(locatie, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
@@ -112,9 +104,9 @@ class DatumKiezenPageTest extends BaseWicketTest {
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
     void tijdslotPanelIsVerborgenZonderDatumSelectie() {
-        TrouwlocatieEntity locatie = vindGekoppeldeLocatie(CeremonieSoort.KLEIN);
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
 
-        maakBeschikbaarheid(locatie, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
@@ -132,9 +124,9 @@ class DatumKiezenPageTest extends BaseWicketTest {
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
     void maandNavigatieIsAanwezig() {
-        TrouwlocatieEntity locatie = vindGekoppeldeLocatie(CeremonieSoort.KLEIN);
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
 
-        maakBeschikbaarheid(locatie, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
@@ -153,9 +145,9 @@ class DatumKiezenPageTest extends BaseWicketTest {
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
     void eenvoudigDossierToontBeschikbareDagen() {
-        TrouwlocatieEntity locatie = vindGekoppeldeLocatie(CeremonieSoort.MIDDELGROOT);
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.MIDDELGROOT);
 
-        maakBeschikbaarheid(locatie, HuwelijksType.EENVOUDIG, DayOfWeek.WEDNESDAY,
+        maakBeschikbaarheid(locatieId, HuwelijksType.EENVOUDIG, DayOfWeek.WEDNESDAY,
                 LocalTime.of(10, 0), LocalTime.of(11, 0), 15);
 
         UUID dossierId = maakDossier(CeremonieSoort.MIDDELGROOT);
@@ -173,9 +165,9 @@ class DatumKiezenPageTest extends BaseWicketTest {
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
     void volledigeDossierFlow_vanIntakeNaarDatumKiezen() {
-        TrouwlocatieEntity locatie = vindGekoppeldeLocatie(CeremonieSoort.KLEIN);
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
 
-        maakBeschikbaarheid(locatie, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
 
         tester.startPage(MarriageIntakePage.class);
@@ -201,9 +193,11 @@ class DatumKiezenPageTest extends BaseWicketTest {
     // Hulpmethoden
     // ──────────────────────────────────────────────────────────────────────────
 
-    private TrouwlocatieEntity vindGekoppeldeLocatie(CeremonieSoort soort) {
-        return marriageTypeLocationRepository.findByMarriageType_Soort(soort)
-                .map(MarriageTypeLocationEntity::getLocatie)
+    private long vindGekoppeldeLocatieId(CeremonieSoort soort) {
+        return marriageIntakeService.findAllMarriageTypes().stream()
+                .filter(mt -> mt.soort() == soort)
+                .map(IntakeMarriageTypeDto::locatieId)
+                .findFirst()
                 .orElseThrow(() -> new IllegalStateException(
                         "Geen locatie gekoppeld aan " + soort));
     }
@@ -213,18 +207,10 @@ class DatumKiezenPageTest extends BaseWicketTest {
                 new CreateDossierDto(RegistratieType.HUWELIJK, soort, null));
     }
 
-    private void maakBeschikbaarheid(TrouwlocatieEntity locatie, HuwelijksType type,
+    private void maakBeschikbaarheid(long locatieId, HuwelijksType type,
                                      DayOfWeek dag, LocalTime start, LocalTime eind, int duur) {
-        LocatieBeschikbaarheidEntity b = new LocatieBeschikbaarheidEntity();
-        b.setLocatie(locatie);
-        b.setHuwelijkstype(type);
-        b.setDagVanDeWeek(dag);
-        b.setStartTijd(start);
-        b.setEindTijd(eind);
-        b.setDuurInMinuten(duur);
-        b.setPrijs(BigDecimal.ZERO);
-        b.setIngangsdatum(LocalDate.now().minusMonths(1));
-        b.setEinddatum(LocalDate.now().plusYears(1));
-        beschikbaarheidRepository.save(b);
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, type, dag, start, eind, duur, BigDecimal.ZERO,
+                LocalDate.now().minusMonths(1), LocalDate.now().plusYears(1)));
     }
 }
