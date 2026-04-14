@@ -100,11 +100,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                     "06-99887766", "w.bakker@gmail.com"),
             "999990032", new PartnerGegevensDto("Dëhlano", "Chavéliën",
                     LocalDate.of(2001, 6, 18), "Paramaribo", "Nederlandse", "Ongehuwd",
-                    "06-44556677", "chaveliën@gmail.com")
+                    "06-44556677", "chavelien@gmail.com")
     );
 
     private static final PartnerGegevensDto MOCK_PARTNER_2 = new PartnerGegevensDto(
-            "Hofstede", "Jan-Diederik, deIII",
+            "Hofstede", "Jan-Diederik, de III",
             LocalDate.of(1999, 1, 1), "Rotterdam", "Nederlandse", "Ongehuwd",
             "06-87654321", "jd3_swagboy@gmail.com");
 
