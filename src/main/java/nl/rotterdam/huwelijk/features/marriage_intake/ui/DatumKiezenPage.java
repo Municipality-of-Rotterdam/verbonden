@@ -53,7 +53,7 @@ public class DatumKiezenPage extends BurgerBasePage {
     private WebMarkupContainer bevestigBar;
 
     /** All available date+time slots for the current month; detached after each request cycle. */
-    private IModel<List<LocalDateTime>> beschikbareSlotsModel;
+    private final IModel<List<LocalDateTime>> beschikbareSlotsModel;
 
     @Override
     protected IModel<String> getTitleModel() {
@@ -63,18 +63,12 @@ public class DatumKiezenPage extends BurgerBasePage {
     public DatumKiezenPage(PageParameters params) {
         this.dossierId = UUID.fromString(params.get("dossierId").toString());
         this.huidigeMaand = YearMonth.now();
+        beschikbareSlotsModel = LoadableDetachableModel.of(() -> marriageIntakeService.findBeschikbareSlots(dossierId, huidigeMaand) );
     }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
-
-        beschikbareSlotsModel = new LoadableDetachableModel<>() {
-            @Override
-            protected List<LocalDateTime> load() {
-                return marriageIntakeService.findBeschikbareSlots(dossierId, huidigeMaand);
-            }
-        };
 
         List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> crumbs = List.of(
                 new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijnloket"), MarriageIntakePage.class),
@@ -83,8 +77,9 @@ public class DatumKiezenPage extends BurgerBasePage {
         );
         pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", crumbs));
 
-        PageParameters terugParams = new PageParameters();
-        terugParams.add("dossierId", dossierId.toString());
+        PageParameters terugParams = new PageParameters()
+                .add("dossierId", dossierId.toString());
+
         pageBody.add(new BookmarkablePageLink<>("terugLink", DeDagPage.class, terugParams));
 
         pageBody.add(new Label("heading", new ResourceModel("datum.kiezen.heading")));
