@@ -122,8 +122,8 @@ public class MockDigiDLoginPage extends BurgerBasePage {
     }
 
     private void loginAs(String bsn) {
-        UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.authenticated(
-                bsn, null, List.of(new SimpleGrantedAuthority("ROLE_BURGER")));
+        UsernamePasswordAuthenticationToken token = UsernamePasswordAuthenticationToken.authenticated(bsn, null, List.of(new SimpleGrantedAuthority("ROLE_BURGER")));
+
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(token);
         SecurityContextHolder.setContext(context);

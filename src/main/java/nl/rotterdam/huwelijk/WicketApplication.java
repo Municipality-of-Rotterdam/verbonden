@@ -29,10 +29,12 @@ import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
 import org.apache.wicket.protocol.http.ResourceIsolationRequestCycleListener;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@Component
 public class WicketApplication extends WebApplication {
 
     @Override
@@ -64,9 +66,7 @@ public class WicketApplication extends WebApplication {
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
         // Spring Security's CSRF filter is disabled in SecurityConfig to avoid conflicts
         // with Wicket's own form submission mechanism (see SecurityConfig for details).
-        getRequestCycleListeners().add(
-                new ResourceIsolationRequestCycleListener(
-                        new FetchMetadataResourceIsolationPolicy()));
+        getRequestCycleListeners().add(new ResourceIsolationRequestCycleListener(new FetchMetadataResourceIsolationPolicy()));
 
         mountPage("/inloggen", MockDigiDLoginPage.class);
         mountPage("/error", BurgerErrorPage.class);

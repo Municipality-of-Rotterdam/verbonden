@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @HuwelijkIntegrationTest
-public class BaseWicketTest {
+public abstract class BaseWicketTest {
 
 
     @Autowired
