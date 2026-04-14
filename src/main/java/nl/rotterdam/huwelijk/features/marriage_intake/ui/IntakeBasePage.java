@@ -16,8 +16,6 @@ import java.util.List;
 
 public abstract class IntakeBasePage extends BurgerBasePage {
 
-    private static final CssReferenceHeaderItem MIJN_DAG_CSS_ITEM =
-            CssHeaderItem.forReference(new PackageResourceReference(IntakeBasePage.class, "mijn-dag.css"));
 
     protected IntakeSidebarPanel keuzesSidebar;
 
@@ -58,6 +56,6 @@ public abstract class IntakeBasePage extends BurgerBasePage {
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
-        response.render(MIJN_DAG_CSS_ITEM);
+        response.render(MarriageIntakeHeaderItems.MARRIAGE_INTAKE_CSS);
     }
 }
