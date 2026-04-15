@@ -301,7 +301,8 @@ public class DatumKiezenPage extends BurgerBasePage {
             maand = maand.plusMonths(1);
         }
 
-        IModel<LocalDateTime> gekozenSlotModel = Model.of((LocalDateTime) null);
+        LocalDateTime initialSlot = null;
+        IModel<LocalDateTime> gekozenSlotModel = Model.of(initialSlot);
 
         DropDownChoice<LocalDateTime> slotKeuze = new DropDownChoice<>(
                 "slotKeuze",
@@ -310,6 +311,9 @@ public class DatumKiezenPage extends BurgerBasePage {
                 new ChoiceRenderer<>() {
                     @Override
                     public Object getDisplayValue(LocalDateTime slot) {
+                        if (slot == null) {
+                            return "— Kies een tijdslot —";
+                        }
                         return slot.format(SLOT_DISPLAY_FORMAT);
                     }
 
