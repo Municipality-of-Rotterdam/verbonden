@@ -163,6 +163,10 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .map(AfspraakEntity::getDatum)
                 .orElse(null);
 
+        LocalTime startTijdHuwelijk = afspraakRepository.findFirstByDossier_Id(e.getId())
+                .map(AfspraakEntity::getStartTijd)
+                .orElse(null);
+
         String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
 
         return new DossierSamenvattingDto(
@@ -170,6 +174,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 e.getRegistratieType(),
                 e.getCeremonieSoort(),
                 datumHuwelijk,
+                startTijdHuwelijk,
                 locatieNaam,
                 false,
                 false,

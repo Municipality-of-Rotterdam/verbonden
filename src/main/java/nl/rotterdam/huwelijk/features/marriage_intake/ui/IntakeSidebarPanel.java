@@ -81,6 +81,24 @@ public class IntakeSidebarPanel extends Panel {
                     : "";
         });
         datumGekozen.add(new Label("datumLabel", datumModel));
+
+        IModel<String> tijdModel = LambdaModel.of(() -> {
+            DossierSamenvattingDto d = getDossierModel().getObject();
+            return (d != null && d.startTijdHuwelijk() != null)
+                    ? d.startTijdHuwelijk().format(DateTimeFormatter.ofPattern("HH:mm"))
+                    : "";
+        });
+        WebMarkupContainer tijdGekozen = new WebMarkupContainer("tijdGekozen") {
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                DossierSamenvattingDto d = getDossierModel().getObject();
+                setVisible(d != null && d.startTijdHuwelijk() != null);
+            }
+        };
+        tijdGekozen.add(new Label("tijdLabel", tijdModel));
+        datumGekozen.add(tijdGekozen);
+
         dossierGegevens.add(datumGekozen);
 
         WebMarkupContainer datumNogKiezen = new WebMarkupContainer("datumNogKiezen") {
