@@ -143,6 +143,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity entity = new HuwelijksDossierEntity();
         entity.setRegistratieType(dto.registratieType());
         entity.setCeremonieSoort(dto.ceremonieSoort());
+        entity.setBsn1(dto.bsn1());
         if (dto.locatieId() != null) {
             locatieRepository.findById(dto.locatieId()).ifPresent(entity::setLocatie);
         }
@@ -166,6 +167,27 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         } else {
             e.setLocatie(null);
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<UUID> findDossierIdByBsn(String bsn) {
+        return dossierRepository.findByBsn1OrBsn2(bsn, bsn)
+                .map(HuwelijksDossierEntity::getUuid);
+    }
+
+    @Override
+    @Transactional
+    public void ensureBsnAccess(UUID dossierId, String bsn) {
+        HuwelijksDossierEntity e = getDossier(dossierId);
+        if (bsn.equals(e.getBsn1()) || bsn.equals(e.getBsn2())) {
+            return;
+        }
+        if (e.getBsn2() == null && !bsn.equals(e.getBsn1())) {
+            e.setBsn2(bsn);
+            return;
+        }
+        throw new IllegalStateException("Toegang geweigerd: BSN heeft geen toegang tot dit dossier");
     }
 
     @Override

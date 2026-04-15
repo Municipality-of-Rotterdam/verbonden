@@ -83,8 +83,14 @@ public class MarriageIntakePage extends IntakeBasePage {
         String dossierIdStr = parameters.get("dossierId").toOptionalString();
         if (dossierIdStr != null) {
             dossierId = UUID.fromString(dossierIdStr);
+            marriageIntakeService.ensureBsnAccess(dossierId, getCurrentBsn());
             DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
             registratieType = dossier.registratieType();
+        } else {
+            marriageIntakeService.findDossierIdByBsn(getCurrentBsn()).ifPresent(id -> {
+                dossierId = id;
+                registratieType = marriageIntakeService.findByDossierId(id).registratieType();
+            });
         }
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
@@ -149,7 +155,7 @@ public class MarriageIntakePage extends IntakeBasePage {
                                     new ChangeIntakeDto(registratieType, dto.soort(), dto.locatieId()));
                         } else {
                             dossierId = marriageIntakeService.create(
-                                    new CreateDossierDto(registratieType, dto.soort(), dto.locatieId()));
+                                    new CreateDossierDto(registratieType, dto.soort(), dto.locatieId(), getCurrentBsn()));
                         }
                         PageParameters params = new PageParameters();
                         params.add("dossierId", dossierId.toString());

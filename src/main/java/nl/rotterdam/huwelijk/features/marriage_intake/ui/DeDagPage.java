@@ -37,6 +37,7 @@ public class DeDagPage extends IntakeBasePage {
 
     public DeDagPage(PageParameters parameters) {
         this.dossierId = UUID.fromString(parameters.get("dossierId").toString());
+        marriageIntakeService.ensureBsnAccess(dossierId, getCurrentBsn());
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 

@@ -21,7 +21,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
     @WithMockUser(username = "999990007")
     void testRender() {
         UUID dossierId = marriageIntakeService.create(
-                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null));
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990007"));
 
         PageParameters params = new PageParameters();
         params.add("dossierId", dossierId.toString());

@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface DossierRepository extends JpaRepository<HuwelijksDossierEntity, Long> {
 
     Optional<HuwelijksDossierEntity> findByUuid(UUID uuid);
+
+    Optional<HuwelijksDossierEntity> findByBsn1OrBsn2(String bsn1, String bsn2);
 }

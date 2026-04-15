@@ -44,6 +44,7 @@ public class JullieGegevensPage extends IntakeBasePage {
 
     public JullieGegevensPage(PageParameters parameters) {
         this.dossierId = UUID.fromString(parameters.get("dossierId").toString());
+        marriageIntakeService.ensureBsnAccess(dossierId, getCurrentBsn());
 
         pageBody.add(new RdHeading("heading", getString("jullie.gegevens.heading"), 1));
 

@@ -65,6 +65,7 @@ public class DatumKiezenPage extends BurgerBasePage {
     public DatumKiezenPage(PageParameters params) {
         this.dossierId = UUID.fromString(params.get("dossierId").toString());
         this.huidigeMaand = YearMonth.now();
+        marriageIntakeService.ensureBsnAccess(dossierId, getCurrentBsn());
     }
 
     @Override
