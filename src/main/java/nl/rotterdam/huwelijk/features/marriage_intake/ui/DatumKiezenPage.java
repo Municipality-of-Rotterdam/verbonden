@@ -11,6 +11,8 @@ import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.ChoiceRenderer;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -100,6 +102,8 @@ public class DatumKiezenPage extends BurgerBasePage {
         bevestigBar = buildBevestigBar();
         bevestigBar.setOutputMarkupId(true);
         pageBody.add(bevestigBar);
+
+        pageBody.add(buildSnelKiezenForm());
     }
 
     // -------------------------------------------------------------------------
@@ -280,6 +284,57 @@ public class DatumKiezenPage extends BurgerBasePage {
         bar.add(bevestigForm);
 
         return bar;
+    }
+
+    // -------------------------------------------------------------------------
+    // Temporary quick-pick form (select all available slots + save button)
+    // -------------------------------------------------------------------------
+
+    private static final DateTimeFormatter SLOT_DISPLAY_FORMAT =
+            DateTimeFormatter.ofPattern("EEEE d MMMM yyyy, HH:mm", Locale.forLanguageTag("nl-NL"));
+
+    private Form<Void> buildSnelKiezenForm() {
+        List<LocalDateTime> alleSlots = new ArrayList<>();
+        YearMonth maand = YearMonth.now();
+        for (int i = 0; i < 3; i++) {
+            alleSlots.addAll(marriageIntakeService.findBeschikbareSlots(dossierId, maand));
+            maand = maand.plusMonths(1);
+        }
+
+        IModel<LocalDateTime> gekozenSlotModel = Model.of((LocalDateTime) null);
+
+        DropDownChoice<LocalDateTime> slotKeuze = new DropDownChoice<>(
+                "slotKeuze",
+                gekozenSlotModel,
+                alleSlots,
+                new ChoiceRenderer<>() {
+                    @Override
+                    public Object getDisplayValue(LocalDateTime slot) {
+                        return slot.format(SLOT_DISPLAY_FORMAT);
+                    }
+
+                    @Override
+                    public String getIdValue(LocalDateTime slot, int index) {
+                        return String.valueOf(index);
+                    }
+                }
+        );
+        slotKeuze.setNullValid(true);
+
+        Form<Void> snelKiezenForm = new Form<>("snelKiezenForm") {
+            @Override
+            protected void onSubmit() {
+                LocalDateTime gekozen = gekozenSlotModel.getObject();
+                if (gekozen != null) {
+                    marriageIntakeService.slaAfspraakOp(dossierId, gekozen.toLocalDate(), gekozen.toLocalTime());
+                    PageParameters params = new PageParameters();
+                    params.add("dossierId", dossierId.toString());
+                    setResponsePage(DeDagPage.class, params);
+                }
+            }
+        };
+        snelKiezenForm.add(slotKeuze);
+        return snelKiezenForm;
     }
 
     // -------------------------------------------------------------------------

@@ -92,6 +92,27 @@
             </form>
         </div>
 
+        <!-- Temporary quick-pick form -->
+        <div class="datum-kiezen__snel-kiezen mt-4" style="border: 2px dashed #aaa; border-radius: 4px; padding: 1.25rem; background: #fafafa;">
+            <h2 style="font-size: 1rem; font-weight: 700; margin: 0 0 0.5rem;">
+                <wicket:message key="datum.kiezen.snel.title">Snel kiezen (tijdelijk)</wicket:message>
+            </h2>
+            <p style="font-size: 0.875rem; color: #555; margin: 0 0 0.75rem;">
+                <wicket:message key="datum.kiezen.snel.beschrijving">Kies een beschikbaar tijdslot uit de lijst en sla het direct op.</wicket:message>
+            </p>
+            <form wicket:id="snelKiezenForm" class="d-flex align-items-end gap-3">
+                <div style="flex: 1;">
+                    <label for="slotKeuze" style="display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">
+                        <wicket:message key="datum.kiezen.snel.label">Beschikbare tijdsloten</wicket:message>
+                    </label>
+                    <select wicket:id="slotKeuze" id="slotKeuze" style="width: 100%; padding: 0.5rem; border: 1px solid #d0d0d0; border-radius: 4px; font-size: 0.9375rem;"></select>
+                </div>
+                <button type="submit" class="datum-kiezen__bevestig-knop">
+                    <wicket:message key="datum.kiezen.snel.opslaan">Opslaan &amp; terug</wicket:message>
+                </button>
+            </form>
+        </div>
+
     </div>
 
 </wicket:extend>
