@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.application;
 
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
@@ -23,6 +24,8 @@ public interface MarriageIntakeService {
     UUID create(CreateDossierDto dto);
 
     void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort);
+
+    void updateIntake(UUID dossierId, ChangeIntakeDto dto);
 
     DossierSamenvattingDto findByDossierId(UUID id);
 

@@ -4,6 +4,7 @@ import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksTy
 import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.NietBeschikbareDagRepository;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
@@ -152,6 +153,19 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Transactional
     public void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort) {
         getDossier(dossierId).setCeremonieSoort(ceremonieSoort);
+    }
+
+    @Override
+    @Transactional
+    public void updateIntake(UUID dossierId, ChangeIntakeDto dto) {
+        HuwelijksDossierEntity e = getDossier(dossierId);
+        e.setRegistratieType(dto.registratieType());
+        e.setCeremonieSoort(dto.ceremonieSoort());
+        if (dto.locatieId() != null) {
+            locatieRepository.findById(dto.locatieId()).ifPresent(e::setLocatie);
+        } else {
+            e.setLocatie(null);
+        }
     }
 
     @Override

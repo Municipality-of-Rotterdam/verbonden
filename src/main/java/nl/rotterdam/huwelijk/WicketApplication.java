@@ -84,6 +84,7 @@ public class WicketApplication extends WebApplication {
         mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/nieuw", BeschikbaarheidCreatePage.class);
         mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/${id}", BeschikbaarheidUpdatePage.class);
 
+        mountPage("/huwelijk/${dossierId}", MarriageIntakePage.class);
         mountPage("/mijn-dag/${dossierId}", DeDagPage.class);
         mountPage("/mijn-dag/${dossierId}/jullie-gegevens", JullieGegevensPage.class);
         mountPage("/mijn-dag/${dossierId}/datum-kiezen", DatumKiezenPage.class);
