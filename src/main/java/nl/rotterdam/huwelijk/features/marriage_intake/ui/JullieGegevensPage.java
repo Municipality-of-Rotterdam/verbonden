@@ -4,6 +4,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntake
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -12,7 +13,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -48,8 +48,7 @@ public class JullieGegevensPage extends IntakeBasePage {
 
         pageBody.add(new RdHeading("heading", getString("jullie.gegevens.heading"), 1));
 
-        List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId,
-                SecurityContextHolder.getContext().getAuthentication().getName());
+        List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
 
         pageBody.add(new ListView<>("partnerCards", partners) {
             @Override
@@ -67,5 +66,9 @@ public class JullieGegevensPage extends IntakeBasePage {
                 item.add(new Label("emailadres", partner.emailadres()));
             }
         });
+
+        WebMarkupContainer partnerNogBevestigenCard = new WebMarkupContainer("partnerNogBevestigenCard");
+        partnerNogBevestigenCard.setVisible(partners.size() < 2);
+        pageBody.add(partnerNogBevestigenCard);
     }
 }

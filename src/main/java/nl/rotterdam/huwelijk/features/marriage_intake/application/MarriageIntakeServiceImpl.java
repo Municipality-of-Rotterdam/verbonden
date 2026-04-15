@@ -104,21 +104,23 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                     "06-44556677", "chavelien@gmail.com")
     );
 
-    private static final PartnerGegevensDto MOCK_PARTNER_2 = new PartnerGegevensDto(
-            "Hofstede", "Jan-Diederik, de III",
-            LocalDate.of(1999, 1, 1), "Rotterdam", "Nederlandse", "Ongehuwd",
-            "06-87654321", "jd3_swagboy@gmail.com");
-
     @Override
     @Transactional(readOnly = true)
-    public List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId, String bsn) {
-        // Partner data is not yet stored in the dossier entity.
-        // The first partner is looked up from mock BRP data by BSN.
-        // The second partner is static mock data.
-        PartnerGegevensDto partner1 = MOCK_PERSONEN.getOrDefault(bsn,
-                new PartnerGegevensDto("Onbekend", bsn,
-                        null, "", "Onbekend", "Onbekend", "", ""));
-        return List.of(partner1, MOCK_PARTNER_2);
+    public List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        List<PartnerGegevensDto> result = new ArrayList<>();
+        if (dossier.getBsn1() != null) {
+            result.add(lookupPartner(dossier.getBsn1()));
+        }
+        if (dossier.getBsn2() != null) {
+            result.add(lookupPartner(dossier.getBsn2()));
+        }
+        return result;
+    }
+
+    private PartnerGegevensDto lookupPartner(String bsn) {
+        return MOCK_PERSONEN.getOrDefault(bsn,
+                new PartnerGegevensDto("Onbekend", bsn, null, "", "Onbekend", "Onbekend", "", ""));
     }
 
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {

@@ -20,7 +20,7 @@ public interface MarriageIntakeService {
 
     List<IntakeMarriageTypeDto> findAllMarriageTypes();
 
-    List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId, String bsn);
+    List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId);
 
     UUID create(CreateDossierDto dto);
 
