@@ -65,27 +65,27 @@ public class IntakeSidebarPanel extends Panel {
         ceremonieDossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
         dossierGegevens.add(ceremonieDossierGegevens);
 
-        // Datum row — shown when datum is set, otherwise "nog kiezen" placeholder
+        // Datum row — shown when datumTijdHuwelijk is set, otherwise "nog kiezen" placeholder
         WebMarkupContainer datumGekozen = new WebMarkupContainer("datumGekozen") {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
                 DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d != null && d.datumHuwelijk() != null);
+                setVisible(d != null && d.datumTijdHuwelijk() != null);
             }
         };
         IModel<String> datumModel = LambdaModel.of(() -> {
             DossierSamenvattingDto d = getDossierModel().getObject();
-            return (d != null && d.datumHuwelijk() != null)
-                    ? d.datumHuwelijk().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+            return (d != null && d.datumTijdHuwelijk() != null)
+                    ? d.datumTijdHuwelijk().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
                     : "";
         });
         datumGekozen.add(new Label("datumLabel", datumModel));
 
         IModel<String> tijdModel = LambdaModel.of(() -> {
             DossierSamenvattingDto d = getDossierModel().getObject();
-            return (d != null && d.startTijdHuwelijk() != null)
-                    ? d.startTijdHuwelijk().format(DateTimeFormatter.ofPattern("HH:mm"))
+            return (d != null && d.datumTijdHuwelijk() != null)
+                    ? d.datumTijdHuwelijk().format(DateTimeFormatter.ofPattern("HH:mm"))
                     : "";
         });
         WebMarkupContainer tijdGekozen = new WebMarkupContainer("tijdGekozen") {
@@ -93,7 +93,7 @@ public class IntakeSidebarPanel extends Panel {
             protected void onConfigure() {
                 super.onConfigure();
                 DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d != null && d.startTijdHuwelijk() != null);
+                setVisible(d != null && d.datumTijdHuwelijk() != null);
             }
         };
         tijdGekozen.add(new Label("tijdLabel", tijdModel));
@@ -106,7 +106,7 @@ public class IntakeSidebarPanel extends Panel {
             protected void onConfigure() {
                 super.onConfigure();
                 DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d == null || d.datumHuwelijk() == null);
+                setVisible(d == null || d.datumTijdHuwelijk() == null);
             }
         };
         dossierGegevens.add(datumNogKiezen);

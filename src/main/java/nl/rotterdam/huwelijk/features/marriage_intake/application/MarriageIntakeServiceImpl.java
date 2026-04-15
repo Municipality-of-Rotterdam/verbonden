@@ -159,12 +159,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public DossierSamenvattingDto findByDossierId(UUID id) {
         HuwelijksDossierEntity e = getDossier(id);
 
-        LocalDate datumHuwelijk = afspraakRepository.findFirstByDossier_Id(e.getId())
-                .map(AfspraakEntity::getDatum)
-                .orElse(null);
-
-        LocalTime startTijdHuwelijk = afspraakRepository.findFirstByDossier_Id(e.getId())
-                .map(AfspraakEntity::getStartTijd)
+        LocalDateTime datumTijdHuwelijk = afspraakRepository.findFirstByDossier_Id(e.getId())
+                .map(a -> LocalDateTime.of(a.getDatum(), a.getStartTijd()))
                 .orElse(null);
 
         String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
@@ -173,8 +169,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 e.getUuid(),
                 e.getRegistratieType(),
                 e.getCeremonieSoort(),
-                datumHuwelijk,
-                startTijdHuwelijk,
+                datumTijdHuwelijk,
                 locatieNaam,
                 false,
                 false,
