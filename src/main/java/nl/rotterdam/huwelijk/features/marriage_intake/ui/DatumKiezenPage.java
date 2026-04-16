@@ -4,6 +4,7 @@ import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
+import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.date_picker.RdDatePicker;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
@@ -79,7 +80,8 @@ public class DatumKiezenPage extends BurgerBasePage {
             RdDatePicker datePicker = new RdDatePicker("datePicker", selectedModel)
                     .withAvailableDateTimes(beschikbareSlots);
 
-            add(datePicker);
+            add(datePicker,
+                    new RdButton("bevestigButton", new ResourceModel("datum.kiezen.bevestig")));
         }
 
         @Override

@@ -62,6 +62,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
 
         String response = tester.getLastResponseAsString();
         assertThat(response).contains("rods-date-picker");
+        assertThat(response).contains("utrecht-button");
     }
 
     @Test
