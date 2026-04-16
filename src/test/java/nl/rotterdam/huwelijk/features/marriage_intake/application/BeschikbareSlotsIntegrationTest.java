@@ -74,7 +74,7 @@ class BeschikbareSlotsIntegrationTest {
 
         List<LocalDateTime> slots = marriageIntakeService.findBeschikbareSlots(dossierId, maand);
 
-        long maandagenInMaand = aantalToekomstigeWeekdagen(maand, DayOfWeek.MONDAY);
+        long maandagenInMaand = aantalToekomstigeWeekdagen(maand);
         assertThat(slots).hasSize((int) (maandagenInMaand * 6));
         assertThat(slots).allMatch(slot -> slot.getDayOfWeek() == DayOfWeek.MONDAY);
         assertThat(slots).allMatch(slot ->
@@ -87,7 +87,7 @@ class BeschikbareSlotsIntegrationTest {
     // ──────────────────────────────────────────────────────────────────────────
 
     @Test
-    void eersteWeekvolgepland_geenBeschikbaarheidOpDieDag() {
+    void eersteWeekVolgepland_geenBeschikbaarheidOpDieDag() {
         long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
         LocalDate volgendeMaandag = volgendeWeekdag(DayOfWeek.MONDAY);
         YearMonth maand = YearMonth.from(volgendeMaandag);
@@ -95,7 +95,7 @@ class BeschikbareSlotsIntegrationTest {
         maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(9, 20), 10);
 
-        vulAlleSlotsOp(CeremonieSoort.KLEIN, volgendeMaandag, LocalTime.of(9, 0), LocalTime.of(9, 20), 10);
+        vulAlleSlotsOp(volgendeMaandag, LocalTime.of(9, 0), LocalTime.of(9, 20));
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
 
@@ -117,15 +117,15 @@ class BeschikbareSlotsIntegrationTest {
 
         LocalDate dag1 = volgendeMaandag;
         LocalDate dag2 = volgendeMaandag.plusWeeks(1);
-        vulAlleSlotsOp(CeremonieSoort.KLEIN, dag1, LocalTime.of(9, 0), LocalTime.of(9, 20), 10);
-        vulAlleSlotsOp(CeremonieSoort.KLEIN, dag2, LocalTime.of(9, 0), LocalTime.of(9, 20), 10);
+        vulAlleSlotsOp(dag1, LocalTime.of(9, 0), LocalTime.of(9, 20));
+        vulAlleSlotsOp(dag2, LocalTime.of(9, 0), LocalTime.of(9, 20));
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
 
         Set<LocalDate> datums = marriageIntakeService.findBeschikbareDatums(dossierId, maand);
         assertThat(datums).doesNotContain(dag1, dag2);
 
-        long resterendeMaandagen = aantalToekomstigeWeekdagen(maand, DayOfWeek.MONDAY) - 2;
+        long resterendeMaandagen = aantalToekomstigeWeekdagen(maand) - 2;
         if (resterendeMaandagen > 0) {
             assertThat(datums).hasSize((int) resterendeMaandagen);
         }
@@ -352,7 +352,7 @@ class BeschikbareSlotsIntegrationTest {
         maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(9, 20), 10);
 
-        vulAlleSlotsOp(CeremonieSoort.KLEIN, volgendeMaandag, LocalTime.of(9, 0), LocalTime.of(9, 20), 10);
+        vulAlleSlotsOp(volgendeMaandag, LocalTime.of(9, 0), LocalTime.of(9, 20));
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
 
@@ -404,13 +404,12 @@ class BeschikbareSlotsIntegrationTest {
                 new CreateNietBeschikbareDagDto(locatieId, datum, reden));
     }
 
-    private void vulAlleSlotsOp(CeremonieSoort soort, LocalDate datum,
-                                LocalTime start, LocalTime eind, int duur) {
+    private void vulAlleSlotsOp(LocalDate datum, LocalTime start, LocalTime eind) {
         LocalTime current = start;
-        while (current.plusMinutes(duur).compareTo(eind) <= 0) {
-            UUID dossier = maakDossier(soort);
+        while (!current.plusMinutes(10).isAfter(eind)) {
+            UUID dossier = maakDossier(CeremonieSoort.KLEIN);
             marriageIntakeService.slaAfspraakOp(dossier, datum, current);
-            current = current.plusMinutes(duur);
+            current = current.plusMinutes(10);
         }
     }
 
@@ -418,10 +417,10 @@ class BeschikbareSlotsIntegrationTest {
         return LocalDate.now().with(TemporalAdjusters.next(dag));
     }
 
-    private long aantalToekomstigeWeekdagen(YearMonth maand, DayOfWeek dag) {
+    private long aantalToekomstigeWeekdagen(YearMonth maand) {
         LocalDate vandaag = LocalDate.now();
         return maand.atDay(1).datesUntil(maand.atEndOfMonth().plusDays(1))
-                .filter(d -> d.getDayOfWeek() == dag)
+                .filter(d -> d.getDayOfWeek() == DayOfWeek.MONDAY)
                 .filter(d -> d.isAfter(vandaag))
                 .count();
     }
