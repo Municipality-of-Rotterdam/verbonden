@@ -46,7 +46,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
-    void paginaRendertMetKalender() {
+    void paginaRendertMetDatePicker() {
         long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
 
         maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
@@ -61,14 +61,12 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(DatumKiezenPage.class);
 
         String response = tester.getLastResponseAsString();
-        assertThat(response).contains("datum-kiezen__kalender-panel");
-        assertThat(response).contains("datum-kiezen__kalender");
-        assertThat(response).contains("kalender-dag");
+        assertThat(response).contains("rods-date-picker");
     }
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
-    void kalenderToontBeschikbareDagen() {
+    void datePickerBeschikbareSlots() {
         long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
 
         maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
@@ -83,12 +81,12 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(DatumKiezenPage.class);
 
         String response = tester.getLastResponseAsString();
-        assertThat(response).contains("kalender-dag--beschikbaar");
+        assertThat(response).contains("el.options");
     }
 
     @Test
     @WithMockUser(username = "999990019", roles = "BURGER")
-    void kalenderToontGeenBeschikbareDagenZonderBeschikbaarheid() {
+    void datePickerGeenBeschikbareSlotsZonderBeschikbaarheid() {
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
 
         PageParameters params = new PageParameters();
@@ -98,53 +96,13 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(DatumKiezenPage.class);
 
         String response = tester.getLastResponseAsString();
-        assertThat(response).doesNotContain("kalender-dag--beschikbaar");
+        assertThat(response).contains("rods-date-picker");
+        assertThat(response).doesNotContain("el.options");
     }
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
-    void tijdslotPanelIsVerborgenZonderDatumSelectie() {
-        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
-
-        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
-                LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
-
-        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
-
-        PageParameters params = new PageParameters();
-        params.add("dossierId", dossierId.toString());
-        tester.startPage(DatumKiezenPage.class, params);
-
-        tester.assertRenderedPage(DatumKiezenPage.class);
-
-        String response = tester.getLastResponseAsString();
-        assertThat(response).doesNotContain("datum-kiezen__tijdsloten");
-    }
-
-    @Test
-    @WithMockUser(username = "999990007", roles = "BURGER")
-    void maandNavigatieIsAanwezig() {
-        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
-
-        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
-                LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
-
-        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
-
-        PageParameters params = new PageParameters();
-        params.add("dossierId", dossierId.toString());
-        tester.startPage(DatumKiezenPage.class, params);
-
-        tester.assertRenderedPage(DatumKiezenPage.class);
-
-        String response = tester.getLastResponseAsString();
-        assertThat(response).contains("datum-kiezen__maand-nav");
-        assertThat(response).contains("datum-kiezen__maand-knop");
-    }
-
-    @Test
-    @WithMockUser(username = "999990007", roles = "BURGER")
-    void eenvoudigDossierToontBeschikbareDagen() {
+    void eenvoudigDossierToontBeschikbareSlots() {
         long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.MIDDELGROOT);
 
         maakBeschikbaarheid(locatieId, HuwelijksType.EENVOUDIG, DayOfWeek.WEDNESDAY,
@@ -159,7 +117,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(DatumKiezenPage.class);
 
         String response = tester.getLastResponseAsString();
-        assertThat(response).contains("kalender-dag--beschikbaar");
+        assertThat(response).contains("el.options");
     }
 
     @Test
@@ -186,7 +144,8 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(DatumKiezenPage.class);
 
         String response = tester.getLastResponseAsString();
-        assertThat(response).contains("kalender-dag--beschikbaar");
+        assertThat(response).contains("rods-date-picker");
+        assertThat(response).contains("el.options");
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -211,6 +170,6 @@ class DatumKiezenPageTest extends BaseWicketTest {
                                      DayOfWeek dag, LocalTime start, LocalTime eind, int duur) {
         locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
                 locatieId, type, dag, start, eind, duur, BigDecimal.ZERO,
-                LocalDate.now().minusMonths(1), LocalDate.now().plusYears(1)));
+                LocalDate.now().minusMonths(1), LocalDate.now().plusYears(2)));
     }
 }

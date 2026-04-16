@@ -383,6 +383,35 @@ class BeschikbareSlotsIntegrationTest {
         assertThat(datums).contains(volgendeMaandag);
     }
 
+    @Test
+    void findAllBeschikbareSlots_retourneert18MaandenAanSlots() {
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
+
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(9, 30), 10);
+
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+
+        var allSlots = marriageIntakeService.findAllBeschikbareSlots(dossierId);
+        assertThat(allSlots).isNotEmpty();
+
+        LocalDate versteSlotDatum = allSlots.stream()
+                .map(LocalDateTime::toLocalDate)
+                .max(LocalDate::compareTo)
+                .orElseThrow();
+        assertThat(versteSlotDatum).isAfterOrEqualTo(LocalDate.now().plusMonths(17));
+
+        assertThat(allSlots).allMatch(slot -> slot.toLocalDate().isAfter(LocalDate.now()));
+    }
+
+    @Test
+    void findAllBeschikbareSlots_leegZonderBeschikbaarheid() {
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+
+        var allSlots = marriageIntakeService.findAllBeschikbareSlots(dossierId);
+        assertThat(allSlots).isEmpty();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Hulpmethoden
     // ──────────────────────────────────────────────────────────────────────────
@@ -396,7 +425,7 @@ class BeschikbareSlotsIntegrationTest {
                                      DayOfWeek dag, LocalTime start, LocalTime eind, int duur) {
         locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
                 locatieId, type, dag, start, eind, duur, BigDecimal.ZERO,
-                LocalDate.now().minusMonths(1), LocalDate.now().plusYears(1)));
+                LocalDate.now().minusMonths(1), LocalDate.now().plusYears(2)));
     }
 
     private void maakNietBeschikbareDag(long locatieId, LocalDate datum, String reden) {

@@ -13,84 +13,10 @@
         <!-- Page heading -->
         <h1 wicket:id="heading" class="datum-kiezen__heading">Kies een datum</h1>
 
-        <!-- Two-panel layout: calendar | time slots -->
-        <div class="datum-kiezen__panels">
-
-            <!-- Left: calendar -->
-            <div class="datum-kiezen__kalender-panel" wicket:id="kalenderPanel">
-                <h2 class="datum-kiezen__panel-title">
-                    <wicket:message key="datum.kiezen.kalender.title">Selecteer een datum</wicket:message>
-                </h2>
-                <p class="datum-kiezen__panel-subtitle">
-                    <wicket:message key="datum.kiezen.kalender.subtitle">U kunt alleen beschikbare dagen selecteren</wicket:message>
-                </p>
-
-                <div class="datum-kiezen__maand-nav">
-                    <a wicket:id="vorigeMaand" class="datum-kiezen__maand-knop">&lsaquo;</a>
-                    <span wicket:id="maandLabel" class="datum-kiezen__maand-label">maand, jaar</span>
-                    <a wicket:id="volgendeMaand" class="datum-kiezen__maand-knop">&rsaquo;</a>
-                </div>
-
-                <table class="datum-kiezen__kalender">
-                    <thead>
-                        <tr>
-                            <th>Zo</th>
-                            <th>Ma</th>
-                            <th>Di</th>
-                            <th>Wo</th>
-                            <th>Do</th>
-                            <th>Vr</th>
-                            <th>Za</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr wicket:id="kalenderRijen">
-                            <td wicket:id="dag">
-                                <a wicket:id="dagLink">
-                                    <span wicket:id="dagNummer">1</span>
-                                    <span wicket:id="vandaagLabel" class="kalender-dag__vandaag-label">Vandaag</span>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Right: time slots (shown after date selection) -->
-            <div class="datum-kiezen__tijdslot-panel" wicket:id="tijdslotPanel">
-                <h2 class="datum-kiezen__panel-title">
-                    <wicket:message key="datum.kiezen.tijdslot.title">Selecteer een tijdslot</wicket:message>
-                </h2>
-                <p class="datum-kiezen__panel-subtitle">
-                    <wicket:message key="datum.kiezen.tijdslot.subtitle.prefix">Beschikbare tijdsloten</wicket:message>
-                    <strong wicket:id="geselecteerdeDatumLabel">vrijdag 23 juli, 2025</strong>
-                </p>
-
-                <div class="datum-kiezen__tijdsloten">
-                    <span wicket:id="tijdsloten">
-                        <a wicket:id="tijdslotLink">
-                            <span wicket:id="tijdLabel">09:00</span>
-                        </a>
-                    </span>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Bottom bar: summary + confirm -->
-        <div class="datum-kiezen__bevestig-bar" wicket:id="bevestigBar">
-            <div class="datum-kiezen__samenvatting">
-                <span class="datum-kiezen__samenvatting-label">
-                    <wicket:message key="datum.kiezen.samenvatting.label">Jullie datum</wicket:message>
-                </span>
-                <span wicket:id="samenvattingLabel" class="datum-kiezen__samenvatting-tekst">op vrijdag, 23 juli om 11:30 uur</span>
-            </div>
-            <form wicket:id="bevestigForm">
-                <button type="submit" class="datum-kiezen__bevestig-knop">
-                    <wicket:message key="datum.kiezen.bevestig">Bevestig datum &amp; tijd</wicket:message>
-                </button>
-            </form>
-        </div>
+        <!-- Date picker form -->
+        <form wicket:id="datumKiezenForm">
+            <rods-date-picker wicket:id="datePicker"></rods-date-picker>
+        </form>
 
     </div>
 

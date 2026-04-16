@@ -200,6 +200,28 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional(readOnly = true)
+    public Collection<LocalDateTime> findAllBeschikbareSlots(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
+        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
+
+        List<LocalDateTime> slots = new ArrayList<>();
+        LocalDate vandaag = LocalDate.now();
+        LocalDate einde = vandaag.plusMonths(18);
+
+        for (LocalDate datum = vandaag.plusDays(1); !datum.isAfter(einde); datum = datum.plusDays(1)) {
+            Set<LocalTime> tijdenVoorDatum = new TreeSet<>();
+            for (TrouwlocatieEntity locatie : locaties) {
+                tijdenVoorDatum.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
+            }
+            LocalDate finalDatum = datum;
+            tijdenVoorDatum.forEach(tijd -> slots.add(LocalDateTime.of(finalDatum, tijd)));
+        }
+        return slots;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
