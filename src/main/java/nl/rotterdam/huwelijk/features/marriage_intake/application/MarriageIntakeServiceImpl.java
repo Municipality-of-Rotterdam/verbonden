@@ -24,6 +24,7 @@ import nl.rotterdam.huwelijk.persistence.TrouwlocatieEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -228,10 +229,15 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
 
+        BigDecimal prijs = marriageTypeRepository.findBySoort(e.getCeremonieSoort())
+                .map(MarriageTypeEntity::getPrijs)
+                .orElse(null);
+
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
                 e.getCeremonieSoort(),
+                prijs,
                 datumTijdHuwelijk,
                 locatieNaam,
                 false,

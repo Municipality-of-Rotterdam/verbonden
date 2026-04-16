@@ -15,8 +15,12 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 
 public class IntakeSidebarPanel extends Panel {
@@ -59,8 +63,17 @@ public class IntakeSidebarPanel extends Panel {
         };
         IModel<String> ceremonieSoortModel = LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::ceremonieSoort, CeremonieSoort::getLabel));
-        IModel<String> ceremoniePrijsModel = LambdaModel.of(
-                () -> dossierValue(DossierSamenvattingDto::ceremonieSoort, CeremonieSoort::getPrijs));
+        IModel<String> ceremoniePrijsModel = LambdaModel.of(() -> {
+            DossierSamenvattingDto d = getDossierModel().getObject();
+            if (d == null) {
+                return "";
+            }
+            BigDecimal prijs = d.prijs();
+            if (prijs == null) {
+                return "";
+            }
+            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(prijs);
+        });
         ceremonieDossierGegevens.add(new Label("ceremonieSoortLabel", ceremonieSoortModel));
         ceremonieDossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
         dossierGegevens.add(ceremonieDossierGegevens);
