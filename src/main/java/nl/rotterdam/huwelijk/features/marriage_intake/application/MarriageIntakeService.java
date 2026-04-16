@@ -3,6 +3,7 @@ package nl.rotterdam.huwelijk.features.marriage_intake.application;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
@@ -43,6 +44,21 @@ public interface MarriageIntakeService {
      * </ul>
      */
     void ensureBsnAccess(UUID dossierId, String bsn);
+
+    /**
+     * Determines and grants (or denies) access to a requested dossier for the given BSN.
+     * <ul>
+     *   <li>If bsn matches bsn1 or bsn2 of the requested dossier:
+     *       returns {@link DossierAccessOutcome.Scenario#GRANTED} with the requested dossier ID.</li>
+     *   <li>If bsn belongs to a different existing dossier:
+     *       returns {@link DossierAccessOutcome.Scenario#SWITCHED_DOSSIER} with that dossier's ID.</li>
+     *   <li>If bsn is not in any dossier and the requested dossier has no bsn2 yet:
+     *       registers bsn as bsn2 and returns {@link DossierAccessOutcome.Scenario#GRANTED}.</li>
+     *   <li>If bsn is not in any dossier and the requested dossier already has two BSNs:
+     *       returns {@link DossierAccessOutcome.Scenario#NOT_AUTHORIZED} with a {@code null} dossier ID.</li>
+     * </ul>
+     */
+    DossierAccessOutcome resolveAccess(UUID requestedDossierId, String bsn);
 
     DossierSamenvattingDto findByDossierId(UUID id);
 

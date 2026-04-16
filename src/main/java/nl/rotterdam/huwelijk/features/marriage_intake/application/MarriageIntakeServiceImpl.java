@@ -7,6 +7,7 @@ import nl.rotterdam.huwelijk.features.location_administration.repository.NietBes
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
@@ -190,6 +191,30 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             return;
         }
         throw new IllegalStateException("Toegang geweigerd: BSN heeft geen toegang tot dit dossier");
+    }
+
+    @Override
+    @Transactional
+    public DossierAccessOutcome resolveAccess(UUID requestedDossierId, String bsn) {
+        Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByBsn1OrBsn2(bsn, bsn);
+
+        if (existingDossier.isPresent()) {
+            UUID existingId = existingDossier.get().getUuid();
+            if (existingId.equals(requestedDossierId)) {
+                return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
+            } else {
+                return new DossierAccessOutcome(DossierAccessOutcome.Scenario.SWITCHED_DOSSIER, existingId);
+            }
+        }
+
+        HuwelijksDossierEntity requested = getDossier(requestedDossierId);
+        if (requested.getBsn2() == null) {
+            // Scenario 3: BSN has no dossier yet; register it as the second partner in this dossier.
+            requested.setBsn2(bsn);
+            return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
+        }
+
+        return new DossierAccessOutcome(DossierAccessOutcome.Scenario.NOT_AUTHORIZED, null);
     }
 
     @Override

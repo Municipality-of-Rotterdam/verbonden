@@ -6,6 +6,12 @@
         <wicket:message key="intake.intro.marriageintake">Intro tekst</wicket:message>
     </p>
 
+    <!-- Alert: BSN belongs to a different dossier; automatically switched -->
+    <div wicket:id="wrongDossierAlert"></div>
+
+    <!-- Alert: requested dossier is full and this BSN has no access -->
+    <div wicket:id="notAuthorizedAlert"></div>
+
     <!-- Form -->
     <form wicket:id="form">
 

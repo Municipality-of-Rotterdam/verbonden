@@ -4,9 +4,12 @@ import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntake
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
@@ -80,20 +83,40 @@ public class MarriageIntakePage extends IntakeBasePage {
     }
 
     public MarriageIntakePage(PageParameters parameters) {
+        boolean showWrongDossierWarning = false;
+        boolean showNotAuthorizedWarning = false;
+
         String dossierIdStr = parameters.get("dossierId").toOptionalString();
         if (dossierIdStr != null) {
-            dossierId = UUID.fromString(dossierIdStr);
-            marriageIntakeService.ensureBsnAccess(dossierId, getCurrentBsn());
-            DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
-            registratieType = dossier.registratieType();
+            UUID requestedDossierId = UUID.fromString(dossierIdStr);
+            DossierAccessOutcome outcome = marriageIntakeService.resolveAccess(requestedDossierId, getCurrentBsn());
+            switch (outcome.scenario()) {
+                case GRANTED -> dossierId = outcome.dossierId();
+                case SWITCHED_DOSSIER -> {
+                    dossierId = outcome.dossierId();
+                    showWrongDossierWarning = true;
+                }
+                case NOT_AUTHORIZED -> showNotAuthorizedWarning = true;
+            }
         } else {
-            marriageIntakeService.findDossierIdByBsn(getCurrentBsn()).ifPresent(id -> {
-                dossierId = id;
-                registratieType = marriageIntakeService.findByDossierId(id).registratieType();
-            });
+            marriageIntakeService.findDossierIdByBsn(getCurrentBsn()).ifPresent(id -> dossierId = id);
+        }
+
+        if (dossierId != null) {
+            registratieType = marriageIntakeService.findByDossierId(dossierId).registratieType();
         }
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
+
+        RdAlert wrongDossierAlert = new RdAlert("wrongDossierAlert",
+                new ResourceModel("intake.alert.wrong.dossier"), RdAlertType.WARNING);
+        wrongDossierAlert.setVisible(showWrongDossierWarning);
+        pageBody.add(wrongDossierAlert);
+
+        RdAlert notAuthorizedAlert = new RdAlert("notAuthorizedAlert",
+                new ResourceModel("intake.alert.not.authorized"), RdAlertType.WARNING);
+        notAuthorizedAlert.setVisible(showNotAuthorizedWarning);
+        pageBody.add(notAuthorizedAlert);
 
         Form<Void> form = new Form<>("form");
         pageBody.add(form);
