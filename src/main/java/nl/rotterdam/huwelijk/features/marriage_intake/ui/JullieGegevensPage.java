@@ -16,7 +16,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 public class JullieGegevensPage extends IntakeBasePage {
 
@@ -24,8 +23,6 @@ public class JullieGegevensPage extends IntakeBasePage {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
-
-    private final UUID dossierId;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -43,8 +40,7 @@ public class JullieGegevensPage extends IntakeBasePage {
     }
 
     public JullieGegevensPage(PageParameters parameters) {
-        this.dossierId = UUID.fromString(parameters.get("dossierId").toString());
-        marriageIntakeService.ensureBsnAccess(dossierId, getCurrentBsn());
+        super(parameters);
 
         pageBody.add(new RdHeading("heading", getString("jullie.gegevens.heading"), 1));
 

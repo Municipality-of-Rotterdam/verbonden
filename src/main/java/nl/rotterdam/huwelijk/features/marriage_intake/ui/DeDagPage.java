@@ -11,14 +11,10 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.util.UUID;
-
 public class DeDagPage extends IntakeBasePage {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
-
-    private UUID dossierId;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -36,8 +32,7 @@ public class DeDagPage extends IntakeBasePage {
     }
 
     public DeDagPage(PageParameters parameters) {
-        this.dossierId = UUID.fromString(parameters.get("dossierId").toString());
-        marriageIntakeService.ensureBsnAccess(dossierId, getCurrentBsn());
+        super(parameters);
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 

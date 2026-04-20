@@ -1,21 +1,34 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
+import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.CssReferenceHeaderItem;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.request.resource.PackageResourceReference;
+import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.List;
+import java.util.UUID;
 
 public abstract class IntakeBasePage extends BurgerBasePage {
 
+    @SpringBean
+    private MarriageIntakeService marriageIntakeService;
+
+    protected UUID dossierId;
+
+    private boolean showWrongDossierWarning;
+    private boolean showNotAuthorizedWarning;
 
     protected IntakeSidebarPanel keuzesSidebar;
 
@@ -23,15 +36,56 @@ public abstract class IntakeBasePage extends BurgerBasePage {
 
     protected abstract IntakeStep getActiveStep();
 
+    /**
+     * Returns {@code true} when the page requires a valid (non-null) dossier ID to render.
+     * Override to return {@code false} on pages that can render without an existing dossier
+     * (e.g. the intake form where a new dossier can be created).
+     */
+    protected boolean requiresDossier() {
+        return true;
+    }
+
+    protected IntakeBasePage(PageParameters parameters) {
+        String dossierIdStr = parameters.get("dossierId").toOptionalString();
+        if (dossierIdStr != null) {
+            UUID requestedDossierId = UUID.fromString(dossierIdStr);
+            DossierAccessOutcome outcome = marriageIntakeService.resolveAccess(requestedDossierId, getCurrentBsn());
+            switch (outcome.scenario()) {
+                case GRANTED -> dossierId = outcome.dossierId();
+                case SWITCHED_DOSSIER -> {
+                    dossierId = outcome.dossierId();
+                    showWrongDossierWarning = true;
+                }
+                case NOT_AUTHORIZED -> showNotAuthorizedWarning = true;
+            }
+        } else {
+            marriageIntakeService.findDossierIdByBsn(getCurrentBsn()).ifPresent(id -> dossierId = id);
+        }
+    }
+
     @Override
     protected void onInitialize() {
         super.onInitialize();
+
+        if (dossierId == null && showNotAuthorizedWarning && requiresDossier()) {
+            throw new RestartResponseException(MarriageIntakePage.class);
+        }
 
         List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
                 new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijnloket"), MarriageIntakePage.class),
                 new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijndag"), MarriageIntakePage.class)
         );
         pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", breadcrumbs));
+
+        RdAlert wrongDossierAlert = new RdAlert("wrongDossierAlert",
+                new ResourceModel("intake.alert.wrong.dossier"), RdAlertType.WARNING);
+        wrongDossierAlert.setVisible(showWrongDossierWarning);
+        pageBody.add(wrongDossierAlert);
+
+        RdAlert notAuthorizedAlert = new RdAlert("notAuthorizedAlert",
+                new ResourceModel("intake.alert.not.authorized"), RdAlertType.WARNING);
+        notAuthorizedAlert.setVisible(showNotAuthorizedWarning);
+        pageBody.add(notAuthorizedAlert);
 
         pageBody.add(createTabButton("tabDedag", IntakeStep.DE_DAG));
         pageBody.add(createTabButton("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS));
