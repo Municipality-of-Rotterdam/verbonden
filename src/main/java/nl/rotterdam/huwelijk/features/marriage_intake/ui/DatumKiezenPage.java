@@ -8,8 +8,6 @@ import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.date_picker.RdDatePicker;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.ChoiceRenderer;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.IModel;
@@ -20,14 +18,10 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakeHeaderItems.MARRIAGE_INTAKE_CSS;
@@ -67,7 +61,6 @@ public class DatumKiezenPage extends BurgerBasePage {
         pageBody.add(new Label("heading", new ResourceModel("datum.kiezen.heading")));
 
         pageBody.add(new DatumKiezenForm());
-        pageBody.add(buildSnelKiezenForm());
     }
 
     private class DatumKiezenForm extends Form<LocalDateTime> {
@@ -123,60 +116,6 @@ public class DatumKiezenPage extends BurgerBasePage {
             params.add("dossierId", dossierId.toString());
             setResponsePage(DeDagPage.class, params);
         }
-    }
-
-    // -------------------------------------------------------------------------
-    // Temporary quick-pick form (select all available slots + save button)
-    // -------------------------------------------------------------------------
-
-    private static final DateTimeFormatter SLOT_DISPLAY_FORMAT =
-            DateTimeFormatter.ofPattern("EEEE d MMMM yyyy, HH:mm", Locale.forLanguageTag("nl-NL"));
-
-    private Form<Void> buildSnelKiezenForm() {
-        List<LocalDateTime> alleSlots = new ArrayList<>();
-        YearMonth maand = YearMonth.now();
-        for (int i = 0; i < 3; i++) {
-            alleSlots.addAll(marriageIntakeService.findBeschikbareSlots(dossierId, maand));
-            maand = maand.plusMonths(1);
-        }
-
-        IModel<LocalDateTime> gekozenSlotModel = Model.of((LocalDateTime) null);
-
-        DropDownChoice<LocalDateTime> slotKeuze = new DropDownChoice<>(
-                "slotKeuze",
-                gekozenSlotModel,
-                alleSlots,
-                new ChoiceRenderer<>() {
-                    @Override
-                    public Object getDisplayValue(LocalDateTime slot) {
-                        if (slot == null) {
-                            return "— Kies een tijdslot —";
-                        }
-                        return slot.format(SLOT_DISPLAY_FORMAT);
-                    }
-
-                    @Override
-                    public String getIdValue(LocalDateTime slot, int index) {
-                        return String.valueOf(index);
-                    }
-                }
-        );
-        slotKeuze.setNullValid(true);
-
-        Form<Void> snelKiezenForm = new Form<>("snelKiezenForm") {
-            @Override
-            protected void onSubmit() {
-                LocalDateTime gekozen = gekozenSlotModel.getObject();
-                if (gekozen != null) {
-                    marriageIntakeService.slaAfspraakOp(dossierId, gekozen.toLocalDate(), gekozen.toLocalTime());
-                    PageParameters params = new PageParameters();
-                    params.add("dossierId", dossierId.toString());
-                    setResponsePage(DeDagPage.class, params);
-                }
-            }
-        };
-        snelKiezenForm.add(slotKeuze);
-        return snelKiezenForm;
     }
 
     @Override
