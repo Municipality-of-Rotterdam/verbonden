@@ -418,7 +418,7 @@ class BeschikbareSlotsIntegrationTest {
 
     private UUID maakDossier(CeremonieSoort soort) {
         return marriageIntakeService.create(
-                new CreateDossierDto(RegistratieType.HUWELIJK, soort, null));
+                new CreateDossierDto(RegistratieType.HUWELIJK, soort, null, null));
     }
 
     private void maakBeschikbaarheid(long locatieId, HuwelijksType type,
