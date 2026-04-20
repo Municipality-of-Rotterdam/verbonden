@@ -57,6 +57,7 @@ Elke feature-package bevat de volgende sub-packages:
 ### Integratietests
 - Gebruik in integratietests altijd **services** om testdata aan te maken, niet repositories of JPA Entities. Entities mogen alleen binnen service-implementaties gebruikt worden.
 - Gebruik `@Transactional` op de testklasse zodat elke test in een transactie draait die na afloop wordt teruggedraaid. Hierdoor is geen handmatige cleanup van testdata nodig.
+- **Let op bij nested transacties:** wanneer een service-methode `@Transactional(propagation = REQUIRES_NEW)` gebruikt, commit die inner-transactie onafhankelijk en wordt **niet** teruggedraaid door de `@Transactional` op de testklasse. In dat geval moet je de data handmatig opschonen in een `@BeforeEach`-methode via service-methoden (bijv. `delete()`/`deleteAll()`), zodat de database vóór elke test weer in de oorspronkelijke staat is.
 - Wanneer seed-data (Flyway) interfereert met de test, verwijder die data via service-methoden in een `@BeforeEach`-methode. Door `@Transactional` wordt ook deze cleanup na de test teruggedraaid.
 
 ### Value types
