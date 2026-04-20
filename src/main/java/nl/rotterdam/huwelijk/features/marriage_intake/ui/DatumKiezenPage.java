@@ -18,6 +18,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -77,8 +79,28 @@ public class DatumKiezenPage extends BurgerBasePage {
             IModel<Collection<LocalDateTime>> beschikbareSlots = LoadableDetachableModel.of(
                     () -> marriageIntakeService.findAllBeschikbareSlots(dossierId));
 
-            RdDatePicker datePicker = new RdDatePicker("datePicker", selectedModel)
+            RdDatePicker datePicker = new RdDatePicker("datePicker", selectedModel) {
+                @Override
+                public String getInput() {
+                    var input = super.getInput();
+
+                    // TODO tijdelijke fix, inputs datepicker zijn local times, outputs met Zulu timezone
+                    // converteer naar local, ga uit van Europe/Amsterdam als zone wat we willen.
+
+                    if (input != null && input.endsWith("Z")) {
+                        ZonedDateTime zoned = ZonedDateTime.parse(input);
+                        ZonedDateTime amsterdam = zoned.withZoneSameInstant(ZoneId.of("Europe/Amsterdam"));
+                        LocalDateTime local = amsterdam.toLocalDateTime();
+                        input = local.toString();
+                    }
+
+                    return input;
+                }
+            }
                     .withAvailableDateTimes(beschikbareSlots);
+
+
+            datePicker.setType(LocalDateTime.class);
 
             add(datePicker,
                     new RdButton("bevestigButton", new ResourceModel("datum.kiezen.bevestig")));
