@@ -4,19 +4,14 @@ import nl.rotterdam.huwelijk.burger_common.BurgerBasePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
-import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.ajax.AjaxEventBehavior;
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
+import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import nl.rotterdam.nl_design_system.wicket.components.date_picker.RdDatePicker;
 import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.ChoiceRenderer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.list.ListItem;
-import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
@@ -24,38 +19,25 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakeHeaderItems.MARRIAGE_INTAKE_CSS;
 
 public class DatumKiezenPage extends BurgerBasePage {
 
-    private static final DayOfWeek[] KOLOM_VOLGORDE = {
-            DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY,
-            DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY
-    };
-
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
 
     private final UUID dossierId;
-    private YearMonth huidigeMaand;
-    private LocalDate geselecteerdeDatum;
-    private LocalTime geselecteerdeTijd;
-
-    private WebMarkupContainer kalenderPanel;
-    private WebMarkupContainer tijdslotPanel;
-    private WebMarkupContainer bevestigBar;
-
-    /** All available date+time slots for the current month; detached after each request cycle. */
-    private IModel<List<LocalDateTime>> beschikbareSlotsModel;
 
     @Override
     protected IModel<String> getTitleModel() {
@@ -64,20 +46,11 @@ public class DatumKiezenPage extends BurgerBasePage {
 
     public DatumKiezenPage(PageParameters params) {
         this.dossierId = UUID.fromString(params.get("dossierId").toString());
-        this.huidigeMaand = YearMonth.now();
-        marriageIntakeService.ensureBsnAccess(dossierId, getCurrentBsn());
     }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
-
-        beschikbareSlotsModel = new LoadableDetachableModel<>() {
-            @Override
-            protected List<LocalDateTime> load() {
-                return marriageIntakeService.findBeschikbareSlots(dossierId, huidigeMaand);
-            }
-        };
 
         List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> crumbs = List.of(
                 new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijnloket"), MarriageIntakePage.class),
@@ -86,205 +59,70 @@ public class DatumKiezenPage extends BurgerBasePage {
         );
         pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", crumbs));
 
-        PageParameters terugParams = new PageParameters();
-        terugParams.add("dossierId", dossierId.toString());
+        PageParameters terugParams = new PageParameters()
+                .add("dossierId", dossierId.toString());
+
         pageBody.add(new BookmarkablePageLink<>("terugLink", DeDagPage.class, terugParams));
 
         pageBody.add(new Label("heading", new ResourceModel("datum.kiezen.heading")));
 
-        kalenderPanel = buildKalenderPanel();
-        kalenderPanel.setOutputMarkupId(true);
-        pageBody.add(kalenderPanel);
-
-        tijdslotPanel = buildTijdslotPanel();
-        tijdslotPanel.setOutputMarkupId(true);
-        pageBody.add(tijdslotPanel);
-
-        bevestigBar = buildBevestigBar();
-        bevestigBar.setOutputMarkupId(true);
-        pageBody.add(bevestigBar);
-
+        pageBody.add(new DatumKiezenForm());
         pageBody.add(buildSnelKiezenForm());
     }
 
-    // -------------------------------------------------------------------------
-    // Calendar panel
-    // -------------------------------------------------------------------------
+    private class DatumKiezenForm extends Form<LocalDateTime> {
 
-    private WebMarkupContainer buildKalenderPanel() {
-        WebMarkupContainer panel = new WebMarkupContainer("kalenderPanel");
+        private final IModel<LocalDateTime> selectedModel = Model.of((LocalDateTime) null);
 
-        AjaxLink<Void> vorigeMaand = new AjaxLink<>("vorigeMaand") {
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                huidigeMaand = huidigeMaand.minusMonths(1);
-                geselecteerdeDatum = null;
-                geselecteerdeTijd = null;
-                beschikbareSlotsModel.detach();
-                target.add(kalenderPanel, tijdslotPanel, bevestigBar);
-            }
+        private DatumKiezenForm() {
+            super("datumKiezenForm");
+            setModel(selectedModel);
+        }
 
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                setEnabled(huidigeMaand.isAfter(YearMonth.now()));
-            }
-        };
-        panel.add(vorigeMaand);
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
 
-        panel.add(new Label("maandLabel", () -> {
-            String naam = huidigeMaand.getMonth()
-                    .getDisplayName(TextStyle.FULL, getSession().getLocale()).toLowerCase();
-            return naam + ", " + huidigeMaand.getYear();
-        }));
+            IModel<Collection<LocalDateTime>> beschikbareSlots = LoadableDetachableModel.of(
+                    () -> marriageIntakeService.findAllBeschikbareSlots(dossierId));
 
-        panel.add(new AjaxLink<Void>("volgendeMaand") {
-            @Override
-            public void onClick(AjaxRequestTarget target) {
-                huidigeMaand = huidigeMaand.plusMonths(1);
-                geselecteerdeDatum = null;
-                geselecteerdeTijd = null;
-                beschikbareSlotsModel.detach();
-                target.add(kalenderPanel, tijdslotPanel, bevestigBar);
-            }
-        });
+            RdDatePicker datePicker = new RdDatePicker("datePicker", selectedModel) {
+                @Override
+                public String getInput() {
+                    var input = super.getInput();
 
-        panel.add(buildKalenderRijen());
-        return panel;
-    }
+                    // TODO tijdelijke fix, inputs datepicker zijn local times, outputs met Zulu timezone
+                    // converteer naar local, ga uit van Europe/Amsterdam als zone wat we willen.
 
-    private ListView<List<LocalDate>> buildKalenderRijen() {
-        return new ListView<>("kalenderRijen", () -> bouwMaandRijen(huidigeMaand)) {
-            @Override
-            protected void populateItem(ListItem<List<LocalDate>> rijItem) {
-                List<LocalDateTime> slots = beschikbareSlotsModel.getObject();
-                Set<LocalDate> beschikbaar = new HashSet<>();
-                slots.forEach(s -> beschikbaar.add(s.toLocalDate()));
-                rijItem.add(new ListView<>("dag", rijItem.getModel()) {
-                    @Override
-                    protected void populateItem(ListItem<LocalDate> dagItem) {
-                        LocalDate datum = dagItem.getModelObject();
-                        boolean isLeeg = datum == null;
-                        boolean isVerleden = datum != null && !datum.isAfter(LocalDate.now());
-                        boolean isBeschikbaar = datum != null && !isVerleden && beschikbaar.contains(datum);
-                        boolean isGeselecteerd = datum != null && datum.equals(geselecteerdeDatum);
-                        boolean isVandaag = datum != null && datum.equals(LocalDate.now());
-
-                        dagItem.add(AttributeModifier.replace("class",
-                                buildDagClass(isLeeg, isBeschikbaar, isGeselecteerd)));
-
-                        WebMarkupContainer dagLink = new WebMarkupContainer("dagLink");
-                        dagLink.add(new Label("dagNummer",
-                                datum != null ? String.valueOf(datum.getDayOfMonth()) : ""));
-                        Label vandaagLabel = new Label("vandaagLabel",
-                                new ResourceModel("datum.kiezen.vandaag"));
-                        vandaagLabel.setVisible(isVandaag);
-                        dagLink.add(vandaagLabel);
-
-                        if (isBeschikbaar) {
-                            dagLink.add(AttributeModifier.replace("href", "#"));
-                            dagLink.add(new AjaxEventBehavior("click") {
-                                @Override
-                                protected void onEvent(AjaxRequestTarget target) {
-                                    geselecteerdeDatum = datum;
-                                    geselecteerdeTijd = null;
-                                    target.add(kalenderPanel, tijdslotPanel, bevestigBar);
-                                }
-                            });
-                        }
-
-                        dagItem.add(dagLink);
+                    if (input != null && input.endsWith("Z")) {
+                        ZonedDateTime zoned = ZonedDateTime.parse(input);
+                        ZonedDateTime amsterdam = zoned.withZoneSameInstant(ZoneId.of("Europe/Amsterdam"));
+                        LocalDateTime local = amsterdam.toLocalDateTime();
+                        input = local.toString();
                     }
-                });
+
+                    return input;
+                }
             }
-        };
-    }
+                    .withAvailableDateTimes(beschikbareSlots);
 
-    // -------------------------------------------------------------------------
-    // Time-slot panel
-    // -------------------------------------------------------------------------
+            datePicker.setType(LocalDateTime.class);
 
-    private WebMarkupContainer buildTijdslotPanel() {
-        WebMarkupContainer panel = new WebMarkupContainer("tijdslotPanel") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                setVisible(geselecteerdeDatum != null);
+            add(datePicker,
+                    new RdButton("bevestigButton", new ResourceModel("datum.kiezen.bevestig")));
+        }
+
+        @Override
+        protected void onSubmit() {
+            LocalDateTime gekozen = selectedModel.getObject();
+            if (gekozen == null) {
+                return;
             }
-        };
-
-        panel.add(new Label("geselecteerdeDatumLabel", () -> {
-            if (geselecteerdeDatum == null) return "";
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("EEEE d MMMM, yyyy", getSession().getLocale());
-            return geselecteerdeDatum.format(fmt);
-        }));
-
-        panel.add(new ListView<>("tijdsloten",
-                () -> {
-                    if (geselecteerdeDatum == null) return List.of();
-                    return beschikbareSlotsModel.getObject().stream()
-                            .filter(s -> s.toLocalDate().equals(geselecteerdeDatum))
-                            .map(LocalDateTime::toLocalTime)
-                            .toList();
-                }) {
-            @Override
-            protected void populateItem(ListItem<LocalTime> item) {
-                LocalTime tijd = item.getModelObject();
-                boolean isGeselecteerd = tijd.equals(geselecteerdeTijd);
-
-                AjaxLink<LocalTime> link = new AjaxLink<>("tijdslotLink", Model.of(tijd)) {
-                    @Override
-                    public void onClick(AjaxRequestTarget target) {
-                        geselecteerdeTijd = getModelObject();
-                        target.add(tijdslotPanel, bevestigBar);
-                    }
-                };
-                link.add(AttributeModifier.replace("class",
-                        isGeselecteerd ? "tijdslot tijdslot--geselecteerd" : "tijdslot"));
-                link.add(new Label("tijdLabel",
-                        tijd.format(DateTimeFormatter.ofPattern("HH:mm"))));
-                item.add(link);
-            }
-        });
-
-        return panel;
-    }
-
-    // -------------------------------------------------------------------------
-    // Confirm bar
-    // -------------------------------------------------------------------------
-
-    private WebMarkupContainer buildBevestigBar() {
-        WebMarkupContainer bar = new WebMarkupContainer("bevestigBar") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                setVisible(geselecteerdeDatum != null && geselecteerdeTijd != null);
-            }
-        };
-
-        bar.add(new Label("samenvattingLabel", () -> {
-            if (geselecteerdeDatum == null || geselecteerdeTijd == null) return "";
-            DateTimeFormatter datumFmt = DateTimeFormatter.ofPattern("EEEE d MMMM", getSession().getLocale());
-            return getString("datum.kiezen.samenvatting.prefix")
-                    + " " + geselecteerdeDatum.format(datumFmt)
-                    + " " + getString("datum.kiezen.samenvatting.om")
-                    + " " + geselecteerdeTijd.format(DateTimeFormatter.ofPattern("HH:mm"))
-                    + " " + getString("datum.kiezen.samenvatting.uur");
-        }));
-
-        Form<Void> bevestigForm = new Form<>("bevestigForm") {
-            @Override
-            protected void onSubmit() {
-                marriageIntakeService.slaAfspraakOp(dossierId, geselecteerdeDatum, geselecteerdeTijd);
-                PageParameters params = new PageParameters();
-                params.add("dossierId", dossierId.toString());
-                setResponsePage(DeDagPage.class, params);
-            }
-        };
-        bar.add(bevestigForm);
-
-        return bar;
+            marriageIntakeService.slaAfspraakOp(dossierId, gekozen.toLocalDate(), gekozen.toLocalTime());
+            PageParameters params = new PageParameters();
+            params.add("dossierId", dossierId.toString());
+            setResponsePage(DeDagPage.class, params);
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -302,8 +140,7 @@ public class DatumKiezenPage extends BurgerBasePage {
             maand = maand.plusMonths(1);
         }
 
-        LocalDateTime initialSlot = null;
-        IModel<LocalDateTime> gekozenSlotModel = Model.of(initialSlot);
+        IModel<LocalDateTime> gekozenSlotModel = Model.of((LocalDateTime) null);
 
         DropDownChoice<LocalDateTime> slotKeuze = new DropDownChoice<>(
                 "slotKeuze",
@@ -340,39 +177,6 @@ public class DatumKiezenPage extends BurgerBasePage {
         };
         snelKiezenForm.add(slotKeuze);
         return snelKiezenForm;
-    }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    private static List<List<LocalDate>> bouwMaandRijen(YearMonth maand) {
-        LocalDate eerste = maand.atDay(1);
-        int verschuiving = kolomIndex(eerste.getDayOfWeek());
-
-        List<LocalDate> cells = new ArrayList<>();
-        for (int i = 0; i < verschuiving; i++) cells.add(null);
-        for (int dag = 1; dag <= maand.lengthOfMonth(); dag++) cells.add(maand.atDay(dag));
-        while (cells.size() % 7 != 0) cells.add(null);
-
-        List<List<LocalDate>> rijen = new ArrayList<>();
-        for (int i = 0; i < cells.size(); i += 7) rijen.add(cells.subList(i, i + 7));
-        return rijen;
-    }
-
-    private static int kolomIndex(DayOfWeek dag) {
-        for (int i = 0; i < KOLOM_VOLGORDE.length; i++) {
-            if (KOLOM_VOLGORDE[i] == dag) return i;
-        }
-        return 0;
-    }
-
-    private static String buildDagClass(boolean leeg,
-                                        boolean beschikbaar, boolean geselecteerd) {
-        if (leeg) return "kalender-dag kalender-dag--leeg";
-        if (geselecteerd) return "kalender-dag kalender-dag--geselecteerd";
-        if (beschikbaar) return "kalender-dag kalender-dag--beschikbaar";
-        return "kalender-dag kalender-dag--onbeschikbaar";
     }
 
     @Override

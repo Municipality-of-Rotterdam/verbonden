@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -65,6 +66,8 @@ public interface MarriageIntakeService {
     Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand);
 
     List<LocalDateTime> findBeschikbareSlots(UUID dossierId, YearMonth maand);
+
+    Collection<LocalDateTime> findAllBeschikbareSlots(UUID dossierId);
 
     List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum);
 
