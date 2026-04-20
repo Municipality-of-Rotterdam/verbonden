@@ -189,6 +189,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
         if (e.getBsn2() == null && !bsn.equals(e.getBsn1())) {
             e.setBsn2(bsn);
+            dossierRepository.save(e);
             return;
         }
         throw new IllegalStateException("Toegang geweigerd: BSN heeft geen toegang tot dit dossier");
@@ -212,6 +213,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         if (requested.getBsn2() == null) {
             // Scenario 3: BSN has no dossier yet; register it as the second partner in this dossier.
             requested.setBsn2(bsn);
+            dossierRepository.save(requested);
             return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
         }
 
