@@ -30,7 +30,7 @@
     <properties>
         <java.version>25</java.version>
         <wicket.version>10.8.0</wicket.version>
-         <rotterdam-nlds.version>0.0.12</rotterdam-nlds.version>
+         <rotterdam-nlds.version>0.1.0</rotterdam-nlds.version>
         <wicket-webjars.version>4.0.8</wicket-webjars.version>
         <bootstrap.version>5.3.7</bootstrap.version>
     </properties>
