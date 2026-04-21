@@ -2,6 +2,7 @@ package nl.rotterdam.huwelijk.administration_common;
 
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsAdministrationPage;
+import nl.rotterdam.huwelijk.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
@@ -59,7 +60,8 @@ public abstract class AdministrationBasePage extends WebPage {
         pageLayout.add(new RdSideNavPanel("sideNav", List.of(
                 new RdSideNavRecord(null, "BABS ", BabsAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Trouwlocaties", LocationAdministrationPage.class, null, null, null),
-                new RdSideNavRecord(null, "Huwelijkstypen", MarriageTypeAdministrationPage.class, null, null, null)
+                new RdSideNavRecord(null, "Huwelijkstypen", MarriageTypeAdministrationPage.class, null, null, null),
+                new RdSideNavRecord(null, "Dossiers", DossierAdministrationPage.class, null, null, null)
         )));
 
         pageBody = new RdPageBodyBorder("pageBody");
