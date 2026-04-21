@@ -4,10 +4,13 @@ import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksTy
 import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.NietBeschikbareDagRepository;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
@@ -85,6 +88,43 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .toList();
     }
 
+    private static final Map<String, PartnerGegevensDto> MOCK_PERSONEN = Map.of(
+            "999990007", new PartnerGegevensDto("Van Muiswinkel", "Erik Jan",
+                    LocalDate.of(1984, 5, 29), "Rotterdam", "Nederlandse", "Ongehuwd",
+                    "06-12345678", "evm1984@gmail.com"),
+            "999990019", new PartnerGegevensDto("De Vries", "Sanne Maria",
+                    LocalDate.of(1992, 3, 14), "Den Haag", "Nederlandse", "Ongehuwd",
+                    "06-11223344", "sanne.devries@gmail.com"),
+            "999990020", new PartnerGegevensDto("Jansen", "Pieter",
+                    LocalDate.of(1988, 7, 22), "Groningen", "Nederlandse", "Gehuwd",
+                    "06-55667788", "pieter.jansen@gmail.com"),
+            "999990202", new PartnerGegevensDto("Bakker", "Willem Adriaan",
+                    LocalDate.of(1975, 11, 3), "Assen", "Nederlandse", "Gescheiden",
+                    "06-99887766", "w.bakker@gmail.com"),
+            "999990032", new PartnerGegevensDto("Dëhlano", "Chavéliën",
+                    LocalDate.of(2001, 6, 18), "Paramaribo", "Nederlandse", "Ongehuwd",
+                    "06-44556677", "chavelien@gmail.com")
+    );
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        List<PartnerGegevensDto> result = new ArrayList<>();
+        if (dossier.getBsn1() != null) {
+            result.add(lookupPartner(dossier.getBsn1()));
+        }
+        if (dossier.getBsn2() != null) {
+            result.add(lookupPartner(dossier.getBsn2()));
+        }
+        return result;
+    }
+
+    private PartnerGegevensDto lookupPartner(String bsn) {
+        return MOCK_PERSONEN.getOrDefault(bsn,
+                new PartnerGegevensDto("Onbekend", bsn, null, "", "Onbekend", "Onbekend", "", ""));
+    }
+
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {
         HuwelijksType huwelijksType = toHuwelijksType(ceremonieSoort);
         List<TrouwlocatieEntity> locaties = resolveLocaties(ceremonieSoort);
@@ -107,6 +147,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity entity = new HuwelijksDossierEntity();
         entity.setRegistratieType(dto.registratieType());
         entity.setCeremonieSoort(dto.ceremonieSoort());
+        entity.setBsn1(dto.bsn1());
         if (dto.locatieId() != null) {
             locatieRepository.findById(dto.locatieId()).ifPresent(entity::setLocatie);
         }
@@ -120,12 +161,72 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     }
 
     @Override
+    @Transactional
+    public void updateIntake(UUID dossierId, ChangeIntakeDto dto) {
+        HuwelijksDossierEntity e = getDossier(dossierId);
+        e.setRegistratieType(dto.registratieType());
+        e.setCeremonieSoort(dto.ceremonieSoort());
+        if (dto.locatieId() != null) {
+            locatieRepository.findById(dto.locatieId()).ifPresent(e::setLocatie);
+        } else {
+            e.setLocatie(null);
+        }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<UUID> findDossierIdByBsn(String bsn) {
+        return dossierRepository.findByBsn1OrBsn2(bsn, bsn)
+                .map(HuwelijksDossierEntity::getUuid);
+    }
+
+    @Override
+    @Transactional
+    public void ensureBsnAccess(UUID dossierId, String bsn) {
+        HuwelijksDossierEntity e = getDossier(dossierId);
+        if (bsn.equals(e.getBsn1()) || bsn.equals(e.getBsn2())) {
+            return;
+        }
+        if (e.getBsn2() == null && !bsn.equals(e.getBsn1())) {
+            e.setBsn2(bsn);
+            dossierRepository.save(e);
+            return;
+        }
+        throw new IllegalStateException("Toegang geweigerd: BSN heeft geen toegang tot dit dossier");
+    }
+
+    @Override
+    @Transactional
+    public DossierAccessOutcome resolveAccess(UUID requestedDossierId, String bsn) {
+        Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByBsn1OrBsn2(bsn, bsn);
+
+        if (existingDossier.isPresent()) {
+            UUID existingId = existingDossier.get().getUuid();
+            if (existingId.equals(requestedDossierId)) {
+                return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
+            } else {
+                return new DossierAccessOutcome(DossierAccessOutcome.Scenario.SWITCHED_DOSSIER, existingId);
+            }
+        }
+
+        HuwelijksDossierEntity requested = getDossier(requestedDossierId);
+        if (requested.getBsn2() == null) {
+            // Scenario 3: BSN has no dossier yet; register it as the second partner in this dossier.
+            requested.setBsn2(bsn);
+            dossierRepository.save(requested);
+            return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
+        }
+
+        return new DossierAccessOutcome(DossierAccessOutcome.Scenario.NOT_AUTHORIZED, null);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public DossierSamenvattingDto findByDossierId(UUID id) {
         HuwelijksDossierEntity e = getDossier(id);
 
-        LocalDate datumHuwelijk = afspraakRepository.findFirstByDossier_Id(e.getId())
-                .map(AfspraakEntity::getDatum)
+        LocalDateTime datumTijdHuwelijk = afspraakRepository.findFirstByDossier_Id(e.getId())
+                .map(a -> LocalDateTime.of(a.getDatum(), a.getStartTijd()))
                 .orElse(null);
 
         String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
@@ -139,7 +240,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 e.getRegistratieType(),
                 e.getCeremonieSoort(),
                 prijs,
-                datumHuwelijk,
+                datumTijdHuwelijk,
                 locatieNaam,
                 false,
                 false,

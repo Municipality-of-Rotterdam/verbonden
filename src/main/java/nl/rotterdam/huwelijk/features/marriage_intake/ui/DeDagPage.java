@@ -3,6 +3,7 @@ package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -10,14 +11,10 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.util.UUID;
-
 public class DeDagPage extends IntakeBasePage {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
-
-    private UUID dossierId;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -35,7 +32,7 @@ public class DeDagPage extends IntakeBasePage {
     }
 
     public DeDagPage(PageParameters parameters) {
-        this.dossierId = UUID.fromString(parameters.get("dossierId").toString());
+        super(parameters);
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
@@ -65,6 +62,10 @@ public class DeDagPage extends IntakeBasePage {
         };
         babsLink.setEnabled(false);
         pageBody.add(babsLink);
+
+        PageParameters jullieGegevensParams = new PageParameters();
+        jullieGegevensParams.add("dossierId", dossierId.toString());
+        pageBody.add(new BookmarkablePageLink<>("jullieGegevensLink", JullieGegevensPage.class, jullieGegevensParams));
     }
 }
 

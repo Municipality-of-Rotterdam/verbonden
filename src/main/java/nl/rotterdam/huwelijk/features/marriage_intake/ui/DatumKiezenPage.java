@@ -99,7 +99,6 @@ public class DatumKiezenPage extends BurgerBasePage {
             }
                     .withAvailableDateTimes(beschikbareSlots);
 
-
             datePicker.setType(LocalDateTime.class);
 
             add(datePicker,

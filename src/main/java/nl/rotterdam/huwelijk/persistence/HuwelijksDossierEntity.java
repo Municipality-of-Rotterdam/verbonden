@@ -37,6 +37,12 @@ public class HuwelijksDossierEntity {
     @JoinColumn(name = "locatie_id")
     private TrouwlocatieEntity locatie;
 
+    @Column(name = "bsn1", length = 10)
+    private String bsn1;
+
+    @Column(name = "bsn2", length = 10)
+    private String bsn2;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
@@ -86,5 +92,21 @@ public class HuwelijksDossierEntity {
 
     public void setAangemaaktOp(LocalDateTime aangemaaktOp) {
         this.aangemaaktOp = aangemaaktOp;
+    }
+
+    public String getBsn1() {
+        return bsn1;
+    }
+
+    public void setBsn1(String bsn1) {
+        this.bsn1 = bsn1;
+    }
+
+    public String getBsn2() {
+        return bsn2;
+    }
+
+    public void setBsn2(String bsn2) {
+        this.bsn2 = bsn2;
     }
 }

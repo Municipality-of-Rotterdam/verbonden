@@ -5,6 +5,12 @@
     <!-- Breadcrumb -->
     <div wicket:id="breadcrumb"></div>
 
+    <!-- Alert: BSN belongs to a different dossier; automatically switched -->
+    <div wicket:id="wrongDossierAlert"></div>
+
+    <!-- Alert: requested dossier is full and this BSN has no access -->
+    <div wicket:id="notAuthorizedAlert"></div>
+
     <!-- Tab navigation -->
     <nav class="rd-tabs" aria-label="Stappen" role="tablist">
         <button wicket:id="tabDedag" class="rd-tab" type="button" role="tab" aria-selected="false">

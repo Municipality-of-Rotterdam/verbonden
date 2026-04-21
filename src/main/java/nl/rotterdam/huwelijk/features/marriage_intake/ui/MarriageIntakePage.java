@@ -1,6 +1,7 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
@@ -16,6 +17,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
@@ -31,7 +33,6 @@ import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 public class MarriageIntakePage extends IntakeBasePage {
 
@@ -59,7 +60,20 @@ public class MarriageIntakePage extends IntakeBasePage {
     }
 
     @Override
+    protected boolean requiresDossier() {
+        return false;
+    }
+
+    @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
+        if (dossierId != null) {
+            return () -> {
+                DossierSamenvattingDto d = marriageIntakeService.findByDossierId(dossierId);
+                return new DossierSamenvattingDto(d.id(), registratieType, d.ceremonieSoort(),
+                        d.prijs(), d.datumTijdHuwelijk(), d.huwelijksLocatie(),
+                        d.gegevensBevestigd(), d.getuigenBevestigd(), d.extras());
+            };
+        }
         return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, List.of());
     }
 
@@ -68,6 +82,12 @@ public class MarriageIntakePage extends IntakeBasePage {
     }
 
     public MarriageIntakePage(PageParameters parameters) {
+        super(parameters);
+
+        if (dossierId != null) {
+            registratieType = marriageIntakeService.findByDossierId(dossierId).registratieType();
+        }
+
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
         Form<Void> form = new Form<>("form");
@@ -121,12 +141,17 @@ public class MarriageIntakePage extends IntakeBasePage {
                         heeftDatum ? dto.eersteGelegenheid().format(DATUM_FORMAT) : ""));
                 item.add(eersteGelegenheidBox);
 
-                // Submit button — disabled when ceremony type is inactive
+                // Submit button — creates a new dossier or updates an existing one
                 RdButton button = new RdButton("kiesButton", Model.of(dto.titel())) {
                     @Override
                     public void onSubmit() {
-                        UUID dossierId = marriageIntakeService.create(
-                                new CreateDossierDto(registratieType, dto.soort(), dto.locatieId()));
+                        if (dossierId != null) {
+                            marriageIntakeService.updateIntake(dossierId,
+                                    new ChangeIntakeDto(registratieType, dto.soort(), dto.locatieId()));
+                        } else {
+                            dossierId = marriageIntakeService.create(
+                                    new CreateDossierDto(registratieType, dto.soort(), dto.locatieId(), getCurrentBsn()));
+                        }
                         PageParameters params = new PageParameters();
                         params.add("dossierId", dossierId.toString());
                         setResponsePage(DeDagPage.class, params);
@@ -136,6 +161,19 @@ public class MarriageIntakePage extends IntakeBasePage {
                 item.add(button);
             }
         });
+
+        // "Verder" button — only shown when a dossier already exists
+        WebMarkupContainer verderContainer = new WebMarkupContainer("verderContainer");
+        verderContainer.setVisible(dossierId != null);
+        verderContainer.add(new Link<Void>("verderLink") {
+            @Override
+            public void onClick() {
+                PageParameters params = new PageParameters();
+                params.add("dossierId", dossierId.toString());
+                setResponsePage(DeDagPage.class, params);
+            }
+        });
+        pageBody.add(verderContainer);
     }
 
     private static String formatPrijs(BigDecimal prijs) {

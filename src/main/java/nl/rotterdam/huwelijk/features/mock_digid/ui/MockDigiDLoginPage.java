@@ -31,14 +31,14 @@ import java.util.List;
 
 public class MockDigiDLoginPage extends BurgerBasePage {
 
-    private record TestBurger(String bsn, String beschrijving) implements Serializable {}
+    private record TestBurger(String bsn, String naam, String beschrijving) implements Serializable {}
 
     private static final List<TestBurger> TEST_BURGERS = List.of(
-            new TestBurger("999990007", "Woont in Rotterdam, vrijgezel, man"),
-            new TestBurger("999990019", "Woont in Den Haag, vrijgezel, vrouw"),
-            new TestBurger("999990020", "Woont in Groningen, getrouwd"),
-            new TestBurger("999990202", "Woont in Assen, gescheiden"),
-            new TestBurger("999990032", "Woont in Suriname, vrijgezel. Bijzondere naam: Chavéliën Dëhlano")
+            new TestBurger("999990007", "Van Muiswinkel, Erik Jan", "Woont in Rotterdam, vrijgezel, man"),
+            new TestBurger("999990019", "De Vries, Sanne Maria", "Woont in Den Haag, vrijgezel, vrouw"),
+            new TestBurger("999990020", "Jansen, Pieter", "Woont in Groningen, getrouwd"),
+            new TestBurger("999990202", "Bakker, Willem Adriaan", "Woont in Assen, gescheiden"),
+            new TestBurger("999990032", "Dëhlano, Chavéliën", "Woont in Suriname, vrijgezel. Bijzondere naam: Chavéliën Dëhlano")
     );
 
     @Override
@@ -59,6 +59,15 @@ public class MockDigiDLoginPage extends BurgerBasePage {
                                      String componentId,
                                      IModel<TestBurger> rowModel) {
                 cellItem.add(new Label(componentId, rowModel.map(TestBurger::bsn)));
+            }
+        });
+
+        columns.add(new AbstractColumn<>(Model.of("Naam")) {
+            @Override
+            public void populateItem(Item<ICellPopulator<TestBurger>> cellItem,
+                                     String componentId,
+                                     IModel<TestBurger> rowModel) {
+                cellItem.add(new Label(componentId, rowModel.map(TestBurger::naam)));
             }
         });
 
