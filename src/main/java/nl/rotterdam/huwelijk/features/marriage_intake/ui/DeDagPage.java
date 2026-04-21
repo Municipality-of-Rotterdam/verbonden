@@ -9,7 +9,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.UUID;
@@ -43,8 +42,9 @@ public class DeDagPage extends IntakeBasePage {
         );
     }
 
-    public DeDagPage(PageParameters parameters) {
-        super(parameters);
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 

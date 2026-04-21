@@ -19,7 +19,7 @@ public class DossierPageParameterUtil {
         return null;
     }
 
-    public static PageParameters makeDossierPageParameters(UUID dossierId) {
-        return new PageParameters().add(PARAM_DOSSIER_ID, dossierId.toString());
+    public static PageParameters makeDossierPageParameters(@Nullable UUID dossierId) {
+        return new PageParameters().add(PARAM_DOSSIER_ID, dossierId);
     }
 }

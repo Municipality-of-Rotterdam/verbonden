@@ -47,7 +47,13 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     private RegistratieType registratieType = RegistratieType.GEREGISTREERD_PARTNERSCHAP;
 
-    private final RdRadioGroup<RegistratieType> registrationGroup;
+    private final RdRadioGroup<RegistratieType> registrationGroup = new RdRadioGroup<>(
+            "registrationGroup",
+            new PropertyModel<>(this, "registratieType"),
+            new ResourceModel("intake.registratie.legend"),
+            new ResourceModel("intake.registratie.description")
+    );
+
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -77,13 +83,9 @@ public class MarriageIntakePage extends IntakeBasePage {
         return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, List.of());
     }
 
-    // TODO this is not right, if it is deserialized from session this constructor might be called
-    public MarriageIntakePage() {
-        this(new PageParameters());
-    }
-
-    public MarriageIntakePage(PageParameters parameters) {
-        super(parameters);
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
 
         if (dossierId != null) {
             registratieType = marriageIntakeService.findByDossierId(dossierId).registratieType();
@@ -94,13 +96,7 @@ public class MarriageIntakePage extends IntakeBasePage {
         Form<Void> form = new Form<>("form");
         pageBody.add(form);
 
-        // Registratie radio group
-        registrationGroup = new RdRadioGroup<>(
-                "registrationGroup",
-                new PropertyModel<>(this, "registratieType"),
-                new ResourceModel("intake.registratie.legend"),
-                new ResourceModel("intake.registratie.description")
-        );
+
         form.add(registrationGroup);
         RadioGroup<RegistratieType> regRadioGroup = registrationGroup.getRadioGroup();
         registrationGroup.add(new RdRadioButton<>("huwelijk", Model.of(RegistratieType.HUWELIJK), regRadioGroup));
@@ -174,6 +170,13 @@ public class MarriageIntakePage extends IntakeBasePage {
             }
         });
         pageBody.add(verderContainer);
+
+        registrationGroup.getRadioGroup().add(new AjaxFormChoiceComponentUpdatingBehavior() {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                target.add(keuzesSidebar);
+            }
+        });
     }
 
     private static String formatPrijs(BigDecimal prijs) {
@@ -183,14 +186,4 @@ public class MarriageIntakePage extends IntakeBasePage {
         return PRIJS_FORMAT.format(prijs);
     }
 
-    @Override
-    protected void onInitialize() {
-        super.onInitialize();
-        registrationGroup.getRadioGroup().add(new AjaxFormChoiceComponentUpdatingBehavior() {
-            @Override
-            protected void onUpdate(AjaxRequestTarget target) {
-                target.add(keuzesSidebar);
-            }
-        });
-    }
 }

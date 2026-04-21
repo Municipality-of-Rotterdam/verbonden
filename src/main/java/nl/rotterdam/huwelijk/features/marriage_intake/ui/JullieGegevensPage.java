@@ -39,10 +39,12 @@ public class JullieGegevensPage extends IntakeBasePage {
         return Model.of(marriageIntakeService.findByDossierId(dossierId));
     }
 
-    public JullieGegevensPage(PageParameters parameters) {
-        super(parameters);
 
-        pageBody.add(new RdHeading("heading", getString("jullie.gegevens.heading"), 1));
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
+
+        pageBody.add(new RdHeading("heading",getString("jullie.gegevens.heading"), 1));
 
         List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
 

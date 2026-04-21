@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.extractDossierId;
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public abstract class IntakeBasePage extends BurgerBasePage {
 
@@ -47,8 +48,11 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         return true;
     }
 
-    protected IntakeBasePage(PageParameters parameters) {
-        UUID requestedDossierId = extractDossierId(parameters);
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
+
+        UUID requestedDossierId = extractDossierId(getPageParameters());
         if (requestedDossierId != null) {
             DossierAccessOutcome outcome = marriageIntakeService.resolveAccess(requestedDossierId, getCurrentBsn());
             switch (outcome.scenario()) {
@@ -62,14 +66,9 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         } else {
             marriageIntakeService.findDossierIdByBsn(getCurrentBsn()).ifPresent(id -> dossierId = id);
         }
-    }
-
-    @Override
-    protected void onInitialize() {
-        super.onInitialize();
 
         if (dossierId == null && showNotAuthorizedWarning && requiresDossier()) {
-            throw new RestartResponseException(MarriageIntakePage.class);
+            throw new RestartResponseException(MarriageIntakePage.class, makeDossierPageParameters(extractDossierId(getPageParameters())));
         }
 
         List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
@@ -88,10 +87,12 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         notAuthorizedAlert.setVisible(showNotAuthorizedWarning);
         pageBody.add(notAuthorizedAlert);
 
-        pageBody.add(createTabButton("tabDedag", IntakeStep.DE_DAG));
-        pageBody.add(createTabButton("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS));
-        pageBody.add(createTabButton("tabGetuigen", IntakeStep.DE_GETUIGEN));
-        pageBody.add(createTabButton("tabExtras", IntakeStep.EXTRAS));
+        pageBody.add(
+                createTabButton("tabDedag", IntakeStep.DE_DAG),
+                createTabButton("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS),
+                createTabButton("tabGetuigen", IntakeStep.DE_GETUIGEN),
+                createTabButton("tabExtras", IntakeStep.EXTRAS)
+        );
 
         keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel());
         pageBody.add(keuzesSidebar);
