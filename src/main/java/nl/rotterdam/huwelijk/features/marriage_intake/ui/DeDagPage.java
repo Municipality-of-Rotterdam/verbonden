@@ -8,8 +8,13 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+
+import java.util.UUID;
+
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class DeDagPage extends IntakeBasePage {
 
@@ -31,6 +36,13 @@ public class DeDagPage extends IntakeBasePage {
         return Model.of(marriageIntakeService.findByDossierId(dossierId));
     }
 
+    public static void respond(UUID dossierId) {
+        RequestCycle.get().setResponsePage(
+                DeDagPage.class,
+                makeDossierPageParameters(dossierId)
+        );
+    }
+
     public DeDagPage(PageParameters parameters) {
         super(parameters);
 
@@ -39,13 +51,11 @@ public class DeDagPage extends IntakeBasePage {
         pageBody.add(new Link<Void>("datumLink") {
             @Override
             public void onClick() {
-                PageParameters params = new PageParameters();
-                params.add("dossierId", dossierId.toString());
-                setResponsePage(DatumKiezenPage.class, params);
+                DatumKiezenPage.respond(dossierId);
             }
         });
 
-        Link<Void> locatieLink = new Link<Void>("locatieLink") {
+        Link<Void> locatieLink = new Link<      >("locatieLink") {
             @Override
             public void onClick() {
                 // Navigation to location picker — to be implemented in a future iteration
@@ -54,7 +64,7 @@ public class DeDagPage extends IntakeBasePage {
         locatieLink.setEnabled(false);
         pageBody.add(locatieLink);
 
-        Link<Void> babsLink = new Link<Void>("babsLink") {
+        Link<Void> babsLink = new Link<>("babsLink") {
             @Override
             public void onClick() {
                 // Navigation to BABS picker — to be implemented in a future iteration
@@ -63,9 +73,7 @@ public class DeDagPage extends IntakeBasePage {
         babsLink.setEnabled(false);
         pageBody.add(babsLink);
 
-        PageParameters jullieGegevensParams = new PageParameters();
-        jullieGegevensParams.add("dossierId", dossierId.toString());
-        pageBody.add(new BookmarkablePageLink<>("jullieGegevensLink", JullieGegevensPage.class, jullieGegevensParams));
+        pageBody.add(new BookmarkablePageLink<>("jullieGegevensLink", JullieGegevensPage.class, makeDossierPageParameters(dossierId)));
     }
 }
 

@@ -20,6 +20,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import java.util.List;
 import java.util.UUID;
 
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.extractDossierId;
+
 public abstract class IntakeBasePage extends BurgerBasePage {
 
     @SpringBean
@@ -46,9 +48,8 @@ public abstract class IntakeBasePage extends BurgerBasePage {
     }
 
     protected IntakeBasePage(PageParameters parameters) {
-        String dossierIdStr = parameters.get("dossierId").toOptionalString();
-        if (dossierIdStr != null) {
-            UUID requestedDossierId = UUID.fromString(dossierIdStr);
+        UUID requestedDossierId = extractDossierId(parameters);
+        if (requestedDossierId != null) {
             DossierAccessOutcome outcome = marriageIntakeService.resolveAccess(requestedDossierId, getCurrentBsn());
             switch (outcome.scenario()) {
                 case GRANTED -> dossierId = outcome.dossierId();

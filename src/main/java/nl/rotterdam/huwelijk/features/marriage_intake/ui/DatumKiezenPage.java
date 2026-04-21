@@ -14,6 +14,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
@@ -24,6 +25,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.requireNonNull;
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.extractDossierId;
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.MarriageIntakeHeaderItems.MARRIAGE_INTAKE_CSS;
 
 public class DatumKiezenPage extends BurgerBasePage {
@@ -39,7 +43,11 @@ public class DatumKiezenPage extends BurgerBasePage {
     }
 
     public DatumKiezenPage(PageParameters params) {
-        this.dossierId = UUID.fromString(params.get("dossierId").toString());
+        this.dossierId = requireNonNull(extractDossierId(params));
+    }
+
+    public static void  respond(UUID dossierId) {
+            RequestCycle.get().setResponsePage(DatumKiezenPage.class, makeDossierPageParameters(dossierId));
     }
 
     @Override
@@ -53,10 +61,7 @@ public class DatumKiezenPage extends BurgerBasePage {
         );
         pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", crumbs));
 
-        PageParameters terugParams = new PageParameters()
-                .add("dossierId", dossierId.toString());
-
-        pageBody.add(new BookmarkablePageLink<>("terugLink", DeDagPage.class, terugParams));
+        pageBody.add(new BookmarkablePageLink<>("terugLink", DeDagPage.class,  makeDossierPageParameters(dossierId)));
 
         pageBody.add(new Label("heading", new ResourceModel("datum.kiezen.heading")));
 
@@ -112,9 +117,8 @@ public class DatumKiezenPage extends BurgerBasePage {
                 return;
             }
             marriageIntakeService.slaAfspraakOp(dossierId, gekozen.toLocalDate(), gekozen.toLocalTime());
-            PageParameters params = new PageParameters();
-            params.add("dossierId", dossierId.toString());
-            setResponsePage(DeDagPage.class, params);
+
+            DeDagPage.respond(dossierId);
         }
     }
 

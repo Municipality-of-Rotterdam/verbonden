@@ -47,7 +47,7 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     private RegistratieType registratieType = RegistratieType.GEREGISTREERD_PARTNERSCHAP;
 
-    private RdRadioGroup<RegistratieType> registrationGroup;
+    private final RdRadioGroup<RegistratieType> registrationGroup;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -77,6 +77,7 @@ public class MarriageIntakePage extends IntakeBasePage {
         return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, List.of());
     }
 
+    // TODO this is not right, if it is deserialized from session this constructor might be called
     public MarriageIntakePage() {
         this(new PageParameters());
     }
@@ -109,7 +110,7 @@ public class MarriageIntakePage extends IntakeBasePage {
         // Load ceremony types from database
         List<IntakeMarriageTypeDto> marriageTypes = marriageIntakeService.findAllMarriageTypes();
 
-        form.add(new ListView<IntakeMarriageTypeDto>("ceremonyTypesList", marriageTypes) {
+        form.add(new ListView<>("ceremonyTypesList", marriageTypes) {
             @Override
             protected void populateItem(ListItem<IntakeMarriageTypeDto> item) {
                 IntakeMarriageTypeDto dto = item.getModelObject();
@@ -125,7 +126,7 @@ public class MarriageIntakePage extends IntakeBasePage {
                 item.add(new Label("prijs", "€\u00a0" + formatPrijs(dto.prijs())));
 
                 // Bullet points
-                item.add(new ListView<String>("bullets", dto.bulletPoints()) {
+                item.add(new ListView<>("bullets", dto.bulletPoints()) {
                     @Override
                     protected void populateItem(ListItem<String> bulletItem) {
                         bulletItem.add(new Label("bullet", bulletItem.getModel()));
@@ -142,7 +143,11 @@ public class MarriageIntakePage extends IntakeBasePage {
                 item.add(eersteGelegenheidBox);
 
                 // Submit button — creates a new dossier or updates an existing one
-                RdButton button = new RdButton("kiesButton", Model.of(dto.titel())) {
+                item.add(new RdButton("kiesButton", Model.of(dto.titel())) {
+
+                    {
+                        setEnabled(dto.active());
+                    }
                     @Override
                     public void onSubmit() {
                         if (dossierId != null) {
@@ -152,13 +157,10 @@ public class MarriageIntakePage extends IntakeBasePage {
                             dossierId = marriageIntakeService.create(
                                     new CreateDossierDto(registratieType, dto.soort(), dto.locatieId(), getCurrentBsn()));
                         }
-                        PageParameters params = new PageParameters();
-                        params.add("dossierId", dossierId.toString());
-                        setResponsePage(DeDagPage.class, params);
+
+                        DeDagPage.respond(dossierId);
                     }
-                };
-                button.setEnabled(dto.active());
-                item.add(button);
+                });
             }
         });
 
@@ -168,9 +170,7 @@ public class MarriageIntakePage extends IntakeBasePage {
         verderContainer.add(new Link<Void>("verderLink") {
             @Override
             public void onClick() {
-                PageParameters params = new PageParameters();
-                params.add("dossierId", dossierId.toString());
-                setResponsePage(DeDagPage.class, params);
+                DeDagPage.respond(dossierId);
             }
         });
         pageBody.add(verderContainer);
