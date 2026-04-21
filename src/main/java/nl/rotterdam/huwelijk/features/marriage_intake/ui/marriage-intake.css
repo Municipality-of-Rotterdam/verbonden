@@ -167,6 +167,12 @@
     background-color: #f0f8f4;
 }
 
+.rd-verder-nav {
+    margin-top: 1rem;
+    text-align: end;
+}
+
+
 /* =============================================================
    DeDagPage – secondary button ("Naar Jullie gegevens")
    ============================================================= */
