@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +31,8 @@ public class DossierAdministrationPage extends AdministrationBasePage {
 
     @SpringBean
     private DossierAdministrationService dossierAdministrationService;
+
+    private static final DateTimeFormatter DATUM_TIJD_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     private final Model<String> zoektermModel = Model.of("");
 
@@ -113,7 +116,8 @@ public class DossierAdministrationPage extends AdministrationBasePage {
                                      String componentId,
                                      IModel<ListDossierDto> rowModel) {
                 cellItem.add(new Label(componentId,
-                        rowModel.map(dto -> dto.aangemaaktOp() != null ? dto.aangemaaktOp().toString() : "")));
+                        rowModel.map(dto -> dto.aangemaaktOp() != null
+                                ? dto.aangemaaktOp().format(DATUM_TIJD_FORMATTER) : "")));
             }
         });
 
