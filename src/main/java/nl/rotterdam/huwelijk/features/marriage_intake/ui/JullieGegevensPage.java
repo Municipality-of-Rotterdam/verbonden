@@ -4,6 +4,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntake
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -74,8 +75,7 @@ public class JullieGegevensPage extends IntakeBasePage {
                 // "Gekozen achternaam" display section (with edit icon inside)
                 WebMarkupContainer gekozenAchternaamSection = new WebMarkupContainer("gekozenAchternaamSection");
                 gekozenAchternaamSection.setVisible(partner.gekozenAchternaam() != null);
-                gekozenAchternaamSection.add(new Label("gekozenAchternaamWaarde",
-                        partner.gekozenAchternaam() != null ? partner.gekozenAchternaam() : ""));
+                gekozenAchternaamSection.add(new Label("gekozenAchternaamWaarde", partner.gekozenAchternaam()));
                 item.add(gekozenAchternaamSection);
 
                 // Edit icon — inside gekozenAchternaamSection
@@ -100,14 +100,14 @@ public class JullieGegevensPage extends IntakeBasePage {
 
                     kiesAchternaamSection.add(new WebMarkupContainer("kiesAchternaamButton") {
                         {
-                            add(new org.apache.wicket.behavior.AttributeAppender("onclick",
+                            add(new AttributeAppender("onclick",
                                     "document.getElementById('" + dialogId + "').showModal();return false;"));
                         }
                     });
 
                     editIconContainer.add(new WebMarkupContainer("editButton") {
                         {
-                            add(new org.apache.wicket.behavior.AttributeAppender("onclick",
+                            add(new AttributeAppender("onclick",
                                     "document.getElementById('" + dialogId + "').showModal();return false;"));
                         }
                     });
@@ -165,7 +165,7 @@ public class JullieGegevensPage extends IntakeBasePage {
 
             add(new WebMarkupContainer("sluitenButton") {
                 {
-                    add(new org.apache.wicket.behavior.AttributeAppender("onclick",
+                    add(new AttributeAppender("onclick",
                             "document.getElementById('" + dialogId + "').close();return false;"));
                 }
             });
