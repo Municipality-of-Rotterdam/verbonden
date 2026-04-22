@@ -4,7 +4,8 @@ import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntake
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
-import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -78,6 +79,13 @@ public class JullieGegevensPage extends IntakeBasePage {
                 gekozenAchternaamSection.add(new Label("gekozenAchternaamWaarde", partner.gekozenAchternaam()));
                 item.add(gekozenAchternaamSection);
 
+                // Dialog overlay — toggled visible/hidden via Ajax (starts hidden)
+                WebMarkupContainer dialogContainer = new WebMarkupContainer("naamKiezenDialog");
+                dialogContainer.setOutputMarkupId(true);
+                dialogContainer.setOutputMarkupPlaceholderTag(true);
+                dialogContainer.setVisible(false);
+                item.add(dialogContainer);
+
                 // Edit icon — inside gekozenAchternaamSection
                 WebMarkupContainer editIconContainer = new WebMarkupContainer("editIconContainer");
                 editIconContainer.setVisible(kanKiezen);
@@ -88,32 +96,29 @@ public class JullieGegevensPage extends IntakeBasePage {
                 kiesAchternaamSection.setVisible(kanKiezen && partner.gekozenAchternaam() == null);
                 item.add(kiesAchternaamSection);
 
-                // Dialog with name-selection form
-                WebMarkupContainer dialogContainer = new WebMarkupContainer("naamKiezenDialog");
-                dialogContainer.setOutputMarkupId(true);
-                dialogContainer.setVisible(kanKiezen);
-                item.add(dialogContainer);
-
                 if (kanKiezen) {
                     List<String> naamOpties = berekenNaamOpties(partner, partners);
-                    String dialogId = dialogContainer.getMarkupId();
 
-                    kiesAchternaamSection.add(new WebMarkupContainer("kiesAchternaamButton") {
-                        {
-                            add(new AttributeAppender("onclick",
-                                    "document.getElementById('" + dialogId + "').showModal();return false;"));
+                    // "Kies je achternaam" button — opens dialog via Ajax
+                    kiesAchternaamSection.add(new AjaxLink<Void>("kiesAchternaamButton") {
+                        @Override
+                        public void onClick(AjaxRequestTarget target) {
+                            dialogContainer.setVisible(true);
+                            target.add(dialogContainer);
                         }
                     });
 
-                    editIconContainer.add(new WebMarkupContainer("editButton") {
-                        {
-                            add(new AttributeAppender("onclick",
-                                    "document.getElementById('" + dialogId + "').showModal();return false;"));
+                    // Edit icon — opens dialog via Ajax
+                    editIconContainer.add(new AjaxLink<Void>("editButton") {
+                        @Override
+                        public void onClick(AjaxRequestTarget target) {
+                            dialogContainer.setVisible(true);
+                            target.add(dialogContainer);
                         }
                     });
 
                     dialogContainer.add(new Label("dialogVoornamen", partner.voornamen()));
-                    dialogContainer.add(new NaamKiezenForm("naamKiezenForm", partner, naamOpties, dialogId));
+                    dialogContainer.add(new NaamKiezenForm("naamKiezenForm", partner, naamOpties, dialogContainer));
                 } else {
                     kiesAchternaamSection.add(new WebMarkupContainer("kiesAchternaamButton"));
                     editIconContainer.add(new WebMarkupContainer("editButton"));
@@ -148,7 +153,8 @@ public class JullieGegevensPage extends IntakeBasePage {
 
         private final RadioGroup<String> naamRadioGroup;
 
-        NaamKiezenForm(String id, PartnerGegevensDto partner, List<String> naamOpties, String dialogId) {
+        NaamKiezenForm(String id, PartnerGegevensDto partner, List<String> naamOpties,
+                       WebMarkupContainer dialogContainer) {
             super(id);
             String initialNaam = partner.gekozenAchternaam() != null ? partner.gekozenAchternaam() : naamOpties.get(0);
 
@@ -163,10 +169,12 @@ public class JullieGegevensPage extends IntakeBasePage {
             });
             add(naamRadioGroup);
 
-            add(new WebMarkupContainer("sluitenButton") {
-                {
-                    add(new AttributeAppender("onclick",
-                            "document.getElementById('" + dialogId + "').close();return false;"));
+            // Cancel button — hides dialog via Ajax without submitting
+            add(new AjaxLink<Void>("sluitenButton") {
+                @Override
+                public void onClick(AjaxRequestTarget target) {
+                    dialogContainer.setVisible(false);
+                    target.add(dialogContainer);
                 }
             });
         }

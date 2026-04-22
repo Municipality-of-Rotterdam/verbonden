@@ -58,8 +58,8 @@
                         </label>
                         <!-- Edit icon button (inside gekozenAchternaamSection, only if user can edit) -->
                         <span wicket:id="editIconContainer" class="rd-gekozen-achternaam__edit-wrapper">
-                            <button wicket:id="editButton" type="button" class="rd-gekozen-achternaam__edit-btn"
-                                    aria-label="Achternaam wijzigen">&#x270E;</button>
+                            <a wicket:id="editButton" class="rd-gekozen-achternaam__edit-btn"
+                                    aria-label="Achternaam wijzigen">&#x270E;</a>
                         </span>
                     </div>
                     <div class="rd-partner-card__input-display rd-gekozen-achternaam__display">
@@ -70,42 +70,44 @@
 
                 <!-- Kies je achternaam button (shown when no name chosen yet and user can choose) -->
                 <div wicket:id="kiesAchternaamSection" class="rd-partner-card__actions">
-                    <button wicket:id="kiesAchternaamButton" type="button" class="rd-partner-card__action-button">
+                    <a wicket:id="kiesAchternaamButton" class="rd-partner-card__action-button">
                         <span class="rd-partner-card__action-icon" aria-hidden="true">&#x1F517;</span>
                         <wicket:message key="jullie.gegevens.kies.achternaam">Kies je achternaam</wicket:message>
-                    </button>
+                    </a>
                 </div>
 
-                <!-- Naam kiezen dialog -->
-                <dialog wicket:id="naamKiezenDialog" class="rd-naam-kiezen-dialog">
-                    <div class="rd-naam-kiezen-dialog__header">
-                        <span class="rd-naam-kiezen-dialog__icon" aria-hidden="true">&#x2665;</span>
-                        <h2 class="rd-naam-kiezen-dialog__title">
-                            <wicket:message key="jullie.gegevens.kies.achternaam.titel">Kies hier uw nieuwe achternaam</wicket:message>
-                        </h2>
+                <!-- Naam kiezen dialog overlay (shown/hidden via server-side Ajax) -->
+                <div wicket:id="naamKiezenDialog" class="rd-naam-kiezen-overlay">
+                    <div class="rd-naam-kiezen-dialog">
+                        <div class="rd-naam-kiezen-dialog__header">
+                            <span class="rd-naam-kiezen-dialog__icon" aria-hidden="true">&#x2665;</span>
+                            <h2 class="rd-naam-kiezen-dialog__title">
+                                <wicket:message key="jullie.gegevens.kies.achternaam.titel">Kies hier uw nieuwe achternaam</wicket:message>
+                            </h2>
+                        </div>
+
+                        <span class="rd-partner-card__voornamen" wicket:id="dialogVoornamen">Voornamen</span>
+
+                        <form wicket:id="naamKiezenForm">
+                            <div wicket:id="naamRadioGroup" class="rd-naam-kiezen-dialog__opties">
+                                <label wicket:id="naamOptie" class="rd-naam-radio-optie">
+                                    <input type="radio" wicket:id="radio"/>
+                                    <span wicket:id="label">Optie</span>
+                                </label>
+                            </div>
+
+                            <div class="rd-naam-kiezen-dialog__actions">
+                                <a wicket:id="sluitenButton" class="rd-naam-kiezen-dialog__cancel-btn">
+                                    <wicket:message key="jullie.gegevens.annuleren">Annuleren</wicket:message>
+                                </a>
+                                <button type="submit" class="rd-naam-kiezen-dialog__bevestig-btn">
+                                    <span aria-hidden="true">&#x1F517;</span>
+                                    <wicket:message key="jullie.gegevens.bevestig.achternaam">Bevestig achternaam</wicket:message>
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    <span class="rd-partner-card__voornamen" wicket:id="dialogVoornamen">Voornamen</span>
-
-                    <form wicket:id="naamKiezenForm">
-                        <div wicket:id="naamRadioGroup" class="rd-naam-kiezen-dialog__opties">
-                            <label wicket:id="naamOptie" class="rd-naam-radio-optie">
-                                <input type="radio" wicket:id="radio"/>
-                                <span wicket:id="label">Optie</span>
-                            </label>
-                        </div>
-
-                        <div class="rd-naam-kiezen-dialog__actions">
-                            <button wicket:id="sluitenButton" type="button" class="rd-naam-kiezen-dialog__cancel-btn">
-                                <wicket:message key="jullie.gegevens.annuleren">Annuleren</wicket:message>
-                            </button>
-                            <button type="submit" class="rd-naam-kiezen-dialog__bevestig-btn">
-                                <span aria-hidden="true">&#x1F517;</span>
-                                <wicket:message key="jullie.gegevens.bevestig.achternaam">Bevestig achternaam</wicket:message>
-                            </button>
-                        </div>
-                    </form>
-                </dialog>
+                </div>
 
             </div>
         </div>

@@ -741,10 +741,12 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     padding: 0.125rem 0.25rem;
     color: var(--rd-color-green-500, #007a3e);
     line-height: 1;
+    text-decoration: none;
 }
 
 .rd-gekozen-achternaam__edit-btn:hover {
     color: var(--rd-color-green-700, #005a2d);
+    text-decoration: none;
 }
 
 .rd-gekozen-achternaam__display {
@@ -759,21 +761,29 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
 }
 
 /* =============================================================
-   JullieGegevensPage – naam kiezen dialog
+   JullieGegevensPage – naam kiezen dialog overlay
    ============================================================= */
 
+/* Full-viewport overlay backdrop — replaces <dialog>::backdrop */
+.rd-naam-kiezen-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* The centred dialog box */
 .rd-naam-kiezen-dialog {
-    border: none;
+    background: #fff;
     border-radius: 6px;
     padding: 2rem;
     width: min(480px, 90vw);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
     max-height: 90vh;
     overflow-y: auto;
-}
-
-.rd-naam-kiezen-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.45);
 }
 
 .rd-naam-kiezen-dialog__header {
@@ -867,8 +877,11 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     font-size: 0.9375rem;
     font-family: inherit;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .rd-naam-kiezen-dialog__cancel-btn:hover {
     background-color: #f5f5f5;
+    color: #333;
+    text-decoration: none;
 }
