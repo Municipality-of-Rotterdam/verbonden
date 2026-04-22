@@ -72,4 +72,6 @@ public interface MarriageIntakeService {
     List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum);
 
     void slaAfspraakOp(UUID dossierId, LocalDate datum, LocalTime startTijd);
+
+    void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam);
 }

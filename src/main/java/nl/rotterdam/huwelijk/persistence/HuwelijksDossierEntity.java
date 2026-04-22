@@ -43,6 +43,12 @@ public class HuwelijksDossierEntity {
     @Column(name = "bsn2", length = 10)
     private String bsn2;
 
+    @Column(name = "gekozen_achternaam_bsn1")
+    private String gekozenAchternaamBsn1;
+
+    @Column(name = "gekozen_achternaam_bsn2")
+    private String gekozenAchternaamBsn2;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
@@ -108,5 +114,21 @@ public class HuwelijksDossierEntity {
 
     public void setBsn2(String bsn2) {
         this.bsn2 = bsn2;
+    }
+
+    public String getGekozenAchternaamBsn1() {
+        return gekozenAchternaamBsn1;
+    }
+
+    public void setGekozenAchternaamBsn1(String gekozenAchternaamBsn1) {
+        this.gekozenAchternaamBsn1 = gekozenAchternaamBsn1;
+    }
+
+    public String getGekozenAchternaamBsn2() {
+        return gekozenAchternaamBsn2;
+    }
+
+    public void setGekozenAchternaamBsn2(String gekozenAchternaamBsn2) {
+        this.gekozenAchternaamBsn2 = gekozenAchternaamBsn2;
     }
 }

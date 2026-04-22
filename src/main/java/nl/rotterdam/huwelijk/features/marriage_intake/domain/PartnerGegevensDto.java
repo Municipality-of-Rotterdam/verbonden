@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public record PartnerGegevensDto(
+        String bsn,
         String achternaam,
         String voornamen,
         LocalDate geboortedatum,
@@ -11,6 +12,7 @@ public record PartnerGegevensDto(
         String nationaliteit,
         String burgerlijkeStaat,
         String telefoonnummer,
-        String emailadres
+        String emailadres,
+        String gekozenAchternaam
 ) implements Serializable {
 }

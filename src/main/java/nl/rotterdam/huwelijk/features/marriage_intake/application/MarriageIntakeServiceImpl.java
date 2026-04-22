@@ -88,22 +88,36 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .toList();
     }
 
-    private static final Map<String, PartnerGegevensDto> MOCK_PERSONEN = Map.of(
-            "999990007", new PartnerGegevensDto("Van Muiswinkel", "Erik Jan",
+    private record MockPersonInfo(
+            String achternaam,
+            String voornamen,
+            LocalDate geboortedatum,
+            String geboorteplaats,
+            String nationaliteit,
+            String burgerlijkeStaat,
+            String telefoonnummer,
+            String emailadres
+    ) {}
+
+    private static final Map<String, MockPersonInfo> MOCK_PERSONEN = Map.of(
+            "999990007", new MockPersonInfo("Van Muiswinkel", "Erik Jan",
                     LocalDate.of(1984, 5, 29), "Rotterdam", "Nederlandse", "Ongehuwd",
                     "06-12345678", "evm1984@gmail.com"),
-            "999990019", new PartnerGegevensDto("De Vries", "Sanne Maria",
+            "999990019", new MockPersonInfo("De Vries", "Sanne Maria",
                     LocalDate.of(1992, 3, 14), "Den Haag", "Nederlandse", "Ongehuwd",
                     "06-11223344", "sanne.devries@gmail.com"),
-            "999990020", new PartnerGegevensDto("Jansen", "Pieter",
+            "999990020", new MockPersonInfo("Jansen", "Pieter",
                     LocalDate.of(1988, 7, 22), "Groningen", "Nederlandse", "Gehuwd",
                     "06-55667788", "pieter.jansen@gmail.com"),
-            "999990202", new PartnerGegevensDto("Bakker", "Willem Adriaan",
+            "999990202", new MockPersonInfo("Bakker", "Willem Adriaan",
                     LocalDate.of(1975, 11, 3), "Assen", "Nederlandse", "Gescheiden",
                     "06-99887766", "w.bakker@gmail.com"),
-            "999990032", new PartnerGegevensDto("Dëhlano", "Chavéliën",
+            "999990032", new MockPersonInfo("Dëhlano", "Chavéliën",
                     LocalDate.of(2001, 6, 18), "Paramaribo", "Nederlandse", "Ongehuwd",
-                    "06-44556677", "chavelien@gmail.com")
+                    "06-44556677", "chavelien@gmail.com"),
+            "999990008", new MockPersonInfo("Hofstede", "Jan-Diederik, deIII",
+                    LocalDate.of(1999, 1, 1), "Rotterdam", "Nederlandse", "Ongehuwd",
+                    "06-87654321", "jd3_swagboy@gmail.com")
     );
 
     @Override
@@ -112,17 +126,22 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         List<PartnerGegevensDto> result = new ArrayList<>();
         if (dossier.getBsn1() != null) {
-            result.add(lookupPartner(dossier.getBsn1()));
+            result.add(lookupPartner(dossier.getBsn1(), dossier.getGekozenAchternaamBsn1()));
         }
         if (dossier.getBsn2() != null) {
-            result.add(lookupPartner(dossier.getBsn2()));
+            result.add(lookupPartner(dossier.getBsn2(), dossier.getGekozenAchternaamBsn2()));
         }
         return result;
     }
 
-    private PartnerGegevensDto lookupPartner(String bsn) {
-        return MOCK_PERSONEN.getOrDefault(bsn,
-                new PartnerGegevensDto("Onbekend", bsn, null, "", "Onbekend", "Onbekend", "", ""));
+    private PartnerGegevensDto lookupPartner(String bsn, String gekozenAchternaam) {
+        MockPersonInfo info = MOCK_PERSONEN.get(bsn);
+        if (info == null) {
+            return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend", "", "", gekozenAchternaam);
+        }
+        return new PartnerGegevensDto(bsn, info.achternaam(), info.voornamen(), info.geboortedatum(),
+                info.geboorteplaats(), info.nationaliteit(), info.burgerlijkeStaat(),
+                info.telefoonnummer(), info.emailadres(), gekozenAchternaam);
     }
 
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {
@@ -450,5 +469,18 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             case GROOT -> HuwelijksType.REGULIER;
         };
     }
-}
 
+    @Override
+    @Transactional
+    public void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        if (bsn.equals(dossier.getBsn1())) {
+            dossier.setGekozenAchternaamBsn1(gekozenAchternaam);
+        } else if (bsn.equals(dossier.getBsn2())) {
+            dossier.setGekozenAchternaamBsn2(gekozenAchternaam);
+        } else {
+            throw new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn);
+        }
+        dossierRepository.save(dossier);
+    }
+}
