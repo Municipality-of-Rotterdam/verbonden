@@ -6,6 +6,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -79,11 +80,18 @@ public class JullieGegevensPage extends IntakeBasePage {
                 gekozenAchternaamSection.add(new Label("gekozenAchternaamWaarde", partner.gekozenAchternaam()));
                 item.add(gekozenAchternaamSection);
 
-                // Dialog overlay — toggled visible/hidden via Ajax (starts hidden)
-                WebMarkupContainer dialogContainer = new WebMarkupContainer("naamKiezenDialog");
+                // Dialog overlay — always rendered; shown/hidden via CSS class to avoid inline style
+                IModel<Boolean> dialogTonen = Model.of(false);
+                WebMarkupContainer dialogContainer = new WebMarkupContainer("naamKiezenDialog") {
+                    @Override
+                    protected void onComponentTag(ComponentTag tag) {
+                        super.onComponentTag(tag);
+                        if (!dialogTonen.getObject()) {
+                            tag.append("class", "d-none", " ");
+                        }
+                    }
+                };
                 dialogContainer.setOutputMarkupId(true);
-                dialogContainer.setOutputMarkupPlaceholderTag(true);
-                dialogContainer.setVisible(false);
                 item.add(dialogContainer);
 
                 // Edit icon — inside gekozenAchternaamSection
@@ -103,7 +111,7 @@ public class JullieGegevensPage extends IntakeBasePage {
                     kiesAchternaamSection.add(new AjaxLink<Void>("kiesAchternaamButton") {
                         @Override
                         public void onClick(AjaxRequestTarget target) {
-                            dialogContainer.setVisible(true);
+                            dialogTonen.setObject(true);
                             target.add(dialogContainer);
                         }
                     });
@@ -112,18 +120,29 @@ public class JullieGegevensPage extends IntakeBasePage {
                     editIconContainer.add(new AjaxLink<Void>("editButton") {
                         @Override
                         public void onClick(AjaxRequestTarget target) {
-                            dialogContainer.setVisible(true);
+                            dialogTonen.setObject(true);
                             target.add(dialogContainer);
                         }
                     });
 
                     dialogContainer.add(new Label("dialogVoornamen", partner.voornamen()));
-                    dialogContainer.add(new NaamKiezenForm("naamKiezenForm", partner, naamOpties, dialogContainer));
+                    dialogContainer.add(new NaamKiezenForm("naamKiezenForm", partner, naamOpties, dialogContainer, dialogTonen));
                 } else {
                     kiesAchternaamSection.add(new WebMarkupContainer("kiesAchternaamButton"));
                     editIconContainer.add(new WebMarkupContainer("editButton"));
                     dialogContainer.add(new Label("dialogVoornamen", ""));
-                    dialogContainer.add(new Form<Void>("naamKiezenForm") {});
+                    Form<Void> stubForm = new Form<>("naamKiezenForm");
+                    WebMarkupContainer stubGroup = new WebMarkupContainer("naamRadioGroup");
+                    stubGroup.add(new ListView<String>("naamOptie", List.of()) {
+                        @Override
+                        protected void populateItem(ListItem<String> optieItem) {
+                            optieItem.add(new WebMarkupContainer("radio"));
+                            optieItem.add(new Label("label", ""));
+                        }
+                    });
+                    stubForm.add(stubGroup);
+                    stubForm.add(new WebMarkupContainer("sluitenButton"));
+                    dialogContainer.add(stubForm);
                 }
             }
         });
@@ -154,7 +173,7 @@ public class JullieGegevensPage extends IntakeBasePage {
         private final RadioGroup<String> naamRadioGroup;
 
         NaamKiezenForm(String id, PartnerGegevensDto partner, List<String> naamOpties,
-                       WebMarkupContainer dialogContainer) {
+                       WebMarkupContainer dialogContainer, IModel<Boolean> dialogTonen) {
             super(id);
             String initialNaam = partner.gekozenAchternaam() != null ? partner.gekozenAchternaam() : naamOpties.get(0);
 
@@ -173,7 +192,7 @@ public class JullieGegevensPage extends IntakeBasePage {
             add(new AjaxLink<Void>("sluitenButton") {
                 @Override
                 public void onClick(AjaxRequestTarget target) {
-                    dialogContainer.setVisible(false);
+                    dialogTonen.setObject(false);
                     target.add(dialogContainer);
                 }
             });
