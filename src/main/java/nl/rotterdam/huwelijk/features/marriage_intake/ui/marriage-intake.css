@@ -357,6 +357,46 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     flex-shrink: 0;
 }
 
+/* Partial check: grey circle with grey checkmark (one person selected name) */
+.rd-status-icon--check-partial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: #aaa;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.rd-status-icon--check-partial::before {
+    content: "✓";
+}
+
+/* Full check: green circle with white checkmark (both persons selected name) */
+.rd-status-icon--check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: var(--rd-color-green-500, #007a3e);
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.rd-status-icon--check::before {
+    content: "✓";
+}
+
 /* Filled (done) status icon */
 .rd-status-icon--done {
     display: inline-block;

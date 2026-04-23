@@ -15,6 +15,7 @@ public record DossierSamenvattingDto(
         String huwelijksLocatie,
         boolean gegevensBevestigd,
         boolean getuigenBevestigd,
-        List<String> extras
+        List<String> extras,
+        int aantalGekozenAchternamen
 ) implements Serializable {
 }

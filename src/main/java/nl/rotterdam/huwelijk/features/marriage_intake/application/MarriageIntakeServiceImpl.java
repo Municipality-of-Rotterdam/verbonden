@@ -254,6 +254,10 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .map(MarriageTypeEntity::getPrijs)
                 .orElse(null);
 
+        int aantalGekozenAchternamen =
+                (e.getGekozenAchternaamBsn1() != null ? 1 : 0) +
+                (e.getGekozenAchternaamBsn2() != null ? 1 : 0);
+
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
@@ -263,7 +267,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 locatieNaam,
                 false,
                 false,
-                List.of());
+                List.of(),
+                aantalGekozenAchternamen);
     }
 
     @Override
