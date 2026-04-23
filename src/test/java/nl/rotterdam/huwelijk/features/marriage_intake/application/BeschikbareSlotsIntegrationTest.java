@@ -9,6 +9,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.huwelijk.config.PlanningConfig;
 import nl.rotterdam.huwelijk.integration_test.HuwelijkIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,9 @@ class BeschikbareSlotsIntegrationTest {
 
     @Autowired
     private LocationAdministrationService locationAdministrationService;
+
+    @Autowired
+    private PlanningConfig planningConfig;
 
     @BeforeEach
     void setUp() {
@@ -384,7 +388,7 @@ class BeschikbareSlotsIntegrationTest {
     }
 
     @Test
-    void findAllBeschikbareSlots_retourneert18MaandenAanSlots() {
+    void findAllBeschikbareSlots_retourneertSlotsInPlanningsperiode() {
         long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
 
         maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
@@ -395,13 +399,14 @@ class BeschikbareSlotsIntegrationTest {
         var allSlots = marriageIntakeService.findAllBeschikbareSlots(dossierId);
         assertThat(allSlots).isNotEmpty();
 
-        LocalDate versteSlotDatum = allSlots.stream()
-                .map(LocalDateTime::toLocalDate)
-                .max(LocalDate::compareTo)
-                .orElseThrow();
-        assertThat(versteSlotDatum).isAfterOrEqualTo(LocalDate.now().plusMonths(17));
+        LocalDate vandaag = LocalDate.now();
+        LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
+        LocalDate laatste = vandaag.plusDays(planningConfig.getTotDagen());
 
-        assertThat(allSlots).allMatch(slot -> slot.toLocalDate().isAfter(LocalDate.now()));
+        assertThat(allSlots).allMatch(slot -> !slot.toLocalDate().isBefore(vroegste),
+                "Geen slot mag voor de vroegste planningsdatum liggen");
+        assertThat(allSlots).allMatch(slot -> !slot.toLocalDate().isAfter(laatste),
+                "Geen slot mag na de laatste planningsdatum liggen");
     }
 
     @Test
