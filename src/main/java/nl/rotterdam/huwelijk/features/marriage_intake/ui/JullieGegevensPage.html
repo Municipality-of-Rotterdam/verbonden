@@ -52,21 +52,8 @@
 
                 <!-- Telefoonnummer & E-mailadres: editable form (shown for current user's card) -->
                 <form wicket:id="contactGegevensForm" class="rd-partner-card__contact-form">
-                    <div class="rd-partner-card__field">
-                        <label class="rd-partner-card__label">
-                            <wicket:message key="jullie.gegevens.telefoonnummer">Telefoonnummer</wicket:message>
-                        </label>
-                        <input type="text" wicket:id="telefoonnummerInput" class="rd-partner-card__text-input"
-                               placeholder="06-12345678"/>
-                    </div>
-                    <div class="rd-partner-card__field">
-                        <label class="rd-partner-card__label">
-                            <wicket:message key="jullie.gegevens.emailadres">E-mailadres</wicket:message>
-                        </label>
-                        <input type="text" wicket:id="emailadresInput" class="rd-partner-card__text-input"
-                               placeholder="naam@voorbeeld.nl"/>
-                    </div>
-                    <div wicket:id="contactFeedback" class="rd-partner-card__feedback"></div>
+                    <div wicket:id="telefoonnummerInput"></div>
+                    <div wicket:id="emailadresInput"></div>
                     <button type="submit" class="rd-partner-card__save-btn">
                         <wicket:message key="jullie.gegevens.opslaan.contact">Opslaan</wicket:message>
                     </button>

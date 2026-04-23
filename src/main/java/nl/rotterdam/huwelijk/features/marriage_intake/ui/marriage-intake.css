@@ -808,31 +808,6 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     margin-top: 0;
 }
 
-.rd-partner-card__text-input {
-    display: block;
-    width: 100%;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9375rem;
-    font-family: inherit;
-    color: #333;
-    background: #fff;
-    box-sizing: border-box;
-}
-
-.rd-partner-card__text-input:focus {
-    outline: 2px solid var(--rd-color-green-500, #007a3e);
-    outline-offset: 1px;
-    border-color: var(--rd-color-green-500, #007a3e);
-}
-
-.rd-partner-card__feedback {
-    font-size: 0.875rem;
-    color: #c0392b;
-    margin-bottom: 0.5rem;
-}
-
 .rd-partner-card__save-btn {
     display: inline-flex;
     align-items: center;

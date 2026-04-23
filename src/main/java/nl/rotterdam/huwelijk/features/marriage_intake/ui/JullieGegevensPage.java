@@ -3,6 +3,7 @@ package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -12,10 +13,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.form.RadioGroup;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
@@ -237,20 +236,23 @@ public class JullieGegevensPage extends IntakeBasePage {
             super.onInitialize();
             IModel<ContactGegevensFormDto> model = getModel();
 
-            TextField<String> telefoonnummerField = new TextField<>("telefoonnummerInput",
+            RdFormFieldTextInput<String> telefoonnummerField = new RdFormFieldTextInput<>(
+                    "telefoonnummerInput",
                     LambdaModel.of(model, ContactGegevensFormDto::getTelefoonnummer,
-                            ContactGegevensFormDto::setTelefoonnummer));
-            telefoonnummerField.add(new TelefoonnummerValidator());
+                            ContactGegevensFormDto::setTelefoonnummer),
+                    new ResourceModel("jullie.gegevens.telefoonnummer"));
+            telefoonnummerField.getTextField().add(new TelefoonnummerValidator());
 
-            TextField<String> emailadresField = new TextField<>("emailadresInput",
+            RdFormFieldTextInput<String> emailadresField = new RdFormFieldTextInput<>(
+                    "emailadresInput",
                     LambdaModel.of(model, ContactGegevensFormDto::getEmailadres,
-                            ContactGegevensFormDto::setEmailadres));
-            emailadresField.add(new EmailadresValidator());
+                            ContactGegevensFormDto::setEmailadres),
+                    new ResourceModel("jullie.gegevens.emailadres"));
+            emailadresField.getTextField().add(new EmailadresValidator());
 
             add(
                     telefoonnummerField,
-                    emailadresField,
-                    new FeedbackPanel("contactFeedback")
+                    emailadresField
             );
         }
 
