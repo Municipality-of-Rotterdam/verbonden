@@ -74,4 +74,6 @@ public interface MarriageIntakeService {
     void slaAfspraakOp(UUID dossierId, LocalDate datum, LocalTime startTijd);
 
     void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam);
+
+    void slaContactGegevensOp(UUID dossierId, String bsn, String telefoonnummer, String emailadres);
 }

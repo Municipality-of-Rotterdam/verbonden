@@ -49,6 +49,18 @@ public class HuwelijksDossierEntity {
     @Column(name = "gekozen_achternaam_bsn2")
     private String gekozenAchternaamBsn2;
 
+    @Column(name = "telefoonnummer_bsn1", length = 50)
+    private String telefoonnummerBsn1;
+
+    @Column(name = "emailadres_bsn1", length = 255)
+    private String emailadresBsn1;
+
+    @Column(name = "telefoonnummer_bsn2", length = 50)
+    private String telefoonnummerBsn2;
+
+    @Column(name = "emailadres_bsn2", length = 255)
+    private String emailadresBsn2;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
@@ -130,5 +142,37 @@ public class HuwelijksDossierEntity {
 
     public void setGekozenAchternaamBsn2(String gekozenAchternaamBsn2) {
         this.gekozenAchternaamBsn2 = gekozenAchternaamBsn2;
+    }
+
+    public String getTelefoonnummerBsn1() {
+        return telefoonnummerBsn1;
+    }
+
+    public void setTelefoonnummerBsn1(String telefoonnummerBsn1) {
+        this.telefoonnummerBsn1 = telefoonnummerBsn1;
+    }
+
+    public String getEmailadresBsn1() {
+        return emailadresBsn1;
+    }
+
+    public void setEmailadresBsn1(String emailadresBsn1) {
+        this.emailadresBsn1 = emailadresBsn1;
+    }
+
+    public String getTelefoonnummerBsn2() {
+        return telefoonnummerBsn2;
+    }
+
+    public void setTelefoonnummerBsn2(String telefoonnummerBsn2) {
+        this.telefoonnummerBsn2 = telefoonnummerBsn2;
+    }
+
+    public String getEmailadresBsn2() {
+        return emailadresBsn2;
+    }
+
+    public void setEmailadresBsn2(String emailadresBsn2) {
+        this.emailadresBsn2 = emailadresBsn2;
     }
 }

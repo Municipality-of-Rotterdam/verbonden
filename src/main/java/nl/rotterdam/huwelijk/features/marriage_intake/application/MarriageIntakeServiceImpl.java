@@ -126,22 +126,30 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         List<PartnerGegevensDto> result = new ArrayList<>();
         if (dossier.getBsn1() != null) {
-            result.add(lookupPartner(dossier.getBsn1(), dossier.getGekozenAchternaamBsn1()));
+            result.add(lookupPartner(dossier.getBsn1(), dossier.getGekozenAchternaamBsn1(),
+                    dossier.getTelefoonnummerBsn1(), dossier.getEmailadresBsn1()));
         }
         if (dossier.getBsn2() != null) {
-            result.add(lookupPartner(dossier.getBsn2(), dossier.getGekozenAchternaamBsn2()));
+            result.add(lookupPartner(dossier.getBsn2(), dossier.getGekozenAchternaamBsn2(),
+                    dossier.getTelefoonnummerBsn2(), dossier.getEmailadresBsn2()));
         }
         return result;
     }
 
-    private PartnerGegevensDto lookupPartner(String bsn, String gekozenAchternaam) {
+    private PartnerGegevensDto lookupPartner(String bsn, String gekozenAchternaam,
+                                             String telefoonnummerOverride, String emailadresOverride) {
         MockPersonInfo info = MOCK_PERSONEN.get(bsn);
+        String telefoonnummer = telefoonnummerOverride != null ? telefoonnummerOverride
+                : (info != null ? info.telefoonnummer() : "");
+        String emailadres = emailadresOverride != null ? emailadresOverride
+                : (info != null ? info.emailadres() : "");
         if (info == null) {
-            return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend", "", "", gekozenAchternaam);
+            return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend",
+                    telefoonnummer, emailadres, gekozenAchternaam);
         }
         return new PartnerGegevensDto(bsn, info.achternaam(), info.voornamen(), info.geboortedatum(),
                 info.geboorteplaats(), info.nationaliteit(), info.burgerlijkeStaat(),
-                info.telefoonnummer(), info.emailadres(), gekozenAchternaam);
+                telefoonnummer, emailadres, gekozenAchternaam);
     }
 
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {
@@ -483,6 +491,22 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             dossier.setGekozenAchternaamBsn1(gekozenAchternaam);
         } else if (bsn.equals(dossier.getBsn2())) {
             dossier.setGekozenAchternaamBsn2(gekozenAchternaam);
+        } else {
+            throw new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn);
+        }
+        dossierRepository.save(dossier);
+    }
+
+    @Override
+    @Transactional
+    public void slaContactGegevensOp(UUID dossierId, String bsn, String telefoonnummer, String emailadres) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        if (bsn.equals(dossier.getBsn1())) {
+            dossier.setTelefoonnummerBsn1(telefoonnummer);
+            dossier.setEmailadresBsn1(emailadres);
+        } else if (bsn.equals(dossier.getBsn2())) {
+            dossier.setTelefoonnummerBsn2(telefoonnummer);
+            dossier.setEmailadresBsn2(emailadres);
         } else {
             throw new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn);
         }

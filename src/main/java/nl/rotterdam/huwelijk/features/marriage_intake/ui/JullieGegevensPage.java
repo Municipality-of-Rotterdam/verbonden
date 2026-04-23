@@ -12,9 +12,12 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -63,6 +66,7 @@ public class JullieGegevensPage extends IntakeBasePage {
             protected void populateItem(ListItem<PartnerGegevensDto> item) {
                 PartnerGegevensDto partner = item.getModelObject();
                 boolean kanKiezen = tweeBsns && partner.bsn().equals(currentBsn);
+                boolean kanContactBewerken = partner.bsn().equals(currentBsn);
 
                 item.add(new Label("achternaam", partner.achternaam()));
                 item.add(new Label("voornamen", partner.voornamen()));
@@ -71,8 +75,20 @@ public class JullieGegevensPage extends IntakeBasePage {
                 item.add(new Label("geboorteplaats", partner.geboorteplaats()));
                 item.add(new Label("nationaliteit", partner.nationaliteit()));
                 item.add(new Label("burgerlijkeStaat", partner.burgerlijkeStaat()));
-                item.add(new Label("telefoonnummer", partner.telefoonnummer()));
-                item.add(new Label("emailadres", partner.emailadres()));
+
+                // Contact gegevens: read-only display (shown for partner's card)
+                WebMarkupContainer contactGegevensReadOnly = new WebMarkupContainer("contactGegevensReadOnly");
+                contactGegevensReadOnly.setVisible(!kanContactBewerken);
+                contactGegevensReadOnly.add(
+                        new Label("telefoonnummer", partner.telefoonnummer()),
+                        new Label("emailadres", partner.emailadres())
+                );
+                item.add(contactGegevensReadOnly);
+
+                // Contact gegevens: editable form (shown for current user's card)
+                ContactGegevensForm contactGegevensForm = new ContactGegevensForm("contactGegevensForm", partner);
+                contactGegevensForm.setVisible(kanContactBewerken);
+                item.add(contactGegevensForm);
 
                 // "Gekozen achternaam" display section (with edit icon inside)
                 WebMarkupContainer gekozenAchternaamSection = new WebMarkupContainer("gekozenAchternaamSection");
@@ -202,6 +218,47 @@ public class JullieGegevensPage extends IntakeBasePage {
         protected void onSubmit() {
             String gekozenNaam = naamRadioGroup.getModelObject();
             marriageIntakeService.slaGekozenAchternaamOp(dossierId, getCurrentBsn(), gekozenNaam);
+            setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
+        }
+    }
+
+    private class ContactGegevensForm extends Form<ContactGegevensFormDto> {
+
+        ContactGegevensForm(String id, PartnerGegevensDto partner) {
+            super(id);
+            ContactGegevensFormDto dto = new ContactGegevensFormDto();
+            dto.setTelefoonnummer(partner.telefoonnummer());
+            dto.setEmailadres(partner.emailadres());
+            setDefaultModel(Model.of(dto));
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            IModel<ContactGegevensFormDto> model = getModel();
+
+            TextField<String> telefoonnummerField = new TextField<>("telefoonnummerInput",
+                    LambdaModel.of(model, ContactGegevensFormDto::getTelefoonnummer,
+                            ContactGegevensFormDto::setTelefoonnummer));
+            telefoonnummerField.add(new TelefoonnummerValidator());
+
+            TextField<String> emailadresField = new TextField<>("emailadresInput",
+                    LambdaModel.of(model, ContactGegevensFormDto::getEmailadres,
+                            ContactGegevensFormDto::setEmailadres));
+            emailadresField.add(new EmailadresValidator());
+
+            add(
+                    telefoonnummerField,
+                    emailadresField,
+                    new FeedbackPanel("contactFeedback")
+            );
+        }
+
+        @Override
+        protected void onSubmit() {
+            ContactGegevensFormDto f = getModelObject();
+            marriageIntakeService.slaContactGegevensOp(dossierId, getCurrentBsn(),
+                    f.getTelefoonnummer(), f.getEmailadres());
             setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
         }
     }
