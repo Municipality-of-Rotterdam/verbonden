@@ -477,7 +477,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             GetuigeEntity entity = new GetuigeEntity();
             entity.setDossier(dossier);
             entity.setVolgnummer(dto.volgnummer());
-            entity.setNaam(dto.naam().strip());
+            entity.setNaam(dto.naam());
             entity.setBestandNaam(dto.bestandNaam());
             entity.setBestandData(dto.bestandData());
             getuigenRepository.save(entity);
