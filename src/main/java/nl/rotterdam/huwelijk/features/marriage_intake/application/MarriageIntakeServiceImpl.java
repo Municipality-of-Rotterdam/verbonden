@@ -9,13 +9,17 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.DossierRepository;
+import nl.rotterdam.huwelijk.features.marriage_intake.repository.GetuigenRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeRepository;
 import nl.rotterdam.huwelijk.persistence.AfspraakEntity;
+import nl.rotterdam.huwelijk.persistence.GetuigeEntity;
 import nl.rotterdam.huwelijk.persistence.HuwelijksDossierEntity;
 import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeEntity;
@@ -42,6 +46,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final MarriageTypeLocationRepository marriageTypeLocationRepository;
     private final MarriageTypeRepository marriageTypeRepository;
     private final AfspraakRepository afspraakRepository;
+    private final GetuigenRepository getuigenRepository;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
                               BeschikbaarheidRepository beschikbaarheidRepository,
@@ -49,7 +54,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               LocatieRepository locatieRepository,
                               MarriageTypeLocationRepository marriageTypeLocationRepository,
                               MarriageTypeRepository marriageTypeRepository,
-                              AfspraakRepository afspraakRepository) {
+                              AfspraakRepository afspraakRepository,
+                              GetuigenRepository getuigenRepository) {
         this.dossierRepository = dossierRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
         this.nietBeschikbareDagRepository = nietBeschikbareDagRepository;
@@ -57,6 +63,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
         this.marriageTypeRepository = marriageTypeRepository;
         this.afspraakRepository = afspraakRepository;
+        this.getuigenRepository = getuigenRepository;
     }
 
     @Override
@@ -235,6 +242,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .map(MarriageTypeEntity::getPrijs)
                 .orElse(null);
 
+        int vereistAantalGetuigen = e.getCeremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
+        long aantalGetuigenIngevuld = getuigenRepository.countByDossier_IdAndNaamIsNotNull(e.getId());
+        boolean getuigenBevestigd = aantalGetuigenIngevuld >= vereistAantalGetuigen;
+        boolean getuigenGedeeltelijkIngevuld = aantalGetuigenIngevuld > 0 && !getuigenBevestigd;
+
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
@@ -243,7 +255,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 datumTijdHuwelijk,
                 locatieNaam,
                 false,
-                false,
+                getuigenBevestigd,
+                getuigenGedeeltelijkIngevuld,
                 List.of());
     }
 
@@ -441,6 +454,34 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private HuwelijksDossierEntity getDossier(UUID uuid) {
         return dossierRepository.findByUuid(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + uuid));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<GetuigeDto> findGetuigen(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        return getuigenRepository.findByDossier_IdOrderByVolgnummer(dossier.getId()).stream()
+                .map(e -> new GetuigeDto(e.getVolgnummer(), e.getNaam(), e.getBestandNaam()))
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void slaGetuigenOp(UUID dossierId, List<SaveGetuigenDto> getuigen) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        getuigenRepository.deleteByDossier_Id(dossier.getId());
+        for (SaveGetuigenDto dto : getuigen) {
+            if (dto.naam() == null || dto.naam().isBlank()) {
+                continue;
+            }
+            GetuigeEntity entity = new GetuigeEntity();
+            entity.setDossier(dossier);
+            entity.setVolgnummer(dto.volgnummer());
+            entity.setNaam(dto.naam().strip());
+            entity.setBestandNaam(dto.bestandNaam());
+            entity.setBestandData(dto.bestandData());
+            getuigenRepository.save(entity);
+        }
     }
 
     private static HuwelijksType toHuwelijksType(CeremonieSoort ceremonieSoort) {

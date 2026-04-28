@@ -12,6 +12,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -88,17 +89,40 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         pageBody.add(notAuthorizedAlert);
 
         pageBody.add(
-                createTabButton("tabDedag", IntakeStep.DE_DAG),
-                createTabButton("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS),
-                createTabButton("tabGetuigen", IntakeStep.DE_GETUIGEN),
-                createTabButton("tabExtras", IntakeStep.EXTRAS)
+                createTabLink("tabDedag", IntakeStep.DE_DAG, DeDagPage.class),
+                createTabLink("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS, JullieGegevensPage.class),
+                createTabLink("tabGetuigen", IntakeStep.DE_GETUIGEN, DeGetuigenPage.class),
+                createDisabledTab("tabExtras", IntakeStep.EXTRAS)
         );
 
         keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel());
         pageBody.add(keuzesSidebar);
     }
 
-    private WebMarkupContainer createTabButton(String id, IntakeStep step) {
+    private Link<Void> createTabLink(String id, IntakeStep step, Class<? extends IntakeBasePage> pageClass) {
+        Link<Void> tab = new Link<>(id) {
+            @Override
+            public void onClick() {
+                if (dossierId != null) {
+                    setResponsePage(pageClass, makeDossierPageParameters(dossierId));
+                }
+            }
+
+            @Override
+            public boolean isEnabled() {
+                return dossierId != null;
+            }
+        };
+        boolean isActive = getActiveStep() == step;
+        tab.add(AttributeModifier.replace("aria-selected", String.valueOf(isActive)));
+        if (isActive) {
+            tab.add(AttributeModifier.append("class", " rd-tab--active"));
+            tab.add(AttributeModifier.replace("aria-current", "step"));
+        }
+        return tab;
+    }
+
+    private WebMarkupContainer createDisabledTab(String id, IntakeStep step) {
         WebMarkupContainer tab = new WebMarkupContainer(id);
         boolean isActive = getActiveStep() == step;
         tab.add(AttributeModifier.replace("aria-selected", String.valueOf(isActive)));

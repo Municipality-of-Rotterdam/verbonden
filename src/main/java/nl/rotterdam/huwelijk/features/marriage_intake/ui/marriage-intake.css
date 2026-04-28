@@ -59,10 +59,14 @@
     margin-bottom: -1px;
     border-radius: 2px 2px 0 0;
     font-family: inherit;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .rd-tab:hover {
     background-color: #f5f5f5;
+    text-decoration: none;
+    color: #444;
 }
 
 .rd-tab--active {
@@ -70,6 +74,12 @@
     border-bottom-color: #fff;
     background-color: #fff;
     font-weight: 600;
+}
+
+.rd-tab--disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Intro paragraph */
@@ -355,6 +365,44 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     border: 2px solid #aaa;
     border-radius: 50%;
     flex-shrink: 0;
+}
+
+/* Green checkmark status icon (all complete) */
+.rd-status-icon--check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: var(--rd-color-green-500, #007a3e);
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.rd-status-icon--check::after {
+    content: '\2713';
+}
+
+/* Grey X status icon (partially complete) */
+.rd-status-icon--partial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: #aaa;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+.rd-status-icon--partial::after {
+    content: '\00D7';
 }
 
 /* Filled (done) status icon */
@@ -711,4 +759,80 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
 
 .rd-partner-card__action-icon {
     font-size: 1rem;
+}
+
+/* =============================================================
+   DeGetuigenPage – witness entry blocks
+   ============================================================= */
+
+.rd-getuigen-card {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 1.5rem;
+    background: #fff;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.rd-getuige-block {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.rd-getuige-block:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.rd-getuige-block__heading {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+    color: #222;
+}
+
+.rd-getuige-block__field {
+    margin-bottom: 0.75rem;
+}
+
+.rd-getuige-block__label {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    color: #333;
+}
+
+.rd-getuige-block__input {
+    width: 100%;
+    max-width: 28rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    color: #222;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.rd-getuige-block__input:focus {
+    outline: 2px solid var(--rd-color-green-500, #007a3e);
+    outline-offset: 2px;
+    border-color: var(--rd-color-green-500, #007a3e);
+}
+
+.rd-getuige-block__file {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.rd-getuige-block__bestand-naam {
+    font-size: 0.875rem;
+    color: var(--rd-color-green-500, #007a3e);
+    display: block;
+    margin-top: 0.2rem;
 }
