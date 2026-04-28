@@ -26,6 +26,6 @@ public class EmailadresWicketConverter implements IConverter<Emailadres> {
 
     @Override
     public String convertToString(Emailadres value, Locale locale) {
-        return value.getValue();
+        return value != null ? value.getValue() : null;
     }
 }

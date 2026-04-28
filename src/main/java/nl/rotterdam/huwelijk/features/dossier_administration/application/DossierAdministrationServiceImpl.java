@@ -38,7 +38,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         List<HuwelijksDossiersPartnerEntity> sorted = entity.getPartners().stream()
                 .sorted(Comparator.comparingInt(HuwelijksDossiersPartnerEntity::getVolgorde))
                 .toList();
-        String bsn1 = sorted.size() > 0 ? sorted.get(0).getBsn() : null;
+        String bsn1 = !sorted.isEmpty() ? sorted.get(0).getBsn() : null;
         String bsn2 = sorted.size() > 1 ? sorted.get(1).getBsn() : null;
         return new ListDossierDto(
                 entity.getUuid(),

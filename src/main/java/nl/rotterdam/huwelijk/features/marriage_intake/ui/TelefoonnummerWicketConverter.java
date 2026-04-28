@@ -26,6 +26,6 @@ public class TelefoonnummerWicketConverter implements IConverter<Telefoonnummer>
 
     @Override
     public String convertToString(Telefoonnummer value, Locale locale) {
-        return value.getValue();
+        return value != null ? value.getValue() : null;
     }
 }
