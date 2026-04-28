@@ -11,8 +11,8 @@ public record PartnerGegevensDto(
         String geboorteplaats,
         String nationaliteit,
         String burgerlijkeStaat,
-        String telefoonnummer,
-        String emailadres,
+        Telefoonnummer telefoonnummer,
+        Emailadres emailadres,
         String gekozenAchternaam
 ) implements Serializable {
 }

@@ -12,5 +12,5 @@ public interface DossierRepository extends JpaRepository<HuwelijksDossierEntity,
 
     Optional<HuwelijksDossierEntity> findByUuid(UUID uuid);
 
-    Optional<HuwelijksDossierEntity> findByBsn1OrBsn2(String bsn1, String bsn2);
+    Optional<HuwelijksDossierEntity> findByPartners_Bsn(String bsn);
 }

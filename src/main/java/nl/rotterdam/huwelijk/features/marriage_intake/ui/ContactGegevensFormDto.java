@@ -1,25 +1,28 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
+
 import java.io.Serializable;
 
 public class ContactGegevensFormDto implements Serializable {
 
-    private String telefoonnummer;
-    private String emailadres;
+    private Telefoonnummer telefoonnummer;
+    private Emailadres emailadres;
 
-    public String getTelefoonnummer() {
+    public Telefoonnummer getTelefoonnummer() {
         return telefoonnummer;
     }
 
-    public void setTelefoonnummer(String telefoonnummer) {
+    public void setTelefoonnummer(Telefoonnummer telefoonnummer) {
         this.telefoonnummer = telefoonnummer;
     }
 
-    public String getEmailadres() {
+    public Emailadres getEmailadres() {
         return emailadres;
     }
 
-    public void setEmailadres(String emailadres) {
+    public void setEmailadres(Emailadres emailadres) {
         this.emailadres = emailadres;
     }
 }

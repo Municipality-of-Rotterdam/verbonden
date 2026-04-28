@@ -9,14 +9,17 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeRepository;
 import nl.rotterdam.huwelijk.persistence.AfspraakEntity;
 import nl.rotterdam.huwelijk.persistence.HuwelijksDossierEntity;
+import nl.rotterdam.huwelijk.persistence.HuwelijksDossiersPartnerEntity;
 import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeEntity;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeLocationEntity;
@@ -125,24 +128,20 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         List<PartnerGegevensDto> result = new ArrayList<>();
-        if (dossier.getBsn1() != null) {
-            result.add(lookupPartner(dossier.getBsn1(), dossier.getGekozenAchternaamBsn1(),
-                    dossier.getTelefoonnummerBsn1(), dossier.getEmailadresBsn1()));
-        }
-        if (dossier.getBsn2() != null) {
-            result.add(lookupPartner(dossier.getBsn2(), dossier.getGekozenAchternaamBsn2(),
-                    dossier.getTelefoonnummerBsn2(), dossier.getEmailadresBsn2()));
+        for (HuwelijksDossiersPartnerEntity partner : dossier.getPartners()) {
+            result.add(lookupPartner(partner.getBsn(), partner.getGekozenAchternaam(),
+                    partner.getTelefoonnummer(), partner.getEmailadres()));
         }
         return result;
     }
 
     private PartnerGegevensDto lookupPartner(String bsn, String gekozenAchternaam,
-                                             String telefoonnummerOverride, String emailadresOverride) {
+                                             Telefoonnummer telefoonnummerOverride, Emailadres emailadresOverride) {
         MockPersonInfo info = MOCK_PERSONEN.get(bsn);
-        String telefoonnummer = telefoonnummerOverride != null ? telefoonnummerOverride
-                : (info != null ? info.telefoonnummer() : "");
-        String emailadres = emailadresOverride != null ? emailadresOverride
-                : (info != null ? info.emailadres() : "");
+        Telefoonnummer telefoonnummer = telefoonnummerOverride != null ? telefoonnummerOverride
+                : (info != null ? new Telefoonnummer(info.telefoonnummer()) : null);
+        Emailadres emailadres = emailadresOverride != null ? emailadresOverride
+                : (info != null ? new Emailadres(info.emailadres()) : null);
         if (info == null) {
             return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend",
                     telefoonnummer, emailadres, gekozenAchternaam);
@@ -174,9 +173,15 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity entity = new HuwelijksDossierEntity();
         entity.setRegistratieType(dto.registratieType());
         entity.setCeremonieSoort(dto.ceremonieSoort());
-        entity.setBsn1(dto.bsn1());
         if (dto.locatieId() != null) {
             locatieRepository.findById(dto.locatieId()).ifPresent(entity::setLocatie);
+        }
+        if (dto.bsn1() != null) {
+            HuwelijksDossiersPartnerEntity partner1 = new HuwelijksDossiersPartnerEntity();
+            partner1.setDossier(entity);
+            partner1.setVolgorde(1);
+            partner1.setBsn(dto.bsn1());
+            entity.getPartners().add(partner1);
         }
         return dossierRepository.save(entity).getUuid();
     }
@@ -203,7 +208,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UUID> findDossierIdByBsn(String bsn) {
-        return dossierRepository.findByBsn1OrBsn2(bsn, bsn)
+        return dossierRepository.findByPartners_Bsn(bsn)
                 .map(HuwelijksDossierEntity::getUuid);
     }
 
@@ -211,11 +216,16 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Transactional
     public void ensureBsnAccess(UUID dossierId, String bsn) {
         HuwelijksDossierEntity e = getDossier(dossierId);
-        if (bsn.equals(e.getBsn1()) || bsn.equals(e.getBsn2())) {
+        boolean alreadyPartner = e.getPartners().stream().anyMatch(p -> bsn.equals(p.getBsn()));
+        if (alreadyPartner) {
             return;
         }
-        if (e.getBsn2() == null && !bsn.equals(e.getBsn1())) {
-            e.setBsn2(bsn);
+        if (e.getPartners().size() < 2) {
+            HuwelijksDossiersPartnerEntity newPartner = new HuwelijksDossiersPartnerEntity();
+            newPartner.setDossier(e);
+            newPartner.setVolgorde(e.getPartners().isEmpty() ? 1 : 2);
+            newPartner.setBsn(bsn);
+            e.getPartners().add(newPartner);
             dossierRepository.save(e);
             return;
         }
@@ -225,7 +235,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public DossierAccessOutcome resolveAccess(UUID requestedDossierId, String bsn) {
-        Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByBsn1OrBsn2(bsn, bsn);
+        Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByPartners_Bsn(bsn);
 
         if (existingDossier.isPresent()) {
             UUID existingId = existingDossier.get().getUuid();
@@ -237,9 +247,12 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
 
         HuwelijksDossierEntity requested = getDossier(requestedDossierId);
-        if (requested.getBsn2() == null) {
-            // Scenario 3: BSN has no dossier yet; register it as the second partner in this dossier.
-            requested.setBsn2(bsn);
+        if (requested.getPartners().size() < 2) {
+            HuwelijksDossiersPartnerEntity partner2 = new HuwelijksDossiersPartnerEntity();
+            partner2.setDossier(requested);
+            partner2.setVolgorde(2);
+            partner2.setBsn(bsn);
+            requested.getPartners().add(partner2);
             dossierRepository.save(requested);
             return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
         }
@@ -262,9 +275,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .map(MarriageTypeEntity::getPrijs)
                 .orElse(null);
 
-        int aantalGekozenAchternamen =
-                (e.getGekozenAchternaamBsn1() != null ? 1 : 0) +
-                (e.getGekozenAchternaamBsn2() != null ? 1 : 0);
+        int aantalGekozenAchternamen = (int) e.getPartners().stream()
+                .filter(p -> p.getGekozenAchternaam() != null)
+                .count();
 
         return new DossierSamenvattingDto(
                 e.getUuid(),
@@ -487,29 +500,24 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Transactional
     public void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
-        if (bsn.equals(dossier.getBsn1())) {
-            dossier.setGekozenAchternaamBsn1(gekozenAchternaam);
-        } else if (bsn.equals(dossier.getBsn2())) {
-            dossier.setGekozenAchternaamBsn2(gekozenAchternaam);
-        } else {
-            throw new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn);
-        }
+        HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
+                .filter(p -> bsn.equals(p.getBsn()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn));
+        partner.setGekozenAchternaam(gekozenAchternaam);
         dossierRepository.save(dossier);
     }
 
     @Override
     @Transactional
-    public void slaContactGegevensOp(UUID dossierId, String bsn, String telefoonnummer, String emailadres) {
+    public void slaContactGegevensOp(UUID dossierId, String bsn, Telefoonnummer telefoonnummer, Emailadres emailadres) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
-        if (bsn.equals(dossier.getBsn1())) {
-            dossier.setTelefoonnummerBsn1(telefoonnummer);
-            dossier.setEmailadresBsn1(emailadres);
-        } else if (bsn.equals(dossier.getBsn2())) {
-            dossier.setTelefoonnummerBsn2(telefoonnummer);
-            dossier.setEmailadresBsn2(emailadres);
-        } else {
-            throw new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn);
-        }
+        HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
+                .filter(p -> bsn.equals(p.getBsn()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn));
+        partner.setTelefoonnummer(telefoonnummer);
+        partner.setEmailadres(emailadres);
         dossierRepository.save(dossier);
     }
 

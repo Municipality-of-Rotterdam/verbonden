@@ -3,8 +3,10 @@ package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
 import nl.rotterdam.huwelijk.integration_test.BaseWicketTest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
@@ -63,7 +65,7 @@ class ContactGegevensFormTest extends BaseWicketTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(partner.telefoonnummer()).isEqualTo("0612345999");
-        assertThat(partner.emailadres()).isEqualTo("new@example.com");
+        assertThat(partner.telefoonnummer()).isEqualTo(new Telefoonnummer("0612345999"));
+        assertThat(partner.emailadres()).isEqualTo(new Emailadres("new@example.com"));
     }
 }

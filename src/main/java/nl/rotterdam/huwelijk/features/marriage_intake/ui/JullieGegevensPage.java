@@ -2,7 +2,9 @@ package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -79,8 +81,10 @@ public class JullieGegevensPage extends IntakeBasePage {
                 WebMarkupContainer contactGegevensReadOnly = new WebMarkupContainer("contactGegevensReadOnly");
                 contactGegevensReadOnly.setVisible(!kanContactBewerken);
                 contactGegevensReadOnly.add(
-                        new Label("telefoonnummer", partner.telefoonnummer()),
-                        new Label("emailadres", partner.emailadres())
+                        new Label("telefoonnummer",
+                                partner.telefoonnummer() != null ? partner.telefoonnummer().getValue() : ""),
+                        new Label("emailadres",
+                                partner.emailadres() != null ? partner.emailadres().getValue() : "")
                 );
                 item.add(contactGegevensReadOnly);
 
@@ -236,19 +240,19 @@ public class JullieGegevensPage extends IntakeBasePage {
             super.onInitialize();
             IModel<ContactGegevensFormDto> model = getModel();
 
-            RdFormFieldTextInput<String> telefoonnummerField = new RdFormFieldTextInput<>(
+            RdFormFieldTextInput<Telefoonnummer> telefoonnummerField = new RdFormFieldTextInput<>(
                     "telefoonnummerInput",
                     LambdaModel.of(model, ContactGegevensFormDto::getTelefoonnummer,
                             ContactGegevensFormDto::setTelefoonnummer),
                     new ResourceModel("jullie.gegevens.telefoonnummer"));
-            telefoonnummerField.getTextField().add(new TelefoonnummerValidator());
+            telefoonnummerField.setModelType(Telefoonnummer.class);
 
-            RdFormFieldTextInput<String> emailadresField = new RdFormFieldTextInput<>(
+            RdFormFieldTextInput<Emailadres> emailadresField = new RdFormFieldTextInput<>(
                     "emailadresInput",
                     LambdaModel.of(model, ContactGegevensFormDto::getEmailadres,
                             ContactGegevensFormDto::setEmailadres),
                     new ResourceModel("jullie.gegevens.emailadres"));
-            emailadresField.getTextField().add(new EmailadresValidator());
+            emailadresField.setModelType(Emailadres.class);
 
             add(
                     telefoonnummerField,
