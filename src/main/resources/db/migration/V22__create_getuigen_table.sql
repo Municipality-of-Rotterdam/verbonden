@@ -5,5 +5,5 @@ CREATE TABLE getuigen (
     naam       VARCHAR(500),
     bestand_naam VARCHAR(500),
     bestand_data BYTEA,
-    CONSTRAINT chk_getuige_volgnummer UNIQUE (dossier_id, volgnummer)
+    CONSTRAINT uq_getuige_dossier_volgnummer UNIQUE (dossier_id, volgnummer)
 );
