@@ -8,6 +8,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.huwelijk.integration_test.BaseWicketTest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -22,14 +23,24 @@ class ContactGegevensFormTest extends BaseWicketTest {
     @Autowired
     private MarriageIntakeService marriageIntakeService;
 
+    private UUID createdDossierId;
+
+    @AfterEach
+    void cleanup() {
+        if (createdDossierId != null) {
+            marriageIntakeService.delete(createdDossierId);
+            createdDossierId = null;
+        }
+    }
+
     @Test
     @WithMockUser(username = "999990007")
     void testContactGegevensFormSavesNewValues() {
-        UUID dossierId = marriageIntakeService.create(
+        createdDossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990007"));
 
         PageParameters params = new PageParameters();
-        params.add("dossierId", dossierId.toString());
+        params.add("dossierId", createdDossierId.toString());
         tester.startPage(JullieGegevensPage.class, params);
         tester.assertRenderedPage(JullieGegevensPage.class);
 
@@ -46,7 +57,7 @@ class ContactGegevensFormTest extends BaseWicketTest {
 
         tester.assertRenderedPage(JullieGegevensPage.class);
 
-        List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
+        List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(createdDossierId);
         PartnerGegevensDto partner = partners.stream()
                 .filter(p -> "999990007".equals(p.bsn()))
                 .findFirst()

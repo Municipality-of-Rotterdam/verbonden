@@ -512,4 +512,12 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
         dossierRepository.save(dossier);
     }
+
+    @Override
+    @Transactional
+    public void delete(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        afspraakRepository.deleteByDossier_Id(dossier.getId());
+        dossierRepository.delete(dossier);
+    }
 }

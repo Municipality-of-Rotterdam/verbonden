@@ -76,4 +76,6 @@ public interface MarriageIntakeService {
     void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam);
 
     void slaContactGegevensOp(UUID dossierId, String bsn, String telefoonnummer, String emailadres);
+
+    void delete(UUID dossierId);
 }
