@@ -14,6 +14,13 @@ public class EmailadresAttributeConverter implements AttributeConverter<Emailadr
 
     @Override
     public Emailadres convertToEntityAttribute(String dbData) {
-        return dbData != null ? new Emailadres(dbData) : null;
+        if (dbData == null) {
+            return null;
+        }
+        try {
+            return new Emailadres(dbData);
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 }

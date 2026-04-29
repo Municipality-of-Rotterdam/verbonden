@@ -114,7 +114,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                     "06-55667788", "pieter.jansen@gmail.com"),
             "999990202", new MockPersonInfo("Bakker", "Willem Adriaan",
                     LocalDate.of(1975, 11, 3), "Assen", "Nederlandse", "Gescheiden",
-                    "06-99887766", "w.bakker@gmail.com"),
+                    "06-22334455", "w.bakker@gmail.com"),
             "999990032", new MockPersonInfo("Dëhlano", "Chavéliën",
                     LocalDate.of(2001, 6, 18), "Paramaribo", "Nederlandse", "Ongehuwd",
                     "06-44556677", "chavelien@gmail.com"),

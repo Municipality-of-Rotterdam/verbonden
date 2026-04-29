@@ -14,6 +14,13 @@ public class TelefoonnummerAttributeConverter implements AttributeConverter<Tele
 
     @Override
     public Telefoonnummer convertToEntityAttribute(String dbData) {
-        return dbData != null ? new Telefoonnummer(dbData) : null;
+        if (dbData == null) {
+            return null;
+        }
+        try {
+            return new Telefoonnummer(dbData);
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 }

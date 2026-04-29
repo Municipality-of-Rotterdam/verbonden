@@ -2,7 +2,6 @@ package nl.rotterdam.huwelijk.features.marriage_intake.domain;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.annotation.Nonnull;
 import nl.rotterdam.huwelijk.domain.ValueHolder;
 
@@ -13,7 +12,8 @@ import static java.util.Objects.requireNonNull;
 /**
  * Value type representing a phone number.
  * NL numbers are assumed when no country code is given (e.g. "06-12345678", "0201234567").
- * Full international numbers with a country code prefix (e.g. "+32 470 123456") are also accepted.
+ * Full international numbers with a country code prefix (e.g. "+32 470 12 34 56") are also accepted.
+ * The raw trimmed input is preserved as the stored value.
  */
 public record Telefoonnummer(String value) implements ValueHolder<String>, Serializable {
 
@@ -21,18 +21,17 @@ public record Telefoonnummer(String value) implements ValueHolder<String>, Seria
 
     public Telefoonnummer {
         requireNonNull(value, "Telefoonnummer mag niet null zijn");
-        value = replacePrefix(value.trim().replaceAll("-",""), "00", "+");
+        value = value.trim();
 
+        String forParsing = replacePrefix(value.replaceAll("[\\s-]", ""), "00", "+");
         try {
-            Phonenumber.PhoneNumber number = PHONE_UTIL.parse(value, "NL");
+            var number = PHONE_UTIL.parse(forParsing, "NL");
             if (!PHONE_UTIL.isValidNumber(number)) {
                 throw new TelefoonnummerOngeldigException(value);
             }
-            value = String.format("+$1$2" , number.getCountryCode() , number.getNationalNumber());
         } catch (NumberParseException e) {
             throw new TelefoonnummerOngeldigException(value);
         }
-
     }
 
     @Override
@@ -45,8 +44,7 @@ public record Telefoonnummer(String value) implements ValueHolder<String>, Seria
         return "Telefoonnummer[" + value + "]";
     }
 
-    private String replacePrefix(@Nonnull String value, String prefix, String replacement){
-        return value.startsWith(prefix)? value.replaceFirst(prefix, replacement) : value;
+    private static String replacePrefix(@Nonnull String value, String prefix, String replacement) {
+        return value.startsWith(prefix) ? value.replaceFirst(prefix, replacement) : value;
     }
-
 }
