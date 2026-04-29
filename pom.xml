@@ -140,6 +140,20 @@
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 
+        <!-- Phone number validation -->
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>9.0.8</version>
+        </dependency>
+
+        <!-- Email address validation -->
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.10.1</version>
+        </dependency>
+
         <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
         <dependency>
             <groupId>org.jsoup</groupId>

@@ -20,7 +20,7 @@ class TelefoonnummerTest {
     }
 
     @Test
-    void acceptsInternationalFormat() {
+    void acceptsInternationalNlFormat() {
         Telefoonnummer nummer = new Telefoonnummer("+31612345678");
         assertThat(nummer.getValue()).isEqualTo("+31612345678");
     }
@@ -29,6 +29,12 @@ class TelefoonnummerTest {
     void acceptsLandlineNumber() {
         Telefoonnummer nummer = new Telefoonnummer("0201234567");
         assertThat(nummer.getValue()).isEqualTo("0201234567");
+    }
+
+    @Test
+    void acceptsInternationalNonNlNumber() {
+        Telefoonnummer nummer = new Telefoonnummer("+32 470 12 34 56");
+        assertThat(nummer.getValue()).isEqualTo("+32 470 12 34 56");
     }
 
     @Test
@@ -44,7 +50,7 @@ class TelefoonnummerTest {
     }
 
     @Test
-    void rejectsNumberStartingWithNonNinetyDigitPrefix() {
+    void rejectsInvalidNumber() {
         assertThatThrownBy(() -> new Telefoonnummer("0012345678"))
                 .isInstanceOf(TelefoonnummerOngeldigException.class);
     }
@@ -70,6 +76,6 @@ class TelefoonnummerTest {
     @Test
     void equalityBasedOnValue() {
         assertThat(new Telefoonnummer("0612345678")).isEqualTo(new Telefoonnummer("0612345678"));
-        assertThat(new Telefoonnummer("0612345678")).isNotEqualTo(new Telefoonnummer("0698765432"));
+        assertThat(new Telefoonnummer("0612345678")).isNotEqualTo(new Telefoonnummer("0623456789"));
     }
 }
