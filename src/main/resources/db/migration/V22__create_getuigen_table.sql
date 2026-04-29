@@ -1,4 +1,4 @@
-CREATE TABLE getuigen (
+CREATE TABLE huwelijksdossiers_getuigen (
     id         BIGSERIAL PRIMARY KEY,
     dossier_id BIGINT       NOT NULL REFERENCES huwelijksdossiers (id),
     volgnummer INT          NOT NULL,
