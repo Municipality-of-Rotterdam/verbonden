@@ -5,6 +5,6 @@ import java.io.Serializable;
 public record GetuigeDto(
         int volgnummer,
         String naam,
-        String bestandNaam
+        LegitimatieFileUpload bestand
 ) implements Serializable {
 }

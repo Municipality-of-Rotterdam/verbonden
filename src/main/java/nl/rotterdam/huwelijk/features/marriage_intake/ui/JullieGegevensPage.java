@@ -6,16 +6,18 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class JullieGegevensPage extends IntakeBasePage {
 
@@ -68,5 +70,7 @@ public class JullieGegevensPage extends IntakeBasePage {
         WebMarkupContainer partnerNogBevestigenCard = new WebMarkupContainer("partnerNogBevestigenCard");
         partnerNogBevestigenCard.setVisible(partners.size() < 2);
         pageBody.add(partnerNogBevestigenCard);
+
+        pageBody.add(new BookmarkablePageLink<>("deGetuigenLink", DeGetuigenPage.class, makeDossierPageParameters(dossierId)));
     }
 }

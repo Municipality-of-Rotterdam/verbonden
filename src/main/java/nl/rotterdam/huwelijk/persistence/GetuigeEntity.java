@@ -23,7 +23,6 @@ public class GetuigeEntity {
     @Column(name = "bestand_naam", length = 500)
     private String bestandNaam;
 
-    @Lob
     @Column(name = "bestand_data")
     private byte[] bestandData;
 

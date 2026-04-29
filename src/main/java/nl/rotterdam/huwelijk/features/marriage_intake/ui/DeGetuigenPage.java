@@ -1,15 +1,20 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
+import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.LegitimatieFileUpload;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.IModel;
@@ -66,10 +71,10 @@ public class DeGetuigenPage extends IntakeBasePage {
 
     private class GetuigenForm extends Form<GetuigenFormDto> {
 
-        private final FileUploadField bestandVeld1 = new FileUploadField("bestand");
-        private final FileUploadField bestandVeld2 = new FileUploadField("bestand");
-        private final FileUploadField bestandVeld3 = new FileUploadField("bestand");
-        private final FileUploadField bestandVeld4 = new FileUploadField("bestand");
+        private final FileUploadField bestandVeld1 = new FileUploadField("bestandInput");
+        private final FileUploadField bestandVeld2 = new FileUploadField("bestandInput");
+        private final FileUploadField bestandVeld3 = new FileUploadField("bestandInput");
+        private final FileUploadField bestandVeld4 = new FileUploadField("bestandInput");
 
         GetuigenForm(String id, GetuigenFormDto formDto) {
             super(id, Model.of(formDto));
@@ -103,7 +108,7 @@ public class DeGetuigenPage extends IntakeBasePage {
             boolean zichtbaar = volgnummer <= maxGetuigen;
             String bestaandeBestandNaam = bestaande.stream()
                     .filter(g -> g.volgnummer() == volgnummer)
-                    .map(GetuigeDto::bestandNaam)
+                    .map(g -> g.bestand() != null ? g.bestand().bestandNaam() : null)
                     .findFirst()
                     .orElse(null);
 
@@ -115,13 +120,33 @@ public class DeGetuigenPage extends IntakeBasePage {
                 }
             };
             blok.add(new Label("getuigeNummer", getString("de.getuigen.getuige") + " " + volgnummer));
-            blok.add(new TextField<>("naam", naamModel(volgnummer, model)));
+
+            blok.add(new RdFormFieldTextInput<>("naam",
+                    naamModel(volgnummer, model),
+                    new ResourceModel("de.getuigen.naam.label"))
+                    .setModelType(PersonFullName.class)
+                    .withTextInput((rdTextInput, parent) -> rdTextInput.add(
+                            new AjaxFormComponentUpdatingBehavior("change") {
+                                @Override
+                                protected void onUpdate(AjaxRequestTarget target) {
+                                    slaAllesOp();
+                                }
+                            }
+                    ))
+            );
+
+            bestandVeld.add(new AjaxFormSubmitBehavior("change") {
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    // form's onSubmit() handles saving
+                }
+            });
             blok.add(bestandVeld);
             blok.add(new Label("bestandNaamLabel", bestaandeBestandNaam != null ? bestaandeBestandNaam : ""));
             return blok;
         }
 
-        private IModel<String> naamModel(int volgnummer, IModel<GetuigenFormDto> model) {
+        private IModel<PersonFullName> naamModel(int volgnummer, IModel<GetuigenFormDto> model) {
             return switch (volgnummer) {
                 case 1 -> LambdaModel.of(model, GetuigenFormDto::getNaam1, GetuigenFormDto::setNaam1);
                 case 2 -> LambdaModel.of(model, GetuigenFormDto::getNaam2, GetuigenFormDto::setNaam2);
@@ -133,25 +158,53 @@ public class DeGetuigenPage extends IntakeBasePage {
 
         @Override
         protected void onSubmit() {
+            slaAllesOp();
+        }
+
+        private void slaAllesOp() {
             GetuigenFormDto formDto = getModelObject();
             DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
             int maxGetuigen = dossier.ceremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
 
-            String[] namen = {formDto.getNaam1(), formDto.getNaam2(), formDto.getNaam3(), formDto.getNaam4()};
-            FileUploadField[] bestanden = {bestandVeld1, bestandVeld2, bestandVeld3, bestandVeld4};
+            PersonFullName[] namen = {
+                    formDto.getNaam1(), formDto.getNaam2(),
+                    formDto.getNaam3(), formDto.getNaam4()
+            };
+            FileUploadField[] velden = {bestandVeld1, bestandVeld2, bestandVeld3, bestandVeld4};
+            LegitimatieFileUpload[] bestanden = {
+                    formDto.getBestand1(), formDto.getBestand2(),
+                    formDto.getBestand3(), formDto.getBestand4()
+            };
 
             List<SaveGetuigenDto> teOpslaan = new ArrayList<>();
             for (int i = 0; i < maxGetuigen; i++) {
-                int volgnummer = i + 1;
-                String naam = namen[i] != null ? namen[i].strip() : null;
-                FileUpload upload = bestanden[i].getFileUpload();
-                String bestandNaam = upload != null ? upload.getClientFileName() : null;
-                byte[] bestandData = upload != null ? upload.getBytes() : null;
-                teOpslaan.add(new SaveGetuigenDto(volgnummer, naam, bestandNaam, bestandData));
+                PersonFullName naam = namen[i];
+                if (naam == null) {
+                    continue;
+                }
+                FileUpload upload = velden[i].getFileUpload();
+                LegitimatieFileUpload bestand;
+                if (upload != null && upload.getClientFileName() != null && !upload.getClientFileName().isBlank()) {
+                    bestand = new LegitimatieFileUpload(upload.getClientFileName(), upload.getBytes());
+                    // Update FormDto so subsequent saves preserve this file
+                    setBestandOpFormDto(formDto, i + 1, bestand);
+                } else {
+                    bestand = bestanden[i];
+                }
+                teOpslaan.add(new SaveGetuigenDto(i + 1, naam.getValue(), bestand));
             }
 
             marriageIntakeService.slaGetuigenOp(dossierId, teOpslaan);
-            DeGetuigenPage.respond(dossierId);
+        }
+
+        private void setBestandOpFormDto(GetuigenFormDto formDto, int volgnummer, LegitimatieFileUpload bestand) {
+            switch (volgnummer) {
+                case 1 -> formDto.setBestand1(bestand);
+                case 2 -> formDto.setBestand2(bestand);
+                case 3 -> formDto.setBestand3(bestand);
+                case 4 -> formDto.setBestand4(bestand);
+            }
         }
     }
 }
+

@@ -14,6 +14,7 @@ import nl.rotterdam.huwelijk.features.location_administration.ui.LocationCreateP
 import nl.rotterdam.huwelijk.features.location_administration.ui.LocationUpdatePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.DatumKiezenPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeDagPage;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeGetuigenPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.JullieGegevensPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagCreatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagImportPage;
@@ -87,6 +88,7 @@ public class WicketApplication extends WebApplication {
         mountPage("/huwelijk/${dossierId}", MarriageIntakePage.class);
         mountPage("/mijn-dag/${dossierId}", DeDagPage.class);
         mountPage("/mijn-dag/${dossierId}/jullie-gegevens", JullieGegevensPage.class);
+        mountPage("/mijn-dag/${dossierId}/de-getuigen", DeGetuigenPage.class);
         mountPage("/mijn-dag/${dossierId}/datum-kiezen", DatumKiezenPage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/nieuw", NietBeschikbareDagCreatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/${id}", NietBeschikbareDagUpdatePage.class);

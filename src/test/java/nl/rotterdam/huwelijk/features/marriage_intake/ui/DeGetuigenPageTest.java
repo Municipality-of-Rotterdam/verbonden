@@ -35,10 +35,10 @@ class DeGetuigenPageTest extends BaseWicketTest {
         tester.startPage(DeGetuigenPage.class, params);
 
         tester.assertRenderedPage(DeGetuigenPage.class);
-        tester.assertVisible("pageBody:getuigenForm:getuige1");
-        tester.assertVisible("pageBody:getuigenForm:getuige2");
-        tester.assertVisible("pageBody:getuigenForm:getuige3");
-        tester.assertVisible("pageBody:getuigenForm:getuige4");
+        tester.assertContains("Getuige 1");
+        tester.assertContains("Getuige 2");
+        tester.assertContains("Getuige 3");
+        tester.assertContains("Getuige 4");
     }
 
     @Test
@@ -52,10 +52,10 @@ class DeGetuigenPageTest extends BaseWicketTest {
         tester.startPage(DeGetuigenPage.class, params);
 
         tester.assertRenderedPage(DeGetuigenPage.class);
-        tester.assertVisible("pageBody:getuigenForm:getuige1");
-        tester.assertVisible("pageBody:getuigenForm:getuige2");
-        tester.assertInvisible("pageBody:getuigenForm:getuige3");
-        tester.assertInvisible("pageBody:getuigenForm:getuige4");
+        tester.assertContains("Getuige 1");
+        tester.assertContains("Getuige 2");
+        assertThat(tester.getLastResponseAsString()).doesNotContain("Getuige 3");
+        assertThat(tester.getLastResponseAsString()).doesNotContain("Getuige 4");
     }
 
     @Test
@@ -65,10 +65,10 @@ class DeGetuigenPageTest extends BaseWicketTest {
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
 
         List<SaveGetuigenDto> getuigen = List.of(
-                new SaveGetuigenDto(1, "Kwik van Willegenburgh", null, null),
-                new SaveGetuigenDto(2, "Kwek van Willegenburgh", null, null),
-                new SaveGetuigenDto(3, "Kwak van Willegenburgh", null, null),
-                new SaveGetuigenDto(4, "Dagobert Duck", null, null)
+                new SaveGetuigenDto(1, "Kwik van Willegenburgh", null),
+                new SaveGetuigenDto(2, "Kwek van Willegenburgh", null),
+                new SaveGetuigenDto(3, "Kwak van Willegenburgh", null),
+                new SaveGetuigenDto(4, "Dagobert Duck", null)
         );
         marriageIntakeService.slaGetuigenOp(dossierId, getuigen);
 
@@ -85,7 +85,7 @@ class DeGetuigenPageTest extends BaseWicketTest {
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
 
         marriageIntakeService.slaGetuigenOp(dossierId,
-                List.of(new SaveGetuigenDto(1, "Eerste Getuige", null, null)));
+                List.of(new SaveGetuigenDto(1, "Eerste Getuige", null)));
 
         var samenvatting = marriageIntakeService.findByDossierId(dossierId);
         assertThat(samenvatting.getuigenBevestigd()).isFalse();
@@ -99,8 +99,8 @@ class DeGetuigenPageTest extends BaseWicketTest {
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, "999990202"));
 
         marriageIntakeService.slaGetuigenOp(dossierId, List.of(
-                new SaveGetuigenDto(1, "Getuige Een", null, null),
-                new SaveGetuigenDto(2, "Getuige Twee", null, null)
+                new SaveGetuigenDto(1, "Getuige Een", null),
+                new SaveGetuigenDto(2, "Getuige Twee", null)
         ));
 
         var samenvatting = marriageIntakeService.findByDossierId(dossierId);

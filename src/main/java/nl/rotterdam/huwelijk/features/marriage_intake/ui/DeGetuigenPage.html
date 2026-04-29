@@ -9,26 +9,20 @@
         de gegevens te verifi&#235;ren door een identiteitscontrole.
     </p>
 
-    <!-- Witnesses form -->
-    <form wicket:id="getuigenForm" enctype="multipart/form-data">
+    <!-- Witnesses form — auto-saves on field change, no submit button needed -->
+    <form wicket:id="getuigenForm">
 
         <div class="rd-getuigen-card">
 
-            <!-- Getuige 1 -->
             <div wicket:id="getuige1" class="rd-getuige-block">
                 <h3 class="rd-getuige-block__heading" wicket:id="getuigeNummer">Getuige 1</h3>
-                <div class="rd-getuige-block__field">
-                    <label class="rd-getuige-block__label">
-                        <wicket:message key="de.getuigen.naam.label">Voornaam &amp; Achternaam</wicket:message>
-                    </label>
-                    <input wicket:id="naam" type="text" class="rd-getuige-block__input"
-                           placeholder="Voornaam en achternaam"/>
-                </div>
+                <!-- RdFormFieldTextInput renders label + input + validation -->
+                <div wicket:id="naam"></div>
                 <div class="rd-getuige-block__field">
                     <label class="rd-getuige-block__label">
                         <wicket:message key="de.getuigen.bestand.label">Identiteitsbewijs (optioneel)</wicket:message>
                     </label>
-                    <input wicket:id="bestand" type="file" class="rd-getuige-block__file"/>
+                    <input wicket:id="bestandInput" type="file" class="rd-getuige-block__file"/>
                     <span wicket:id="bestandNaamLabel" class="rd-getuige-block__bestand-naam"></span>
                 </div>
             </div>
@@ -36,18 +30,12 @@
             <!-- Getuige 2 -->
             <div wicket:id="getuige2" class="rd-getuige-block">
                 <h3 class="rd-getuige-block__heading" wicket:id="getuigeNummer">Getuige 2</h3>
-                <div class="rd-getuige-block__field">
-                    <label class="rd-getuige-block__label">
-                        <wicket:message key="de.getuigen.naam.label">Voornaam &amp; Achternaam</wicket:message>
-                    </label>
-                    <input wicket:id="naam" type="text" class="rd-getuige-block__input"
-                           placeholder="Voornaam en achternaam"/>
-                </div>
+                <div wicket:id="naam"></div>
                 <div class="rd-getuige-block__field">
                     <label class="rd-getuige-block__label">
                         <wicket:message key="de.getuigen.bestand.label">Identiteitsbewijs (optioneel)</wicket:message>
                     </label>
-                    <input wicket:id="bestand" type="file" class="rd-getuige-block__file"/>
+                    <input wicket:id="bestandInput" type="file" class="rd-getuige-block__file"/>
                     <span wicket:id="bestandNaamLabel" class="rd-getuige-block__bestand-naam"></span>
                 </div>
             </div>
@@ -55,18 +43,12 @@
             <!-- Getuige 3 -->
             <div wicket:id="getuige3" class="rd-getuige-block">
                 <h3 class="rd-getuige-block__heading" wicket:id="getuigeNummer">Getuige 3</h3>
-                <div class="rd-getuige-block__field">
-                    <label class="rd-getuige-block__label">
-                        <wicket:message key="de.getuigen.naam.label">Voornaam &amp; Achternaam</wicket:message>
-                    </label>
-                    <input wicket:id="naam" type="text" class="rd-getuige-block__input"
-                           placeholder="Voornaam en achternaam"/>
-                </div>
+                <div wicket:id="naam"></div>
                 <div class="rd-getuige-block__field">
                     <label class="rd-getuige-block__label">
                         <wicket:message key="de.getuigen.bestand.label">Identiteitsbewijs (optioneel)</wicket:message>
                     </label>
-                    <input wicket:id="bestand" type="file" class="rd-getuige-block__file"/>
+                    <input wicket:id="bestandInput" type="file" class="rd-getuige-block__file"/>
                     <span wicket:id="bestandNaamLabel" class="rd-getuige-block__bestand-naam"></span>
                 </div>
             </div>
@@ -74,30 +56,19 @@
             <!-- Getuige 4 -->
             <div wicket:id="getuige4" class="rd-getuige-block">
                 <h3 class="rd-getuige-block__heading" wicket:id="getuigeNummer">Getuige 4</h3>
-                <div class="rd-getuige-block__field">
-                    <label class="rd-getuige-block__label">
-                        <wicket:message key="de.getuigen.naam.label">Voornaam &amp; Achternaam</wicket:message>
-                    </label>
-                    <input wicket:id="naam" type="text" class="rd-getuige-block__input"
-                           placeholder="Voornaam en achternaam"/>
-                </div>
+                <div wicket:id="naam"></div>
                 <div class="rd-getuige-block__field">
                     <label class="rd-getuige-block__label">
                         <wicket:message key="de.getuigen.bestand.label">Identiteitsbewijs (optioneel)</wicket:message>
                     </label>
-                    <input wicket:id="bestand" type="file" class="rd-getuige-block__file"/>
+                    <input wicket:id="bestandInput" type="file" class="rd-getuige-block__file"/>
                     <span wicket:id="bestandNaamLabel" class="rd-getuige-block__bestand-naam"></span>
                 </div>
             </div>
 
         </div>
 
-        <div class="rd-verder-nav">
-            <button type="submit" class="rd-ceremony-select-button" style="width: auto; padding: 0.625rem 1.5rem;">
-                <wicket:message key="de.getuigen.opslaan">Opslaan</wicket:message>
-            </button>
-        </div>
-
     </form>
 
 </wicket:extend>
+
