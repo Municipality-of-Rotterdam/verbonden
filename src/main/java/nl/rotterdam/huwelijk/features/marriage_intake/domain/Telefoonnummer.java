@@ -2,6 +2,8 @@ package nl.rotterdam.huwelijk.features.marriage_intake.domain;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+import jakarta.annotation.Nonnull;
 import nl.rotterdam.huwelijk.domain.ValueHolder;
 
 import java.io.Serializable;
@@ -19,16 +21,18 @@ public record Telefoonnummer(String value) implements ValueHolder<String>, Seria
 
     public Telefoonnummer {
         requireNonNull(value, "Telefoonnummer mag niet null zijn");
-        value = value.trim();
+        value = replacePrefix(value.trim().replaceAll("-",""), "00", "+");
 
         try {
-            var number = PHONE_UTIL.parse(value, "NL");
+            Phonenumber.PhoneNumber number = PHONE_UTIL.parse(value, "NL");
             if (!PHONE_UTIL.isValidNumber(number)) {
                 throw new TelefoonnummerOngeldigException(value);
             }
+            value = String.format("+$1$2" , number.getCountryCode() , number.getNationalNumber());
         } catch (NumberParseException e) {
             throw new TelefoonnummerOngeldigException(value);
         }
+
     }
 
     @Override
@@ -40,4 +44,9 @@ public record Telefoonnummer(String value) implements ValueHolder<String>, Seria
     public String toString() {
         return "Telefoonnummer[" + value + "]";
     }
+
+    private String replacePrefix(@Nonnull String value, String prefix, String replacement){
+        return value.startsWith(prefix)? value.replaceFirst(prefix, replacement) : value;
+    }
+
 }
