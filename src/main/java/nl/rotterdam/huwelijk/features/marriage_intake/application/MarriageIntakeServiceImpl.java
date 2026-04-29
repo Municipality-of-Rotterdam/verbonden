@@ -492,6 +492,23 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
     }
 
+    @Override
+    @Transactional
+    public void slaGetuigeOp(UUID dossierId, SaveGetuigenDto dto) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        GetuigeEntity entity = getuigenRepository
+                .findByDossier_IdAndVolgnummer(dossier.getId(), dto.volgnummer())
+                .orElseGet(GetuigeEntity::new);
+        entity.setDossier(dossier);
+        entity.setVolgnummer(dto.volgnummer());
+        entity.setNaam(dto.naam());
+        if (dto.bestand() != null) {
+            entity.setBestandNaam(dto.bestand().bestandNaam());
+            entity.setBestandData(dto.bestand().bestandData());
+        }
+        getuigenRepository.save(entity);
+    }
+
     private static HuwelijksType toHuwelijksType(CeremonieSoort ceremonieSoort) {
         return switch (ceremonieSoort) {
             case KLEIN -> HuwelijksType.GRATIS;

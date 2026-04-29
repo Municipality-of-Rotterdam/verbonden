@@ -78,4 +78,6 @@ public interface MarriageIntakeService {
     List<GetuigeDto> findGetuigen(UUID dossierId);
 
     void slaGetuigenOp(UUID dossierId, List<SaveGetuigenDto> getuigen);
+
+    void slaGetuigeOp(UUID dossierId, SaveGetuigenDto getuige);
 }

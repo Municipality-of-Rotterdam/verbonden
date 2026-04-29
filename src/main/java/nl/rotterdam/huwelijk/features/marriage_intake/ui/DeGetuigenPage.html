@@ -9,26 +9,21 @@
         de gegevens te verifi&#235;ren door een identiteitscontrole.
     </p>
 
-    <!-- Witnesses form — auto-saves on field change, no submit button needed -->
-    <form wicket:id="getuigenForm">
+    <div class="rd-getuigen-card">
 
-        <div class="rd-getuigen-card">
-
-            <div wicket:id="getuigen">
-                <div class="rd-getuige-block">
-                    <h3 class="rd-getuige-block__heading" wicket:id="getuigeNummer">Getuige</h3>
-                    <!-- RdFormFieldTextInput renders label + input + validation -->
-                    <div wicket:id="naam"></div>
-                    <div wicket:id="bestandInput">
-                        <input wicket:id="input" type="file"/>
-                    </div>
-                    <span wicket:id="bestandNaamLabel" class="rd-getuige-block__bestand-naam"></span>
+        <div wicket:id="getuigen">
+            <form wicket:id="getuigeForm" class="rd-getuige-block">
+                <h3 class="rd-getuige-block__heading" wicket:id="getuigeNummer">Getuige</h3>
+                <!-- RdFormFieldTextInput renders label + input + validation -->
+                <div wicket:id="naam"></div>
+                <div wicket:id="bestandInput">
+                    <input wicket:id="input" type="file"/>
                 </div>
-            </div>
-
+                <span wicket:id="bestandNaamLabel" class="rd-getuige-block__bestand-naam"></span>
+            </form>
         </div>
 
-    </form>
+    </div>
 
 </wicket:extend>
 

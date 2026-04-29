@@ -27,7 +27,6 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,93 +71,81 @@ public class DeGetuigenPage extends IntakeBasePage {
         List<GetuigeDto> bestaande = marriageIntakeService.findGetuigen(dossierId);
         List<GetuigenItemFormDto> items = GetuigenItemFormDto.vanGetuigen(maxGetuigen, bestaande);
 
-        pageBody.add(new GetuigenForm("getuigenForm", items));
+        pageBody.add(new ListView<GetuigenItemFormDto>("getuigen", new ListModel<>(items)) {
+            @Override
+            protected void populateItem(ListItem<GetuigenItemFormDto> item) {
+                item.add(new GetuigeForm("getuigeForm", item.getModel()));
+            }
+        }.setReuseItems(true));
     }
 
-    private class GetuigenForm extends Form<List<GetuigenItemFormDto>> {
+    private class GetuigeForm extends Form<GetuigenItemFormDto> {
 
-        private final List<RdFormFieldFileUpload> bestandVelden = new ArrayList<>();
+        private RdFormFieldFileUpload bestandVeld;
 
-        GetuigenForm(String id, List<GetuigenItemFormDto> items) {
-            super(id, new ListModel<>(items));
+        GetuigeForm(String id, IModel<GetuigenItemFormDto> model) {
+            super(id, model);
             setMultiPart(true);
             setMaxSize(Bytes.megabytes(10));
-            for (int i = 0; i < items.size(); i++) {
-                bestandVelden.add(new RdFormFieldFileUpload(
-                        "bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label")));
-            }
         }
 
         @Override
         protected void onInitialize() {
             super.onInitialize();
 
-            IModel<List<GetuigenItemFormDto>> model = getModel();
+            IModel<GetuigenItemFormDto> model = getModel();
+            int volgnummer = model.getObject().getVolgnummer();
+            String bestaandeBestandNaam = model.getObject().getBestand() != null
+                    ? model.getObject().getBestand().bestandNaam() : null;
 
-            add(new ListView<GetuigenItemFormDto>("getuigen", model) {
-                @Override
-                protected void populateItem(ListItem<GetuigenItemFormDto> item) {
-                    int index = item.getIndex();
-                    int volgnummer = item.getModelObject().getVolgnummer();
-                    RdFormFieldFileUpload bestandVeld = bestandVelden.get(index);
+            bestandVeld = new RdFormFieldFileUpload(
+                    "bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
 
-                    String bestaandeBestandNaam = item.getModelObject().getBestand() != null
-                            ? item.getModelObject().getBestand().bestandNaam() : null;
-
-                    item.add(new Label("getuigeNummer", getString("de.getuigen.getuige") + " " + volgnummer));
-
-                    item.add(new RdFormFieldTextInput<>("naam",
-                            LambdaModel.of(item.getModel(), GetuigenItemFormDto::getNaam, GetuigenItemFormDto::setNaam),
+            add(
+                    new Label("getuigeNummer", getString("de.getuigen.getuige") + " " + volgnummer),
+                    new RdFormFieldTextInput<>("naam",
+                            LambdaModel.of(model, GetuigenItemFormDto::getNaam, GetuigenItemFormDto::setNaam),
                             new ResourceModel("de.getuigen.naam.label"))
                             .setModelType(PersonFullName.class)
                             .withTextInput((rdTextInput, parent) -> rdTextInput.add(
                                     new AjaxFormComponentUpdatingBehavior("change") {
                                         @Override
                                         protected void onUpdate(AjaxRequestTarget target) {
-                                            slaAllesOp();
+                                            slaOp();
                                         }
                                     }
-                            ))
-                    );
-
+                            )),
                     bestandVeld.withInput(input -> input.add(new AjaxFormSubmitBehavior("change") {
                         @Override
                         protected void onSubmit(AjaxRequestTarget target) {
                             // form's onSubmit() handles saving
                         }
-                    }));
-                    item.add(bestandVeld);
-                    item.add(new Label("bestandNaamLabel", bestaandeBestandNaam != null ? bestaandeBestandNaam : ""));
-                }
-            }.setReuseItems(true));
+                    })),
+                    new Label("bestandNaamLabel", bestaandeBestandNaam != null ? bestaandeBestandNaam : "")
+            );
         }
 
         @Override
         protected void onSubmit() {
-            slaAllesOp();
+            slaOp();
         }
 
-        private void slaAllesOp() {
-            List<GetuigenItemFormDto> items = getModelObject();
-            List<SaveGetuigenDto> teOpslaan = new ArrayList<>();
-            for (int i = 0; i < items.size(); i++) {
-                GetuigenItemFormDto item = items.get(i);
-                PersonFullName naam = item.getNaam();
-                if (naam == null) {
-                    continue;
-                }
-                FileUpload upload = bestandVelden.get(i).getFileUpload();
-                LegitimatieFileUpload bestand;
-                if (upload != null && upload.getClientFileName() != null && !upload.getClientFileName().isBlank()) {
-                    bestand = new LegitimatieFileUpload(upload.getClientFileName(), upload.getBytes());
-                    item.setBestand(bestand);
-                } else {
-                    bestand = item.getBestand();
-                }
-                teOpslaan.add(new SaveGetuigenDto(item.getVolgnummer(), naam.getValue(), bestand));
+        private void slaOp() {
+            GetuigenItemFormDto formDto = getModelObject();
+            PersonFullName naam = formDto.getNaam();
+            if (naam == null) {
+                return;
             }
-
-            marriageIntakeService.slaGetuigenOp(dossierId, teOpslaan);
+            FileUpload upload = bestandVeld.getFileUpload();
+            LegitimatieFileUpload bestand;
+            if (upload != null && upload.getClientFileName() != null && !upload.getClientFileName().isBlank()) {
+                bestand = new LegitimatieFileUpload(upload.getClientFileName(), upload.getBytes());
+                formDto.setBestand(bestand);
+            } else {
+                bestand = formDto.getBestand();
+            }
+            marriageIntakeService.slaGetuigeOp(dossierId,
+                    new SaveGetuigenDto(formDto.getVolgnummer(), naam.getValue(), bestand));
         }
     }
 }

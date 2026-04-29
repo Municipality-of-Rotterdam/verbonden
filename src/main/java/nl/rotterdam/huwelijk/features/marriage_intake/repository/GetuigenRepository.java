@@ -7,11 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GetuigenRepository extends JpaRepository<GetuigeEntity, Long> {
 
     List<GetuigeEntity> findByDossier_IdOrderByVolgnummer(long dossierId);
+
+    Optional<GetuigeEntity> findByDossier_IdAndVolgnummer(long dossierId, int volgnummer);
 
     @Modifying
     @Query("delete from GetuigeEntity g where g.dossier.id = :dossierId")
