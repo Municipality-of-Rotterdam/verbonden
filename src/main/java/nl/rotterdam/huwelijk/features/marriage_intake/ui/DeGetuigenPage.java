@@ -13,10 +13,11 @@ import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
@@ -66,99 +67,70 @@ public class DeGetuigenPage extends IntakeBasePage {
         pageBody.add(new RdHeading("heading", getString("de.getuigen.heading"), 1));
         pageBody.add(new Label("intro", new ResourceModel("de.getuigen.intro")));
 
+        DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
+        int maxGetuigen = dossier.ceremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
         List<GetuigeDto> bestaande = marriageIntakeService.findGetuigen(dossierId);
-        pageBody.add(new GetuigenForm("getuigenForm", GetuigenFormDto.vanGetuigen(bestaande)));
+        List<GetuigenItemFormDto> items = GetuigenItemFormDto.vanGetuigen(maxGetuigen, bestaande);
+
+        pageBody.add(new GetuigenForm("getuigenForm", items));
     }
 
-    private class GetuigenForm extends Form<GetuigenFormDto> {
+    private class GetuigenForm extends Form<List<GetuigenItemFormDto>> {
 
-        private final RdFormFieldFileUpload bestandVeld1;
-        private final RdFormFieldFileUpload bestandVeld2;
-        private final RdFormFieldFileUpload bestandVeld3;
-        private final RdFormFieldFileUpload bestandVeld4;
+        private final List<RdFormFieldFileUpload> bestandVelden = new ArrayList<>();
 
-        GetuigenForm(String id, GetuigenFormDto formDto) {
-            super(id, Model.of(formDto));
+        GetuigenForm(String id, List<GetuigenItemFormDto> items) {
+            super(id, new ListModel<>(items));
             setMultiPart(true);
             setMaxSize(Bytes.megabytes(10));
-            bestandVeld1 = new RdFormFieldFileUpload("bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
-            bestandVeld2 = new RdFormFieldFileUpload("bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
-            bestandVeld3 = new RdFormFieldFileUpload("bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
-            bestandVeld4 = new RdFormFieldFileUpload("bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
+            for (int i = 0; i < items.size(); i++) {
+                bestandVelden.add(new RdFormFieldFileUpload(
+                        "bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label")));
+            }
         }
 
         @Override
         protected void onInitialize() {
             super.onInitialize();
 
-            IModel<GetuigenFormDto> model = getModel();
+            IModel<List<GetuigenItemFormDto>> model = getModel();
 
-            DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
-            int maxGetuigen = dossier.ceremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
-            List<GetuigeDto> bestaande = marriageIntakeService.findGetuigen(dossierId);
-
-            add(
-                    maakGetuigeBlok("getuige1", 1, model, bestandVeld1, maxGetuigen, bestaande),
-                    maakGetuigeBlok("getuige2", 2, model, bestandVeld2, maxGetuigen, bestaande),
-                    maakGetuigeBlok("getuige3", 3, model, bestandVeld3, maxGetuigen, bestaande),
-                    maakGetuigeBlok("getuige4", 4, model, bestandVeld4, maxGetuigen, bestaande)
-            );
-        }
-
-        private WebMarkupContainer maakGetuigeBlok(String id, int volgnummer,
-                                                    IModel<GetuigenFormDto> model,
-                                                    RdFormFieldFileUpload bestandVeld,
-                                                    int maxGetuigen,
-                                                    List<GetuigeDto> bestaande) {
-            boolean zichtbaar = volgnummer <= maxGetuigen;
-            String bestaandeBestandNaam = bestaande.stream()
-                    .filter(g -> g.volgnummer() == volgnummer)
-                    .map(g -> g.bestand() != null ? g.bestand().bestandNaam() : null)
-                    .findFirst()
-                    .orElse(null);
-
-            WebMarkupContainer blok = new WebMarkupContainer(id) {
+            add(new ListView<GetuigenItemFormDto>("getuigen", model) {
                 @Override
-                protected void onConfigure() {
-                    super.onConfigure();
-                    setVisible(zichtbaar);
+                protected void populateItem(ListItem<GetuigenItemFormDto> item) {
+                    int index = item.getIndex();
+                    int volgnummer = item.getModelObject().getVolgnummer();
+                    RdFormFieldFileUpload bestandVeld = bestandVelden.get(index);
+
+                    String bestaandeBestandNaam = item.getModelObject().getBestand() != null
+                            ? item.getModelObject().getBestand().bestandNaam() : null;
+
+                    item.add(new Label("getuigeNummer", getString("de.getuigen.getuige") + " " + volgnummer));
+
+                    item.add(new RdFormFieldTextInput<>("naam",
+                            LambdaModel.of(item.getModel(), GetuigenItemFormDto::getNaam, GetuigenItemFormDto::setNaam),
+                            new ResourceModel("de.getuigen.naam.label"))
+                            .setModelType(PersonFullName.class)
+                            .withTextInput((rdTextInput, parent) -> rdTextInput.add(
+                                    new AjaxFormComponentUpdatingBehavior("change") {
+                                        @Override
+                                        protected void onUpdate(AjaxRequestTarget target) {
+                                            slaAllesOp();
+                                        }
+                                    }
+                            ))
+                    );
+
+                    bestandVeld.withInput(input -> input.add(new AjaxFormSubmitBehavior("change") {
+                        @Override
+                        protected void onSubmit(AjaxRequestTarget target) {
+                            // form's onSubmit() handles saving
+                        }
+                    }));
+                    item.add(bestandVeld);
+                    item.add(new Label("bestandNaamLabel", bestaandeBestandNaam != null ? bestaandeBestandNaam : ""));
                 }
-            };
-            blok.add(new Label("getuigeNummer", getString("de.getuigen.getuige") + " " + volgnummer));
-
-            blok.add(new RdFormFieldTextInput<>("naam",
-                    naamModel(volgnummer, model),
-                    new ResourceModel("de.getuigen.naam.label"))
-                    .setModelType(PersonFullName.class)
-                    .withTextInput((rdTextInput, parent) -> rdTextInput.add(
-                            new AjaxFormComponentUpdatingBehavior("change") {
-                                @Override
-                                protected void onUpdate(AjaxRequestTarget target) {
-                                    slaAllesOp();
-                                }
-                            }
-                    ))
-            );
-
-            bestandVeld.withInput(input -> input.add(new AjaxFormSubmitBehavior("change") {
-                @Override
-                protected void onSubmit(AjaxRequestTarget target) {
-                    // form's onSubmit() handles saving
-                }
-            }));
-            blok.add(bestandVeld);
-            blok.add(new Label("bestandNaamLabel", bestaandeBestandNaam != null ? bestaandeBestandNaam : ""));
-            return blok;
-        }
-
-        private IModel<PersonFullName> naamModel(int volgnummer, IModel<GetuigenFormDto> model) {
-            return switch (volgnummer) {
-                case 1 -> LambdaModel.of(model, GetuigenFormDto::getNaam1, GetuigenFormDto::setNaam1);
-                case 2 -> LambdaModel.of(model, GetuigenFormDto::getNaam2, GetuigenFormDto::setNaam2);
-                case 3 -> LambdaModel.of(model, GetuigenFormDto::getNaam3, GetuigenFormDto::setNaam3);
-                case 4 -> LambdaModel.of(model, GetuigenFormDto::getNaam4, GetuigenFormDto::setNaam4);
-                default -> throw new IllegalArgumentException("Ongeldig volgnummer: " + volgnummer);
-            };
+            }.setReuseItems(true));
         }
 
         @Override
@@ -167,48 +139,26 @@ public class DeGetuigenPage extends IntakeBasePage {
         }
 
         private void slaAllesOp() {
-            GetuigenFormDto formDto = getModelObject();
-            DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
-            int maxGetuigen = dossier.ceremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
-
-            PersonFullName[] namen = {
-                    formDto.getNaam1(), formDto.getNaam2(),
-                    formDto.getNaam3(), formDto.getNaam4()
-            };
-            RdFormFieldFileUpload[] velden = {bestandVeld1, bestandVeld2, bestandVeld3, bestandVeld4};
-            LegitimatieFileUpload[] bestanden = {
-                    formDto.getBestand1(), formDto.getBestand2(),
-                    formDto.getBestand3(), formDto.getBestand4()
-            };
-
+            List<GetuigenItemFormDto> items = getModelObject();
             List<SaveGetuigenDto> teOpslaan = new ArrayList<>();
-            for (int i = 0; i < maxGetuigen; i++) {
-                PersonFullName naam = namen[i];
+            for (int i = 0; i < items.size(); i++) {
+                GetuigenItemFormDto item = items.get(i);
+                PersonFullName naam = item.getNaam();
                 if (naam == null) {
                     continue;
                 }
-                FileUpload upload = velden[i].getFileUpload();
+                FileUpload upload = bestandVelden.get(i).getFileUpload();
                 LegitimatieFileUpload bestand;
                 if (upload != null && upload.getClientFileName() != null && !upload.getClientFileName().isBlank()) {
                     bestand = new LegitimatieFileUpload(upload.getClientFileName(), upload.getBytes());
-                    // Update FormDto so subsequent saves preserve this file
-                    setBestandOpFormDto(formDto, i + 1, bestand);
+                    item.setBestand(bestand);
                 } else {
-                    bestand = bestanden[i];
+                    bestand = item.getBestand();
                 }
-                teOpslaan.add(new SaveGetuigenDto(i + 1, naam.getValue(), bestand));
+                teOpslaan.add(new SaveGetuigenDto(item.getVolgnummer(), naam.getValue(), bestand));
             }
 
             marriageIntakeService.slaGetuigenOp(dossierId, teOpslaan);
-        }
-
-        private void setBestandOpFormDto(GetuigenFormDto formDto, int volgnummer, LegitimatieFileUpload bestand) {
-            switch (volgnummer) {
-                case 1 -> formDto.setBestand1(bestand);
-                case 2 -> formDto.setBestand2(bestand);
-                case 3 -> formDto.setBestand3(bestand);
-                case 4 -> formDto.setBestand4(bestand);
-            }
         }
     }
 }
