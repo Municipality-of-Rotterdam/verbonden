@@ -8,14 +8,12 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
-import org.apache.wicket.ajax.form.OnChangeAjaxBehavior;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -248,7 +246,8 @@ public class JullieGegevensPage extends IntakeBasePage {
                             LambdaModel.of(model, ContactGegevensFormDto::getTelefoonnummer, ContactGegevensFormDto::setTelefoonnummer),
                             new ResourceModel("jullie.gegevens.telefoonnummer"))
                             .setModelType(Telefoonnummer.class)
-                            .withTextInput((rdTextInput, rdFormFieldTextInput) -> rdTextInput.add(new FormComponentUpdatingBehavior() {
+                            .withTextInput((rdTextInput, rdFormFieldTextInput) -> rdTextInput.add(new AjaxFormComponentUpdatingBehavior("change") {
+                                @Override
                                 protected void onUpdate(AjaxRequestTarget target) {
                                     ContactGegevensFormDto f = getModelObject();
                                     marriageIntakeService.slaContactGegevensOp(dossierId, getCurrentBsn(), f.getTelefoonnummer(), f.getEmailadres());
@@ -258,20 +257,13 @@ public class JullieGegevensPage extends IntakeBasePage {
                                     ContactGegevensFormDto::setEmailadres),
                             new ResourceModel("jullie.gegevens.emailadres"))
                             .setModelType(Emailadres.class)
-                            .withTextInput((rdTextInput, rdFormFieldTextInput) -> rdTextInput.add(new FormComponentUpdatingBehavior() {
+                            .withTextInput((rdTextInput, rdFormFieldTextInput) -> rdTextInput.add(new AjaxFormComponentUpdatingBehavior("change") {
+                                @Override
                                 protected void onUpdate(AjaxRequestTarget target) {
                                     ContactGegevensFormDto f = getModelObject();
                                     marriageIntakeService.slaContactGegevensOp(dossierId, getCurrentBsn(), f.getTelefoonnummer(), f.getEmailadres());
                                 }}))
             );
         }
-
-//        @Override
-//        protected void onSubmit() {
-//            ContactGegevensFormDto f = getModelObject();
-//            marriageIntakeService.slaContactGegevensOp(dossierId, getCurrentBsn(),
-//                    f.getTelefoonnummer(), f.getEmailadres());
-//            setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
-//        }
     }
 }
