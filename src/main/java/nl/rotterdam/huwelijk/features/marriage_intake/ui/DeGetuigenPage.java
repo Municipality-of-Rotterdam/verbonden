@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
+import nl.rotterdam.huwelijk.administration_common.RdFormFieldFileUpload;
 import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
@@ -16,11 +17,11 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
-import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.lang.Bytes;
@@ -71,15 +72,19 @@ public class DeGetuigenPage extends IntakeBasePage {
 
     private class GetuigenForm extends Form<GetuigenFormDto> {
 
-        private final FileUploadField bestandVeld1 = new FileUploadField("bestandInput");
-        private final FileUploadField bestandVeld2 = new FileUploadField("bestandInput");
-        private final FileUploadField bestandVeld3 = new FileUploadField("bestandInput");
-        private final FileUploadField bestandVeld4 = new FileUploadField("bestandInput");
+        private final RdFormFieldFileUpload bestandVeld1;
+        private final RdFormFieldFileUpload bestandVeld2;
+        private final RdFormFieldFileUpload bestandVeld3;
+        private final RdFormFieldFileUpload bestandVeld4;
 
         GetuigenForm(String id, GetuigenFormDto formDto) {
             super(id, Model.of(formDto));
             setMultiPart(true);
             setMaxSize(Bytes.megabytes(10));
+            bestandVeld1 = new RdFormFieldFileUpload("bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
+            bestandVeld2 = new RdFormFieldFileUpload("bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
+            bestandVeld3 = new RdFormFieldFileUpload("bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
+            bestandVeld4 = new RdFormFieldFileUpload("bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
         }
 
         @Override
@@ -102,7 +107,7 @@ public class DeGetuigenPage extends IntakeBasePage {
 
         private WebMarkupContainer maakGetuigeBlok(String id, int volgnummer,
                                                     IModel<GetuigenFormDto> model,
-                                                    FileUploadField bestandVeld,
+                                                    RdFormFieldFileUpload bestandVeld,
                                                     int maxGetuigen,
                                                     List<GetuigeDto> bestaande) {
             boolean zichtbaar = volgnummer <= maxGetuigen;
@@ -135,12 +140,12 @@ public class DeGetuigenPage extends IntakeBasePage {
                     ))
             );
 
-            bestandVeld.add(new AjaxFormSubmitBehavior("change") {
+            bestandVeld.withInput(input -> input.add(new AjaxFormSubmitBehavior("change") {
                 @Override
                 protected void onSubmit(AjaxRequestTarget target) {
                     // form's onSubmit() handles saving
                 }
-            });
+            }));
             blok.add(bestandVeld);
             blok.add(new Label("bestandNaamLabel", bestaandeBestandNaam != null ? bestaandeBestandNaam : ""));
             return blok;
@@ -170,7 +175,7 @@ public class DeGetuigenPage extends IntakeBasePage {
                     formDto.getNaam1(), formDto.getNaam2(),
                     formDto.getNaam3(), formDto.getNaam4()
             };
-            FileUploadField[] velden = {bestandVeld1, bestandVeld2, bestandVeld3, bestandVeld4};
+            RdFormFieldFileUpload[] velden = {bestandVeld1, bestandVeld2, bestandVeld3, bestandVeld4};
             LegitimatieFileUpload[] bestanden = {
                     formDto.getBestand1(), formDto.getBestand2(),
                     formDto.getBestand3(), formDto.getBestand4()

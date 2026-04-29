@@ -6,6 +6,7 @@ import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.IModel;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class RdFormFieldFileUpload extends RdFormFieldBorder<List<FileUpload>, FileUploadField> {
 
@@ -20,5 +21,10 @@ public class RdFormFieldFileUpload extends RdFormFieldBorder<List<FileUpload>, F
 
     public FileUpload getFileUpload() {
         return getInput().getFileUpload();
+    }
+
+    public RdFormFieldFileUpload withInput(Consumer<FileUploadField> configure) {
+        configure.accept(getInput());
+        return this;
     }
 }
