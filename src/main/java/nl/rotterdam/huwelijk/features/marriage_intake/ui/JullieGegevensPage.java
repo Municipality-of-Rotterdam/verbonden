@@ -6,6 +6,9 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvatting
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.nl_design_system.wicket.components.data_summary.RdDataSummary;
+import nl.rotterdam.nl_design_system.wicket.components.data_summary.SummaryItem;
+import nl.rotterdam.nl_design_system.wicket.components.data_summary.SummaryItemValue;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -23,6 +26,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.NonNull;
 
@@ -83,12 +87,15 @@ public class JullieGegevensPage extends IntakeBasePage {
                 // Contact gegevens: read-only display (shown for partner's card)
                 WebMarkupContainer contactGegevensReadOnly = new WebMarkupContainer("contactGegevensReadOnly");
                 contactGegevensReadOnly.setVisible(!kanContactBewerken);
+
                 contactGegevensReadOnly.add(
-                        new Label("telefoonnummer",
-                                partner.telefoonnummer() != null ? partner.telefoonnummer().getValue() : ""),
-                        new Label("emailadres",
-                                partner.emailadres() != null ? partner.emailadres().getValue() : "")
-                );
+                        new RdDataSummary("contactGegevensSummary",
+                                new ListModel<>(
+                                        List.of(
+                                                new SummaryItem(new ResourceModel("jullie.gegevens.telefoonnummer"), new SummaryItemValue(partner.telefoonnummer() != null ? partner.telefoonnummer().getValue() : "", false)),
+                                                new SummaryItem(new ResourceModel("jullie.gegevens.emailadres"), new SummaryItemValue(partner.emailadres() != null ? partner.emailadres().getValue() : "", false))
+                                        ))));
+
                 item.add(contactGegevensReadOnly);
 
                 // Contact gegevens: editable form (shown for current user's card)

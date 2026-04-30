@@ -32,22 +32,9 @@
 
                 <!-- Telefoonnummer & E-mailadres: read-only (shown for partner's card) -->
                 <div wicket:id="contactGegevensReadOnly">
-                    <div class="rd-partner-card__field">
-                        <label class="rd-partner-card__label">
-                            <wicket:message key="jullie.gegevens.telefoonnummer">Telefoonnummer</wicket:message>
-                        </label>
-                        <div class="rd-partner-card__input-display">
-                            <span wicket:id="telefoonnummer">06-12345678</span>
-                        </div>
-                    </div>
-                    <div class="rd-partner-card__field">
-                        <label class="rd-partner-card__label">
-                            <wicket:message key="jullie.gegevens.emailadres">E-mailadres</wicket:message>
-                        </label>
-                        <div class="rd-partner-card__input-display">
-                            <span wicket:id="emailadres">naam@voorbeeld.nl</span>
-                        </div>
-                    </div>
+
+                    <dl wicket:id="contactGegevensSummary"/>
+
                 </div>
 
                 <!-- Telefoonnummer & E-mailadres: editable form (shown for current user's card) -->
