@@ -129,25 +129,27 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         List<PartnerGegevensDto> result = new ArrayList<>();
         for (HuwelijksDossiersPartnerEntity partner : dossier.getPartners()) {
-            result.add(lookupPartner(partner.getBsn(), partner.getGekozenAchternaam(),
+            result.add(convertToDto(partner.getBsn(), partner.getGekozenAchternaam(),
                     partner.getTelefoonnummer(), partner.getEmailadres()));
         }
         return result;
     }
 
-    private PartnerGegevensDto lookupPartner(String bsn, String gekozenAchternaam,
-                                             Telefoonnummer telefoonnummerOverride, Emailadres emailadresOverride) {
-        MockPersonInfo info = MOCK_PERSONEN.get(bsn);
+    private PartnerGegevensDto convertToDto(String bsn, String gekozenAchternaam,
+                                            Telefoonnummer telefoonnummerOverride, Emailadres emailadresOverride) {
+        // TODO for Theo, make only naam / geboortedata from haalcentraal
+        MockPersonInfo mockInfo = null; // MOCK_PERSONEN.get(bsn);
+
         Telefoonnummer telefoonnummer = telefoonnummerOverride != null ? telefoonnummerOverride
-                : (info != null ? new Telefoonnummer(info.telefoonnummer()) : null);
+                : (mockInfo != null ? new Telefoonnummer(mockInfo.telefoonnummer()) : null);
         Emailadres emailadres = emailadresOverride != null ? emailadresOverride
-                : (info != null ? new Emailadres(info.emailadres()) : null);
-        if (info == null) {
+                : (mockInfo != null ? new Emailadres(mockInfo.emailadres()) : null);
+        if (mockInfo == null) {
             return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend",
                     telefoonnummer, emailadres, gekozenAchternaam);
         }
-        return new PartnerGegevensDto(bsn, info.achternaam(), info.voornamen(), info.geboortedatum(),
-                info.geboorteplaats(), info.nationaliteit(), info.burgerlijkeStaat(),
+        return new PartnerGegevensDto(bsn, mockInfo.achternaam(), mockInfo.voornamen(), mockInfo.geboortedatum(),
+                mockInfo.geboorteplaats(), mockInfo.nationaliteit(), mockInfo.burgerlijkeStaat(),
                 telefoonnummer, emailadres, gekozenAchternaam);
     }
 

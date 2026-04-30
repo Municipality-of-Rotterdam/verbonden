@@ -93,8 +93,8 @@ public class JullieGegevensPage extends IntakeBasePage {
                         new RdDataSummary("contactGegevensSummary",
                                 new ListModel<>(
                                         List.of(
-                                                new SummaryItem(new ResourceModel("jullie.gegevens.telefoonnummer"), new SummaryItemValue(partner.telefoonnummer() != null ? partner.telefoonnummer().getValue() : "", false)),
-                                                new SummaryItem(new ResourceModel("jullie.gegevens.emailadres"), new SummaryItemValue(partner.emailadres() != null ? partner.emailadres().getValue() : "", false))
+                                                new SummaryItem(new ResourceModel("jullie.gegevens.telefoonnummer"), new SummaryItemValue(partner.telefoonnummer(), false)),
+                                                new SummaryItem(new ResourceModel("jullie.gegevens.emailadres"), new SummaryItemValue(partner.emailadres(), false))
                                         ))));
 
                 item.add(contactGegevensReadOnly);
