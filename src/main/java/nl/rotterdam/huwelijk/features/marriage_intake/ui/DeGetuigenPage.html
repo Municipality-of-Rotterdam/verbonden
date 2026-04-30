@@ -9,20 +9,17 @@
         de gegevens te verifi&#235;ren door een identiteitscontrole.
     </p>
 
-    <div class="rd-getuigen-card">
-
-        <div wicket:id="getuigen">
-            <form wicket:id="getuigeForm" class="rd-getuige-block">
-                <h3 class="rd-getuige-block__heading" wicket:id="getuigeNummer">Getuige</h3>
+    <div wicket:id="getuigen">
+        <form wicket:id="getuigeForm" class="rd-getuige-form">
+            <wicket:border wicket:id="getuigeFieldset">
                 <!-- RdFormFieldTextInput renders label + input + validation -->
                 <div wicket:id="naam"></div>
                 <div wicket:id="bestandInput">
                     <input wicket:id="input" type="file"/>
                 </div>
                 <span wicket:id="bestandNaamLabel" class="rd-getuige-block__bestand-naam"></span>
-            </form>
-        </div>
-
+            </wicket:border>
+        </form>
     </div>
 
 </wicket:extend>

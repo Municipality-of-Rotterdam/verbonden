@@ -765,69 +765,12 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
    DeGetuigenPage – witness entry blocks
    ============================================================= */
 
-.rd-getuigen-card {
+form.rd-getuige-form {
     border: 1px solid #d0d0d0;
     border-radius: 4px;
     padding: 1.5rem;
     background: #fff;
-    margin-bottom: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.rd-getuige-block {
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e8e8e8;
-}
-
-.rd-getuige-block:last-child {
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.rd-getuige-block__heading {
-    font-size: 1rem;
-    font-weight: 700;
-    margin: 0 0 0.75rem;
-    color: #222;
-}
-
-.rd-getuige-block__field {
-    margin-bottom: 0.75rem;
-}
-
-.rd-getuige-block__label {
-    display: block;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    color: #333;
-}
-
-.rd-getuige-block__input {
-    width: 100%;
-    max-width: 28rem;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
-    font-size: 0.9375rem;
-    font-family: inherit;
-    color: #222;
-    background: #fff;
-    box-sizing: border-box;
-}
-
-.rd-getuige-block__input:focus {
-    outline: 2px solid var(--rd-color-green-500, #007a3e);
-    outline-offset: 2px;
-    border-color: var(--rd-color-green-500, #007a3e);
-}
-
-.rd-getuige-block__file {
-    display: block;
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
+    margin-bottom: 1rem;
 }
 
 .rd-getuige-block__bestand-naam {

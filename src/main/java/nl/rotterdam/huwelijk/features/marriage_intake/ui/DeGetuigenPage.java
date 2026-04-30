@@ -8,6 +8,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvatting
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.LegitimatieFileUpload;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.nl_design_system.wicket.components.fieldset.RdFieldset;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -101,8 +102,10 @@ public class DeGetuigenPage extends IntakeBasePage {
             bestandVeld = new RdFormFieldFileUpload(
                     "bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
 
-            add(
-                    new Label("getuigeNummer", getString("de.getuigen.getuige") + " " + volgnummer),
+            RdFieldset<Void> fieldset = new RdFieldset<>(
+                    "getuigeFieldset", Model.of(null),
+                    Model.of(getString("de.getuigen.getuige") + " " + volgnummer));
+            fieldset.add(
                     new RdFormFieldTextInput<>("naam",
                             LambdaModel.of(model, GetuigenItemFormDto::getNaam, GetuigenItemFormDto::setNaam),
                             new ResourceModel("de.getuigen.naam.label"))
@@ -123,6 +126,7 @@ public class DeGetuigenPage extends IntakeBasePage {
                     })),
                     new Label("bestandNaamLabel", bestaandeBestandNaam != null ? bestaandeBestandNaam : "")
             );
+            add(fieldset);
         }
 
         @Override
