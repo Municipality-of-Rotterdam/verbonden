@@ -51,13 +51,13 @@
                 </div>
 
                 <!-- Telefoonnummer & E-mailadres: editable form (shown for current user's card) -->
-                <form wicket:id="contactGegevensForm" class="rd-partner-card__contact-form">
+                <form wicket:id="contactGegevensForm" class="rd-partner-card__contact-form d-flex flex-column gap-3">
                     <div wicket:id="telefoonnummerInput"></div>
                     <div wicket:id="emailadresInput"></div>
                 </form>
 
                 <!-- Gekozen achternaam display (shown after selection) -->
-                <div wicket:id="gekozenAchternaamSection" class="rd-partner-card__field">
+                <div wicket:id="gekozenAchternaamSection" class="rd-partner-card__field py-3">
                     <div class="rd-gekozen-achternaam__label-row">
                         <label class="rd-partner-card__label rd-gekozen-achternaam__label">
                             <wicket:message key="jullie.gegevens.nieuwe.achternaam">Nieuwe achternaam</wicket:message>

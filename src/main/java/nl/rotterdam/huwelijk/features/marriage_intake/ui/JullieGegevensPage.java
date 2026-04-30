@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
+import nl.rotterdam.huwelijk.domain.ValueHolder;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
@@ -23,6 +24,7 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.jspecify.annotations.NonNull;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -195,11 +197,11 @@ public class JullieGegevensPage extends IntakeBasePage {
         NaamKiezenForm(String id, PartnerGegevensDto partner, List<String> naamOpties,
                        WebMarkupContainer dialogContainer, IModel<Boolean> dialogTonen) {
             super(id);
-            String initialNaam = partner.gekozenAchternaam() != null ? partner.gekozenAchternaam() : naamOpties.get(0);
+            String initialNaam = partner.gekozenAchternaam() != null ? partner.gekozenAchternaam() : naamOpties.getFirst();
 
             naamRadioGroup = new RadioGroup<>("naamRadioGroup", Model.of(initialNaam));
             naamRadioGroup.setRequired(true);
-            naamRadioGroup.add(new ListView<String>("naamOptie", naamOpties) {
+            naamRadioGroup.add(new ListView<>("naamOptie", naamOpties) {
                 @Override
                 protected void populateItem(ListItem<String> optieItem) {
                     optieItem.add(new Radio<>("radio", optieItem.getModel(), naamRadioGroup));
@@ -246,24 +248,31 @@ public class JullieGegevensPage extends IntakeBasePage {
                             LambdaModel.of(model, ContactGegevensFormDto::getTelefoonnummer, ContactGegevensFormDto::setTelefoonnummer),
                             new ResourceModel("jullie.gegevens.telefoonnummer"))
                             .setModelType(Telefoonnummer.class)
-                            .withTextInput((rdTextInput, rdFormFieldTextInput) -> rdTextInput.add(new AjaxFormComponentUpdatingBehavior("change") {
-                                @Override
-                                protected void onUpdate(AjaxRequestTarget target) {
-                                    ContactGegevensFormDto f = getModelObject();
-                                    marriageIntakeService.slaContactGegevensOp(dossierId, getCurrentBsn(), f.getTelefoonnummer(), f.getEmailadres());
-                                }})),
+                            .withTextInput((rdTextInput, rdFormFieldTextInput) -> rdTextInput.add(newContactUpdateBehavior(rdFormFieldTextInput))),
                     new RdFormFieldTextInput<>("emailadresInput",
                             LambdaModel.of(model, ContactGegevensFormDto::getEmailadres,
                                     ContactGegevensFormDto::setEmailadres),
                             new ResourceModel("jullie.gegevens.emailadres"))
                             .setModelType(Emailadres.class)
-                            .withTextInput((rdTextInput, rdFormFieldTextInput) -> rdTextInput.add(new AjaxFormComponentUpdatingBehavior("change") {
-                                @Override
-                                protected void onUpdate(AjaxRequestTarget target) {
-                                    ContactGegevensFormDto f = getModelObject();
-                                    marriageIntakeService.slaContactGegevensOp(dossierId, getCurrentBsn(), f.getTelefoonnummer(), f.getEmailadres());
-                                }}))
+                            .withTextInput((rdTextInput, rdFormFieldTextInput) -> rdTextInput.add(newContactUpdateBehavior(rdFormFieldTextInput)))
             );
+        }
+
+        private @NonNull AjaxFormComponentUpdatingBehavior newContactUpdateBehavior(RdFormFieldTextInput<? extends ValueHolder<?>> rdFormFieldTextInput) {
+            return new AjaxFormComponentUpdatingBehavior("change") {
+
+                @Override
+                protected void onError(AjaxRequestTarget target, RuntimeException e) {
+                    target.add(rdFormFieldTextInput);
+                }
+
+                @Override
+                protected void onUpdate(AjaxRequestTarget target) {
+                    ContactGegevensFormDto f = getModelObject();
+                    marriageIntakeService.slaContactGegevensOp(dossierId, getCurrentBsn(), f.getTelefoonnummer(), f.getEmailadres());
+                    target.add(rdFormFieldTextInput);
+                }
+            };
         }
     }
 }
