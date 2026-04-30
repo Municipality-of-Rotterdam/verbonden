@@ -29,8 +29,4 @@ public record Emailadres(String value) implements ValueHolder<String>, Serializa
         return value;
     }
 
-    @Override
-    public String toString() {
-        return "Emailadres[" + value + "]";
-    }
 }
