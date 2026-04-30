@@ -40,6 +40,11 @@ public record Telefoonnummer(String value) implements ValueHolder<String>, Seria
         return value;
     }
 
+    @Override
+    public String toString() {
+        return "Telefoonnummer[" + value + "]";
+    }
+
     private static String replacePrefix(@Nonnull String value, String prefix, String replacement) {
         return value.startsWith(prefix) ? value.replaceFirst(prefix, replacement) : value;
     }
