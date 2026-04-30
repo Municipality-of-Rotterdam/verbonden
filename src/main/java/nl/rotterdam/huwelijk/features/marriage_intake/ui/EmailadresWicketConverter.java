@@ -4,17 +4,13 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.EmailadresOngeldigException;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Locale;
 
 public class EmailadresWicketConverter implements IConverter<Emailadres> {
 
     @Override
-    public @Nullable Emailadres convertToObject(String value, Locale locale) throws ConversionException {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
+    public Emailadres convertToObject(String value, Locale locale) throws ConversionException {
         try {
             return new Emailadres(value);
         } catch (EmailadresOngeldigException e) {
@@ -26,6 +22,6 @@ public class EmailadresWicketConverter implements IConverter<Emailadres> {
 
     @Override
     public String convertToString(Emailadres value, Locale locale) {
-        return value != null ? value.getValue() : null;
+        return value.getValue();
     }
 }
