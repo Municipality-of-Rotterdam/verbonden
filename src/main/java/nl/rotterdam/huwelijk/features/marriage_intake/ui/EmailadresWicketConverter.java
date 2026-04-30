@@ -19,7 +19,7 @@ public class EmailadresWicketConverter implements IConverter<Emailadres> {
             return new Emailadres(value);
         } catch (EmailadresOngeldigException e) {
             throw new ConversionException("Emailadres is ongeldig")
-                    .setResourceKey("Emailadres.ongeldig")
+                    .setResourceKey("EmailadresValidator")
                     .setLocale(locale);
         }
     }

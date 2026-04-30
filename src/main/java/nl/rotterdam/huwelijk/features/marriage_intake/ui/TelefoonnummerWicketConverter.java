@@ -19,7 +19,7 @@ public class TelefoonnummerWicketConverter implements IConverter<Telefoonnummer>
             return new Telefoonnummer(value);
         } catch (TelefoonnummerOngeldigException e) {
             throw new ConversionException("Telefoonnummer is ongeldig")
-                    .setResourceKey("Telefoonnummer.ongeldig")
+                    .setResourceKey("TelefoonnummerValidator")
                     .setLocale(locale);
         }
     }
