@@ -76,13 +76,14 @@ public class JullieGegevensPage extends IntakeBasePage {
                 boolean kanKiezen = tweeBsns && partner.bsn().equals(currentBsn);
                 boolean kanContactBewerken = partner.bsn().equals(currentBsn);
 
-                item.add(new Label("achternaam", partner.achternaam()));
-                item.add(new Label("voornamen", partner.voornamen()));
-                item.add(new Label("geboortedatum",
-                        partner.geboortedatum() != null ? partner.geboortedatum().format(DATUM_FORMAT) : ""));
-                item.add(new Label("geboorteplaats", partner.geboorteplaats()));
-                item.add(new Label("nationaliteit", partner.nationaliteit()));
-                item.add(new Label("burgerlijkeStaat", partner.burgerlijkeStaat()));
+                item.add(
+                        new Label("achternaam", partner.achternaam()),
+                        new Label("voornamen", partner.voornamen()),
+                        new Label("geboortedatum", partner.geboortedatum() != null ? partner.geboortedatum().format(DATUM_FORMAT) : ""),
+                        new Label("geboorteplaats", partner.geboorteplaats()),
+                        new Label("nationaliteit", partner.nationaliteit()),
+                        new Label("burgerlijkeStaat", partner.burgerlijkeStaat())
+                );
 
                 // Contact gegevens: read-only display (shown for partner's card)
                 WebMarkupContainer contactGegevensReadOnly = new WebMarkupContainer("contactGegevensReadOnly");
