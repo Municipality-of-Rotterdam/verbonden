@@ -9,14 +9,17 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.huwelijk.features.marriage_type_administration.repository.MarriageTypeRepository;
 import nl.rotterdam.huwelijk.persistence.AfspraakEntity;
 import nl.rotterdam.huwelijk.persistence.HuwelijksDossierEntity;
+import nl.rotterdam.huwelijk.persistence.HuwelijksDossiersPartnerEntity;
 import nl.rotterdam.huwelijk.persistence.LocatieBeschikbaarheidEntity;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeEntity;
 import nl.rotterdam.huwelijk.persistence.MarriageTypeLocationEntity;
@@ -88,22 +91,36 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .toList();
     }
 
-    private static final Map<String, PartnerGegevensDto> MOCK_PERSONEN = Map.of(
-            "999990007", new PartnerGegevensDto("Van Muiswinkel", "Erik Jan",
+    private record MockPersonInfo(
+            String achternaam,
+            String voornamen,
+            LocalDate geboortedatum,
+            String geboorteplaats,
+            String nationaliteit,
+            String burgerlijkeStaat,
+            String telefoonnummer,
+            String emailadres
+    ) {}
+
+    private static final Map<String, MockPersonInfo> MOCK_PERSONEN = Map.of(
+            "999990007", new MockPersonInfo("Van Muiswinkel", "Erik Jan",
                     LocalDate.of(1984, 5, 29), "Rotterdam", "Nederlandse", "Ongehuwd",
                     "06-12345678", "evm1984@gmail.com"),
-            "999990019", new PartnerGegevensDto("De Vries", "Sanne Maria",
+            "999990019", new MockPersonInfo("De Vries", "Sanne Maria",
                     LocalDate.of(1992, 3, 14), "Den Haag", "Nederlandse", "Ongehuwd",
                     "06-11223344", "sanne.devries@gmail.com"),
-            "999990020", new PartnerGegevensDto("Jansen", "Pieter",
+            "999990020", new MockPersonInfo("Jansen", "Pieter",
                     LocalDate.of(1988, 7, 22), "Groningen", "Nederlandse", "Gehuwd",
                     "06-55667788", "pieter.jansen@gmail.com"),
-            "999990202", new PartnerGegevensDto("Bakker", "Willem Adriaan",
+            "999990202", new MockPersonInfo("Bakker", "Willem Adriaan",
                     LocalDate.of(1975, 11, 3), "Assen", "Nederlandse", "Gescheiden",
-                    "06-99887766", "w.bakker@gmail.com"),
-            "999990032", new PartnerGegevensDto("Dëhlano", "Chavéliën",
+                    "06-22334455", "w.bakker@gmail.com"),
+            "999990032", new MockPersonInfo("Dëhlano", "Chavéliën",
                     LocalDate.of(2001, 6, 18), "Paramaribo", "Nederlandse", "Ongehuwd",
-                    "06-44556677", "chavelien@gmail.com")
+                    "06-44556677", "chavelien@gmail.com"),
+            "999990008", new MockPersonInfo("Hofstede", "Jan-Diederik, deIII",
+                    LocalDate.of(1999, 1, 1), "Rotterdam", "Nederlandse", "Ongehuwd",
+                    "06-87654321", "jd3_swagboy@gmail.com")
     );
 
     @Override
@@ -111,18 +128,27 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         List<PartnerGegevensDto> result = new ArrayList<>();
-        if (dossier.getBsn1() != null) {
-            result.add(lookupPartner(dossier.getBsn1()));
-        }
-        if (dossier.getBsn2() != null) {
-            result.add(lookupPartner(dossier.getBsn2()));
+        for (HuwelijksDossiersPartnerEntity partner : dossier.getPartners()) {
+            result.add(convertToDto(partner.getBsn(), partner.getGekozenAchternaam(), partner.getTelefoonnummer(), partner.getEmailadres()));
         }
         return result;
     }
 
-    private PartnerGegevensDto lookupPartner(String bsn) {
-        return MOCK_PERSONEN.getOrDefault(bsn,
-                new PartnerGegevensDto("Onbekend", bsn, null, "", "Onbekend", "Onbekend", "", ""));
+    private PartnerGegevensDto convertToDto(String bsn, String gekozenAchternaam,
+                                            Telefoonnummer telefoonnummer, Emailadres emailadres) {
+        MockPersonInfo mockInfo = retrievePersonInfo(bsn);
+        if (mockInfo == null) {
+            return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend",
+                    telefoonnummer, emailadres, gekozenAchternaam);
+        }
+        return new PartnerGegevensDto(bsn, mockInfo.achternaam(), mockInfo.voornamen(), mockInfo.geboortedatum(),
+                mockInfo.geboorteplaats(), mockInfo.nationaliteit(), mockInfo.burgerlijkeStaat(),
+                telefoonnummer, emailadres, gekozenAchternaam);
+    }
+
+    //This should eventually retrieve the person from HaalCentraal
+    private MockPersonInfo retrievePersonInfo(String bsn) {
+        return MOCK_PERSONEN.get(bsn);
     }
 
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {
@@ -147,9 +173,15 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity entity = new HuwelijksDossierEntity();
         entity.setRegistratieType(dto.registratieType());
         entity.setCeremonieSoort(dto.ceremonieSoort());
-        entity.setBsn1(dto.bsn1());
         if (dto.locatieId() != null) {
             locatieRepository.findById(dto.locatieId()).ifPresent(entity::setLocatie);
+        }
+        if (dto.bsn1() != null) {
+            HuwelijksDossiersPartnerEntity partner1 = new HuwelijksDossiersPartnerEntity();
+            partner1.setDossier(entity);
+            partner1.setVolgorde(1);
+            partner1.setBsn(dto.bsn1());
+            entity.getPartners().add(partner1);
         }
         return dossierRepository.save(entity).getUuid();
     }
@@ -176,7 +208,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UUID> findDossierIdByBsn(String bsn) {
-        return dossierRepository.findByBsn1OrBsn2(bsn, bsn)
+        return dossierRepository.findByPartners_Bsn(bsn)
                 .map(HuwelijksDossierEntity::getUuid);
     }
 
@@ -184,11 +216,16 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Transactional
     public void ensureBsnAccess(UUID dossierId, String bsn) {
         HuwelijksDossierEntity e = getDossier(dossierId);
-        if (bsn.equals(e.getBsn1()) || bsn.equals(e.getBsn2())) {
+        boolean alreadyPartner = e.getPartners().stream().anyMatch(p -> bsn.equals(p.getBsn()));
+        if (alreadyPartner) {
             return;
         }
-        if (e.getBsn2() == null && !bsn.equals(e.getBsn1())) {
-            e.setBsn2(bsn);
+        if (e.getPartners().size() < 2) {
+            HuwelijksDossiersPartnerEntity newPartner = new HuwelijksDossiersPartnerEntity();
+            newPartner.setDossier(e);
+            newPartner.setVolgorde(e.getPartners().isEmpty() ? 1 : 2);
+            newPartner.setBsn(bsn);
+            e.getPartners().add(newPartner);
             dossierRepository.save(e);
             return;
         }
@@ -198,7 +235,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public DossierAccessOutcome resolveAccess(UUID requestedDossierId, String bsn) {
-        Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByBsn1OrBsn2(bsn, bsn);
+        Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByPartners_Bsn(bsn);
 
         if (existingDossier.isPresent()) {
             UUID existingId = existingDossier.get().getUuid();
@@ -210,9 +247,12 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
 
         HuwelijksDossierEntity requested = getDossier(requestedDossierId);
-        if (requested.getBsn2() == null) {
-            // Scenario 3: BSN has no dossier yet; register it as the second partner in this dossier.
-            requested.setBsn2(bsn);
+        if (requested.getPartners().size() < 2) {
+            HuwelijksDossiersPartnerEntity partner2 = new HuwelijksDossiersPartnerEntity();
+            partner2.setDossier(requested);
+            partner2.setVolgorde(2);
+            partner2.setBsn(bsn);
+            requested.getPartners().add(partner2);
             dossierRepository.save(requested);
             return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
         }
@@ -235,6 +275,10 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .map(MarriageTypeEntity::getPrijs)
                 .orElse(null);
 
+        int aantalGekozenAchternamen = (int) e.getPartners().stream()
+                .filter(p -> p.getGekozenAchternaam() != null)
+                .count();
+
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
@@ -244,7 +288,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 locatieNaam,
                 false,
                 false,
-                List.of());
+                List.of(),
+                aantalGekozenAchternamen);
     }
 
     @Override
@@ -450,5 +495,37 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             case GROOT -> HuwelijksType.REGULIER;
         };
     }
-}
 
+    @Override
+    @Transactional
+    public void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
+                .filter(p -> bsn.equals(p.getBsn()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn));
+        partner.setGekozenAchternaam(gekozenAchternaam);
+        dossierRepository.save(dossier);
+    }
+
+    @Override
+    @Transactional
+    public void slaContactGegevensOp(UUID dossierId, String bsn, Telefoonnummer telefoonnummer, Emailadres emailadres) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
+                .filter(p -> bsn.equals(p.getBsn()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn));
+        partner.setTelefoonnummer(telefoonnummer);
+        partner.setEmailadres(emailadres);
+        dossierRepository.save(dossier);
+    }
+
+    @Override
+    @Transactional
+    public void delete(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        afspraakRepository.deleteByDossier_Id(dossier.getId());
+        dossierRepository.delete(dossier);
+    }
+}
