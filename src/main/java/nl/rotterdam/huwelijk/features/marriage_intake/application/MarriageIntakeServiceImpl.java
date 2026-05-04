@@ -129,21 +129,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         List<PartnerGegevensDto> result = new ArrayList<>();
         for (HuwelijksDossiersPartnerEntity partner : dossier.getPartners()) {
-            result.add(convertToDto(partner.getBsn(), partner.getGekozenAchternaam(),
-                    partner.getTelefoonnummer(), partner.getEmailadres()));
+            result.add(convertToDto(partner.getBsn(), partner.getGekozenAchternaam(), partner.getTelefoonnummer(), partner.getEmailadres()));
         }
         return result;
     }
 
     private PartnerGegevensDto convertToDto(String bsn, String gekozenAchternaam,
-                                            Telefoonnummer telefoonnummerOverride, Emailadres emailadresOverride) {
-        // TODO for Theo, make only naam / geboortedata from haalcentraal
-        MockPersonInfo mockInfo = null; // MOCK_PERSONEN.get(bsn);
-
-        Telefoonnummer telefoonnummer = telefoonnummerOverride != null ? telefoonnummerOverride
-                : (mockInfo != null ? new Telefoonnummer(mockInfo.telefoonnummer()) : null);
-        Emailadres emailadres = emailadresOverride != null ? emailadresOverride
-                : (mockInfo != null ? new Emailadres(mockInfo.emailadres()) : null);
+                                            Telefoonnummer telefoonnummer, Emailadres emailadres) {
+        MockPersonInfo mockInfo = retrievePersonInfo(bsn);
         if (mockInfo == null) {
             return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend",
                     telefoonnummer, emailadres, gekozenAchternaam);
@@ -151,6 +144,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         return new PartnerGegevensDto(bsn, mockInfo.achternaam(), mockInfo.voornamen(), mockInfo.geboortedatum(),
                 mockInfo.geboorteplaats(), mockInfo.nationaliteit(), mockInfo.burgerlijkeStaat(),
                 telefoonnummer, emailadres, gekozenAchternaam);
+    }
+
+    //This should eventually retrieve the person from HaalCentraal
+    private MockPersonInfo retrievePersonInfo(String bsn) {
+        return MOCK_PERSONEN.get(bsn);
     }
 
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {
