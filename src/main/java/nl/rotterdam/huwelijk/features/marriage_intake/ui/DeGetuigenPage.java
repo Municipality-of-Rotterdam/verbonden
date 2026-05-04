@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
+import static nl.rotterdam.nl_design_system.wicket.components.models.DefaultModels.NULL_STRING_MODEL;
 
 public class DeGetuigenPage extends IntakeBasePage {
 
@@ -102,8 +103,8 @@ public class DeGetuigenPage extends IntakeBasePage {
             bestandVeld = new RdFormFieldFileUpload(
                     "bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
 
-            RdFieldset<Void> fieldset = new RdFieldset<>(
-                    "getuigeFieldset", Model.of(null),
+            RdFieldset<String> fieldset = new RdFieldset<>(
+                    "getuigeFieldset", NULL_STRING_MODEL,
                     Model.of(getString("de.getuigen.getuige") + " " + volgnummer));
             fieldset.add(
                     new RdFormFieldTextInput<>("naam",

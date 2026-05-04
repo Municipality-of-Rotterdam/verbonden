@@ -300,7 +300,6 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 datumTijdHuwelijk,
                 locatieNaam,
                 false,
-                false,
                 getuigenBevestigd,
                 getuigenGedeeltelijkIngevuld,
                 List.of(),
