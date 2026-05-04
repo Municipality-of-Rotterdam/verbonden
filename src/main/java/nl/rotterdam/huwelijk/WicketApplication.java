@@ -7,6 +7,10 @@ import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsUpdatePage;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.PersonFullNameWicketConverter;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.EmailadresWicketConverter;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.TelefoonnummerWicketConverter;
 import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidCreatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidUpdatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
@@ -45,6 +49,8 @@ public class WicketApplication extends WebApplication {
         locator.set(LocalDate.class, new LocalDateWicketConverter());
         locator.set(LocalTime.class, new LocalTimeWicketConverter());
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
+        locator.set(Telefoonnummer.class, new TelefoonnummerWicketConverter());
+        locator.set(Emailadres.class, new EmailadresWicketConverter());
         return locator;
     }
 

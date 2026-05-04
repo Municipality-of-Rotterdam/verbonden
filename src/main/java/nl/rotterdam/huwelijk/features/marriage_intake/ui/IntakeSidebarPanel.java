@@ -154,12 +154,20 @@ public class IntakeSidebarPanel extends Panel {
 
         // Gegevens & Getuigen status icons
         WebMarkupContainer gegevensStatusIcon = new WebMarkupContainer("gegevensStatusIcon");
-        gegevensStatusIcon.add(new WebMarkupContainer("gegevensStatusCheck") {
+        gegevensStatusIcon.add(new WebMarkupContainer("gegevensStatusCheckGreen") {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
                 DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d != null && d.gegevensBevestigd());
+                setVisible(d != null && d.aantalGekozenAchternamen() == 2);
+            }
+        });
+        gegevensStatusIcon.add(new WebMarkupContainer("gegevensStatusCheckGrey") {
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                DossierSamenvattingDto d = getDossierModel().getObject();
+                setVisible(d != null && d.aantalGekozenAchternamen() == 1);
             }
         });
         gegevensStatusIcon.add(new WebMarkupContainer("gegevensStatusEmpty") {
@@ -167,7 +175,7 @@ public class IntakeSidebarPanel extends Panel {
             protected void onConfigure() {
                 super.onConfigure();
                 DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d == null || !d.gegevensBevestigd());
+                setVisible(d == null || d.aantalGekozenAchternamen() == 0);
             }
         });
         add(gegevensStatusIcon);

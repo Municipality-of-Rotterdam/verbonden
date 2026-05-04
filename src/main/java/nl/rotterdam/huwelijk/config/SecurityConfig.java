@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -14,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 import java.util.ArrayList;
@@ -56,10 +57,10 @@ public class SecurityConfig {
     public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher(new OrRequestMatcher(
-                        new AntPathRequestMatcher("/beheer/**"),
-                        new AntPathRequestMatcher("/login"),
-                        new AntPathRequestMatcher("/login/**"),
-                        new AntPathRequestMatcher("/logout")
+                        PathPatternRequestMatcher.withDefaults().matcher("/beheer/**"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/login"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/login/**"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/logout")
                 ))
                 // Apache Wicket 10 has its own CSRF protection; disable Spring Security's to avoid conflicts.
                 .csrf(csrf -> csrf.disable())
@@ -73,7 +74,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                        .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/logout"))
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 );
@@ -106,7 +107,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/inloggen"))
                 )
                 .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/uitloggen", "GET"))
+                        .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/uitloggen"))
                         .logoutSuccessUrl("/inloggen")
                         .permitAll()
                 );

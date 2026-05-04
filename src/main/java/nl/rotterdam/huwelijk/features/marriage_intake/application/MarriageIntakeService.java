@@ -5,10 +5,12 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -80,4 +82,10 @@ public interface MarriageIntakeService {
     void slaGetuigenOp(UUID dossierId, List<SaveGetuigenDto> getuigen);
 
     void slaGetuigeOp(UUID dossierId, SaveGetuigenDto getuige);
+
+    void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam);
+
+    void slaContactGegevensOp(UUID dossierId, String bsn, Telefoonnummer telefoonnummer, Emailadres emailadres);
+
+    void delete(UUID dossierId);
 }

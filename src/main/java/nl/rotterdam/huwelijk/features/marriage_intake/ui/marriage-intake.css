@@ -378,12 +378,33 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     border-radius: 50%;
     flex-shrink: 0;
     color: #fff;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 700;
+    line-height: 1;
 }
 
-.rd-status-icon--check::after {
-    content: '\2713';
+.rd-status-icon--check::before {
+    content: "✓";
+}
+
+/* Partial check: grey circle with grey checkmark (one person selected name) */
+.rd-status-icon--check-partial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: #aaa;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.rd-status-icon--check-partial::before {
+    content: "✓";
 }
 
 /* Grey X status icon (partially complete) */
@@ -399,6 +420,7 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     color: #aaa;
     font-size: 0.65rem;
     font-weight: 700;
+    line-height: 1;
 }
 
 .rd-status-icon--partial::after {
@@ -778,4 +800,204 @@ form.rd-getuige-form {
     color: var(--rd-color-green-500, #007a3e);
     display: block;
     margin-top: 0.2rem;
+}
+
+/* =============================================================
+   JullieGegevensPage – gekozen achternaam display
+   ============================================================= */
+
+.rd-gekozen-achternaam__label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+}
+
+.rd-gekozen-achternaam__label {
+    margin-bottom: 0 !important;
+}
+
+.rd-gekozen-achternaam__edit-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+.rd-gekozen-achternaam__edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.125rem 0.25rem;
+    color: var(--rd-color-green-500, #007a3e);
+    line-height: 1;
+    text-decoration: none;
+}
+
+.rd-gekozen-achternaam__edit-btn:hover {
+    color: var(--rd-color-green-700, #005a2d);
+    text-decoration: none;
+}
+
+.rd-gekozen-achternaam__display {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.rd-gekozen-achternaam__icon {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* =============================================================
+   JullieGegevensPage – editable contact fields
+   ============================================================= */
+
+.rd-partner-card__contact-form {
+    margin-top: 0;
+}
+
+.rd-partner-card__save-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.45rem 1rem;
+    border: none;
+    border-radius: 3px;
+    background: var(--rd-color-green-700, #005a2d);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.25rem;
+}
+
+.rd-partner-card__save-btn:hover {
+    background: var(--rd-color-green-800, #004022);
+}
+
+/* =============================================================
+   JullieGegevensPage – naam kiezen dialog overlay
+   ============================================================= */
+
+/* Full-viewport overlay backdrop — replaces <dialog>::backdrop */
+.rd-naam-kiezen-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* The centred dialog box */
+.rd-naam-kiezen-dialog {
+    background: #fff;
+    border-radius: 6px;
+    padding: 2rem;
+    width: min(480px, 90vw);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.rd-naam-kiezen-dialog__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.rd-naam-kiezen-dialog__icon {
+    color: var(--rd-color-pink, #c0006a);
+    font-size: 1.25rem;
+}
+
+.rd-naam-kiezen-dialog__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: #222;
+}
+
+.rd-naam-kiezen-dialog__opties {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1rem 0 1.5rem;
+}
+
+/* Style each Wicket-generated radio option as a card row */
+.rd-naam-radio-optie {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-size: 0.9375rem;
+    color: #333;
+    background: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.rd-naam-radio-optie:has(input:checked) {
+    border-color: var(--rd-color-green-500, #007a3e);
+    background-color: #f0f8f4;
+    font-weight: 700;
+}
+
+.rd-naam-radio-optie input[type="radio"] {
+    accent-color: var(--rd-color-green-500, #007a3e);
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.rd-naam-kiezen-dialog__actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.rd-naam-kiezen-dialog__bevestig-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.625rem 1.25rem;
+    background-color: var(--rd-color-pink, #c0006a);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.rd-naam-kiezen-dialog__bevestig-btn:hover {
+    background-color: #a0005a;
+}
+
+.rd-naam-kiezen-dialog__cancel-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.625rem 1rem;
+    background: #fff;
+    color: #333;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.rd-naam-kiezen-dialog__cancel-btn:hover {
+    background-color: #f5f5f5;
+    color: #333;
+    text-decoration: none;
 }
