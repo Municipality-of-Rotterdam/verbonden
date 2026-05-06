@@ -122,6 +122,7 @@ public class DeGetuigenPage extends IntakeBasePage {
             }
             marriageIntakeService.slaGetuigeOp(dossierId,
                     new SaveGetuigenDto(formDto.getVolgnummer(), naam.getValue()));
+            setResponsePage(DeGetuigenPage.class, makeDossierPageParameters(dossierId));
         }
     }
 }

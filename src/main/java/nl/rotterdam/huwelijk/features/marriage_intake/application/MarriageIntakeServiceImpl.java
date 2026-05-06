@@ -4,11 +4,12 @@ import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksTy
 import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.NietBeschikbareDagRepository;
-import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
