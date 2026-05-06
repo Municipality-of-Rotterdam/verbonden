@@ -795,13 +795,6 @@ form.rd-getuige-form {
     margin-bottom: 1rem;
 }
 
-.rd-getuige-block__bestand-naam {
-    font-size: 0.875rem;
-    color: var(--rd-color-green-500, #007a3e);
-    display: block;
-    margin-top: 0.2rem;
-}
-
 /* =============================================================
    JullieGegevensPage – gekozen achternaam display
    ============================================================= */

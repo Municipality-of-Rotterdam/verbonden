@@ -9,10 +9,8 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
-import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
-import nl.rotterdam.huwelijk.features.marriage_intake.domain.LegitimatieFileUpload;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
@@ -509,10 +507,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         return getuigenRepository.findByDossier_IdOrderByVolgnummer(dossier.getId()).stream()
                 .map(e -> new GetuigeDto(
                         e.getVolgnummer(),
-                        e.getNaam(),
-                        e.getBestandNaam() != null
-                                ? new LegitimatieFileUpload(e.getBestandNaam(), e.getBestandData())
-                                : null))
+                        e.getNaam()))
                 .toList();
     }
 
@@ -529,10 +524,6 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             entity.setDossier(dossier);
             entity.setVolgnummer(dto.volgnummer());
             entity.setNaam(dto.naam());
-            if (dto.bestand() != null) {
-                entity.setBestandNaam(dto.bestand().bestandNaam());
-                entity.setBestandData(dto.bestand().bestandData());
-            }
             getuigenRepository.save(entity);
         }
     }
@@ -547,10 +538,6 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         entity.setDossier(dossier);
         entity.setVolgnummer(dto.volgnummer());
         entity.setNaam(dto.naam());
-        if (dto.bestand() != null) {
-            entity.setBestandNaam(dto.bestand().bestandNaam());
-            entity.setBestandData(dto.bestand().bestandData());
-        }
         getuigenRepository.save(entity);
     }
 

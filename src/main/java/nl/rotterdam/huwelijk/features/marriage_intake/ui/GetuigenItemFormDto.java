@@ -2,7 +2,6 @@ package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
-import nl.rotterdam.huwelijk.features.marriage_intake.domain.LegitimatieFileUpload;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ public class GetuigenItemFormDto implements Serializable {
 
     private final int volgnummer;
     private PersonFullName naam;
-    private LegitimatieFileUpload bestand;
 
     public GetuigenItemFormDto(int volgnummer) {
         this.volgnummer = volgnummer;
@@ -23,9 +21,6 @@ public class GetuigenItemFormDto implements Serializable {
     public PersonFullName getNaam() { return naam; }
     public void setNaam(PersonFullName naam) { this.naam = naam; }
 
-    public LegitimatieFileUpload getBestand() { return bestand; }
-    public void setBestand(LegitimatieFileUpload bestand) { this.bestand = bestand; }
-
     public static List<GetuigenItemFormDto> vanGetuigen(int maxGetuigen, List<GetuigeDto> bestaande) {
         List<GetuigenItemFormDto> items = new ArrayList<>();
         for (int i = 1; i <= maxGetuigen; i++) {
@@ -33,7 +28,6 @@ public class GetuigenItemFormDto implements Serializable {
             for (GetuigeDto g : bestaande) {
                 if (g.volgnummer() == i) {
                     item.setNaam(toPersonFullName(g.naam()));
-                    item.setBestand(g.bestand());
                     break;
                 }
             }

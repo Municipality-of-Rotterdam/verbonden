@@ -1,22 +1,18 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
-import nl.rotterdam.huwelijk.administration_common.RdFormFieldFileUpload;
 import nl.rotterdam.huwelijk.features.babs_administration.domain.PersonFullName;
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
-import nl.rotterdam.huwelijk.features.marriage_intake.domain.LegitimatieFileUpload;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.nl_design_system.wicket.components.fieldset.RdFieldset;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
-import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
@@ -26,7 +22,6 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.apache.wicket.util.lang.Bytes;
 
 import java.util.List;
 import java.util.UUID;
@@ -83,12 +78,8 @@ public class DeGetuigenPage extends IntakeBasePage {
 
     private class GetuigeForm extends Form<GetuigenItemFormDto> {
 
-        private RdFormFieldFileUpload bestandVeld;
-
         GetuigeForm(String id, IModel<GetuigenItemFormDto> model) {
             super(id, model);
-            setMultiPart(true);
-            setMaxSize(Bytes.megabytes(10));
         }
 
         @Override
@@ -97,11 +88,6 @@ public class DeGetuigenPage extends IntakeBasePage {
 
             IModel<GetuigenItemFormDto> model = getModel();
             int volgnummer = model.getObject().getVolgnummer();
-            String bestaandeBestandNaam = model.getObject().getBestand() != null
-                    ? model.getObject().getBestand().bestandNaam() : null;
-
-            bestandVeld = new RdFormFieldFileUpload(
-                    "bestandInput", new ListModel<>(), new ResourceModel("de.getuigen.bestand.label"));
 
             RdFieldset<String> fieldset = new RdFieldset<>(
                     "getuigeFieldset", NULL_STRING_MODEL,
@@ -118,14 +104,7 @@ public class DeGetuigenPage extends IntakeBasePage {
                                             slaOp();
                                         }
                                     }
-                            )),
-                    bestandVeld.withInput(input -> input.add(new AjaxFormSubmitBehavior("change") {
-                        @Override
-                        protected void onSubmit(AjaxRequestTarget target) {
-                            // form's onSubmit() handles saving
-                        }
-                    })),
-                    new Label("bestandNaamLabel", bestaandeBestandNaam != null ? bestaandeBestandNaam : "")
+                            ))
             );
             add(fieldset);
         }
@@ -141,16 +120,8 @@ public class DeGetuigenPage extends IntakeBasePage {
             if (naam == null) {
                 return;
             }
-            FileUpload upload = bestandVeld.getFileUpload();
-            LegitimatieFileUpload bestand;
-            if (upload != null && upload.getClientFileName() != null && !upload.getClientFileName().isBlank()) {
-                bestand = new LegitimatieFileUpload(upload.getClientFileName(), upload.getBytes());
-                formDto.setBestand(bestand);
-            } else {
-                bestand = formDto.getBestand();
-            }
             marriageIntakeService.slaGetuigeOp(dossierId,
-                    new SaveGetuigenDto(formDto.getVolgnummer(), naam.getValue(), bestand));
+                    new SaveGetuigenDto(formDto.getVolgnummer(), naam.getValue()));
         }
     }
 }

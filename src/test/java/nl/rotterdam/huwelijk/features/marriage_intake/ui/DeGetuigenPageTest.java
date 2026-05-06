@@ -65,10 +65,10 @@ class DeGetuigenPageTest extends BaseWicketTest {
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
 
         List<SaveGetuigenDto> getuigen = List.of(
-                new SaveGetuigenDto(1, "Kwik van Willegenburgh", null),
-                new SaveGetuigenDto(2, "Kwek van Willegenburgh", null),
-                new SaveGetuigenDto(3, "Kwak van Willegenburgh", null),
-                new SaveGetuigenDto(4, "Dagobert Duck", null)
+                new SaveGetuigenDto(1, "Kwik van Willegenburgh"),
+                new SaveGetuigenDto(2, "Kwek van Willegenburgh"),
+                new SaveGetuigenDto(3, "Kwak van Willegenburgh"),
+                new SaveGetuigenDto(4, "Dagobert Duck")
         );
         marriageIntakeService.slaGetuigenOp(dossierId, getuigen);
 
@@ -85,7 +85,7 @@ class DeGetuigenPageTest extends BaseWicketTest {
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
 
         marriageIntakeService.slaGetuigenOp(dossierId,
-                List.of(new SaveGetuigenDto(1, "Eerste Getuige", null)));
+                List.of(new SaveGetuigenDto(1, "Eerste Getuige")));
 
         var samenvatting = marriageIntakeService.findByDossierId(dossierId);
         assertThat(samenvatting.getuigenBevestigd()).isFalse();
@@ -99,8 +99,8 @@ class DeGetuigenPageTest extends BaseWicketTest {
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, "999990202"));
 
         marriageIntakeService.slaGetuigenOp(dossierId, List.of(
-                new SaveGetuigenDto(1, "Getuige Een", null),
-                new SaveGetuigenDto(2, "Getuige Twee", null)
+                new SaveGetuigenDto(1, "Getuige Een"),
+                new SaveGetuigenDto(2, "Getuige Twee")
         ));
 
         var samenvatting = marriageIntakeService.findByDossierId(dossierId);
