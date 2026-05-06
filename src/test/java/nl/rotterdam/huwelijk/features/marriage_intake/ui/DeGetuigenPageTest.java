@@ -60,6 +60,22 @@ class DeGetuigenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990202")
+    void paginaToontBestaandeNaamAlsGetuigeAlIngevuld() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, "999990202"));
+        marriageIntakeService.slaGetuigenOp(dossierId,
+                List.of(new SaveGetuigenDto(1, "Kwik van Willegenburgh")));
+
+        PageParameters params = new PageParameters();
+        params.add("dossierId", dossierId.toString());
+        tester.startPage(DeGetuigenPage.class, params);
+
+        tester.assertRenderedPage(DeGetuigenPage.class);
+        assertThat(tester.getLastResponseAsString()).contains("Kwik van Willegenburgh");
+    }
+
+    @Test
+    @WithMockUser(username = "999990202")
     void slaGetuigenOp_persisteertNamenCorrect() {
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
@@ -76,6 +92,67 @@ class DeGetuigenPageTest extends BaseWicketTest {
         assertThat(opgeslagen).hasSize(4);
         assertThat(opgeslagen.get(0).naam()).isEqualTo("Kwik van Willegenburgh");
         assertThat(opgeslagen.get(3).naam()).isEqualTo("Dagobert Duck");
+    }
+
+    @Test
+    @WithMockUser(username = "999990202")
+    void slaGetuigeOp_persisteertEnkeleGetuige() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
+
+        marriageIntakeService.slaGetuigeOp(dossierId, new SaveGetuigenDto(2, "Anna van Bergen"));
+
+        List<GetuigeDto> opgeslagen = marriageIntakeService.findGetuigen(dossierId);
+        assertThat(opgeslagen).hasSize(1);
+        assertThat(opgeslagen.get(0).volgnummer()).isEqualTo(2);
+        assertThat(opgeslagen.get(0).naam()).isEqualTo("Anna van Bergen");
+    }
+
+    @Test
+    @WithMockUser(username = "999990202")
+    void slaGetuigeOp_updatesBestaandeGetuigeZonderDuplicaat() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
+        marriageIntakeService.slaGetuigeOp(dossierId, new SaveGetuigenDto(1, "Kwik van Willegenburgh"));
+
+        marriageIntakeService.slaGetuigeOp(dossierId, new SaveGetuigenDto(1, "Kwek van Willegenburgh"));
+
+        List<GetuigeDto> opgeslagen = marriageIntakeService.findGetuigen(dossierId);
+        assertThat(opgeslagen).hasSize(1);
+        assertThat(opgeslagen.get(0).naam()).isEqualTo("Kwek van Willegenburgh");
+    }
+
+    @Test
+    @WithMockUser(username = "999990202")
+    void slaGetuigenOp_negerteBlanckeNamen() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
+
+        marriageIntakeService.slaGetuigenOp(dossierId, List.of(
+                new SaveGetuigenDto(1, "Anna van Bergen"),
+                new SaveGetuigenDto(2, ""),
+                new SaveGetuigenDto(3, "  ")
+        ));
+
+        List<GetuigeDto> opgeslagen = marriageIntakeService.findGetuigen(dossierId);
+        assertThat(opgeslagen).hasSize(1);
+        assertThat(opgeslagen.get(0).naam()).isEqualTo("Anna van Bergen");
+    }
+
+    @Test
+    @WithMockUser(username = "999990202")
+    void findGetuigen_retourneertGeorderdOpVolgnummer() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
+        marriageIntakeService.slaGetuigenOp(dossierId, List.of(
+                new SaveGetuigenDto(3, "Derde Getuige"),
+                new SaveGetuigenDto(1, "Eerste Getuige"),
+                new SaveGetuigenDto(2, "Tweede Getuige")
+        ));
+
+        List<GetuigeDto> opgeslagen = marriageIntakeService.findGetuigen(dossierId);
+
+        assertThat(opgeslagen).extracting(GetuigeDto::volgnummer).containsExactly(1, 2, 3);
     }
 
     @Test
@@ -107,4 +184,16 @@ class DeGetuigenPageTest extends BaseWicketTest {
         assertThat(samenvatting.getuigenBevestigd()).isTrue();
         assertThat(samenvatting.getuigenGedeeltelijkIngevuld()).isFalse();
     }
+
+    @Test
+    @WithMockUser(username = "999990202")
+    void sidebarToontGeenBevestigingAlsGeenGetuigenIngevuld() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990202"));
+
+        var samenvatting = marriageIntakeService.findByDossierId(dossierId);
+        assertThat(samenvatting.getuigenBevestigd()).isFalse();
+        assertThat(samenvatting.getuigenGedeeltelijkIngevuld()).isFalse();
+    }
 }
+
