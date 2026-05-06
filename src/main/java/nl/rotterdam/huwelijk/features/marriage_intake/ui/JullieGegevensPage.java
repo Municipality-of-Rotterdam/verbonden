@@ -27,6 +27,8 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
+import org.apache.wicket.request.Url;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.NonNull;
 
@@ -179,6 +181,35 @@ public class JullieGegevensPage extends IntakeBasePage {
 
         WebMarkupContainer partnerNogBevestigenCard = new WebMarkupContainer("partnerNogBevestigenCard");
         partnerNogBevestigenCard.setVisible(partners.size() < 2);
+
+        String absoluteLoginUrl = "";
+        String qrDataUri = "";
+        if (dossierId != null) {
+            Url relUrl = Url.parse(urlFor(MarriageIntakePage.class, makeDossierPageParameters(dossierId)).toString());
+            absoluteLoginUrl = RequestCycle.get().getUrlRenderer().renderFullUrl(relUrl);
+            if (partners.size() < 2) {
+                qrDataUri = QrCodeUtil.generateQrCodeDataUri(absoluteLoginUrl, 200, 200);
+            }
+        }
+
+        WebMarkupContainer qrCodeImg = new WebMarkupContainer("partnerQrCode") {
+            @Override
+            protected void onComponentTag(ComponentTag tag) {
+                super.onComponentTag(tag);
+                tag.put("src", qrDataUri);
+            }
+        };
+        partnerNogBevestigenCard.add(qrCodeImg);
+
+        WebMarkupContainer loginLink = new WebMarkupContainer("partnerLoginLink") {
+            @Override
+            protected void onComponentTag(ComponentTag tag) {
+                super.onComponentTag(tag);
+                tag.put("href", absoluteLoginUrl);
+            }
+        };
+        partnerNogBevestigenCard.add(loginLink);
+
         pageBody.add(partnerNogBevestigenCard);
     }
 

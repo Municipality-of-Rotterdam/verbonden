@@ -154,6 +154,13 @@
             <version>1.10.1</version>
         </dependency>
 
+        <!-- ZXing QR code generation -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.3</version>
+        </dependency>
+
         <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
         <dependency>
             <groupId>org.jsoup</groupId>

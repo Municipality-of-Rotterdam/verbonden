@@ -108,11 +108,22 @@
         <!-- Shown when the second partner has not yet logged in to confirm -->
         <div wicket:id="partnerNogBevestigenCard" class="col-12 col-md-6">
             <div class="rd-partner-card rd-partner-card--wachten">
+                <h3 class="rd-partner-card__achternaam">
+                    <wicket:message key="jullie.gegevens.partner.uitnodigen.heading">Partner uitnodigen</wicket:message>
+                </h3>
                 <p class="rd-partner-card__wachten-melding">
-                    <wicket:message key="jullie.gegevens.partner.nog.bevestigen">
-                        De partner heeft de aanvraag nog niet bevestigd. Uw partner kan bevestigen door in te loggen op het dossier.
+                    <wicket:message key="jullie.gegevens.partner.uitnodigen.instructie">
+                        Uw partner heeft de aanvraag nog niet bevestigd. Laat uw partner de QR-code scannen om in te loggen, of gebruik de knop hieronder.
                     </wicket:message>
                 </p>
+                <div class="rd-partner-qr-code-wrapper">
+                    <img wicket:id="partnerQrCode" class="rd-partner-qr-code" alt="QR code om in te loggen als partner"/>
+                </div>
+                <div class="rd-partner-card__actions">
+                    <a wicket:id="partnerLoginLink" class="rd-partner-card__action-button" target="_blank" rel="noopener noreferrer">
+                        <wicket:message key="jullie.gegevens.partner.inloggen">Inloggen als partner</wicket:message>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

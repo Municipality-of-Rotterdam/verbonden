@@ -801,6 +801,29 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
 }
 
 /* =============================================================
+   JullieGegevensPage – partner nog bevestigen card (QR code)
+   ============================================================= */
+
+.rd-partner-card__wachten-melding {
+    font-size: 0.9375rem;
+    color: #555;
+    margin-bottom: 0.75rem;
+}
+
+.rd-partner-qr-code-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem 0 1rem;
+}
+
+.rd-partner-qr-code {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+}
+
+/* =============================================================
    JullieGegevensPage – editable contact fields
    ============================================================= */
 
