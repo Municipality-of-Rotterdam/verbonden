@@ -17,6 +17,12 @@ class QrCodeUtil {
     }
 
     static String generateQrCodeDataUri(String content, int width, int height) {
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("content must not be null or blank");
+        }
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("width and height must be positive");
+        }
         try {
             BitMatrix bitMatrix = new QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, width, height);
 
@@ -27,10 +33,11 @@ class QrCodeUtil {
                 }
             }
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ImageIO.write(image, "PNG", outputStream);
-            String base64 = Base64.getEncoder().encodeToString(outputStream.toByteArray());
-            return "data:image/png;base64," + base64;
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                ImageIO.write(image, "PNG", outputStream);
+                String base64 = Base64.getEncoder().encodeToString(outputStream.toByteArray());
+                return "data:image/png;base64," + base64;
+            }
         } catch (WriterException | IOException e) {
             throw new RuntimeException("Failed to generate QR code", e);
         }

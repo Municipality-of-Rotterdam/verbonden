@@ -817,7 +817,7 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
 }
 
 .rd-partner-qr-code {
-    width: 200px;
+    width: 200px;  /* matches QR_CODE_SIZE constant in JullieGegevensPage.java */
     height: 200px;
     border: 1px solid #d0d0d0;
     border-radius: 4px;

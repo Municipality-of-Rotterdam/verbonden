@@ -41,6 +41,7 @@ import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParam
 public class JullieGegevensPage extends IntakeBasePage {
 
     private static final DateTimeFormatter DATUM_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private static final int QR_CODE_SIZE = 200;
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
@@ -182,15 +183,13 @@ public class JullieGegevensPage extends IntakeBasePage {
         WebMarkupContainer partnerNogBevestigenCard = new WebMarkupContainer("partnerNogBevestigenCard");
         partnerNogBevestigenCard.setVisible(partners.size() < 2);
 
-        String absoluteLoginUrl = "";
-        String qrDataUri = "";
-        if (dossierId != null) {
-            Url relUrl = Url.parse(urlFor(MarriageIntakePage.class, makeDossierPageParameters(dossierId)).toString());
-            absoluteLoginUrl = RequestCycle.get().getUrlRenderer().renderFullUrl(relUrl);
-            if (partners.size() < 2) {
-                qrDataUri = QrCodeUtil.generateQrCodeDataUri(absoluteLoginUrl, 200, 200);
-            }
-        }
+        String loginUrl = dossierId != null
+                ? RequestCycle.get().getUrlRenderer().renderFullUrl(
+                        Url.parse(urlFor(MarriageIntakePage.class, makeDossierPageParameters(dossierId)).toString()))
+                : "";
+        String qrDataUri = !loginUrl.isEmpty() && partners.size() < 2
+                ? QrCodeUtil.generateQrCodeDataUri(loginUrl, QR_CODE_SIZE, QR_CODE_SIZE)
+                : "";
 
         WebMarkupContainer qrCodeImg = new WebMarkupContainer("partnerQrCode") {
             @Override
@@ -199,15 +198,17 @@ public class JullieGegevensPage extends IntakeBasePage {
                 tag.put("src", qrDataUri);
             }
         };
+        qrCodeImg.setVisible(!qrDataUri.isEmpty());
         partnerNogBevestigenCard.add(qrCodeImg);
 
         WebMarkupContainer loginLink = new WebMarkupContainer("partnerLoginLink") {
             @Override
             protected void onComponentTag(ComponentTag tag) {
                 super.onComponentTag(tag);
-                tag.put("href", absoluteLoginUrl);
+                tag.put("href", loginUrl);
             }
         };
+        loginLink.setVisible(!loginUrl.isEmpty());
         partnerNogBevestigenCard.add(loginLink);
 
         pageBody.add(partnerNogBevestigenCard);
