@@ -117,11 +117,8 @@ public class DeGetuigenPage extends IntakeBasePage {
         private void slaOp() {
             GetuigenItemFormDto formDto = getModelObject();
             PersonFullName naam = formDto.getNaam();
-            if (naam == null) {
-                return;
-            }
             marriageIntakeService.slaGetuigeOp(dossierId,
-                    new SaveGetuigenDto(formDto.getVolgnummer(), naam.getValue()));
+                    new SaveGetuigenDto(formDto.getVolgnummer(), naam==null ? null : naam.getValue()));
             setResponsePage(DeGetuigenPage.class, makeDossierPageParameters(dossierId));
         }
     }

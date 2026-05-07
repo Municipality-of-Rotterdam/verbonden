@@ -407,26 +407,6 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     content: "✓";
 }
 
-/* Grey X status icon (partially complete) */
-.rd-status-icon--partial {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.1rem;
-    height: 1.1rem;
-    border: 2px solid #aaa;
-    border-radius: 50%;
-    flex-shrink: 0;
-    color: #aaa;
-    font-size: 0.65rem;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.rd-status-icon--partial::after {
-    content: '\00D7';
-}
-
 /* Filled (done) status icon */
 .rd-status-icon--done {
     display: inline-block;
