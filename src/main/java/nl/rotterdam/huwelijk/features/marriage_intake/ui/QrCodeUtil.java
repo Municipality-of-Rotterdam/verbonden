@@ -34,8 +34,9 @@ class QrCodeUtil {
             throw new IllegalArgumentException("width and height must be positive");
         }
         try {
-            // Encode with size 0,0 so ZXing picks the smallest module grid
-            // (Math.max(0, qrWidth) == qrWidth → scale factor 1).
+            // Passing 0,0 causes ZXing to choose the minimum module grid for the
+            // content (equivalent to Math.max(0, qrWidth) == qrWidth, scale=1).
+            // This is well-defined behaviour in ZXing 3.5.x: see QRCodeWriter#renderResult.
             BitMatrix bitMatrix = new QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, 0, 0);
             int size = bitMatrix.getWidth();
 
@@ -48,13 +49,21 @@ class QrCodeUtil {
             // White background
             svg.append("<rect width=\"").append(size)
                .append("\" height=\"").append(size).append("\" fill=\"white\"/>");
-            // One <rect> per black module
+            // One <rect> per horizontal run of black modules to keep the SVG compact
             for (int y = 0; y < size; y++) {
-                for (int x = 0; x < size; x++) {
+                int x = 0;
+                while (x < size) {
                     if (bitMatrix.get(x, y)) {
-                        svg.append("<rect x=\"").append(x)
+                        int runStart = x;
+                        while (x < size && bitMatrix.get(x, y)) {
+                            x++;
+                        }
+                        svg.append("<rect x=\"").append(runStart)
                            .append("\" y=\"").append(y)
-                           .append("\" width=\"1\" height=\"1\"/>");
+                           .append("\" width=\"").append(x - runStart)
+                           .append("\" height=\"1\"/>");
+                    } else {
+                        x++;
                     }
                 }
             }
