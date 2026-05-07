@@ -132,9 +132,9 @@ public class JullieGegevensPage extends IntakeBasePage {
                 editIconContainer.setVisible(kanKiezen);
                 gekozenAchternaamSection.add(editIconContainer);
 
-                // "Kies je achternaam" button section — only shown when no name chosen yet
+                // "Kies je achternaam" button section — shown whenever this user can choose
                 WebMarkupContainer kiesAchternaamSection = new WebMarkupContainer("kiesAchternaamSection");
-                kiesAchternaamSection.setVisible(kanKiezen && partner.gekozenAchternaam() == null);
+                kiesAchternaamSection.setVisible(kanKiezen);
                 item.add(kiesAchternaamSection);
 
                 if (kanKiezen) {
