@@ -3,8 +3,10 @@
         background-color: var(--rods-color-base-white);
     }
     .utrecht-page-footer__content {
-        border-top: 3px solid var(--rods-color-base-green);
         background-color: var(--rods-color-base-white);
+    }
+    #footer-content {
+        border-top: 3px solid var(--rods-color-base-green);
     }
 
     .utrecht-page-footer__navigation .utrecht-link-list {
@@ -12,6 +14,44 @@
         flex-direction: row;
     }
 }
+
+/* Mobiel: footer-links onder elkaar, logo rechts */
+@media (max-width: 768px) {
+
+    .rods-theme {
+        /* standaard 72px voor desktop, veel te veel natuurlijk voor mobiel. Waarom is het in figma-tokens niet rem? */
+        --utrecht-page-footer-padding-inline-start: 15px;
+        --utrecht-page-footer-padding-inline-end: 15px;
+
+        .rd-footer-links {
+            flex-direction: column;
+            align-content: center;
+            gap: 0.5rem;
+        }
+        .utrecht-page-footer__content {
+            /* inline-size van 100% met padding-inline-start ziet er niet goed uit, geeft horizontale scrollbar */
+            inline-size: unset;
+        }
+
+        .rd-footer-links a {
+            display: block;
+        }
+
+        .rd-footer-logo {
+            margin-top: 1rem;
+        }
+
+        .rd-footer-logo svg {
+            /* zonder dit is logo te groot en staat balk niet in het midden */
+            max-width: 200px;
+            margin: 0 auto;
+        }
+    }
+}
+
+
+
+
 
 
 /* Footer links */
