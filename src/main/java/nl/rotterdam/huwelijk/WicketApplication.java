@@ -74,17 +74,14 @@ public class WicketApplication extends WebApplication {
         getApplicationSettings().setPageExpiredErrorPage(BurgerErrorPage.class);
         getApplicationSettings().setAccessDeniedPage(BurgerErrorPage.class);
 
-        // Enable Wicket's built-in Content Security Policy headers.
-        // CSP is managed centrally via Spring Security (see SecurityConfig).
-        // Without this, both Wicket and Spring Security would send separate
-        // Content-Security-Policy headers; browsers enforce all of them as an
-        // intersection.
-        // Explicitly allow certain options, e.g. to allow data: in images
-        getCspSettings().blocking() // standaard alles blokkeren, met paar enkele uitzonderingen
-                .add(STYLE_SRC, SELF) // moet blijkbaar expliciet worden toegevoegd
-                .add(IMG_SRC, "data:") // nodig voor bootstrap en QR
-                .add(FRAME_ANCESTORS, NONE) // blokkeer frame-ancestors
-                .reportBack();
+        // Extend Wicket's default blocking CSP to allow data: images (needed for QR codes)
+        // and style-src 'self'. Wicket's internalInit() already calls reportBack(), so
+        // we must NOT call it here again — doing so causes an IllegalArgumentException
+        // ("report-uri directive can only contain one URI") in tests and at runtime.
+        getCspSettings().blocking()
+                .add(STYLE_SRC, SELF)
+                .add(IMG_SRC, "data:")
+                .add(FRAME_ANCESTORS, NONE);
 
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
         // Spring Security's CSRF filter is disabled in SecurityConfig to avoid conflicts
