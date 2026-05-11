@@ -59,10 +59,14 @@
     margin-bottom: -1px;
     border-radius: 2px 2px 0 0;
     font-family: inherit;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .rd-tab:hover {
     background-color: #f5f5f5;
+    text-decoration: none;
+    color: #444;
 }
 
 .rd-tab--active {
@@ -70,6 +74,12 @@
     border-bottom-color: #fff;
     background-color: #fff;
     font-weight: 600;
+}
+
+.rd-tab--disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* Intro paragraph */
@@ -357,6 +367,26 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     flex-shrink: 0;
 }
 
+/* Green checkmark status icon (all complete) */
+.rd-status-icon--check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: var(--rd-color-green-500, #007a3e);
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.rd-status-icon--check::before {
+    content: "✓";
+}
+
 /* Partial check: grey circle with grey checkmark (one person selected name) */
 .rd-status-icon--check-partial {
     display: inline-flex;
@@ -374,26 +404,6 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
 }
 
 .rd-status-icon--check-partial::before {
-    content: "✓";
-}
-
-/* Full check: green circle with white checkmark (both persons selected name) */
-.rd-status-icon--check {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.1rem;
-    height: 1.1rem;
-    background: var(--rd-color-green-500, #007a3e);
-    border-radius: 50%;
-    flex-shrink: 0;
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.rd-status-icon--check::before {
     content: "✓";
 }
 
@@ -751,6 +761,18 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
 
 .rd-partner-card__action-icon {
     font-size: 1rem;
+}
+
+/* =============================================================
+   DeGetuigenPage – witness entry blocks
+   ============================================================= */
+
+form.rd-getuige-form {
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    padding: 1.5rem;
+    background: #fff;
+    margin-bottom: 1rem;
 }
 
 /* =============================================================

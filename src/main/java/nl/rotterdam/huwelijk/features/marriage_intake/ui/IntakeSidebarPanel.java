@@ -189,12 +189,20 @@ public class IntakeSidebarPanel extends Panel {
                 setVisible(d != null && d.getuigenBevestigd());
             }
         });
+        getuigenStatusIcon.add(new WebMarkupContainer("getuigenStatusPartial") {
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                DossierSamenvattingDto d = getDossierModel().getObject();
+                setVisible(d != null && d.getuigenGedeeltelijkIngevuld());
+            }
+        });
         getuigenStatusIcon.add(new WebMarkupContainer("getuigenStatusEmpty") {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
                 DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d == null || !d.getuigenBevestigd());
+                setVisible(d == null || (!d.getuigenBevestigd() && !d.getuigenGedeeltelijkIngevuld()));
             }
         });
         add(getuigenStatusIcon);
