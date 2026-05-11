@@ -442,6 +442,38 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     background-color: #f5f5f5;
 }
 
+/* Qr instructions*/
+.circle-list {
+    list-style: none;         /* Remove default numbers */
+    counter-reset: my-counter; /* Initialize the counter */
+    padding-left: 0;
+}
+
+.circle-list li {
+    counter-increment: my-counter; /* Increment counter for each item */
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.circle-list li::before {
+    content: counter(my-counter); /* Display the number */
+    background: #fff;          /* Circle color */
+    color: #333;                 /* Number color */
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;           /* Makes it a circle */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 0.65rem;           /* Space between circle and text */
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+    border: 2px solid #333;
+}
+
+
 /* =============================================================
    Ceremony selection section
    ============================================================= */
