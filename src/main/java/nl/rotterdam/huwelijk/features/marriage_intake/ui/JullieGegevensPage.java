@@ -37,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class JullieGegevensPage extends IntakeBasePage {
@@ -184,10 +185,9 @@ public class JullieGegevensPage extends IntakeBasePage {
         WebMarkupContainer partnerNogBevestigenCard = new WebMarkupContainer("partnerNogBevestigenCard");
         partnerNogBevestigenCard.setVisible(partners.size() < 2);
 
-        String loginUrl = dossierId != null
-                ? RequestCycle.get().getUrlRenderer().renderFullUrl(
-                        Url.parse(urlFor(MarriageIntakePage.class, makeDossierPageParameters(dossierId)).toString()))
-                : "";
+        String loginUrl = RequestCycle.get().getUrlRenderer().renderFullUrl(
+                    Url.parse(urlFor(MarriageIntakePage.class, makeDossierPageParameters(requireNonNull(dossierId))).toString()));
+
         String qrDataUri = !loginUrl.isEmpty() && partners.size() < 2
                 ? QrCodeUtil.generateQrCodeDataUri(loginUrl, QR_CODE_SIZE, QR_CODE_SIZE)
                 : "";
