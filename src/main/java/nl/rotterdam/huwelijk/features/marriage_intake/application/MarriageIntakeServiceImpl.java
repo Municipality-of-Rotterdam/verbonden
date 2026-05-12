@@ -60,7 +60,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               MarriageTypeLocationRepository marriageTypeLocationRepository,
                               MarriageTypeRepository marriageTypeRepository,
                               AfspraakRepository afspraakRepository,
-                              PlanningConfig planningConfig) {
+                              PlanningConfig planningConfig,
                               GetuigenRepository getuigenRepository) {
         this.dossierRepository = dossierRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
