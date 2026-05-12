@@ -19,7 +19,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Override
     @Transactional(readOnly = true)
     public Page<ListDossierDto> search(String zoekterm, Pageable pageable) {
-        return dossierAdministrationRepository.searchProjected(zoekterm == null ? "" : zoekterm, pageable);
+        return dossierAdministrationRepository.search(zoekterm == null ? "" : zoekterm, pageable);
     }
 
     @Override

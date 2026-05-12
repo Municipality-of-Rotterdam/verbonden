@@ -12,23 +12,40 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DossierAdministrationRepository extends JpaRepository<HuwelijksDossierEntity, Long> {
 
-    @Query("""
+    @Query(value = """
             SELECT new nl.rotterdam.huwelijk.features.dossier_administration.domain.ListDossierDto(
-                d.uuid, d.bsn1, d.bsn2, d.registratieType, d.ceremonieSoort, d.aangemaaktOp)
+                d.uuid,
+                (SELECT p1.bsn FROM HuwelijksDossiersPartnerEntity p1 WHERE p1.dossier = d AND p1.volgorde = 1),
+                (SELECT p2.bsn FROM HuwelijksDossiersPartnerEntity p2 WHERE p2.dossier = d AND p2.volgorde = 2),
+                d.registratieType,
+                d.ceremonieSoort,
+                d.aangemaaktOp)
             FROM HuwelijksDossierEntity d
             WHERE :zoekterm IS NULL OR :zoekterm = ''
-               OR d.bsn1 LIKE CONCAT('%', :zoekterm, '%')
-               OR d.bsn2 LIKE CONCAT('%', :zoekterm, '%')
+               OR EXISTS (SELECT p FROM HuwelijksDossiersPartnerEntity p
+                          WHERE p.dossier = d
+                            AND (p.bsn LIKE CONCAT('%', :zoekterm, '%')
+                                 OR LOWER(p.gekozenAchternaam) LIKE LOWER(CONCAT('%', :zoekterm, '%'))))
+               OR LOWER(CAST(d.uuid AS String)) LIKE LOWER(CONCAT('%', :zoekterm, '%'))
+            """,
+            countQuery = """
+            SELECT COUNT(d) FROM HuwelijksDossierEntity d
+            WHERE :zoekterm IS NULL OR :zoekterm = ''
+               OR EXISTS (SELECT p FROM HuwelijksDossiersPartnerEntity p
+                          WHERE p.dossier = d
+                            AND (p.bsn LIKE CONCAT('%', :zoekterm, '%')
+                                 OR LOWER(p.gekozenAchternaam) LIKE LOWER(CONCAT('%', :zoekterm, '%'))))
                OR LOWER(CAST(d.uuid AS String)) LIKE LOWER(CONCAT('%', :zoekterm, '%'))
             """)
-    Page<ListDossierDto> searchProjected(@Param("zoekterm") String zoekterm, Pageable pageable);
+    Page<ListDossierDto> search(@Param("zoekterm") String zoekterm, Pageable pageable);
 
     @Query("""
-            SELECT COUNT(d)
-            FROM HuwelijksDossierEntity d
+            SELECT COUNT(d) FROM HuwelijksDossierEntity d
             WHERE :zoekterm IS NULL OR :zoekterm = ''
-               OR d.bsn1 LIKE CONCAT('%', :zoekterm, '%')
-               OR d.bsn2 LIKE CONCAT('%', :zoekterm, '%')
+               OR EXISTS (SELECT p FROM HuwelijksDossiersPartnerEntity p
+                          WHERE p.dossier = d
+                            AND (p.bsn LIKE CONCAT('%', :zoekterm, '%')
+                                 OR LOWER(p.gekozenAchternaam) LIKE LOWER(CONCAT('%', :zoekterm, '%'))))
                OR LOWER(CAST(d.uuid AS String)) LIKE LOWER(CONCAT('%', :zoekterm, '%'))
             """)
     long countByZoekterm(@Param("zoekterm") String zoekterm);

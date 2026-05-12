@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -14,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+    private static final String CONTENT_SECURITY_POLICY =
+            "default-src 'self'; img-src 'self' data:";
 
     /**
      * Comma-separated list of {@code gebruikersnaam:wachtwoord} pairs for administrators.
@@ -56,13 +59,16 @@ public class SecurityConfig {
     public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher(new OrRequestMatcher(
-                        new AntPathRequestMatcher("/beheer/**"),
-                        new AntPathRequestMatcher("/login"),
-                        new AntPathRequestMatcher("/login/**"),
-                        new AntPathRequestMatcher("/logout")
+                        PathPatternRequestMatcher.withDefaults().matcher("/beheer/**"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/login"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/login/**"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/logout")
                 ))
                 // Apache Wicket 10 has its own CSRF protection; disable Spring Security's to avoid conflicts.
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/login/**").permitAll()
                         .requestMatchers("/beheer/**").hasRole("BEHEERDER")
@@ -73,7 +79,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+                        .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/logout"))
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 );
@@ -97,6 +103,9 @@ public class SecurityConfig {
     public SecurityFilterChain burgerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/inloggen", "/inloggen/**").permitAll()
                         .requestMatchers("/wicket/resource/**").permitAll()
@@ -106,7 +115,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/inloggen"))
                 )
                 .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/uitloggen", "GET"))
+                        .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/uitloggen"))
                         .logoutSuccessUrl("/inloggen")
                         .permitAll()
                 );

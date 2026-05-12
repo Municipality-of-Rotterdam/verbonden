@@ -7,6 +7,10 @@ import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsUpdatePage;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.huwelijk.features.babs_administration.ui.PersonFullNameWicketConverter;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.EmailadresWicketConverter;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.TelefoonnummerWicketConverter;
 import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidCreatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.BeschikbaarheidUpdatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.LocationAdministrationPage;
@@ -14,6 +18,7 @@ import nl.rotterdam.huwelijk.features.location_administration.ui.LocationCreateP
 import nl.rotterdam.huwelijk.features.location_administration.ui.LocationUpdatePage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.DatumKiezenPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeDagPage;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeGetuigenPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.JullieGegevensPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagCreatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagImportPage;
@@ -35,6 +40,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static org.apache.wicket.csp.CSPDirective.*;
+import static org.apache.wicket.csp.CSPDirectiveSrcValue.NONE;
+import static org.apache.wicket.csp.CSPDirectiveSrcValue.SELF;
+
 @Component
 public class WicketApplication extends WebApplication {
 
@@ -44,6 +53,8 @@ public class WicketApplication extends WebApplication {
         locator.set(LocalDate.class, new LocalDateWicketConverter());
         locator.set(LocalTime.class, new LocalTimeWicketConverter());
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
+        locator.set(Telefoonnummer.class, new TelefoonnummerWicketConverter());
+        locator.set(Emailadres.class, new EmailadresWicketConverter());
         return locator;
     }
 
@@ -63,6 +74,15 @@ public class WicketApplication extends WebApplication {
         getApplicationSettings().setInternalErrorPage(BurgerErrorPage.class);
         getApplicationSettings().setPageExpiredErrorPage(BurgerErrorPage.class);
         getApplicationSettings().setAccessDeniedPage(BurgerErrorPage.class);
+
+        // Extend Wicket's default blocking CSP to allow data: images (needed for QR codes)
+        // and style-src 'self'. Wicket's internalInit() already calls reportBack(), so
+        // we must NOT call it here again — doing so causes an IllegalArgumentException
+        // ("report-uri directive can only contain one URI") in tests and at runtime.
+        getCspSettings().blocking()
+                .add(STYLE_SRC, SELF)
+                .add(IMG_SRC, "data:")
+                .add(FRAME_ANCESTORS, NONE);
 
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
         // Spring Security's CSRF filter is disabled in SecurityConfig to avoid conflicts
@@ -87,6 +107,7 @@ public class WicketApplication extends WebApplication {
         mountPage("/huwelijk/${dossierId}", MarriageIntakePage.class);
         mountPage("/mijn-dag/${dossierId}", DeDagPage.class);
         mountPage("/mijn-dag/${dossierId}/jullie-gegevens", JullieGegevensPage.class);
+        mountPage("/mijn-dag/${dossierId}/de-getuigen", DeGetuigenPage.class);
         mountPage("/mijn-dag/${dossierId}/datum-kiezen", DatumKiezenPage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/nieuw", NietBeschikbareDagCreatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/${id}", NietBeschikbareDagUpdatePage.class);
