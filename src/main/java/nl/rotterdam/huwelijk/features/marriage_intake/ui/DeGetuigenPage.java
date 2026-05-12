@@ -68,7 +68,7 @@ public class DeGetuigenPage extends IntakeBasePage {
         List<GetuigeDto> bestaande = marriageIntakeService.findGetuigen(dossierId);
         List<GetuigenItemFormDto> items = GetuigenItemFormDto.vanGetuigen(maxGetuigen, bestaande);
 
-        pageBody.add(new ListView<GetuigenItemFormDto>("getuigen", new ListModel<>(items)) {
+        pageBody.add(new ListView<>("getuigen", new ListModel<>(items)) {
             @Override
             protected void populateItem(ListItem<GetuigenItemFormDto> item) {
                 item.add(new GetuigeForm("getuigeForm", item.getModel()));
@@ -97,7 +97,7 @@ public class DeGetuigenPage extends IntakeBasePage {
                             LambdaModel.of(model, GetuigenItemFormDto::getNaam, GetuigenItemFormDto::setNaam),
                             new ResourceModel("de.getuigen.naam.label"))
                             .setModelType(PersonFullName.class)
-                            .withTextInput((rdTextInput, parent) -> rdTextInput.add(
+                            .withTextInput((rdTextInput, _) -> rdTextInput.add(
                                     new AjaxFormComponentUpdatingBehavior("change") {
                                         @Override
                                         protected void onUpdate(AjaxRequestTarget target) {

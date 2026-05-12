@@ -7,6 +7,7 @@ import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -22,6 +23,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
+
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class IntakeSidebarPanel extends Panel {
 
@@ -205,6 +208,8 @@ public class IntakeSidebarPanel extends Panel {
                 setVisible(d == null || (!d.getuigenBevestigd() && !d.getuigenGedeeltelijkIngevuld()));
             }
         });
+
+        getuigenStatusIcon.add(new BookmarkablePageLink<DeGetuigenPage>("getuigenLink", DeGetuigenPage.class,  makeDossierPageParameters(getDossierModel().getObject().id())));
         add(getuigenStatusIcon);
 
         // Extra's list
