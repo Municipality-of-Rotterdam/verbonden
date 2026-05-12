@@ -7,14 +7,16 @@ import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
+import org.jspecify.annotations.Nullable;
+import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -24,19 +26,23 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 
-import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
+import static java.util.Objects.requireNonNull;
 
-public class IntakeSidebarPanel extends Panel {
+public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
+    private final IModel<DossierSamenvattingDto> dossierModel;
     public IntakeSidebarPanel(String id, IModel<DossierSamenvattingDto> dossierModel) {
         super(id, dossierModel);
+        this.dossierModel = dossierModel;
         setOutputMarkupId(true);
     }
 
-    @SuppressWarnings("unchecked")
-    private IModel<DossierSamenvattingDto> getDossierModel() {
-        return (IModel<DossierSamenvattingDto>) getDefaultModel();
+    @Nullable
+    private DossierSamenvattingDto getDossierModelObject() {
+        return getModelObject();
     }
+    
+    
 
     @Override
     protected void onInitialize() {
@@ -47,7 +53,7 @@ public class IntakeSidebarPanel extends Panel {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                setVisible(getDossierModel().getObject() != null);
+                setVisible(getDossierModelObject() != null);
             }
         };
 
@@ -60,14 +66,14 @@ public class IntakeSidebarPanel extends Panel {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d != null && d.id() != null);
             }
         };
         IModel<String> ceremonieSoortModel = LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::ceremonieSoort, CeremonieSoort::getLabel));
         IModel<String> ceremoniePrijsModel = LambdaModel.of(() -> {
-            DossierSamenvattingDto d = getDossierModel().getObject();
+            DossierSamenvattingDto d = getDossierModelObject();
             if (d == null) {
                 return "";
             }
@@ -86,12 +92,12 @@ public class IntakeSidebarPanel extends Panel {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d != null && d.datumTijdHuwelijk() != null);
             }
         };
         IModel<String> datumModel = LambdaModel.of(() -> {
-            DossierSamenvattingDto d = getDossierModel().getObject();
+            DossierSamenvattingDto d = getDossierModelObject();
             return (d != null && d.datumTijdHuwelijk() != null)
                     ? d.datumTijdHuwelijk().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
                     : "";
@@ -99,7 +105,7 @@ public class IntakeSidebarPanel extends Panel {
         datumGekozen.add(new Label("datumLabel", datumModel));
 
         IModel<String> tijdModel = LambdaModel.of(() -> {
-            DossierSamenvattingDto d = getDossierModel().getObject();
+            DossierSamenvattingDto d = getDossierModelObject();
             return (d != null && d.datumTijdHuwelijk() != null)
                     ? d.datumTijdHuwelijk().format(DateTimeFormatter.ofPattern("HH:mm"))
                     : "";
@@ -108,7 +114,7 @@ public class IntakeSidebarPanel extends Panel {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d != null && d.datumTijdHuwelijk() != null);
             }
         };
@@ -121,7 +127,7 @@ public class IntakeSidebarPanel extends Panel {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d == null || d.datumTijdHuwelijk() == null);
             }
         };
@@ -132,12 +138,12 @@ public class IntakeSidebarPanel extends Panel {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d != null && d.huwelijksLocatie() != null && !d.huwelijksLocatie().isBlank());
             }
         };
         IModel<String> locatieModel = LambdaModel.of(() -> {
-            DossierSamenvattingDto d = getDossierModel().getObject();
+            DossierSamenvattingDto d = getDossierModelObject();
             return (d != null && d.huwelijksLocatie() != null) ? d.huwelijksLocatie() : "";
         });
         locatieGekozen.add(new Label("locatieLabel", locatieModel));
@@ -147,7 +153,7 @@ public class IntakeSidebarPanel extends Panel {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d == null || d.huwelijksLocatie() == null || d.huwelijksLocatie().isBlank());
             }
         };
@@ -156,75 +162,49 @@ public class IntakeSidebarPanel extends Panel {
         add(dossierGegevens);
 
         // Gegevens & Getuigen status icons
-        WebMarkupContainer gegevensStatusIcon = new WebMarkupContainer("gegevensStatusIcon");
-        gegevensStatusIcon.add(new WebMarkupContainer("gegevensStatusCheckGreen") {
+        WebMarkupContainer gegevensRegel = new WebMarkupContainer("gegevensStatusIcon");
+        gegevensRegel.add(new WebMarkupContainer("gegevensStatusCheckGreen") {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d != null && d.aantalGekozenAchternamen() == 2);
             }
         });
-        gegevensStatusIcon.add(new WebMarkupContainer("gegevensStatusCheckGrey") {
+        gegevensRegel.add(new WebMarkupContainer("gegevensStatusCheckGrey") {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d != null && d.aantalGekozenAchternamen() == 1);
             }
         });
-        gegevensStatusIcon.add(new WebMarkupContainer("gegevensStatusEmpty") {
+        gegevensRegel.add(new WebMarkupContainer("gegevensStatusEmpty") {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d == null || d.aantalGekozenAchternamen() == 0);
             }
         });
-        add(gegevensStatusIcon);
+        add(gegevensRegel);
 
-        WebMarkupContainer getuigenStatusIcon = new WebMarkupContainer("getuigenStatusIcon");
-        getuigenStatusIcon.add(new WebMarkupContainer("getuigenStatusCheck") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d != null && d.getuigenBevestigd());
-            }
-        });
-        getuigenStatusIcon.add(new WebMarkupContainer("getuigenStatusPartial") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d != null && d.getuigenGedeeltelijkIngevuld());
-            }
-        });
-        getuigenStatusIcon.add(new WebMarkupContainer("getuigenStatusEmpty") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
-                setVisible(d == null || (!d.getuigenBevestigd() && !d.getuigenGedeeltelijkIngevuld()));
-            }
-        });
 
-        getuigenStatusIcon.add(new BookmarkablePageLink<DeGetuigenPage>("getuigenLink", DeGetuigenPage.class,  makeDossierPageParameters(getDossierModel().getObject().id())));
-        add(getuigenStatusIcon);
+        add(new GetuigenRegel());
 
         // Extra's list
         WebMarkupContainer extrasNogNiet = new WebMarkupContainer("extrasNogNiet") {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d == null || d.extras() == null || d.extras().isEmpty());
             }
         };
         add(extrasNogNiet);
 
         IModel<List<String>> extrasListModel = LambdaModel.of(() -> {
-            DossierSamenvattingDto d = getDossierModel().getObject();
+            DossierSamenvattingDto d = getDossierModelObject();
             return (d != null && d.extras() != null) ? d.extras() : List.of();
         });
 
@@ -232,7 +212,7 @@ public class IntakeSidebarPanel extends Panel {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                DossierSamenvattingDto d = getDossierModel().getObject();
+                DossierSamenvattingDto d = getDossierModelObject();
                 setVisible(d != null && d.extras() != null && !d.extras().isEmpty());
             }
 
@@ -257,10 +237,53 @@ public class IntakeSidebarPanel extends Panel {
     }
 
     private <I, O> String dossierValue(Function<DossierSamenvattingDto, I> extractor, Function<I, O> mapper) {
-        DossierSamenvattingDto d = getDossierModel().getObject();
+        DossierSamenvattingDto d = getDossierModelObject();
         if (d == null) {
             return "";
         }
         return String.valueOf(mapper.apply(extractor.apply(d)));
+    }
+
+    private class GetuigenRegel extends WebMarkupContainer {
+
+        public GetuigenRegel() {
+            super("getuigenRegel");
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            add(
+                    new WebMarkupContainer("getuigenStatusCheck")
+                            .add(new VisibleModelBehavior(dossierModel.map(DossierSamenvattingDto::getuigenBevestigd))),
+
+                    new WebMarkupContainer("getuigenStatusPartial")
+                            .add(new VisibleModelBehavior(dossierModel.map(DossierSamenvattingDto::getuigenGedeeltelijkIngevuld))),
+
+                    new WebMarkupContainer("getuigenStatusEmpty") {
+                        @Override
+                        protected void onConfigure() {
+                            super.onConfigure();
+                            DossierSamenvattingDto d = getDossierModelObject();
+                            setVisible(d == null || (!d.getuigenBevestigd() && !d.getuigenGedeeltelijkIngevuld()));
+                        }
+                    },
+
+                    new Link<Void>("getuigenLink") {
+
+                        @Override
+                        public void onClick() {
+                            DeGetuigenPage.respond(requireNonNull(getDossierModelObject()).id());
+                        }
+
+                        @Override
+                        protected void onConfigure() {
+                            super.onConfigure();
+                            DossierSamenvattingDto samenvattingDto = getDossierModelObject();
+                            setEnabled(samenvattingDto != null && samenvattingDto.id() != null);
+                        }
+                    }
+            );
+        }
     }
 }
