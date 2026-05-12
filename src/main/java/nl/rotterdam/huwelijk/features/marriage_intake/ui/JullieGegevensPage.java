@@ -20,6 +20,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
@@ -212,6 +213,8 @@ public class JullieGegevensPage extends IntakeBasePage {
         partnerNogBevestigenCard.add(loginLink);
 
         pageBody.add(partnerNogBevestigenCard);
+
+        pageBody.add(new BookmarkablePageLink<>("deGetuigenLink", DeGetuigenPage.class, makeDossierPageParameters(dossierId)));
     }
 
     private List<String> berekenNaamOpties(PartnerGegevensDto eigenPartner, List<PartnerGegevensDto> allePartners) {
