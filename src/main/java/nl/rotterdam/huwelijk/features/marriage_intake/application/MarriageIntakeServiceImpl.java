@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.application;
 
+import nl.rotterdam.huwelijk.config.PlanningConfig;
 import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
 import nl.rotterdam.huwelijk.features.location_administration.repository.LocatieRepository;
@@ -49,6 +50,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final MarriageTypeLocationRepository marriageTypeLocationRepository;
     private final MarriageTypeRepository marriageTypeRepository;
     private final AfspraakRepository afspraakRepository;
+    private final PlanningConfig planningConfig;
     private final GetuigenRepository getuigenRepository;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
@@ -58,6 +60,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               MarriageTypeLocationRepository marriageTypeLocationRepository,
                               MarriageTypeRepository marriageTypeRepository,
                               AfspraakRepository afspraakRepository,
+                              PlanningConfig planningConfig,
                               GetuigenRepository getuigenRepository) {
         this.dossierRepository = dossierRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
@@ -66,6 +69,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
         this.marriageTypeRepository = marriageTypeRepository;
         this.afspraakRepository = afspraakRepository;
+        this.planningConfig = planningConfig;
         this.getuigenRepository = getuigenRepository;
     }
 
@@ -314,13 +318,12 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         Set<LocalDate> beschikbaar = new HashSet<>();
         LocalDate vandaag = LocalDate.now();
-        LocalDate start = maand.atDay(1);
-        LocalDate einde = maand.atEndOfMonth();
+        LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
+        LocalDate laatste = vandaag.plusDays(planningConfig.getTotDagen());
+        LocalDate start = maand.atDay(1).isBefore(vroegste) ? vroegste : maand.atDay(1);
+        LocalDate einde = maand.atEndOfMonth().isAfter(laatste) ? laatste : maand.atEndOfMonth();
 
         for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
-            if (!datum.isAfter(vandaag)) {
-                continue;
-            }
             for (TrouwlocatieEntity locatie : locaties) {
                 if (heeftVrijSlot(locatie.getId(), huwelijksType, datum)) {
                     beschikbaar.add(datum);
@@ -340,13 +343,12 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         List<LocalDateTime> slots = new ArrayList<>();
         LocalDate vandaag = LocalDate.now();
-        LocalDate start = maand.atDay(1);
-        LocalDate einde = maand.atEndOfMonth();
+        LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
+        LocalDate laatste = vandaag.plusDays(planningConfig.getTotDagen());
+        LocalDate start = maand.atDay(1).isBefore(vroegste) ? vroegste : maand.atDay(1);
+        LocalDate einde = maand.atEndOfMonth().isAfter(laatste) ? laatste : maand.atEndOfMonth();
 
         for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
-            if (!datum.isAfter(vandaag)) {
-                continue;
-            }
             Set<LocalTime> tijdenVoorDatum = new TreeSet<>();
             for (TrouwlocatieEntity locatie : locaties) {
                 tijdenVoorDatum.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
@@ -366,9 +368,10 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         List<LocalDateTime> slots = new ArrayList<>();
         LocalDate vandaag = LocalDate.now();
-        LocalDate einde = vandaag.plusMonths(18);
+        LocalDate start = vandaag.plusDays(planningConfig.getVanafDagen());
+        LocalDate einde = vandaag.plusDays(planningConfig.getTotDagen());
 
-        for (LocalDate datum = vandaag.plusDays(1); !datum.isAfter(einde); datum = datum.plusDays(1)) {
+        for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
             Set<LocalTime> tijdenVoorDatum = new TreeSet<>();
             for (TrouwlocatieEntity locatie : locaties) {
                 tijdenVoorDatum.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
