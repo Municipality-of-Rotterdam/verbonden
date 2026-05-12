@@ -40,6 +40,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static org.apache.wicket.csp.CSPDirective.*;
+import static org.apache.wicket.csp.CSPDirectiveSrcValue.NONE;
+import static org.apache.wicket.csp.CSPDirectiveSrcValue.SELF;
+
 @Component
 public class WicketApplication extends WebApplication {
 
@@ -70,6 +74,15 @@ public class WicketApplication extends WebApplication {
         getApplicationSettings().setInternalErrorPage(BurgerErrorPage.class);
         getApplicationSettings().setPageExpiredErrorPage(BurgerErrorPage.class);
         getApplicationSettings().setAccessDeniedPage(BurgerErrorPage.class);
+
+        // Extend Wicket's default blocking CSP to allow data: images (needed for QR codes)
+        // and style-src 'self'. Wicket's internalInit() already calls reportBack(), so
+        // we must NOT call it here again — doing so causes an IllegalArgumentException
+        // ("report-uri directive can only contain one URI") in tests and at runtime.
+        getCspSettings().blocking()
+                .add(STYLE_SRC, SELF)
+                .add(IMG_SRC, "data:")
+                .add(FRAME_ANCESTORS, NONE);
 
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
         // Spring Security's CSRF filter is disabled in SecurityConfig to avoid conflicts

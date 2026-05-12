@@ -28,6 +28,8 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
+import org.apache.wicket.request.Url;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.NonNull;
 
@@ -35,11 +37,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class JullieGegevensPage extends IntakeBasePage {
 
     private static final DateTimeFormatter DATUM_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private static final int QR_CODE_SIZE = 200;
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
@@ -130,9 +134,9 @@ public class JullieGegevensPage extends IntakeBasePage {
                 editIconContainer.setVisible(kanKiezen);
                 gekozenAchternaamSection.add(editIconContainer);
 
-                // "Kies je achternaam" button section — only shown when no name chosen yet
+                // "Kies je achternaam" button section — shown whenever this user can choose
                 WebMarkupContainer kiesAchternaamSection = new WebMarkupContainer("kiesAchternaamSection");
-                kiesAchternaamSection.setVisible(kanKiezen && partner.gekozenAchternaam() == null);
+                kiesAchternaamSection.setVisible(kanKiezen);
                 item.add(kiesAchternaamSection);
 
                 if (kanKiezen) {
@@ -180,6 +184,34 @@ public class JullieGegevensPage extends IntakeBasePage {
 
         WebMarkupContainer partnerNogBevestigenCard = new WebMarkupContainer("partnerNogBevestigenCard");
         partnerNogBevestigenCard.setVisible(partners.size() < 2);
+
+        String loginUrl = RequestCycle.get().getUrlRenderer().renderFullUrl(
+                    Url.parse(urlFor(MarriageIntakePage.class, makeDossierPageParameters(requireNonNull(dossierId))).toString()));
+
+        String qrDataUri = !loginUrl.isEmpty() && partners.size() < 2
+                ? QrCodeUtil.generateQrCodeDataUri(loginUrl, QR_CODE_SIZE, QR_CODE_SIZE)
+                : "";
+
+        WebMarkupContainer qrCodeImg = new WebMarkupContainer("partnerQrCode") {
+            @Override
+            protected void onComponentTag(ComponentTag tag) {
+                super.onComponentTag(tag);
+                tag.put("src", qrDataUri);
+            }
+        };
+        qrCodeImg.setVisible(!qrDataUri.isEmpty());
+        partnerNogBevestigenCard.add(qrCodeImg);
+
+        WebMarkupContainer loginLink = new WebMarkupContainer("partnerLoginLink") {
+            @Override
+            protected void onComponentTag(ComponentTag tag) {
+                super.onComponentTag(tag);
+                tag.put("href", loginUrl);
+            }
+        };
+        loginLink.setVisible(!loginUrl.isEmpty());
+        partnerNogBevestigenCard.add(loginLink);
+
         pageBody.add(partnerNogBevestigenCard);
 
         pageBody.add(new BookmarkablePageLink<>("deGetuigenLink", DeGetuigenPage.class, makeDossierPageParameters(dossierId)));

@@ -39,6 +39,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+    private static final String CONTENT_SECURITY_POLICY =
+            "default-src 'self'; img-src 'self' data:";
 
     /**
      * Comma-separated list of {@code gebruikersnaam:wachtwoord} pairs for administrators.
@@ -64,6 +66,9 @@ public class SecurityConfig {
                 ))
                 // Apache Wicket 10 has its own CSRF protection; disable Spring Security's to avoid conflicts.
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/login/**").permitAll()
                         .requestMatchers("/beheer/**").hasRole("BEHEERDER")
@@ -98,6 +103,9 @@ public class SecurityConfig {
     public SecurityFilterChain burgerSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/inloggen", "/inloggen/**").permitAll()
                         .requestMatchers("/wicket/resource/**").permitAll()
