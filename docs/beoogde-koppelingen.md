@@ -25,6 +25,8 @@ Binnen Rotterdam zijn meerdere versies van zaaksystemen in omloop. Afhankelijk v
 Voor inloggen met DigiD wordt OIDC-ondersteuning ingebouwd.
 Toegang met een Europees middel of eHerkenning wordt geweigerd. Anonieme toegang wordt geblokkeerd.
 
+Een DigiD koppeling zorgt er automatisch voor dat de applicatie ook meeloopt in de periodieke DigiD audit. Hier zijn kosten aan verbonden.
+
 ## Medewerkersportaal
 
 Medewerkers loggen in met hun gemeentelijke account.
