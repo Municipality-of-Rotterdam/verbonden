@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
+import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
@@ -188,6 +189,20 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             }
         });
         add(gegevensRegel);
+        gegevensRegel.add(new Link<Void>("jullieGegevensLink") {
+            @Override
+            public void onClick() {
+                setResponsePage(JullieGegevensPage.class,
+                        makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
+            }
+
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                DossierSamenvattingDto samenvattingDto = getDossierModelObject();
+                setEnabled(samenvattingDto != null && samenvattingDto.id() != null);
+            }
+        });
 
 
         add(new GetuigenRegel());
