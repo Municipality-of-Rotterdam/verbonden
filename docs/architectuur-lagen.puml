@@ -2,7 +2,7 @@
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-title Huwelijk POC - lagen en package-structuur
+title Huwelijksapplicatie - lagen en package-structuur
 
 package "UI" {
   [feature.<naam>.ui]

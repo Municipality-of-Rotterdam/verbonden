@@ -1,6 +1,6 @@
 # Applicatie-architectuur
 
-Dit document beschrijft de applicatie-architectuur van `huwelijk-poc-copilot` op basis van de codebase, build-opzet, gebruikte frameworks en de Copilot-richtlijnen.
+Dit document beschrijft de applicatie-architectuur van `huwelijksapplicatie`.
 
 ## Technische basis
 
@@ -19,7 +19,7 @@ De applicatie is een monoliet met duidelijke lagen:
 4. **Persistentielaag** met JPA entities in `nl.rotterdam.huwelijk.persistence` en repositories in `feature.<naam>.repository`.
 5. **Database**: PostgreSQL, schema/migraties via Flyway.
 
-Belangrijke architectuurregels uit de Copilot-richtlijnen:
+Belangrijke architectuurregels voor de software-structuur:
 
 - JPA entities verlaten de servicelaag niet.
 - Service I/O gebruikt immutable `record` DTOs.
