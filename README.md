@@ -4,6 +4,7 @@ POC voor het digitaliseren van huwelijksaanvragen bij de Gemeente Rotterdam.
 
 ## Documentatie
 
+- [Applicatie-architectuur](docs/applicatie-architectuur.md)
 - [Beoogde koppelingen](docs/beoogde-koppelingen.md)
 
 ## Vereisten

@@ -1,0 +1,45 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title Huwelijksapplicatie - lagen en package-structuur
+
+package "UI" {
+  [feature.<naam>.ui]
+  [administration_common]
+  [burger_common]
+}
+
+package "Application" {
+  [feature.<naam>.application]
+}
+
+package "Domain" {
+  [feature.<naam>.domain]
+  [nl.rotterdam.huwelijk.domain]
+}
+
+package "Persistence" {
+  [feature.<naam>.repository]
+  [nl.rotterdam.huwelijk.persistence]
+}
+
+database "PostgreSQL" as Db
+
+[feature.<naam>.ui] --> [feature.<naam>.application]
+[feature.<naam>.application] --> [feature.<naam>.domain]
+[feature.<naam>.application] --> [feature.<naam>.repository]
+[feature.<naam>.repository] --> [nl.rotterdam.huwelijk.persistence]
+[nl.rotterdam.huwelijk.persistence] --> Db
+
+note right of [nl.rotterdam.huwelijk.persistence]
+Alleen JPA entities in dit package.
+Geen repositories.
+end note
+
+note left of [feature.<naam>.application]
+Service I/O gebruikt record DTOs.
+JPA entities verlaten de servicelaag niet.
+end note
+
+@enduml
