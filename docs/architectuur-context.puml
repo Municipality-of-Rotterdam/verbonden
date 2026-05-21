@@ -1,0 +1,33 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+title Huwelijk POC - context en bouwblokken
+
+actor "Burger" as Citizen
+actor "Beheerder" as Admin
+
+node "Spring Boot applicatie\n(huwelijk-poc-copilot)" as App {
+  component "Wicket UI\n(features.*.ui)" as UI
+  component "Service layer\n(features.*.application)" as Service
+  component "Domain DTOs &\nvalue types\n(features.*.domain, domain)" as Domain
+  component "Persistence\n(JPA entities + repositories)" as Persistence
+
+  UI --> Service
+  Service --> Domain
+  Service --> Persistence
+}
+
+database "PostgreSQL" as Db
+component "Flyway migraties" as Flyway
+component "Spring Security" as Security
+component "Mock DigiD\n(/inloggen)" as MockDigid
+
+Citizen --> UI
+Admin --> UI
+UI ..> Security
+Citizen ..> MockDigid
+Persistence --> Db
+Flyway --> Db
+
+@enduml
