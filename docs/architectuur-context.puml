@@ -22,11 +22,18 @@ database "PostgreSQL" as Db
 component "Flyway migraties" as Flyway
 component "Spring Security" as Security
 component "Mock DigiD\n(/inloggen)" as MockDigid
+cloud "Haal Centraal" as HaalCentraal
+node "Zaaksysteem\n(ZGW APIs)" as Zaaksysteem
+component "ZGW Document API" as ZgwDocumentApi
 
 Citizen --> UI
 Admin --> UI
 UI ..> Security
 Citizen ..> MockDigid
+Service ..> HaalCentraal : brongegevens burger
+Service --> Zaaksysteem : administratief compleet dossier
+Service --> ZgwDocumentApi : upload documenten
+ZgwDocumentApi --> Zaaksysteem
 Persistence --> Db
 Flyway --> Db
 

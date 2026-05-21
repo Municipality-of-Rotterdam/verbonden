@@ -25,6 +25,13 @@ Belangrijke architectuurregels uit de Copilot-richtlijnen:
 - Service I/O gebruikt immutable `record` DTOs.
 - Feature-packages volgen vaste sub-packages: `ui`, `application`, `domain`, `repository`.
 
+## Architectuurprincipes (Common Ground)
+
+- **Data bij de bron:** burgergegevens worden bij de bron opgehaald (bijvoorbeeld via Haal Centraal voor adres- en oudergegevens), in plaats van langdurig te kopiëren naar de huwelijksapplicatie.
+- **Administratief compleet maken van voorgenomen huwelijk/partnerschap:** de primaire verantwoordelijkheid van deze applicatie is het compleet maken van de aanvraag.
+- **Zaakgericht vervolgproces:** zodra een dossier administratief compleet is, wordt het doorgezet naar het zaaksysteem, waar het vervolg plaatsvindt in bestaande processen.
+- **Documenten via ZGW document-API's:** identiteitsbewijzen en andere vereiste verklaringen worden via de ZGW document-API's opgeslagen in het zaaksysteem.
+
 ## Feature-indeling
 
 Belangrijkste functionele modules:
