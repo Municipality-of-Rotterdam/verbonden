@@ -43,6 +43,13 @@ Belangrijkste functionele modules:
 - `features.dossier_administration` (dossiers)
 - `features.mock_digid` (mock-inlog voor development/test)
 
+Dit was de situatie op 22 mei 2026. De verwachting is dat er in de toekomst nog features bijkomen zoals:
+
+- haal centraal integratie
+- betalingen
+- zaaksysteem integratie
+- afhandelen van taken (zoals verwerken van ids en verklaringen)
+
 Daarnaast zijn er gedeelde basislagen:
 
 - `administration_common` (beheer-basispagina's)
