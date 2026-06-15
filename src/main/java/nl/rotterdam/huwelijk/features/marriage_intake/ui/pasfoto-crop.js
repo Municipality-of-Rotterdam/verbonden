@@ -1,6 +1,6 @@
 /**
  * Pasfoto crop functionality.
- * Uses Cropper.js (loaded via CDN link in the page header) to allow
+ * Uses Cropper.js 2.x (loaded via WebJar) to allow
  * the user to select a crop area on the uploaded photo.
  */
 (function () {
@@ -58,19 +58,28 @@
                 imgElement._cropper.destroy();
             }
 
-            // Initialize Cropper.js with passport photo aspect ratio (35:45)
-            imgElement._cropper = new Cropper(imgElement, {
-                aspectRatio: 35 / 45,
-                viewMode: 1,
-                autoCropArea: 0.8,
-                movable: false,
-                rotatable: false,
-                scalable: false,
-                zoomable: true,
-                guides: true,
-                center: true,
-                background: true
+            // Initialize Cropper.js 2.x with passport photo aspect ratio (35:45)
+            var cropper = new Cropper.default(imgElement, {
+                template: '<cropper-canvas background>'
+                    + '<cropper-image rotatable="false" scalable="false" skewable="false" translatable></cropper-image>'
+                    + '<cropper-shade hidden></cropper-shade>'
+                    + '<cropper-handle action="select" plain></cropper-handle>'
+                    + '<cropper-selection initial-coverage="0.8" movable resizable aspect-ratio="' + (35 / 45) + '">'
+                    + '<cropper-grid role="grid" bordered covered></cropper-grid>'
+                    + '<cropper-crosshair centered></cropper-crosshair>'
+                    + '<cropper-handle action="move" theme-color="rgba(255, 255, 255, 0.35)"></cropper-handle>'
+                    + '<cropper-handle action="n-resize"></cropper-handle>'
+                    + '<cropper-handle action="e-resize"></cropper-handle>'
+                    + '<cropper-handle action="s-resize"></cropper-handle>'
+                    + '<cropper-handle action="w-resize"></cropper-handle>'
+                    + '<cropper-handle action="ne-resize"></cropper-handle>'
+                    + '<cropper-handle action="nw-resize"></cropper-handle>'
+                    + '<cropper-handle action="se-resize"></cropper-handle>'
+                    + '<cropper-handle action="sw-resize"></cropper-handle>'
+                    + '</cropper-selection>'
+                    + '</cropper-canvas>'
             });
+            imgElement._cropper = cropper;
         };
         reader.readAsDataURL(file);
 
@@ -84,14 +93,16 @@
             fileInput.value = '';
         });
 
-        // On form submit: set crop coordinates from Cropper.js data
+        // On form submit: set crop coordinates from Cropper.js selection
         form.addEventListener('submit', function () {
             if (imgElement._cropper) {
-                var data = imgElement._cropper.getData(true); // rounded integer values
-                cropXInput.value = data.x;
-                cropYInput.value = data.y;
-                cropWidthInput.value = data.width;
-                cropHeightInput.value = data.height;
+                var selection = imgElement._cropper.getCropperSelection();
+                if (selection) {
+                    cropXInput.value = Math.round(selection.x);
+                    cropYInput.value = Math.round(selection.y);
+                    cropWidthInput.value = Math.round(selection.width);
+                    cropHeightInput.value = Math.round(selection.height);
+                }
             }
         });
     }

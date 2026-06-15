@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-Description: WebJar for cropperjs
+Bundle-License: MIT
+Bundle-SymbolicName: org.webjars.npm.cropperjs
+Bundle-Name: cropperjs
+Bundle-Version: 2.1.0
+Bundle-ManifestVersion: 2
+Build-Jdk-Spec: 1.8
+Created-By: webjars.org

@@ -72,7 +72,6 @@ public class JullieGegevensPage extends IntakeBasePage {
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
-        response.render(MarriageIntakeHeaderItems.CROPPER_CSS);
         response.render(MarriageIntakeHeaderItems.CROPPER_JS);
         response.render(MarriageIntakeHeaderItems.PASFOTO_CROP_JS);
     }
