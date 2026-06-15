@@ -199,6 +199,13 @@
             <version>${bootstrap.version}</version>
         </dependency>
 
+        <!-- Cropper.js for passport photo crop selection (via WebJars) -->
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>cropperjs</artifactId>
+            <version>1.5.13</version>
+        </dependency>
+
         <!-- Wicket Extensions (for DataTable toolbars) -->
         <dependency>
             <groupId>org.apache.wicket</groupId>

@@ -50,10 +50,30 @@
                     </label>
                     <img wicket:id="pasfotoImage" class="rd-partner-card__pasfoto" alt="Pasfoto"/>
                     <form wicket:id="pasfotoUploadForm" class="rd-partner-card__pasfoto-upload" enctype="multipart/form-data">
-                        <input type="file" wicket:id="pasfotoFile" accept="image/*" class="rd-partner-card__pasfoto-input"/>
-                        <button type="submit" class="rd-partner-card__pasfoto-upload-btn">
-                            <wicket:message key="jullie.gegevens.pasfoto.uploaden">Uploaden</wicket:message>
-                        </button>
+                        <input type="file" wicket:id="pasfotoFile" accept="image/*" class="rd-partner-card__pasfoto-input rd-pasfoto-file-input"/>
+                        <input type="hidden" wicket:id="cropX" class="rd-crop-x"/>
+                        <input type="hidden" wicket:id="cropY" class="rd-crop-y"/>
+                        <input type="hidden" wicket:id="cropWidth" class="rd-crop-width"/>
+                        <input type="hidden" wicket:id="cropHeight" class="rd-crop-height"/>
+                        <!-- Crop overlay (shown after file selection via JS) -->
+                        <div class="rd-pasfoto-crop-overlay d-none">
+                            <div class="rd-pasfoto-crop-dialog">
+                                <p class="rd-pasfoto-crop-dialog__instructie">
+                                    <wicket:message key="jullie.gegevens.pasfoto.crop.instructie">Selecteer het gedeelte van de foto dat als pasfoto gebruikt moet worden.</wicket:message>
+                                </p>
+                                <div class="rd-pasfoto-crop-dialog__image-container">
+                                    <img class="rd-pasfoto-crop-dialog__image" alt=""/>
+                                </div>
+                                <div class="rd-pasfoto-crop-dialog__actions">
+                                    <button type="button" class="rd-pasfoto-crop-dialog__cancel-btn">
+                                        <wicket:message key="jullie.gegevens.pasfoto.annuleren">Annuleren</wicket:message>
+                                    </button>
+                                    <button type="submit" class="rd-pasfoto-crop-dialog__submit-btn">
+                                        <wicket:message key="jullie.gegevens.pasfoto.bijsnijden">Bijsnijden en opslaan</wicket:message>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                     <a wicket:id="verwijderPasfotoLink" class="rd-partner-card__pasfoto-verwijder">
                         <wicket:message key="jullie.gegevens.pasfoto.verwijderen">Verwijderen</wicket:message>

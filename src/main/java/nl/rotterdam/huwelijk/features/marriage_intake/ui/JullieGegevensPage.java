@@ -15,9 +15,11 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
@@ -65,6 +67,14 @@ public class JullieGegevensPage extends IntakeBasePage {
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
         return Model.of(marriageIntakeService.findByDossierId(dossierId));
+    }
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.render(MarriageIntakeHeaderItems.CROPPER_CSS);
+        response.render(MarriageIntakeHeaderItems.CROPPER_JS);
+        response.render(MarriageIntakeHeaderItems.PASFOTO_CROP_JS);
     }
 
 
@@ -363,6 +373,10 @@ public class JullieGegevensPage extends IntakeBasePage {
         private static final Bytes MAX_FILE_SIZE = Bytes.megabytes(5);
 
         private final FileUploadField fileUploadField;
+        private final HiddenField<Integer> cropX;
+        private final HiddenField<Integer> cropY;
+        private final HiddenField<Integer> cropWidth;
+        private final HiddenField<Integer> cropHeight;
         private final String bsn;
 
         PasfotoUploadForm(String id, String bsn) {
@@ -371,7 +385,11 @@ public class JullieGegevensPage extends IntakeBasePage {
             setMultiPart(true);
             setMaxSize(MAX_FILE_SIZE);
             fileUploadField = new FileUploadField("pasfotoFile");
-            add(fileUploadField);
+            cropX = new HiddenField<>("cropX", Model.of(0), Integer.class);
+            cropY = new HiddenField<>("cropY", Model.of(0), Integer.class);
+            cropWidth = new HiddenField<>("cropWidth", Model.of(0), Integer.class);
+            cropHeight = new HiddenField<>("cropHeight", Model.of(0), Integer.class);
+            add(fileUploadField, cropX, cropY, cropWidth, cropHeight);
         }
 
         @Override
@@ -388,6 +406,16 @@ public class JullieGegevensPage extends IntakeBasePage {
             }
 
             byte[] data = upload.getBytes();
+
+            int x = cropX.getModelObject() != null ? cropX.getModelObject() : 0;
+            int y = cropY.getModelObject() != null ? cropY.getModelObject() : 0;
+            int w = cropWidth.getModelObject() != null ? cropWidth.getModelObject() : 0;
+            int h = cropHeight.getModelObject() != null ? cropHeight.getModelObject() : 0;
+
+            if (w > 0 && h > 0) {
+                data = PasfotoCropUtil.crop(data, x, y, w, h, contentType);
+            }
+
             marriageIntakeService.slaPasfotoOp(dossierId, bsn, data, contentType);
             setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
         }
