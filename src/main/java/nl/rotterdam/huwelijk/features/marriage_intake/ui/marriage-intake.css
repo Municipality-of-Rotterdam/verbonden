@@ -1029,3 +1029,59 @@ form.rd-getuige-form {
     color: #333;
     text-decoration: none;
 }
+
+/* Pasfoto section */
+.rd-partner-card__pasfoto-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.rd-partner-card__pasfoto {
+    display: block;
+    width: 150px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin: 0.5rem 0;
+}
+
+.rd-partner-card__pasfoto-upload {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.rd-partner-card__pasfoto-input {
+    font-size: 0.875rem;
+}
+
+.rd-partner-card__pasfoto-upload-btn {
+    background-color: #1b4d80;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.rd-partner-card__pasfoto-upload-btn:hover {
+    background-color: #163d66;
+}
+
+.rd-partner-card__pasfoto-verwijder {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #c00;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.rd-partner-card__pasfoto-verwijder:hover {
+    color: #900;
+}

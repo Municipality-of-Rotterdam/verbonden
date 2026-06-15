@@ -20,6 +20,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.ui.DatumKiezenPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeDagPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeGetuigenPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.JullieGegevensPage;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.PasfotoResource;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagCreatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagImportPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagUpdatePage;
@@ -82,6 +83,7 @@ public class WicketApplication extends WebApplication {
         getCspSettings().blocking()
                 .add(STYLE_SRC, SELF)
                 .add(IMG_SRC, "data:")
+                .add(IMG_SRC, "blob:")
                 .add(FRAME_ANCESTORS, NONE);
 
         // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
@@ -112,5 +114,8 @@ public class WicketApplication extends WebApplication {
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/nieuw", NietBeschikbareDagCreatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/${id}", NietBeschikbareDagUpdatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/importeren", NietBeschikbareDagImportPage.class);
+
+        getSharedResources().add("pasfoto", new PasfotoResource());
+        mountResource("/pasfoto/${dossierId}/${bsn}", new org.apache.wicket.request.resource.SharedResourceReference("pasfoto"));
     }
 }

@@ -20,6 +20,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -31,11 +33,13 @@ import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.lang.Bytes;
 import org.jspecify.annotations.NonNull;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
@@ -108,6 +112,38 @@ public class JullieGegevensPage extends IntakeBasePage {
                 ContactGegevensForm contactGegevensForm = new ContactGegevensForm("contactGegevensForm", partner);
                 contactGegevensForm.setVisible(kanContactBewerken);
                 item.add(contactGegevensForm);
+
+                // Pasfoto section
+                WebMarkupContainer pasfotoSection = new WebMarkupContainer("pasfotoSection");
+
+                // Show existing photo if present
+                WebMarkupContainer pasfotoImage = new WebMarkupContainer("pasfotoImage") {
+                    @Override
+                    protected void onComponentTag(ComponentTag tag) {
+                        super.onComponentTag(tag);
+                        tag.put("src", "/pasfoto/" + dossierId + "/" + partner.bsn());
+                    }
+                };
+                pasfotoImage.setVisible(partner.heeftPasfoto());
+                pasfotoSection.add(pasfotoImage);
+
+                // Upload form (only for current user's card)
+                PasfotoUploadForm pasfotoUploadForm = new PasfotoUploadForm("pasfotoUploadForm", partner.bsn());
+                pasfotoUploadForm.setVisible(kanContactBewerken);
+                pasfotoSection.add(pasfotoUploadForm);
+
+                // Delete link (only for current user if photo exists)
+                AjaxLink<Void> verwijderPasfotoLink = new AjaxLink<>("verwijderPasfotoLink") {
+                    @Override
+                    public void onClick(AjaxRequestTarget target) {
+                        marriageIntakeService.verwijderPasfoto(dossierId, partner.bsn());
+                        setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
+                    }
+                };
+                verwijderPasfotoLink.setVisible(kanContactBewerken && partner.heeftPasfoto());
+                pasfotoSection.add(verwijderPasfotoLink);
+
+                item.add(pasfotoSection);
 
                 // "Gekozen achternaam" display section (with edit icon inside)
                 WebMarkupContainer gekozenAchternaamSection = new WebMarkupContainer("gekozenAchternaamSection");
@@ -316,6 +352,44 @@ public class JullieGegevensPage extends IntakeBasePage {
                     target.add(rdFormFieldTextInput);
                 }
             };
+        }
+    }
+
+    private class PasfotoUploadForm extends Form<Void> {
+
+        private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
+                "image/jpeg", "image/png", "image/gif", "image/webp"
+        );
+        private static final Bytes MAX_FILE_SIZE = Bytes.megabytes(5);
+
+        private final FileUploadField fileUploadField;
+        private final String bsn;
+
+        PasfotoUploadForm(String id, String bsn) {
+            super(id);
+            this.bsn = bsn;
+            setMultiPart(true);
+            setMaxSize(MAX_FILE_SIZE);
+            fileUploadField = new FileUploadField("pasfotoFile");
+            add(fileUploadField);
+        }
+
+        @Override
+        protected void onSubmit() {
+            FileUpload upload = fileUploadField.getFileUpload();
+            if (upload == null) {
+                return;
+            }
+
+            String contentType = upload.getContentType();
+            if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
+                error(getString("jullie.gegevens.pasfoto.ongeldig.type"));
+                return;
+            }
+
+            byte[] data = upload.getBytes();
+            marriageIntakeService.slaPasfotoOp(dossierId, bsn, data, contentType);
+            setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
         }
     }
 }

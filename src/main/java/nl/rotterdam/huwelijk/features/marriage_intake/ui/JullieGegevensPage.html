@@ -43,6 +43,23 @@
                     <div wicket:id="emailadresInput"></div>
                 </form>
 
+                <!-- Pasfoto section -->
+                <div wicket:id="pasfotoSection" class="rd-partner-card__pasfoto-section">
+                    <label class="rd-partner-card__label">
+                        <wicket:message key="jullie.gegevens.pasfoto">Pasfoto</wicket:message>
+                    </label>
+                    <img wicket:id="pasfotoImage" class="rd-partner-card__pasfoto" alt="Pasfoto"/>
+                    <form wicket:id="pasfotoUploadForm" class="rd-partner-card__pasfoto-upload" enctype="multipart/form-data">
+                        <input type="file" wicket:id="pasfotoFile" accept="image/*" class="rd-partner-card__pasfoto-input"/>
+                        <button type="submit" class="rd-partner-card__pasfoto-upload-btn">
+                            <wicket:message key="jullie.gegevens.pasfoto.uploaden">Uploaden</wicket:message>
+                        </button>
+                    </form>
+                    <a wicket:id="verwijderPasfotoLink" class="rd-partner-card__pasfoto-verwijder">
+                        <wicket:message key="jullie.gegevens.pasfoto.verwijderen">Verwijderen</wicket:message>
+                    </a>
+                </div>
+
                 <!-- Gekozen achternaam display (shown after selection) -->
                 <div wicket:id="gekozenAchternaamSection" class="rd-partner-card__field py-3">
                     <div class="rd-gekozen-achternaam__label-row">

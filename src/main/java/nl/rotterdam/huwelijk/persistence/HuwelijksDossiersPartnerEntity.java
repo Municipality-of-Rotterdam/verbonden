@@ -33,6 +33,12 @@ public class HuwelijksDossiersPartnerEntity {
     @Column(name = "emailadres", length = 255)
     private Emailadres emailadres;
 
+    @Column(name = "pasfoto")
+    private byte[] pasfoto;
+
+    @Column(name = "pasfoto_content_type", length = 100)
+    private String pasfotoContentType;
+
     public Long getId() {
         return id;
     }
@@ -87,5 +93,21 @@ public class HuwelijksDossiersPartnerEntity {
 
     public void setEmailadres(Emailadres emailadres) {
         this.emailadres = emailadres;
+    }
+
+    public byte[] getPasfoto() {
+        return pasfoto;
+    }
+
+    public void setPasfoto(byte[] pasfoto) {
+        this.pasfoto = pasfoto;
+    }
+
+    public String getPasfotoContentType() {
+        return pasfotoContentType;
+    }
+
+    public void setPasfotoContentType(String pasfotoContentType) {
+        this.pasfotoContentType = pasfotoContentType;
     }
 }
