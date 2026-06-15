@@ -2,6 +2,7 @@ package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 
 import nl.rotterdam.huwelijk.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PasfotoDto;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
@@ -16,6 +17,10 @@ public class PasfotoResource extends AbstractResource {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
+
+    public PasfotoResource() {
+        Injector.get().inject(this);
+    }
 
     @Override
     protected ResourceResponse newResourceResponse(Attributes attributes) {
