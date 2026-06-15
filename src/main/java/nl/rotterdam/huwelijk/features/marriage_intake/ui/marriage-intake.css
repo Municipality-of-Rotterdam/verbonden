@@ -1119,14 +1119,17 @@ form.rd-getuige-form {
 }
 
 .rd-pasfoto-crop-dialog__image-container {
-    max-height: 400px;
-    overflow: hidden;
+    position: relative;
     margin-bottom: 1rem;
 }
 
 .rd-pasfoto-crop-dialog__image {
     display: block;
     max-width: 100%;
+}
+
+.rd-pasfoto-crop-dialog__image-container cropper-canvas {
+    height: 400px;
 }
 
 .rd-pasfoto-crop-dialog__actions {
