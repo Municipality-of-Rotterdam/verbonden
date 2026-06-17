@@ -746,6 +746,17 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     display: block;
 }
 
+.rd-partner-card__pasfoto-display {
+    margin-bottom: 1rem;
+}
+
+.rd-partner-card__pasfoto {
+    width: 75px;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+}
+
 .rd-partner-card__field {
     margin-bottom: 1rem;
 }
