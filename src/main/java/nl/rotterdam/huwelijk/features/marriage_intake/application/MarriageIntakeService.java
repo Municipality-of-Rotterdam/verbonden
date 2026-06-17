@@ -9,6 +9,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.PasfotoDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
 
@@ -86,6 +87,10 @@ public interface MarriageIntakeService {
     void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam);
 
     void slaContactGegevensOp(UUID dossierId, String bsn, Telefoonnummer telefoonnummer, Emailadres emailadres);
+
+    void slaPasfotoOp(UUID dossierId, String bsn, byte[] imageData, String contentType);
+
+    PasfotoDto findPasfoto(UUID dossierId, String bsn);
 
     void delete(UUID dossierId);
 }

@@ -13,6 +13,7 @@ public record PartnerGegevensDto(
         String burgerlijkeStaat,
         Telefoonnummer telefoonnummer,
         Emailadres emailadres,
-        String gekozenAchternaam
+        String gekozenAchternaam,
+        boolean pasfotoAanwezig
 ) implements Serializable {
 }

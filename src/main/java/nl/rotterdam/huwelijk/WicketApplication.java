@@ -20,6 +20,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.ui.DatumKiezenPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeDagPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.DeGetuigenPage;
 import nl.rotterdam.huwelijk.features.marriage_intake.ui.JullieGegevensPage;
+import nl.rotterdam.huwelijk.features.marriage_intake.ui.PasfotoResource;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagCreatePage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagImportPage;
 import nl.rotterdam.huwelijk.features.location_administration.ui.NietBeschikbareDagUpdatePage;
@@ -34,6 +35,8 @@ import org.apache.wicket.Page;
 import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
 import org.apache.wicket.protocol.http.ResourceIsolationRequestCycleListener;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.resource.IResource;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.springframework.stereotype.Component;
 
@@ -81,6 +84,7 @@ public class WicketApplication extends WebApplication {
         // ("report-uri directive can only contain one URI") in tests and at runtime.
         getCspSettings().blocking()
                 .add(STYLE_SRC, SELF)
+                .add(IMG_SRC, SELF)
                 .add(IMG_SRC, "data:")
                 .add(FRAME_ANCESTORS, NONE);
 
@@ -112,5 +116,12 @@ public class WicketApplication extends WebApplication {
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/nieuw", NietBeschikbareDagCreatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/${id}", NietBeschikbareDagUpdatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/importeren", NietBeschikbareDagImportPage.class);
+
+        mountResource("/pasfoto/${dossierId}/${bsn}", new ResourceReference("pasfoto") {
+            @Override
+            public IResource getResource() {
+                return new PasfotoResource();
+            }
+        });
     }
 }

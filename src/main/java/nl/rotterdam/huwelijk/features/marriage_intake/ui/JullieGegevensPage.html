@@ -30,6 +30,22 @@
                     <span wicket:id="burgerlijkeStaat">Burgerlijke staat</span>
                 </div>
 
+                <!-- Pasfoto display (shown when a photo exists) -->
+                <div wicket:id="pasfotoDisplay" class="rd-partner-card__pasfoto-display">
+                    <img wicket:id="pasfotoImg" class="rd-partner-card__pasfoto" alt="Pasfoto"/>
+                </div>
+
+                <!-- Pasfoto upload form (shown for current user's own card) -->
+                <form wicket:id="pasfotoUploadForm" enctype="multipart/form-data" class="rd-partner-card__pasfoto-form">
+                    <label class="rd-partner-card__label">
+                        <wicket:message key="jullie.gegevens.pasfoto.label">Pasfoto</wicket:message>
+                    </label>
+                    <input type="file" wicket:id="pasfotoField" accept="image/*"/>
+                    <button type="submit" class="rd-partner-card__pasfoto-btn">
+                        <wicket:message key="jullie.gegevens.pasfoto.uploaden">Pasfoto uploaden</wicket:message>
+                    </button>
+                </form>
+
                 <!-- Telefoonnummer & E-mailadres: read-only (shown for partner's card) -->
                 <div wicket:id="contactGegevensReadOnly">
 

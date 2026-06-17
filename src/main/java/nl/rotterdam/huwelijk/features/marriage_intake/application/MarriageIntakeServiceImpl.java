@@ -14,6 +14,7 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.PasfotoDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.Telefoonnummer;
 import nl.rotterdam.huwelijk.features.marriage_intake.repository.AfspraakRepository;
@@ -140,21 +141,21 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         List<PartnerGegevensDto> result = new ArrayList<>();
         for (HuwelijksDossiersPartnerEntity partner : dossier.getPartners()) {
-            result.add(convertToDto(partner.getBsn(), partner.getGekozenAchternaam(), partner.getTelefoonnummer(), partner.getEmailadres()));
+            result.add(convertToDto(partner.getBsn(), partner.getGekozenAchternaam(), partner.getTelefoonnummer(), partner.getEmailadres(), partner.getPasfoto() != null));
         }
         return result;
     }
 
     private PartnerGegevensDto convertToDto(String bsn, String gekozenAchternaam,
-                                            Telefoonnummer telefoonnummer, Emailadres emailadres) {
+                                            Telefoonnummer telefoonnummer, Emailadres emailadres, boolean pasfotoAanwezig) {
         MockPersonInfo mockInfo = retrievePersonInfo(bsn);
         if (mockInfo == null) {
             return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend",
-                    telefoonnummer, emailadres, gekozenAchternaam);
+                    telefoonnummer, emailadres, gekozenAchternaam, pasfotoAanwezig);
         }
         return new PartnerGegevensDto(bsn, mockInfo.achternaam(), mockInfo.voornamen(), mockInfo.geboortedatum(),
                 mockInfo.geboorteplaats(), mockInfo.nationaliteit(), mockInfo.burgerlijkeStaat(),
-                telefoonnummer, emailadres, gekozenAchternaam);
+                telefoonnummer, emailadres, gekozenAchternaam, pasfotoAanwezig);
     }
 
     //This should eventually retrieve the person from HaalCentraal
@@ -576,6 +577,31 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         partner.setTelefoonnummer(telefoonnummer);
         partner.setEmailadres(emailadres);
         dossierRepository.save(dossier);
+    }
+
+    @Override
+    @Transactional
+    public void slaPasfotoOp(UUID dossierId, String bsn, byte[] imageData, String contentType) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
+                .filter(p -> bsn.equals(p.getBsn()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn));
+        partner.setPasfoto(imageData);
+        partner.setPasfotoContentType(contentType);
+        dossierRepository.save(dossier);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PasfotoDto findPasfoto(UUID dossierId, String bsn) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        return dossier.getPartners().stream()
+                .filter(p -> bsn.equals(p.getBsn()))
+                .filter(p -> p.getPasfoto() != null)
+                .findFirst()
+                .map(p -> new PasfotoDto(p.getPasfoto(), p.getPasfotoContentType()))
+                .orElse(null);
     }
 
     @Override

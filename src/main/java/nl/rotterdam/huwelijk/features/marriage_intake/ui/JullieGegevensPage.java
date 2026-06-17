@@ -20,6 +20,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -89,6 +91,24 @@ public class JullieGegevensPage extends IntakeBasePage {
                         new Label("nationaliteit", partner.nationaliteit()),
                         new Label("burgerlijkeStaat", partner.burgerlijkeStaat())
                 );
+
+                // Pasfoto display (shown when a photo exists)
+                WebMarkupContainer pasfotoDisplay = new WebMarkupContainer("pasfotoDisplay");
+                pasfotoDisplay.setVisible(partner.pasfotoAanwezig());
+                WebMarkupContainer pasfotoImg = new WebMarkupContainer("pasfotoImg") {
+                    @Override
+                    protected void onComponentTag(ComponentTag tag) {
+                        super.onComponentTag(tag);
+                        tag.put("src", "/pasfoto/" + dossierId + "/" + partner.bsn());
+                    }
+                };
+                pasfotoDisplay.add(pasfotoImg);
+                item.add(pasfotoDisplay);
+
+                // Pasfoto upload form (only shown for the current user's own card)
+                PasfotoUploadForm pasfotoUploadForm = new PasfotoUploadForm("pasfotoUploadForm");
+                pasfotoUploadForm.setVisible(kanContactBewerken);
+                item.add(pasfotoUploadForm);
 
                 // Contact gegevens: read-only display (shown for partner's card)
                 WebMarkupContainer contactGegevensReadOnly = new WebMarkupContainer("contactGegevensReadOnly");
@@ -267,6 +287,40 @@ public class JullieGegevensPage extends IntakeBasePage {
         protected void onSubmit() {
             String gekozenNaam = naamRadioGroup.getModelObject();
             marriageIntakeService.slaGekozenAchternaamOp(dossierId, getCurrentBsn(), gekozenNaam);
+            setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
+        }
+    }
+
+    private class PasfotoUploadForm extends Form<Void> {
+
+        private final FileUploadField pasfotoField;
+
+        PasfotoUploadForm(String id) {
+            super(id);
+            setMultiPart(true);
+            pasfotoField = new FileUploadField("pasfotoField");
+            add(pasfotoField);
+        }
+
+        @Override
+        protected void onSubmit() {
+            FileUpload upload = pasfotoField.getFileUpload();
+            if (upload == null) {
+                return;
+            }
+            String contentType = upload.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                error(getString("jullie.gegevens.pasfoto.fout.geen.afbeelding"));
+                return;
+            }
+            byte[] data;
+            try {
+                data = upload.getBytes();
+            } catch (Exception e) {
+                error(getString("jullie.gegevens.pasfoto.fout.lezen"));
+                return;
+            }
+            marriageIntakeService.slaPasfotoOp(dossierId, getCurrentBsn(), data, contentType);
             setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
         }
     }
