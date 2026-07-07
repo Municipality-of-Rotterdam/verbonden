@@ -153,8 +153,7 @@ public class ExtrasPage extends IntakeBasePage {
                     ExtraDto extra = item.getModelObject();
 
                     WebMarkupContainer keuzeItem = new WebMarkupContainer("keuzeItem");
-                    boolean isGeselecteerd = extra.id() == (geselecteerdIdModel.getObject() != null
-                            ? geselecteerdIdModel.getObject() : -1L);
+                    boolean isGeselecteerd = Long.valueOf(extra.id()).equals(geselecteerdIdModel.getObject());
                     if (isGeselecteerd) {
                         keuzeItem.add(AttributeModifier.append("class", " rd-extra-keuze--geselecteerd"));
                     }

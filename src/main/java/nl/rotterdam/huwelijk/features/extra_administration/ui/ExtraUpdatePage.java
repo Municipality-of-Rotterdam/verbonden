@@ -19,6 +19,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public class ExtraUpdatePage extends AdministrationBasePage {
@@ -84,11 +85,11 @@ public class ExtraUpdatePage extends AdministrationBasePage {
                     new RdFormFieldTextInput<>("startdatum",
                             LambdaModel.of(model, ExtraFormDto::getStartdatum, ExtraFormDto::setStartdatum),
                             Model.of("Startdatum"),
-                            Model.of("Datum vanaf wanneer de extra beschikbaar is")).setHtmlInputType("date"),
+                            Model.of("Datum vanaf wanneer de extra beschikbaar is")).setHtmlInputType("date").setModelType(LocalDate.class),
                     new RdFormFieldTextInput<>("einddatum",
                             LambdaModel.of(model, ExtraFormDto::getEinddatum, ExtraFormDto::setEinddatum),
                             Model.of("Einddatum"),
-                            Model.of("Datum tot wanneer de extra beschikbaar is")).setHtmlInputType("date"),
+                            Model.of("Datum tot wanneer de extra beschikbaar is")).setHtmlInputType("date").setModelType(LocalDate.class),
                     new RdButton("opslaan", Model.of("Opslaan"))
             );
         }
