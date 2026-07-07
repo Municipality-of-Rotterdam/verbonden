@@ -89,8 +89,11 @@
             <wicket:message key="intake.sidebar.extras.nogniet">Nog geen extra&#x2019;s gekozen</wicket:message>
         </p>
         <div wicket:id="extrasList">
-            <div class="rd-keuzes-item rd-keuzes-item--extra">
+            <div class="rd-keuzes-item d-flex justify-content-between align-items-center rd-keuzes-item--extra">
                 <span wicket:id="extraLabel">extra</span>
+                <span wicket:id="extraPrijsContainer" class="rd-keuzes-item__prijs">
+                    &#x20AC;&nbsp;<span wicket:id="extraPrijs">prijs</span>
+                </span>
             </div>
         </div>
     </div>

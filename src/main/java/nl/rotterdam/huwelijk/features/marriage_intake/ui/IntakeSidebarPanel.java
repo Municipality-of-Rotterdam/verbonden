@@ -3,6 +3,7 @@ package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -13,6 +14,7 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
 import org.jspecify.annotations.Nullable;
@@ -218,12 +220,12 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         };
         add(extrasNogNiet);
 
-        IModel<List<String>> extrasListModel = LambdaModel.of(() -> {
+        IModel<List<SidebarExtraItemDto>> extrasListModel = LambdaModel.of(() -> {
             DossierSamenvattingDto d = getDossierModelObject();
             return (d != null && d.extras() != null) ? d.extras() : List.of();
         });
 
-        ListView<String> extrasListView = new ListView<>("extrasList", new ListModel<>(extrasListModel.getObject())) {
+        ListView<SidebarExtraItemDto> extrasListView = new ListView<>("extrasList", new ListModel<>(extrasListModel.getObject())) {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
@@ -232,8 +234,19 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             }
 
             @Override
-            protected void populateItem(ListItem<String> item) {
-                item.add(new Label("extraLabel", item.getModel()));
+            protected void populateItem(ListItem<SidebarExtraItemDto> item) {
+                SidebarExtraItemDto extra = item.getModelObject();
+                item.add(new Label("extraLabel", Model.of(extra.naam())));
+                WebMarkupContainer prijsContainer = new WebMarkupContainer("extraPrijsContainer");
+                prijsContainer.setVisible(extra.prijs() != null);
+                if (extra.prijs() != null) {
+                    String prijsText = new DecimalFormat("#,##0.00",
+                            new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(extra.prijs());
+                    prijsContainer.add(new Label("extraPrijs", Model.of(prijsText)));
+                } else {
+                    prijsContainer.add(new Label("extraPrijs", Model.of("")));
+                }
+                item.add(prijsContainer);
             }
         };
         extrasListView.setReuseItems(false);

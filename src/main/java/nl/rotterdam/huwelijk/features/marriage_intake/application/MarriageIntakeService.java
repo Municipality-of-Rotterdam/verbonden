@@ -6,6 +6,9 @@ import nl.rotterdam.huwelijk.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.ExtraDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveExtrasDto;
+import nl.rotterdam.huwelijk.features.extra_administration.domain.ExtraType;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.huwelijk.features.marriage_intake.domain.PartnerGegevensDto;
@@ -88,4 +91,10 @@ public interface MarriageIntakeService {
     void slaContactGegevensOp(UUID dossierId, String bsn, Telefoonnummer telefoonnummer, Emailadres emailadres);
 
     void delete(UUID dossierId);
+
+    List<ExtraDto> findActiefExtras(ExtraType type);
+
+    SaveExtrasDto findExtrasSelecties(UUID dossierId);
+
+    void slaExtrasOp(UUID dossierId, SaveExtrasDto dto);
 }

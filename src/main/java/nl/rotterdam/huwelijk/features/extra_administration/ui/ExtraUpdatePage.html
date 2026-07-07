@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Extra wijzigen</title>
+</head>
+<body>
+<wicket:extend>
+    <h1>Extra wijzigen</h1>
+
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar overzicht</a></p>
+
+    <div wicket:id="feedback"></div>
+
+    <form wicket:id="extraForm" class="d-flex flex-column gap-3">
+        <div>
+            <select wicket:id="type"></select>
+        </div>
+        <div wicket:id="naam"></div>
+        <div wicket:id="omschrijving"></div>
+        <div wicket:id="afbeelding"></div>
+        <div wicket:id="prijs"></div>
+        <div wicket:id="startdatum"></div>
+        <div wicket:id="einddatum"></div>
+        <div>
+            <button wicket:id="opslaan" type="submit"></button>
+        </div>
+    </form>
+</wicket:extend>
+</body>
+</html>
