@@ -30,6 +30,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 
 import static nl.rotterdam.huwelijk.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
@@ -153,7 +154,7 @@ public class ExtrasPage extends IntakeBasePage {
                     ExtraDto extra = item.getModelObject();
 
                     WebMarkupContainer keuzeItem = new WebMarkupContainer("keuzeItem");
-                    boolean isGeselecteerd = Long.valueOf(extra.id()).equals(geselecteerdIdModel.getObject());
+                    boolean isGeselecteerd = Objects.equals(extra.id(), geselecteerdIdModel.getObject());
                     if (isGeselecteerd) {
                         keuzeItem.add(AttributeModifier.append("class", " rd-extra-keuze--geselecteerd"));
                     }
@@ -187,7 +188,7 @@ public class ExtrasPage extends IntakeBasePage {
                     selectCheckbox.add(new AjaxFormComponentUpdatingBehavior("change") {
                         @Override
                         protected void onUpdate(AjaxRequestTarget target) {
-                            Boolean checked = (Boolean) getComponent().getDefaultModelObject();
+                            Boolean checked = ((CheckBox) getComponent()).getModelObject();
                             if (Boolean.TRUE.equals(checked)) {
                                 geselecteerdIdModel.setObject(extra.id());
                             } else {
