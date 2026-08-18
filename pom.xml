@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.14</version>
+        <version>4.1.0</version>
         <relativePath/>
     </parent>
 
@@ -29,9 +29,9 @@
 
     <properties>
         <java.version>25</java.version>
-        <wicket.version>10.9.0</wicket.version>
-        <wicket-stuff.version>10.8.0</wicket-stuff.version>
-         <rotterdam-nlds.version>0.1.0</rotterdam-nlds.version>
+        <wicket.version>10.10.0</wicket.version>
+        <wicket-stuff.version>10.10.0</wicket-stuff.version>
+         <rotterdam-nlds.version>0.1.1</rotterdam-nlds.version>
         <wicket-webjars.version>4.0.14</wicket-webjars.version>
         <bootstrap.version>5.3.8</bootstrap.version>
     </properties>
@@ -88,7 +88,7 @@
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wicketstuff</groupId>
@@ -143,8 +143,8 @@
 
         <!-- Flyway database migrations -->
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -222,6 +222,16 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-resttestclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
