@@ -155,35 +155,35 @@
         <dependency>
             <groupId>com.googlecode.libphonenumber</groupId>
             <artifactId>libphonenumber</artifactId>
-            <version>9.0.8</version>
+            <version>9.0.37</version>
         </dependency>
 
         <!-- Email address validation -->
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.10.1</version>
+            <version>1.11.0</version>
         </dependency>
 
         <!-- ZXing QR code generation -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.5.3</version>
+            <version>3.5.4</version>
         </dependency>
 
         <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>1.18.3</version>
+            <version>1.23.1</version>
         </dependency>
 
         <!-- Apache POI for xlsx import -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.4.0</version>
+            <version>5.5.1</version>
         </dependency>
 
         <!-- Wicket Webjars integration -->
