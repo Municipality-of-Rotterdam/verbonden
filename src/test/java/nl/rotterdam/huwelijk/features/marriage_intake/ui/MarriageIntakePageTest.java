@@ -3,7 +3,7 @@ package nl.rotterdam.huwelijk.features.marriage_intake.ui;
 import nl.rotterdam.huwelijk.integration_test.BaseWicketTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
