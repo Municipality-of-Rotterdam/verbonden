@@ -1,0 +1,60 @@
+# This repository adheres to the publiccode.yml standard by including this
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/publiccodeyml/publiccode.yml
+
+publiccodeYmlVersion: "0.7"
+
+name: Huwelijk POC
+url: https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot
+
+softwareType: standalone/web
+
+platforms:
+  - web
+
+categories:
+  - it-development
+
+developmentStatus: development
+
+description:
+  nl:
+    shortDescription: >-
+      POC voor het digitaliseren van huwelijksaanvragen bij de Gemeente
+      Rotterdam.
+
+    longDescription: |
+      Dit project is een proof-of-concept applicatie voor het digitaliseren
+      van het huwelijksaangifteproces bij de Gemeente Rotterdam. Burgers
+      kunnen hun huwelijk of geregistreerd partnerschap digitaal aanvragen en
+      plannen. Daarnaast bevat de applicatie een beheeromgeving voor het
+      beheren van Buitengewoon Ambtenaren van de Burgerlijke Stand (BABS).
+
+      Dit is een proof-of-concept: de functionaliteit is nog incompleet en
+      wordt actief doorontwikkeld.
+
+    features:
+      - Digitale huwelijksaangifte voor burgers
+      - Beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BABS)
+
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: Gemeente Rotterdam
+
+intendedAudience:
+  countries:
+    - NL
+  scope:
+    - government
+
+localisation:
+  availableLanguages:
+    - nl
+  localisationReady: false
+
+maintenance:
+  type: internal
+  contacts:
+    - name: Gemeente Rotterdam - Mijnloket ontwikkelteam
+      email: mijnloket_ontwikkelteam@Rotterdam.onmicrosoft.com
+      affiliation: Gemeente Rotterdam
