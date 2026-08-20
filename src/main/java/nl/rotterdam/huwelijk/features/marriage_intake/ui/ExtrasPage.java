@@ -185,6 +185,7 @@ public class ExtrasPage extends IntakeBasePage {
 
                     CheckBox selectCheckbox = new CheckBox("selectCheckbox", Model.of(isGeselecteerd));
                     selectCheckbox.setOutputMarkupId(true);
+                    selectCheckbox.add(AttributeModifier.replace("aria-label", extra.naam()));
                     selectCheckbox.add(new AjaxFormComponentUpdatingBehavior("change") {
                         @Override
                         protected void onUpdate(AjaxRequestTarget target) {
