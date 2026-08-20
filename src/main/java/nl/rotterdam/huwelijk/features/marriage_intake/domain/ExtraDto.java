@@ -1,5 +1,6 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.domain;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 public record ExtraDto(
@@ -8,5 +9,5 @@ public record ExtraDto(
         String omschrijving,
         String afbeelding,
         BigDecimal prijs
-) {
+) implements Serializable {
 }
