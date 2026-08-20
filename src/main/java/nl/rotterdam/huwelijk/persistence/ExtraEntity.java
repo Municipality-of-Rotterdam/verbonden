@@ -36,6 +36,9 @@ public class ExtraEntity {
     @Column(name = "einddatum")
     private LocalDate einddatum;
 
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
@@ -101,6 +104,14 @@ public class ExtraEntity {
 
     public void setEinddatum(LocalDate einddatum) {
         this.einddatum = einddatum;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public LocalDateTime getAangemaaktOp() {

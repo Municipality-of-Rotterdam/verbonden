@@ -66,7 +66,10 @@ class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
     @Override
     @Transactional
     public void delete(long id) {
-        extraRepository.deleteById(id);
+        extraRepository.findById(id).ifPresent(extra -> {
+            extra.setActive(false);
+            extraRepository.save(extra);
+        });
     }
 
     @Override

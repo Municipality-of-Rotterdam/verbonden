@@ -16,6 +16,7 @@ public interface ExtraRepository extends JpaRepository<ExtraEntity, Long> {
     @Query("""
             SELECT e FROM ExtraEntity e
             WHERE e.type = :type
+              AND e.active = true
               AND (e.startdatum IS NULL OR e.startdatum <= :vandaag)
               AND (e.einddatum IS NULL OR e.einddatum > :vandaag)
             ORDER BY e.naam
