@@ -13,12 +13,14 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,6 +33,9 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
     private ExtraAdministrationService extraAdministrationService;
 
     public ExtraAdministrationPage() {
+        FeedbackPanel feedback = new FeedbackPanel("feedback");
+        feedback.setOutputMarkupId(true);
+        pageBody.add(feedback);
         pageBody.add(new BookmarkablePageLink<>("nieuwExtraLink", ExtraCreatePage.class));
         pageBody.add(buildExtrasTable());
     }
@@ -155,7 +160,12 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
             add(new Link<>("verwijderLink", model) {
                 @Override
                 public void onClick() {
-                    extraAdministrationService.delete(getModelObject().id());
+                    try {
+                        extraAdministrationService.delete(getModelObject().id());
+                    } catch (DataIntegrityViolationException e) {
+                        getPage().error(getString("extra.verwijder.fout.ingebruik"));
+                        return;
+                    }
                     setResponsePage(ExtraAdministrationPage.class);
                 }
             });

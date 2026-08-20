@@ -2,7 +2,6 @@ package nl.rotterdam.huwelijk.persistence;
 
 import jakarta.persistence.*;
 import nl.rotterdam.huwelijk.features.extra_administration.domain.ExtraType;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

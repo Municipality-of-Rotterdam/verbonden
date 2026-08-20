@@ -258,23 +258,15 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             protected void onConfigure() {
                 super.onConfigure();
                 DossierSamenvattingDto d = getDossierModelObject();
-                setVisible(d != null && d.prijs() != null);
+                setVisible(d != null && d.totalPrijs() != null);
             }
         };
         IModel<String> totaalModel = LambdaModel.of(() -> {
             DossierSamenvattingDto d = getDossierModelObject();
-            if (d == null || d.prijs() == null) {
+            if (d == null || d.totalPrijs() == null) {
                 return "";
             }
-            BigDecimal total = d.prijs();
-            if (d.extras() != null) {
-                for (SidebarExtraItemDto extra : d.extras()) {
-                    if (extra.prijs() != null) {
-                        total = total.add(extra.prijs());
-                    }
-                }
-            }
-            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(total);
+            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(d.totalPrijs());
         });
         totaalContainer.add(new Label("totaalPrijs", totaalModel));
         add(totaalContainer);

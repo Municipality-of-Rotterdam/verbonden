@@ -318,6 +318,12 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             extraItems.add(new SidebarExtraItemDto(e.getInternationaleAkte().getNaam(), e.getInternationaleAkte().getPrijs()));
         }
 
+        BigDecimal extrasTotaal = extraItems.stream()
+                .filter(item -> item.prijs() != null)
+                .map(SidebarExtraItemDto::prijs)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalPrijs = prijs != null ? prijs.add(extrasTotaal) : (extrasTotaal.compareTo(BigDecimal.ZERO) > 0 ? extrasTotaal : null);
+
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
@@ -329,7 +335,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 getuigenBevestigd,
                 getuigenGedeeltelijkIngevuld,
                 extraItems,
-                aantalGekozenAchternamen);
+                aantalGekozenAchternamen,
+                totalPrijs);
     }
 
     @Override
@@ -631,7 +638,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public void slaExtrasOp(UUID dossierId, SaveExtrasDto dto) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         dossier.setRingenUitwisselen(dto.ringenUitwisselen());
-        dossier.setMuziek(dto.muziek());
+        boolean isGroot = dossier.getCeremonieSoort() == CeremonieSoort.GROOT;
+        dossier.setMuziek(isGroot && dto.muziek());
         dossier.setTrouwboekje(dto.trouwboekjeId() != null
                 ? extraRepository.findById(dto.trouwboekjeId()).orElse(null)
                 : null);
