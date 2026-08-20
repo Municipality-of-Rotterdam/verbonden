@@ -209,7 +209,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort) {
-        getDossier(dossierId).setCeremonieSoort(ceremonieSoort);
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        dossier.setCeremonieSoort(ceremonieSoort);
+        if (ceremonieSoort != CeremonieSoort.GROOT) {
+            dossier.setMuziek(false);
+        }
     }
 
     @Override
@@ -218,6 +222,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity e = getDossier(dossierId);
         e.setRegistratieType(dto.registratieType());
         e.setCeremonieSoort(dto.ceremonieSoort());
+        if (dto.ceremonieSoort() != CeremonieSoort.GROOT) {
+            e.setMuziek(false);
+        }
         if (dto.locatieId() != null) {
             locatieRepository.findById(dto.locatieId()).ifPresent(e::setLocatie);
         } else {
