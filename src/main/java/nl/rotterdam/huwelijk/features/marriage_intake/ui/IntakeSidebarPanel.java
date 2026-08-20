@@ -252,6 +252,33 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         extrasListView.setReuseItems(false);
         add(extrasListView);
 
+        // Totaal (ceremony price + extras prices)
+        WebMarkupContainer totaalContainer = new WebMarkupContainer("totaalContainer") {
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                DossierSamenvattingDto d = getDossierModelObject();
+                setVisible(d != null && d.prijs() != null);
+            }
+        };
+        IModel<String> totaalModel = LambdaModel.of(() -> {
+            DossierSamenvattingDto d = getDossierModelObject();
+            if (d == null || d.prijs() == null) {
+                return "";
+            }
+            BigDecimal total = d.prijs();
+            if (d.extras() != null) {
+                for (SidebarExtraItemDto extra : d.extras()) {
+                    if (extra.prijs() != null) {
+                        total = total.add(extra.prijs());
+                    }
+                }
+            }
+            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(total);
+        });
+        totaalContainer.add(new Label("totaalPrijs", totaalModel));
+        add(totaalContainer);
+
         // Bevestig form with RdButton
         Form<Void> bevestigForm = new Form<>("bevestigForm");
         bevestigForm.add(new RdButton("bevestigButton",

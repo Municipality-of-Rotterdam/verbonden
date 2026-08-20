@@ -100,6 +100,18 @@
 
     <hr class="rd-keuzes-divider"/>
 
+    <!-- Totaal section -->
+    <div wicket:id="totaalContainer" class="rd-keuzes-section">
+        <div class="rd-keuzes-item d-flex justify-content-between align-items-center rd-keuzes-item--totaal">
+            <strong><wicket:message key="intake.sidebar.totaal">Totaal</wicket:message></strong>
+            <span class="rd-keuzes-item__prijs">
+                &#x20AC;&nbsp;<span wicket:id="totaalPrijs">totaal</span>
+            </span>
+        </div>
+    </div>
+
+    <hr class="rd-keuzes-divider"/>
+
     <!-- Confirm button (RdButton inside its own form) -->
     <form wicket:id="bevestigForm">
         <button wicket:id="bevestigButton" type="submit"></button>
