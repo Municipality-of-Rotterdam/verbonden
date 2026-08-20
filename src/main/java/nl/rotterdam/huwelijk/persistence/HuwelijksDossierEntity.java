@@ -43,6 +43,20 @@ public class HuwelijksDossierEntity {
     @OrderBy("volgorde ASC")
     private List<HuwelijksDossiersPartnerEntity> partners = new ArrayList<>();
 
+    @Column(name = "ringen_uitwisselen", nullable = false)
+    private boolean ringenUitwisselen = false;
+
+    @Column(name = "muziek", nullable = false)
+    private boolean muziek = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trouwboekje_id")
+    private ExtraEntity trouwboekje;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "internationale_akte_id")
+    private ExtraEntity internationaleAkte;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
@@ -88,6 +102,38 @@ public class HuwelijksDossierEntity {
 
     public List<HuwelijksDossiersPartnerEntity> getPartners() {
         return partners;
+    }
+
+    public boolean isRingenUitwisselen() {
+        return ringenUitwisselen;
+    }
+
+    public void setRingenUitwisselen(boolean ringenUitwisselen) {
+        this.ringenUitwisselen = ringenUitwisselen;
+    }
+
+    public boolean isMuziek() {
+        return muziek;
+    }
+
+    public void setMuziek(boolean muziek) {
+        this.muziek = muziek;
+    }
+
+    public ExtraEntity getTrouwboekje() {
+        return trouwboekje;
+    }
+
+    public void setTrouwboekje(ExtraEntity trouwboekje) {
+        this.trouwboekje = trouwboekje;
+    }
+
+    public ExtraEntity getInternationaleAkte() {
+        return internationaleAkte;
+    }
+
+    public void setInternationaleAkte(ExtraEntity internationaleAkte) {
+        this.internationaleAkte = internationaleAkte;
     }
 
     public LocalDateTime getAangemaaktOp() {

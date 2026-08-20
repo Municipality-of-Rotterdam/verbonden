@@ -16,7 +16,8 @@ public record DossierSamenvattingDto(
         boolean gegevensBevestigd,
         boolean getuigenBevestigd,
         boolean getuigenGedeeltelijkIngevuld,
-        List<String> extras,
-        int aantalGekozenAchternamen
+        List<SidebarExtraItemDto> extras,
+        int aantalGekozenAchternamen,
+        BigDecimal totalPrijs
 ) implements Serializable {
 }

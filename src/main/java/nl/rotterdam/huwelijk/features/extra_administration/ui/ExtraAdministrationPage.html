@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Extra's Beheer</title>
+</head>
+<body>
+<wicket:extend>
+    <h1>Extra's Beheer</h1>
+
+    <div wicket:id="feedback"></div>
+
+    <div class="mb-3">
+        <a wicket:id="nieuwExtraLink" class="utrecht-button utrecht-button--primary-action">Nieuwe extra toevoegen</a>
+    </div>
+
+    <form wicket:id="actionsForm">
+        <table wicket:id="extrasTable"></table>
+    </form>
+
+    <wicket:fragment wicket:id="actiesFragment">
+        <a wicket:id="bewerkLink" class="utrecht-button utrecht-button--secondary-action">Bewerken</a>
+        <a wicket:id="verwijderLink" class="utrecht-button utrecht-button--secondary-action">Verwijderen</a>
+    </wicket:fragment>
+</wicket:extend>
+</body>
+</html>

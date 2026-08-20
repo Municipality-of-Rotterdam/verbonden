@@ -92,7 +92,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
                 createTabLink("tabDedag", IntakeStep.DE_DAG, DeDagPage.class),
                 createTabLink("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS, JullieGegevensPage.class),
                 createTabLink("tabGetuigen", IntakeStep.DE_GETUIGEN, DeGetuigenPage.class),
-                createDisabledTab("tabExtras", IntakeStep.EXTRAS)
+                createTabLink("tabExtras", IntakeStep.EXTRAS, ExtrasPage.class)
         );
 
         keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel());

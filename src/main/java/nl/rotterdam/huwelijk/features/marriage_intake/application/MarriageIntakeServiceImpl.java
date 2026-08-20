@@ -1,5 +1,11 @@
 package nl.rotterdam.huwelijk.features.marriage_intake.application;
 
+import nl.rotterdam.huwelijk.features.extra_administration.domain.ExtraType;
+import nl.rotterdam.huwelijk.features.extra_administration.repository.ExtraRepository;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.ExtraDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.SaveExtrasDto;
+import nl.rotterdam.huwelijk.features.marriage_intake.domain.SidebarExtraItemDto;
+import nl.rotterdam.huwelijk.persistence.ExtraEntity;
 import nl.rotterdam.huwelijk.config.PlanningConfig;
 import nl.rotterdam.huwelijk.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.huwelijk.features.location_administration.repository.BeschikbaarheidRepository;
@@ -52,6 +58,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final AfspraakRepository afspraakRepository;
     private final PlanningConfig planningConfig;
     private final GetuigenRepository getuigenRepository;
+    private final ExtraRepository extraRepository;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
                               BeschikbaarheidRepository beschikbaarheidRepository,
@@ -61,7 +68,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               MarriageTypeRepository marriageTypeRepository,
                               AfspraakRepository afspraakRepository,
                               PlanningConfig planningConfig,
-                              GetuigenRepository getuigenRepository) {
+                              GetuigenRepository getuigenRepository,
+                              ExtraRepository extraRepository) {
         this.dossierRepository = dossierRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
         this.nietBeschikbareDagRepository = nietBeschikbareDagRepository;
@@ -71,6 +79,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         this.afspraakRepository = afspraakRepository;
         this.planningConfig = planningConfig;
         this.getuigenRepository = getuigenRepository;
+        this.extraRepository = extraRepository;
     }
 
     @Override
@@ -200,7 +209,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort) {
-        getDossier(dossierId).setCeremonieSoort(ceremonieSoort);
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        dossier.setCeremonieSoort(ceremonieSoort);
+        if (ceremonieSoort != CeremonieSoort.GROOT) {
+            dossier.setMuziek(false);
+        }
     }
 
     @Override
@@ -209,6 +222,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity e = getDossier(dossierId);
         e.setRegistratieType(dto.registratieType());
         e.setCeremonieSoort(dto.ceremonieSoort());
+        if (dto.ceremonieSoort() != CeremonieSoort.GROOT) {
+            e.setMuziek(false);
+        }
         if (dto.locatieId() != null) {
             locatieRepository.findById(dto.locatieId()).ifPresent(e::setLocatie);
         } else {
@@ -295,6 +311,26 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .filter(p -> p.getGekozenAchternaam() != null)
                 .count();
 
+        List<SidebarExtraItemDto> extraItems = new ArrayList<>();
+        if (e.isRingenUitwisselen()) {
+            extraItems.add(new SidebarExtraItemDto("Ringen uitwisselen", null));
+        }
+        if (e.isMuziek()) {
+            extraItems.add(new SidebarExtraItemDto("Muziek", null));
+        }
+        if (e.getTrouwboekje() != null) {
+            extraItems.add(new SidebarExtraItemDto(e.getTrouwboekje().getNaam(), e.getTrouwboekje().getPrijs()));
+        }
+        if (e.getInternationaleAkte() != null) {
+            extraItems.add(new SidebarExtraItemDto(e.getInternationaleAkte().getNaam(), e.getInternationaleAkte().getPrijs()));
+        }
+
+        BigDecimal extrasTotaal = extraItems.stream()
+                .filter(item -> item.prijs() != null)
+                .map(SidebarExtraItemDto::prijs)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalPrijs = prijs != null ? prijs.add(extrasTotaal) : (extrasTotaal.compareTo(BigDecimal.ZERO) > 0 ? extrasTotaal : null);
+
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
@@ -305,8 +341,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 false,
                 getuigenBevestigd,
                 getuigenGedeeltelijkIngevuld,
-                List.of(),
-                aantalGekozenAchternamen);
+                extraItems,
+                aantalGekozenAchternamen,
+                totalPrijs);
     }
 
     @Override
@@ -584,5 +621,38 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         afspraakRepository.deleteByDossier_Id(dossier.getId());
         dossierRepository.delete(dossier);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SaveExtrasDto findExtrasSelecties(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        Long trouwboekjeId = dossier.getTrouwboekje() != null ? dossier.getTrouwboekje().getId() : null;
+        Long internationaleAkteId = dossier.getInternationaleAkte() != null ? dossier.getInternationaleAkte().getId() : null;
+        return new SaveExtrasDto(dossier.isRingenUitwisselen(), dossier.isMuziek(), trouwboekjeId, internationaleAkteId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ExtraDto> findActiefExtras(ExtraType type) {
+        return extraRepository.findActiefByType(type, LocalDate.now()).stream()
+                .map(e -> new ExtraDto(e.getId(), e.getNaam(), e.getOmschrijving(), e.getAfbeelding(), e.getPrijs()))
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void slaExtrasOp(UUID dossierId, SaveExtrasDto dto) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        dossier.setRingenUitwisselen(dto.ringenUitwisselen());
+        boolean isGroot = dossier.getCeremonieSoort() == CeremonieSoort.GROOT;
+        dossier.setMuziek(isGroot && dto.muziek());
+        dossier.setTrouwboekje(dto.trouwboekjeId() != null
+                ? extraRepository.findById(dto.trouwboekjeId()).orElse(null)
+                : null);
+        dossier.setInternationaleAkte(dto.internationaleAkteId() != null
+                ? extraRepository.findById(dto.internationaleAkteId()).orElse(null)
+                : null);
+        dossierRepository.save(dossier);
     }
 }
