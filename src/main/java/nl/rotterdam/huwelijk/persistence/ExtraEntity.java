@@ -15,7 +15,7 @@ public class ExtraEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = ExtraTypeAttributeConverter.class)
     @Column(name = "type", nullable = false)
     private ExtraType type;
 
