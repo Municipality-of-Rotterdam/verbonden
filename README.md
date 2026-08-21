@@ -41,8 +41,7 @@ Deze repository is een Maven-reactor met drie modules:
 `core` en `remote-local` worden op Maven Central gepubliceerd, zodat een
 productie-adapter (echte DigiD-OIDC en persoonsgegevens-API's) in een eigen,
 besloten repository tegen `huwelijk-core` kan bouwen zonder deze code te
-forken. Zie [docs/modularize-app.md](docs/modularize-app.md) voor de
-achtergrond.
+forken.
 
 ## Vereisten
 

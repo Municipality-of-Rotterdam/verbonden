@@ -5,8 +5,7 @@ Dit document beschrijft de applicatie-architectuur van `huwelijksapplicatie`.
 ## Technische basis
 
 - **Build-tool:** Maven-reactor (root `pom.xml`, packaging `pom`), met Spring
-  Boot parent. Drie modules: `core`, `remote-local`, `app-local` — zie
-  [modularize-app.md](modularize-app.md) voor de achtergrond.
+  Boot parent. Drie modules: `core`, `remote-local`, `app-local`.
 - **Runtime:** Java 25.
 - **Frameworks:** Spring Boot, Spring Data JPA, Spring Security, Apache Wicket, Flyway, PostgreSQL.
 - **UI-stijl:** Rotterdam NL Design System (NLDS) componenten en thema.
