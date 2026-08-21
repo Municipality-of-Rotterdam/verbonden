@@ -11,6 +11,7 @@ De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.huwelijk.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
 - `nl.rotterdam.huwelijk.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
 - `nl.rotterdam.huwelijk.config` — Spring Boot configuratieklassen.
+- `nl.rotterdam.huwelijk.identity` — publiek SPI-contract (adapter-poorten zoals `PersonLookupService`, `BurgerLoginPageMount`, `CurrentUserProvider`) waartegen adapter-modules zoals `remote-local` bouwen. Bewuste uitzondering op de feature-packageconventie hieronder: dit is geen feature maar een cross-cutting contract, gebruikt door meerdere features én door `WicketApplication`/`config`. Zie [docs/modularize-app.md](docs/modularize-app.md).
 
 Elke feature-package bevat de volgende sub-packages:
 - `feature.<naam>.ui` — Wicket-pagina's en UI-hulpklassen (FormDto, componenten).

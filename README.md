@@ -6,8 +6,10 @@ POC voor het digitaliseren van huwelijksaanvragen bij de Gemeente Rotterdam.
 
 Deze codebase bestaat uit de volgende features:
 
-- Digitale huwelijksaangifte voor burgers
+- Digitale aangifte voorgenomen huwelijk en geregistreerd partnerschap voor burgers
 - Beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BABS)
+- Beheren van Gemeentelijke locaties
+- Beheren van dossiers
 
 Dit is een proof-of-concept: de functionaliteit is nog incompleet en wordt
 actief doorontwikkeld. Zie [publiccode.yml](publiccode.yml) voor de
@@ -23,6 +25,24 @@ Dit project heeft de status: **development** (proof-of-concept). Zie
 - [Applicatie-architectuur](docs/applicatie-architectuur.md)
 - [Beoogde koppelingen](docs/beoogde-koppelingen.md)
 - [Checklist organisatorische stappen open source publicatie](docs/open-source-publicatie-checklist.md)
+
+## Modules
+
+Deze repository is een Maven-reactor met drie modules:
+
+- **`core`** — gedeelde productiecode en het publieke SPI-contract (package
+  `identity`) waarmee een echte DigiD-/persoonsgegevenskoppeling gebouwd kan
+  worden. Niet zelfstandig start-baar.
+- **`remote-local`** — mock-implementatie van die SPI (mock-DigiD-inlogpagina,
+  mock-persoonsgegevens) voor lokale ontwikkeling.
+- **`app-local`** — het uitvoerbare Spring Boot-artefact van deze repository,
+  draait altijd op `core` + `remote-local`.
+
+`core` en `remote-local` worden op Maven Central gepubliceerd, zodat een
+productie-adapter (echte DigiD-OIDC en persoonsgegevens-API's) in een eigen,
+besloten repository tegen `huwelijk-core` kan bouwen zonder deze code te
+forken. Zie [docs/modularize-app.md](docs/modularize-app.md) voor de
+achtergrond.
 
 ## Vereisten
 
@@ -68,7 +88,7 @@ docker compose down -v
 ### 2. Start de Spring Boot applicatie
 
 ```bash
-./mvnw spring-boot:run
+./mvnw spring-boot:run -pl app-local -am
 ```
 
 De applicatie is daarna bereikbaar op <http://localhost:8080>.
@@ -85,7 +105,7 @@ Standaard inloggegevens voor lokaal gebruik (geconfigureerd in `application.prop
 | `beheerder` | `rotterdam` |
 
 Extra beheerders kun je toevoegen via de eigenschap `beheer.gebruikers` in
-`src/main/resources/application.properties`:
+`app-local/src/main/resources/application.properties`:
 
 ```properties
 # Formaat: gebruiker1:wachtwoord1,gebruiker2:wachtwoord2

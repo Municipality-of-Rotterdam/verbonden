@@ -14,7 +14,7 @@
     <groupId>nl.rotterdam.huwelijk</groupId>
     <artifactId>huwelijk-poc-copilot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>huwelijk-poc-copilot</name>
     <description>Huwelijk POC - Municipality of Rotterdam</description>
@@ -27,11 +27,17 @@
         </license>
     </licenses>
 
+    <modules>
+        <module>core</module>
+        <module>remote-local</module>
+        <module>app-local</module>
+    </modules>
+
     <properties>
         <java.version>25</java.version>
         <wicket.version>10.10.0</wicket.version>
         <wicket-stuff.version>10.10.0</wicket-stuff.version>
-         <rotterdam-nlds.version>0.1.1</rotterdam-nlds.version>
+        <rotterdam-nlds.version>0.1.1</rotterdam-nlds.version>
         <wicket-webjars.version>4.0.14</wicket-webjars.version>
         <bootstrap.version>5.3.8</bootstrap.version>
     </properties>
@@ -81,166 +87,20 @@
                 <artifactId>wicket-spring</artifactId>
                 <version>${wicket.version}</version>
             </dependency>
+
+            <!-- Reactor modules -->
+            <dependency>
+                <groupId>nl.rotterdam.huwelijk</groupId>
+                <artifactId>huwelijk-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>nl.rotterdam.huwelijk</groupId>
+                <artifactId>huwelijk-remote-local</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <!-- Spring Boot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wicketstuff</groupId>
-            <artifactId>wicketstuff-minis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
-        <!-- PostgreSQL -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!-- Apache Wicket -->
-        <dependency>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket-tester</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket-spring</artifactId>
-            <version>${wicket.version}</version>
-        </dependency>
-
-        <!-- NL Design System Wicket Components by Rotterdam -->
-        <dependency>
-            <groupId>nl.rotterdam.nl-design-system</groupId>
-            <artifactId>rotterdam-nlds-wicket</artifactId>
-            <version>${rotterdam-nlds.version}</version>
-        </dependency>
-        <!-- Rotterdam Design Tokens (rods-theme CSS custom properties) -->
-        <dependency>
-            <groupId>nl.rotterdam.nl-design-system</groupId>
-            <artifactId>rotterdam-nlds-css-wicket</artifactId>
-            <version>${rotterdam-nlds.version}</version>
-        </dependency>
-
-        <!-- Spring Security -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-        <!-- Flyway database migrations -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-flyway</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-database-postgresql</artifactId>
-        </dependency>
-
-        <!-- Phone number validation -->
-        <dependency>
-            <groupId>com.googlecode.libphonenumber</groupId>
-            <artifactId>libphonenumber</artifactId>
-            <version>9.0.37</version>
-        </dependency>
-
-        <!-- Email address validation -->
-        <dependency>
-            <groupId>commons-validator</groupId>
-            <artifactId>commons-validator</artifactId>
-            <version>1.11.0</version>
-        </dependency>
-
-        <!-- ZXing QR code generation -->
-        <dependency>
-            <groupId>com.google.zxing</groupId>
-            <artifactId>core</artifactId>
-            <version>3.5.4</version>
-        </dependency>
-
-        <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.23.1</version>
-        </dependency>
-
-        <!-- Apache POI for xlsx import -->
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>5.5.1</version>
-        </dependency>
-
-        <!-- Wicket Webjars integration -->
-        <dependency>
-            <groupId>de.agilecoders.wicket.webjars</groupId>
-            <artifactId>wicket-webjars</artifactId>
-            <version>${wicket-webjars.version}</version>
-        </dependency>
-        <!-- Bootstrap utilities CSS (via WebJars) -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>bootstrap</artifactId>
-            <version>${bootstrap.version}</version>
-        </dependency>
-
-        <!-- Wicket Extensions (for DataTable toolbars) -->
-        <dependency>
-            <groupId>org.apache.wicket</groupId>
-            <artifactId>wicket-extensions</artifactId>
-            <version>${wicket.version}</version>
-        </dependency>
-
-        <!-- Rotterdam NLDS Extensions (RotterdamLogoImage, icons, etc.) -->
-        <dependency>
-            <groupId>nl.rotterdam.nl-design-system</groupId>
-            <artifactId>rotterdam-nlds-extensions-wicket</artifactId>
-            <version>${rotterdam-nlds.version}</version>
-        </dependency>
-
-        <!-- Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-resttestclient</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-restclient</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.zonky.test</groupId>
-            <artifactId>embedded-database-spring-test</artifactId>
-            <version>2.8.0</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <resources>
@@ -258,12 +118,14 @@
                 </includes>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
 </project>
