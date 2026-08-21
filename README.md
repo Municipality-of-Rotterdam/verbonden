@@ -1,4 +1,4 @@
-# huwelijk-poc-copilot
+# Verbonden
 
 POC voor het digitaliseren van huwelijksaanvragen bij de Gemeente Rotterdam.
 
@@ -40,7 +40,7 @@ Deze repository is een Maven-reactor met drie modules:
 
 `core` en `remote-local` worden op Maven Central gepubliceerd, zodat een
 productie-adapter (echte DigiD-OIDC en persoonsgegevens-API's) in een eigen,
-besloten repository tegen `huwelijk-core` kan bouwen zonder deze code te
+besloten repository tegen `verbonden-core` kan bouwen zonder deze code te
 forken.
 
 ## Vereisten
@@ -68,9 +68,9 @@ een eventuele lokale PostgreSQL-installatie te vermijden).
 |-----------|--------|
 | Host | `localhost` |
 | Poort | `5433` |
-| Database | `huwelijk` |
-| Gebruiker | `huwelijk` |
-| Wachtwoord | `huwelijk` |
+| Database | `verbonden` |
+| Gebruiker | `verbonden` |
+| Wachtwoord | `verbonden` |
 
 Stop de database later met:
 

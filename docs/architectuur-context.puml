@@ -2,12 +2,12 @@
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-title Huwelijksapplicatie - context en bouwblokken
+title Verbonden - context en bouwblokken
 
 actor "Burger" as Citizen
 actor "Beheerder" as Admin
 
-node "Spring Boot applicatie\n(huwelijksapplicatie)" as App {
+node "Spring Boot applicatie\n(Verbonden)" as App {
   component "Wicket UI\n(features.*.ui)" as UI
   component "Service layer\n(features.*.application)" as Service
   component "Domain DTOs &\nvalue types\n(features.*.domain, domain)" as Domain

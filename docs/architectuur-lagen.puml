@@ -2,7 +2,7 @@
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-title Huwelijksapplicatie - lagen en package-structuur
+title Verbonden - lagen en package-structuur
 
 package "UI" {
   [feature.<naam>.ui]
@@ -16,12 +16,12 @@ package "Application" {
 
 package "Domain" {
   [feature.<naam>.domain]
-  [nl.rotterdam.huwelijk.domain]
+  [nl.rotterdam.verbonden.domain]
 }
 
 package "Persistence" {
   [feature.<naam>.repository]
-  [nl.rotterdam.huwelijk.persistence]
+  [nl.rotterdam.verbonden.persistence]
 }
 
 database "PostgreSQL" as Db
@@ -29,10 +29,10 @@ database "PostgreSQL" as Db
 [feature.<naam>.ui] --> [feature.<naam>.application]
 [feature.<naam>.application] --> [feature.<naam>.domain]
 [feature.<naam>.application] --> [feature.<naam>.repository]
-[feature.<naam>.repository] --> [nl.rotterdam.huwelijk.persistence]
-[nl.rotterdam.huwelijk.persistence] --> Db
+[feature.<naam>.repository] --> [nl.rotterdam.verbonden.persistence]
+[nl.rotterdam.verbonden.persistence] --> Db
 
-note right of [nl.rotterdam.huwelijk.persistence]
+note right of [nl.rotterdam.verbonden.persistence]
 Alleen JPA entities in dit package.
 Geen repositories.
 end note

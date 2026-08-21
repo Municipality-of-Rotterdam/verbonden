@@ -4,14 +4,14 @@
 
 ### Packagestructuur
 De code is opgedeeld in de volgende packages:
-- `nl.rotterdam.huwelijk.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
-- `nl.rotterdam.huwelijk.domain` — gedeelde domeininterfaces zoals `ValueHolder<T>`, die door meerdere feature-packages worden hergebruikt.
-- `nl.rotterdam.huwelijk.features.babs_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
-- `nl.rotterdam.huwelijk.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
-- `nl.rotterdam.huwelijk.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
-- `nl.rotterdam.huwelijk.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
-- `nl.rotterdam.huwelijk.config` — Spring Boot configuratieklassen.
-- `nl.rotterdam.huwelijk.identity` — publiek SPI-contract (adapter-poorten zoals `PersonLookupService`, `BurgerLoginPageMount`, `CurrentUserProvider`) waartegen adapter-modules zoals `remote-local` bouwen. Bewuste uitzondering op de feature-packageconventie hieronder: dit is geen feature maar een cross-cutting contract, gebruikt door meerdere features én door `WicketApplication`/`config`.
+- `nl.rotterdam.verbonden.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
+- `nl.rotterdam.verbonden.domain` — gedeelde domeininterfaces zoals `ValueHolder<T>`, die door meerdere feature-packages worden hergebruikt.
+- `nl.rotterdam.verbonden.features.babs_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
+- `nl.rotterdam.verbonden.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
+- `nl.rotterdam.verbonden.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
+- `nl.rotterdam.verbonden.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
+- `nl.rotterdam.verbonden.config` — Spring Boot configuratieklassen.
+- `nl.rotterdam.verbonden.identity` — publiek SPI-contract (adapter-poorten zoals `PersonLookupService`, `BurgerLoginPageMount`, `CurrentUserProvider`) waartegen adapter-modules zoals `remote-local` bouwen. Bewuste uitzondering op de feature-packageconventie hieronder: dit is geen feature maar een cross-cutting contract, gebruikt door meerdere features én door `WicketApplication`/`config`.
 
 Elke feature-package bevat de volgende sub-packages:
 - `feature.<naam>.ui` — Wicket-pagina's en UI-hulpklassen (FormDto, componenten).
@@ -49,7 +49,7 @@ Elke feature-package bevat de volgende sub-packages:
 
 ### Algemeen
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
-- JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`) en staan in `nl.rotterdam.huwelijk.persistence`.
+- JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`) en staan in `nl.rotterdam.verbonden.persistence`.
 - Voeg geen JPA-annotaties toe aan klassen buiten het `persistence`-package.
 - Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsCreatePage` en `BapsUpdatePage`).
 - Genereer nooit methoden of klassen die nergens worden aangeroepen of gebruikt.
@@ -69,4 +69,4 @@ Elke feature-package bevat de volgende sub-packages:
 - **JPA-integratie:** maak een `AttributeConverter` aan in het `persistence`-package die de conversie tussen het value type en het databasetype afhandelt. Gebruik `@Convert(converter = ...)` op het entity-veld.
 - **Wicket-integratie:** maak een `IConverter` aan in het `ui`-package die de conversie tussen `String` en het value type afhandelt. Vang validatie-excepties af en geef nette Wicket `ConversionException`-meldingen. Registreer de converter globaal in `WicketApplication.newConverterLocator()`.
 - Value types worden gebruikt in JPA Entities, DTOs (`CreateXxxDto`, `ChangeXxxDto`, `ListXxxDto`) en `FormDto`-klassen — consistent door alle lagen heen.
-- `ValueHolder<T>` staat in `nl.rotterdam.huwelijk.domain` — een gedeeld package, niet in een feature-package — zodat meerdere features het kunnen hergebruiken.
+- `ValueHolder<T>` staat in `nl.rotterdam.verbonden.domain` — een gedeeld package, niet in een feature-package — zodat meerdere features het kunnen hergebruiken.

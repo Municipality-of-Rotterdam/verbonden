@@ -1,6 +1,6 @@
 # Applicatie-architectuur
 
-Dit document beschrijft de applicatie-architectuur van `huwelijksapplicatie`.
+Dit document beschrijft de applicatie-architectuur van `Verbonden`.
 
 ## Technische basis
 
@@ -16,8 +16,8 @@ De applicatielogica (in `core`) is een monoliet met duidelijke lagen:
 
 1. **UI (Wicket pages/components)** in `feature.<naam>.ui`.
 2. **Applicatielaag (services)** in `feature.<naam>.application`.
-3. **Domeinlaag (DTOs/value types)** in `feature.<naam>.domain` en `nl.rotterdam.huwelijk.domain`.
-4. **Persistentielaag** met JPA entities in `nl.rotterdam.huwelijk.persistence` en repositories in `feature.<naam>.repository`.
+3. **Domeinlaag (DTOs/value types)** in `feature.<naam>.domain` en `nl.rotterdam.verbonden.domain`.
+4. **Persistentielaag** met JPA entities in `nl.rotterdam.verbonden.persistence` en repositories in `feature.<naam>.repository`.
 5. **Database**: PostgreSQL, schema/migraties via Flyway.
 
 Belangrijke architectuurregels voor de software-structuur:
@@ -28,7 +28,7 @@ Belangrijke architectuurregels voor de software-structuur:
 
 ## Architectuurprincipes (Common Ground)
 
-- **Data bij de bron:** burgergegevens worden bij de bron opgehaald (bijvoorbeeld via Haal Centraal voor adres- en oudergegevens), in plaats van langdurig te kopiëren naar de huwelijksapplicatie.
+- **Data bij de bron:** burgergegevens worden bij de bron opgehaald (bijvoorbeeld via Haal Centraal voor adres- en oudergegevens), in plaats van langdurig te kopiëren naar Verbonden.
 - **Administratief compleet maken van voorgenomen huwelijk/partnerschap:** de primaire verantwoordelijkheid van deze applicatie is het compleet maken van de aanvraag.
 - **Zaakgericht vervolgproces:** zodra een dossier administratief compleet is, wordt het doorgezet naar het zaaksysteem, waar het vervolg plaatsvindt in bestaande processen.
 - **Documenten via ZGW document-API's:** identiteitsbewijzen en andere vereiste verklaringen worden via de ZGW document-API's opgeslagen in het zaaksysteem.

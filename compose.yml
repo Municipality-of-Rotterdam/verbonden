@@ -2,9 +2,9 @@ services:
   postgres:
     image: postgres:18
     environment:
-      POSTGRES_DB: huwelijk
-      POSTGRES_USER: huwelijk
-      POSTGRES_PASSWORD: huwelijk
+      POSTGRES_DB: verbonden
+      POSTGRES_USER: verbonden
+      POSTGRES_PASSWORD: verbonden
     ports:
       - "5433:5432"
     volumes:

@@ -1,4 +1,4 @@
-# Bijdragen aan Huwelijk POC
+# Bijdragen aan Verbonden
 
 Allereerst bedankt dat je wilt bijdragen aan dit project! Zonder jouw input
 wordt dit nooit een beter open source project.
@@ -13,7 +13,7 @@ dragen aan dit project ga je akkoord met de voorwaarden hiervan.
 ### Meld een bug
 
 Heb je een bug gevonden? Maak dan een
-[issue](https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot/issues)
+[issue](https://github.com/Municipality-of-Rotterdam/verbonden/issues)
 aan met:
 
 - Een duidelijke en beschrijvende titel
@@ -40,8 +40,8 @@ documentatie zijn zeer welkom.
 ### 1. Fork en clone de repository
 
 ```bash
-git clone https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot.git
-cd huwelijk-poc-copilot
+git clone https://github.com/Municipality-of-Rotterdam/verbonden.git
+cd verbonden
 ```
 
 ### 2. Maak een nieuwe branch
