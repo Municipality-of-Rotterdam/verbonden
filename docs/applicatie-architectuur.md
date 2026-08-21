@@ -4,14 +4,16 @@ Dit document beschrijft de applicatie-architectuur van `huwelijksapplicatie`.
 
 ## Technische basis
 
-- **Build-tool:** Maven (`pom.xml`), met Spring Boot parent.
+- **Build-tool:** Maven-reactor (root `pom.xml`, packaging `pom`), met Spring
+  Boot parent. Drie modules: `core`, `remote-local`, `app-local` — zie
+  [modularize-app.md](modularize-app.md) voor de achtergrond.
 - **Runtime:** Java 25.
 - **Frameworks:** Spring Boot, Spring Data JPA, Spring Security, Apache Wicket, Flyway, PostgreSQL.
 - **UI-stijl:** Rotterdam NL Design System (NLDS) componenten en thema.
 
 ## Opbouw op hoofdlijnen
 
-De applicatie is een monoliet met duidelijke lagen:
+De applicatielogica (in `core`) is een monoliet met duidelijke lagen:
 
 1. **UI (Wicket pages/components)** in `feature.<naam>.ui`.
 2. **Applicatielaag (services)** in `feature.<naam>.application`.
