@@ -5,22 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>nl.rotterdam.huwelijk</groupId>
-        <artifactId>huwelijk-poc-copilot</artifactId>
+        <groupId>nl.rotterdam.verbonden</groupId>
+        <artifactId>verbonden</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>huwelijk-core</artifactId>
+    <artifactId>verbonden-core</artifactId>
     <packaging>jar</packaging>
 
-    <name>huwelijk-core</name>
+    <name>verbonden-core</name>
     <description>
         Gedeelde productiecode en publiek SPI-contract (package `identity`) voor de
-        Huwelijk POC-applicatie van Gemeente Rotterdam. Niet zelfstandig start-baar;
-        vereist een adapter-module zoals huwelijk-remote-local.
+        Verbonden-applicatie van Gemeente Rotterdam. Niet zelfstandig start-baar;
+        vereist een adapter-module zoals verbonden-remote-local.
     </description>
-    <url>https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot</url>
+    <url>https://github.com/Municipality-of-Rotterdam/verbonden</url>
 
     <developers>
         <developer>
@@ -30,9 +30,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot.git</connection>
-        <developerConnection>scm:git:git@github.com:Municipality-of-Rotterdam/huwelijk-poc-copilot.git</developerConnection>
-        <url>https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot</url>
+        <connection>scm:git:https://github.com/Municipality-of-Rotterdam/verbonden.git</connection>
+        <developerConnection>scm:git:git@github.com:Municipality-of-Rotterdam/verbonden.git</developerConnection>
+        <url>https://github.com/Municipality-of-Rotterdam/verbonden</url>
     </scm>
 
     <dependencies>

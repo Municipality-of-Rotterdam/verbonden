@@ -5,22 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>nl.rotterdam.huwelijk</groupId>
-        <artifactId>huwelijk-poc-copilot</artifactId>
+        <groupId>nl.rotterdam.verbonden</groupId>
+        <artifactId>verbonden</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>huwelijk-remote-local</artifactId>
+    <artifactId>verbonden-remote-local</artifactId>
     <packaging>jar</packaging>
 
-    <name>huwelijk-remote-local</name>
+    <name>verbonden-remote-local</name>
     <description>
-        Mock-implementatie van de huwelijk-core identity-SPI (mock-DigiD-inlogpagina en
+        Mock-implementatie van de verbonden-core identity-SPI (mock-DigiD-inlogpagina en
         mock-persoonsgegevens) voor lokale ontwikkeling, en publieke referentie-implementatie
         voor wie een eigen adapter-module bouwt.
     </description>
-    <url>https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot</url>
+    <url>https://github.com/Municipality-of-Rotterdam/verbonden</url>
 
     <developers>
         <developer>
@@ -30,15 +30,15 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot.git</connection>
-        <developerConnection>scm:git:git@github.com:Municipality-of-Rotterdam/huwelijk-poc-copilot.git</developerConnection>
-        <url>https://github.com/Municipality-of-Rotterdam/huwelijk-poc-copilot</url>
+        <connection>scm:git:https://github.com/Municipality-of-Rotterdam/verbonden.git</connection>
+        <developerConnection>scm:git:git@github.com:Municipality-of-Rotterdam/verbonden.git</developerConnection>
+        <url>https://github.com/Municipality-of-Rotterdam/verbonden</url>
     </scm>
 
     <dependencies>
         <dependency>
-            <groupId>nl.rotterdam.huwelijk</groupId>
-            <artifactId>huwelijk-core</artifactId>
+            <groupId>nl.rotterdam.verbonden</groupId>
+            <artifactId>verbonden-core</artifactId>
         </dependency>
     </dependencies>
 

@@ -11,13 +11,13 @@
         <relativePath/>
     </parent>
 
-    <groupId>nl.rotterdam.huwelijk</groupId>
-    <artifactId>huwelijk-poc-copilot</artifactId>
+    <groupId>nl.rotterdam.verbonden</groupId>
+    <artifactId>verbonden</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>huwelijk-poc-copilot</name>
-    <description>Huwelijk POC - Municipality of Rotterdam</description>
+    <name>verbonden</name>
+    <description>Verbonden - Municipality of Rotterdam</description>
 
     <licenses>
         <license>
@@ -90,13 +90,13 @@
 
             <!-- Reactor modules -->
             <dependency>
-                <groupId>nl.rotterdam.huwelijk</groupId>
-                <artifactId>huwelijk-core</artifactId>
+                <groupId>nl.rotterdam.verbonden</groupId>
+                <artifactId>verbonden-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>nl.rotterdam.huwelijk</groupId>
-                <artifactId>huwelijk-remote-local</artifactId>
+                <groupId>nl.rotterdam.verbonden</groupId>
+                <artifactId>verbonden-remote-local</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

@@ -1,6 +1,6 @@
 # Beoogde koppelingen
 
-Dit document beschrijft de beoogde koppelingen met externe voorzieningen voor de applicatie huwelijk.
+Dit document beschrijft de beoogde koppelingen met externe voorzieningen voor de applicatie Verbonden.
 
 ## Haal Centraal
 

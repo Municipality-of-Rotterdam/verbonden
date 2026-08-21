@@ -5,29 +5,29 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>nl.rotterdam.huwelijk</groupId>
-        <artifactId>huwelijk-poc-copilot</artifactId>
+        <groupId>nl.rotterdam.verbonden</groupId>
+        <artifactId>verbonden</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>huwelijk-app-local</artifactId>
+    <artifactId>verbonden-app-local</artifactId>
     <packaging>jar</packaging>
 
-    <name>huwelijk-app-local</name>
+    <name>verbonden-app-local</name>
     <description>
-        Uitvoerbaar Spring Boot-artefact van de Huwelijk POC-applicatie, draait altijd op
-        huwelijk-remote-local (mock-adapters). Niet gepubliceerd op Maven Central.
+        Uitvoerbaar Spring Boot-artefact van de Verbonden-applicatie, draait altijd op
+        verbonden-remote-local (mock-adapters). Niet gepubliceerd op Maven Central.
     </description>
 
     <dependencies>
         <dependency>
-            <groupId>nl.rotterdam.huwelijk</groupId>
-            <artifactId>huwelijk-core</artifactId>
+            <groupId>nl.rotterdam.verbonden</groupId>
+            <artifactId>verbonden-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>nl.rotterdam.huwelijk</groupId>
-            <artifactId>huwelijk-remote-local</artifactId>
+            <groupId>nl.rotterdam.verbonden</groupId>
+            <artifactId>verbonden-remote-local</artifactId>
         </dependency>
 
         <!-- Test -->
