@@ -40,6 +40,8 @@
         <rotterdam-nlds.version>0.1.1</rotterdam-nlds.version>
         <wicket-webjars.version>4.0.14</wicket-webjars.version>
         <bootstrap.version>5.3.8</bootstrap.version>
+        <!-- Pinned to match the PostgreSQL major version used by compose.yml -->
+        <embedded-postgres-binaries.version>18.4.0</embedded-postgres-binaries.version>
     </properties>
 
     <dependencyManagement>
@@ -86,6 +88,91 @@
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-spring</artifactId>
                 <version>${wicket.version}</version>
+            </dependency>
+
+            <!-- Rotterdam NL Design System Wicket components -->
+            <dependency>
+                <groupId>nl.rotterdam.nl-design-system</groupId>
+                <artifactId>rotterdam-nlds-wicket</artifactId>
+                <version>${rotterdam-nlds.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>nl.rotterdam.nl-design-system</groupId>
+                <artifactId>rotterdam-nlds-css-wicket</artifactId>
+                <version>${rotterdam-nlds.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>nl.rotterdam.nl-design-system</groupId>
+                <artifactId>rotterdam-nlds-extensions-wicket</artifactId>
+                <version>${rotterdam-nlds.version}</version>
+            </dependency>
+
+            <!-- Wicket Webjars integration -->
+            <dependency>
+                <groupId>de.agilecoders.wicket.webjars</groupId>
+                <artifactId>wicket-webjars</artifactId>
+                <version>${wicket-webjars.version}</version>
+            </dependency>
+            <!-- Bootstrap utilities CSS (via WebJars) -->
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>bootstrap</artifactId>
+                <version>${bootstrap.version}</version>
+            </dependency>
+
+            <!-- Phone number validation -->
+            <dependency>
+                <groupId>com.googlecode.libphonenumber</groupId>
+                <artifactId>libphonenumber</artifactId>
+                <version>9.0.37</version>
+            </dependency>
+
+            <!-- Email address validation -->
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>1.11.0</version>
+            </dependency>
+
+            <!-- ZXing QR code generation -->
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>core</artifactId>
+                <version>3.5.4</version>
+            </dependency>
+
+            <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>1.23.1</version>
+            </dependency>
+
+            <!-- Apache POI for xlsx import -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>5.5.1</version>
+            </dependency>
+
+            <!-- Zonky embedded-database-spring-test: real Postgres binaries as a subprocess, no Docker required -->
+            <dependency>
+                <groupId>io.zonky.test</groupId>
+                <artifactId>embedded-database-spring-test</artifactId>
+                <version>2.8.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.zonky.test</groupId>
+                <artifactId>embedded-postgres</artifactId>
+                <version>2.2.2</version>
+            </dependency>
+            <!-- Selects which native postgres binaries the Zonky embedded-postgres provider downloads/uses -->
+            <dependency>
+                <groupId>io.zonky.test.postgres</groupId>
+                <artifactId>embedded-postgres-binaries-bom</artifactId>
+                <version>${embedded-postgres-binaries.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Reactor modules -->
