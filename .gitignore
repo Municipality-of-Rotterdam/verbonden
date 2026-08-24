@@ -39,3 +39,6 @@ build/
 Thumbs.db
 src/main/resources/static/
 application.properties
+
+### Local MCP config (machine-specific, e.g. JetBrains IDE plugin port) ###
+.mcp.json
