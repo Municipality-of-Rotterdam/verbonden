@@ -20,6 +20,12 @@
         verbonden-remote-local (mock-adapters). Niet gepubliceerd op Maven Central.
     </description>
 
+    <properties>
+        <!-- Never publish this module: it has no distributionManagement, and unlike
+             core/remote-local it never declares central-publishing-maven-plugin. -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>nl.rotterdam.verbonden</groupId>

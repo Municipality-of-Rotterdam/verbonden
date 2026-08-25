@@ -24,6 +24,8 @@
 
     <developers>
         <developer>
+            <name>Gemeente Rotterdam - Mijnloket ontwikkelteam</name>
+            <email>mijnloket_ontwikkelteam@Rotterdam.onmicrosoft.com</email>
             <organization>Gemeente Rotterdam</organization>
             <organizationUrl>https://www.rotterdam.nl</organizationUrl>
         </developer>
@@ -41,5 +43,33 @@
             <artifactId>verbonden-core</artifactId>
         </dependency>
     </dependencies>
+
+    <!-- Only active with -Prelease (see release.yml / root pom.xml) so ordinary
+         `mvnw verify` builds are unaffected. -->
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

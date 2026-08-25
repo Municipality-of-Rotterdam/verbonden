@@ -27,6 +27,23 @@
         </license>
     </licenses>
 
+    <url>https://github.com/Municipality-of-Rotterdam/verbonden</url>
+
+    <developers>
+        <developer>
+            <name>Gemeente Rotterdam - Mijnloket ontwikkelteam</name>
+            <email>mijnloket_ontwikkelteam@Rotterdam.onmicrosoft.com</email>
+            <organization>Gemeente Rotterdam</organization>
+            <organizationUrl>https://www.rotterdam.nl</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/Municipality-of-Rotterdam/verbonden.git</connection>
+        <developerConnection>scm:git:git@github.com:Municipality-of-Rotterdam/verbonden.git</developerConnection>
+        <url>https://github.com/Municipality-of-Rotterdam/verbonden</url>
+    </scm>
+
     <modules>
         <module>core</module>
         <module>remote-local</module>
@@ -211,8 +228,101 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                 </plugin>
+
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.11.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>central</publishingServerId>
+                        <autoPublish>true</autoPublish>
+                        <waitUntil>published</waitUntil>
+                        <deploymentName>verbonden ${project.version}</deploymentName>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>3.2.8</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.4.0</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.12.0</version>
+                    <configuration>
+                        <!-- Release POM metadata requires attached javadoc jars; this codebase's
+                             Javadoc comments aren't doclint-clean, so don't fail the release build on that. -->
+                        <doclint>none</doclint>
+                        <failOnError>false</failOnError>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
+    <!-- The "release" profile activates signing + Central publishing, and is only
+         enabled via -Prelease during the release workflow (see .github/workflows/release.yml)
+         — never during a normal `mvnw verify`, which has no GPG key/Sonatype credentials
+         available and must keep working unchanged for ordinary CI builds.
+         `inherited=false` on both plugins below is load-bearing: without it, Maven
+         inherits this profile's <build><plugins> into every module (including
+         app-local), which would sign and publish app-local too. core/remote-local
+         declare their own separate, full "release" profile (with source/javadoc jars
+         as well) directly in their own pom.xml; app-local declares no such profile at
+         all, so with `inherited=false` here it is never signed or published, regardless
+         of -Prelease. -->
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <inherited>false</inherited>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <inherited>false</inherited>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
