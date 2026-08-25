@@ -4,12 +4,13 @@ services:
     image: postgres:18
     environment:
       POSTGRES_DB: verbonden
-      POSTGRES_USER: verbonden
-      POSTGRES_PASSWORD: verbonden
+      POSTGRES_USER: verbonden_owner
+      POSTGRES_PASSWORD: verbonden_owner
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+      - ./docker/postgres:/docker-entrypoint-initdb.d
 
 volumes:
   postgres_data:
