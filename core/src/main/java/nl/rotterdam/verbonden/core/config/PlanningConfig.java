@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 /**
  * Configuratie voor de planningsperiode van huwelijken.
  * <ul>
- *   <li>{@code huwelijk.planning.vanaf-dagen} — minimaal aantal dagen vooruit dat een huwelijk gepland kan worden (standaard 28).</li>
- *   <li>{@code huwelijk.planning.tot-dagen} — maximaal aantal dagen vooruit dat een huwelijk gepland kan worden (standaard 365).</li>
+ *   <li>{@code verbonden.planning.vanaf-dagen} — minimaal aantal dagen vooruit dat een huwelijk gepland kan worden (standaard 28).</li>
+ *   <li>{@code verbonden.planning.tot-dagen} — maximaal aantal dagen vooruit dat een huwelijk gepland kan worden (standaard 365).</li>
  * </ul>
  */
 @Component
-@ConfigurationProperties(prefix = "huwelijk.planning")
+@ConfigurationProperties(prefix = "verbonden.planning")
 public class PlanningConfig {
 
     private int vanafDagen = 28;
