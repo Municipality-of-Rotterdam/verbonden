@@ -35,10 +35,12 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Set release version
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
           ./mvnw --no-transfer-progress -B \
             org.codehaus.mojo:versions-maven-plugin:2.21.0:set \
-            -DnewVersion=${{ inputs.version }} \
+            -DnewVersion="${VERSION}" \
             -DprocessAllModules \
             -DgenerateBackupPoms=false
 
@@ -53,11 +55,28 @@ jobs:
         run: ./mvnw --no-transfer-progress -B -Prelease -DskipTests deploy
 
       - name: Commit and tag release
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add pom.xml core/pom.xml remote-local/pom.xml app-local/pom.xml
-          git commit -m "Release verbonden ${{ inputs.version }}"
-          git tag "v${{ inputs.version }}"
-          git push origin main
-          git push origin "v${{ inputs.version }}"
+          git commit -m "Release verbonden ${VERSION}"
+
+          # The Maven Central publish above is irreversible, so don't give up on a
+          # non-fast-forward push if main moved during the build/deploy: retry with
+          # a rebase instead of failing outright and leaving main/tag out of sync
+          # with the already-published artifact.
+          for attempt in 1 2 3; do
+            git tag -f "v${VERSION}"
+            if git push origin main && git push origin "v${VERSION}"; then
+              exit 0
+            fi
+            echo "Push failed (attempt ${attempt}/3); fetching and rebasing onto origin/main..."
+            git tag -d "v${VERSION}"
+            git fetch origin main
+            git rebase origin/main
+          done
+
+          echo "::error::Failed to push the release commit/tag for v${VERSION} after 3 attempts. The Maven Central artifact is already published — see RELEASING.md Troubleshooting to push the commit and tag 'v${VERSION}' to main manually."
+          exit 1

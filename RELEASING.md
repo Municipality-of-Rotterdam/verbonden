@@ -156,6 +156,15 @@ workflow dan opnieuw met bijvoorbeeld `1.0.1-SNAPSHOT`.
   `core/pom.xml` en `remote-local/pom.xml`.
 - **Signeerfout**: controleer of de secrets `GPG_PRIVATE_KEY` en
   `GPG_PASSPHRASE` nog kloppen en of de sleutel niet verlopen is.
+- **Push van de release-commit/tag mislukt na publicatie**: de workflow
+  probeert de push 3x met een fetch + rebase ertussen (bijv. bij een
+  gelijktijdige merge naar `main`). Faalt dat alsnog, dan is het artefact
+  al gepubliceerd op Central maar staan de versiebump-commit en de tag
+  `v<versie>` alleen nog lokaal op de runner. Herstel handmatig: haal de
+  workflow-logs erbij voor de exacte commit-inhoud (of herhaal lokaal de
+  versiebump met `versions-maven-plugin:set -DnewVersion=<versie>
+  -DprocessAllModules`), commit, tag met `v<versie>`, en push beide naar
+  `main`.
 
 ## Credentials roteren
 
