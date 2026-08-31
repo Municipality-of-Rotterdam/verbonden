@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <relativePath/>
     </parent>
 
@@ -52,7 +52,7 @@
 
     <properties>
         <java.version>25</java.version>
-        <wicket.version>10.10.0</wicket.version>
+        <wicket.version>10.11.0</wicket.version>
         <wicket-stuff.version>10.10.0</wicket-stuff.version>
         <rotterdam-nlds.version>0.1.1</rotterdam-nlds.version>
         <wicket-webjars.version>4.0.14</wicket-webjars.version>
