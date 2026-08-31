@@ -18,10 +18,9 @@ Sonatype-namespace, via het [Central Portal](https://central.sonatype.com/).
 lokale Spring Boot-artefact, geen library waar andere projecten van
 afhankelijk zijn.
 
-Deze credentials staan los van die van
-[nl-design-system/rotterdam](https://github.com/nl-design-system/rotterdam),
-omdat beide repositories een ander verantwoordelijk team hebben, ook al mogen
-beide teams de gedeelde `nl.rotterdam`-namespace in Sonatype beheren.
+Deze repository heeft zijn eigen credentials en deelt die niet met andere
+Rotterdam-repositories, ook al mogen die repositories dezelfde gedeelde
+`nl.rotterdam`-namespace in Sonatype beheren.
 
 ## Status
 
