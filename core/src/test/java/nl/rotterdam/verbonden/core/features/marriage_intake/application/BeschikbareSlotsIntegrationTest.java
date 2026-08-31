@@ -447,15 +447,16 @@ class BeschikbareSlotsIntegrationTest {
         }
     }
 
-    private static LocalDate volgendeWeekdag(DayOfWeek dag) {
-        return LocalDate.now().with(TemporalAdjusters.next(dag));
+    private LocalDate volgendeWeekdag(DayOfWeek dag) {
+        LocalDate vroegste = LocalDate.now().plusDays(planningConfig.getVanafDagen());
+        return vroegste.with(TemporalAdjusters.nextOrSame(dag));
     }
 
     private long aantalToekomstigeWeekdagen(YearMonth maand) {
-        LocalDate vandaag = LocalDate.now();
+        LocalDate vroegste = LocalDate.now().plusDays(planningConfig.getVanafDagen());
         return maand.atDay(1).datesUntil(maand.atEndOfMonth().plusDays(1))
                 .filter(d -> d.getDayOfWeek() == DayOfWeek.MONDAY)
-                .filter(d -> d.isAfter(vandaag))
+                .filter(d -> !d.isBefore(vroegste))
                 .count();
     }
 }
