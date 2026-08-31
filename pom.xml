@@ -298,13 +298,10 @@
          enabled via -Prelease during the release workflow (see .github/workflows/release.yml)
          — never during a normal `mvnw verify`, which has no GPG key/Sonatype credentials
          available and must keep working unchanged for ordinary CI builds.
-         `inherited=false` on both plugins below is load-bearing: without it, Maven
-         inherits this profile's <build><plugins> into every module (including
-         app-local), which would sign and publish app-local too. core/remote-local
-         declare their own separate, full "release" profile (with source/javadoc jars
-         as well) directly in their own pom.xml; app-local declares no such profile at
-         all, so with `inherited=false` here it is never signed or published, regardless
-         of -Prelease. -->
+         It's declared once here and inherited by every module, including app-local.
+         app-local is kept out of publishing simply via its own <maven.deploy.skip>true</maven.deploy.skip>
+         (see app-local/pom.xml), which skips the deploy step there; it still gets
+         signed/built with source+javadoc jars like the other modules during -Prelease. -->
     <profiles>
         <profile>
             <id>release</id>
@@ -313,12 +310,18 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <inherited>false</inherited>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <inherited>false</inherited>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>

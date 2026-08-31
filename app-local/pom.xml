@@ -21,8 +21,10 @@
     </description>
 
     <properties>
-        <!-- Never publish this module: it has no distributionManagement, and unlike
-             core/remote-local it never declares central-publishing-maven-plugin. -->
+        <!-- Never publish this module: it has no distributionManagement. All modules
+             (including this one) inherit the "release" profile from the parent pom,
+             so during -Prelease it still gets signed/built with source+javadoc jars
+             like core/remote-local, but this skip keeps it from being deployed. -->
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
