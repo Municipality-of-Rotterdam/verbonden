@@ -7,8 +7,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.annotation.*;
 
+import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureEmbeddedDatabase
+@AutoConfigureEmbeddedDatabase(provider = ZONKY)
 @AutoConfigureTestRestTemplate
 
 @Target(ElementType.TYPE)
