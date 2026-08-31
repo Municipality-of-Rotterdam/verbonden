@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.remote_local;
 
-import nl.rotterdam.verbonden.identity.PersonInfo;
-import nl.rotterdam.verbonden.identity.PersonLookupService;
+import nl.rotterdam.verbonden.core.identity.PersonInfo;
+import nl.rotterdam.verbonden.core.identity.PersonLookupService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

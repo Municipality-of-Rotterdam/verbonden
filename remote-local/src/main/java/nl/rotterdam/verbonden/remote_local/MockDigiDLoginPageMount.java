@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.remote_local;
 
-import nl.rotterdam.verbonden.features.mock_digid.ui.MockDigiDLoginPage;
-import nl.rotterdam.verbonden.identity.BurgerLoginPageMount;
+import nl.rotterdam.verbonden.remote_local.features.mock_digid.ui.MockDigiDLoginPage;
+import nl.rotterdam.verbonden.core.identity.BurgerLoginPageMount;
 import org.apache.wicket.markup.html.WebPage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
