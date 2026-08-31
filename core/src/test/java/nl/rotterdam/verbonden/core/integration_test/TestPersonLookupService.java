@@ -1,4 +1,4 @@
-package nl.rotterdam.verbonden.remote_local;
+package nl.rotterdam.verbonden.core.integration_test;
 
 import nl.rotterdam.verbonden.core.identity.PersonInfo;
 import nl.rotterdam.verbonden.core.identity.PersonLookupService;
@@ -9,13 +9,15 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Mock-implementatie van {@link PersonLookupService} voor lokale ontwikkeling
- * en testen. Vervangt de daadwerkelijke Haal Centraal-koppeling (of een
- * Rotterdam-eigen alternatief) die alleen in een productie-adapter-module
- * beschikbaar is.
+ * Test-only stand-in for {@link PersonLookupService}, needed because core's integration
+ * tests boot a full Spring context (via {@link VerbondenIntegrationTest}) and
+ * {@code MarriageIntakeServiceImpl} has a required dependency on this SPI. Core cannot
+ * depend on remote-local's mock (that would be a circular module dependency), so this
+ * duplicates the same mock BSN dataset as remote-local's {@code MockPersonLookupService}
+ * — several of the moved tests hardcode those exact BSNs.
  */
 @Component
-class MockPersonLookupService implements PersonLookupService {
+class TestPersonLookupService implements PersonLookupService {
 
     private static final Map<String, PersonInfo> MOCK_PERSONEN = Map.of(
             "999990007", new PersonInfo("Van Muiswinkel", "Erik Jan",
