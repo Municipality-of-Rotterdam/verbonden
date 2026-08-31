@@ -20,14 +20,16 @@
         Verbonden-applicatie van Gemeente Rotterdam. Niet zelfstandig start-baar;
         vereist een adapter-module zoals verbonden-remote-local.
     </description>
+    <!-- Deliberately duplicated (not inherited) from the parent pom: Maven's default
+         inheritance appends this module's artifactId to an inherited url/scm.* (e.g.
+         ".../verbonden/verbonden-core"), which is wrong here since every module lives
+         at the same repo URL. The documented opt-out (child.*.inherit.append.path
+         properties, either on parent or child) does not take effect on this project's
+         Maven version (verified empirically, incl. in an isolated throwaway reactor),
+         so an explicit, identical copy is the only reliable way to publish a correct
+         url/scm to Maven Central. Keep this in sync with pom.xml/remote-local/pom.xml
+         if the repo URL ever changes. -->
     <url>https://github.com/Municipality-of-Rotterdam/verbonden</url>
-
-    <developers>
-        <developer>
-            <organization>Gemeente Rotterdam</organization>
-            <organizationUrl>https://www.rotterdam.nl</organizationUrl>
-        </developer>
-    </developers>
 
     <scm>
         <connection>scm:git:https://github.com/Municipality-of-Rotterdam/verbonden.git</connection>
