@@ -33,12 +33,12 @@ Rotterdam-repositories, ook al mogen die repositories dezelfde gedeelde
   activeert. Dit profiel is alleen actief met `-Prelease`, zodat de gewone
   `mvnw verify` (o.a. gebruikt in `.github/workflows/ci.yml`) ongewijzigd
   blijft werken — er zijn daar geen GPG/Sonatype-secrets beschikbaar.
-- `app-local` expliciet uitgesloten: `maven.deploy.skip=true` gezet en geen
-  van de release-plugins gedeclareerd. Met `<inherited>false</inherited>` op
-  de root-declaraties voorkomen we dat het `release`-profiel van de
-  parent-POM alsnog naar `app-local` doorerft. Gecontroleerd via
-  `mvn help:effective-pom -Prelease -pl app-local` dat geen van de
-  publicatie-plugins daar actief wordt.
+- `app-local` expliciet uitgesloten van publicatie via `maven.deploy.skip=true`.
+  Het `release`-profiel zelf staat eenmalig in de parent-POM en erft door naar
+  alle modules (ook `app-local`) — tijdens `-Prelease` wordt `app-local` dus
+  wel gesigneerd en van sources-/javadoc-jars voorzien, maar de deploy-stap
+  slaat 'm over. Gecontroleerd via `mvn help:effective-pom -Prelease -pl
+  app-local` dat `maven.deploy.skip` daar staat.
 - `.github/workflows/release.yml` toegevoegd: handmatige
   `workflow_dispatch`-workflow met een versie-input, die de versie zet,
   bouwt/test, deployt naar Central (`-Prelease`) en de versiebump + tag
@@ -57,9 +57,12 @@ Rotterdam-repositories, ook al mogen die repositories dezelfde gedeelde
    (niet het NLDS-token hergebruiken).
 4. Bevestigen/aanvragen dat de gebruikte Sonatype-account lid is van de
    `nl.rotterdam`-namespace.
-5. De 4 secrets toevoegen op **repository-niveau** (niet org-niveau) aan
-   `Municipality-of-Rotterdam/verbonden`: `GPG_PRIVATE_KEY`,
-   `GPG_PASSPHRASE`, `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD`.
+5. De 4 secrets toevoegen aan het GitHub **environment** `release` op
+   `Municipality-of-Rotterdam/verbonden` (niet repo- of org-brede secrets):
+   `GPG_PRIVATE_KEY`, `GPG_PASSPHRASE`, `MAVEN_CENTRAL_USERNAME`,
+   `MAVEN_CENTRAL_PASSWORD`. De workflow (`release.yml`) declareert
+   `environment: release` op de job, zodat alleen die job er toegang toe
+   heeft.
 6. De POM-wijzigingen en de nieuwe workflow/documentatie committen en pushen
    (staan nu alleen lokaal op de branch `release-to-maven-central`) en een PR
    openen.
@@ -77,15 +80,35 @@ Rotterdam-repositories, ook al mogen die repositories dezelfde gedeelde
    ```
    gpg --full-generate-key
    ```
+   Gekozen antwoorden op de prompts:
+   - **Kind of key**: `(10) ECC (sign only)` — er is alleen een signing-key
+     nodig voor Maven Central, geen encryptie.
+   - **Elliptic curve**: `(1) Curve 25519` (Ed25519) — de default, breed
+     ondersteund door GnuPG en Sonatype's Central Portal.
+   - **Validity**: `2y` — niet "does not expire" (slechte practice voor een
+     sleutel die in CI-secrets leeft), maar ook niet zo kort dat rotatie
+     hinderlijk wordt. Zet een reminder om de sleutel op tijd te vernieuwen;
+     zie [Credentials roteren](#credentials-roteren).
+   - **Real name**: `Gemeente Rotterdam - Mijnloket ontwikkelteam` (niet de
+     naam van de persoon die de sleutel genereert) — consistent met de
+     `<developers>`-entry in de parent-POM, en zodat de sleutel niet aan één
+     teamlid gebonden is.
+   - **Email**: `mijnloket_ontwikkelteam@Rotterdam.onmicrosoft.com` —
+     hetzelfde teamadres als in de `<developers>`-entry.
+   - **Passphrase**: gegenereerd/gekozen wachtwoord, bewaard in de
+     teamwachtwoordmanager (zie stap 3).
 2. Publiceer de publieke sleutel naar een keyserver die Central controleert:
    ```
    gpg --keyserver keyserver.ubuntu.com --send-keys <KEY_ID>
    ```
-3. Exporteer de private key ge-armored voor de GitHub-secret, en verwijder
-   het lokale bestand zodra het is geüpload:
+3. Exporteer de private key ge-armored voor de GitHub-secret:
    ```
    gpg --export-secret-keys --armor <KEY_ID> > verbonden-release-key.asc
    ```
+   Bewaar de inhoud van dit bestand (en de passphrase) in de
+   teamwachtwoordmanager — GitHub-secrets zijn write-only en niet meer uit te
+   lezen, dus zonder eigen backup ben je de sleutel kwijt bij verlies van het
+   secret of bij rotatie over 2 jaar. Verwijder het lokale bestand daarna.
 4. Genereer een Central Portal user token op
    [central.sonatype.com](https://central.sonatype.com/) via
    Account → Generate User Token.
