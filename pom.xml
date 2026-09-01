@@ -299,9 +299,13 @@
          — never during a normal `mvnw verify`, which has no GPG key/Sonatype credentials
          available and must keep working unchanged for ordinary CI builds.
          It's declared once here and inherited by every module, including app-local.
-         app-local is kept out of publishing simply via its own <maven.deploy.skip>true</maven.deploy.skip>
-         (see app-local/pom.xml), which skips the deploy step there; it still gets
-         signed/built with source+javadoc jars like the other modules during -Prelease. -->
+         Publishing actually happens via central-publishing-maven-plugin (bound as a
+         build extension, so it replaces maven-deploy-plugin's "deploy" phase binding
+         entirely); that plugin does not read maven.deploy.skip, only its own
+         skipPublishing property. app-local is kept out of publishing via both
+         <maven.deploy.skip>true</maven.deploy.skip> and <skipPublishing>true</skipPublishing>
+         (see app-local/pom.xml); it still gets signed/built with source+javadoc jars
+         like the other modules during -Prelease. -->
     <profiles>
         <profile>
             <id>release</id>

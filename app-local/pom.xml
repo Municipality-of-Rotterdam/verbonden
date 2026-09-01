@@ -24,8 +24,15 @@
         <!-- Never publish this module: it has no distributionManagement. All modules
              (including this one) inherit the "release" profile from the parent pom,
              so during -Prelease it still gets signed/built with source+javadoc jars
-             like core/remote-local, but this skip keeps it from being deployed. -->
+             like core/remote-local, but these skips keep it from being deployed.
+             maven.deploy.skip only affects the classic maven-deploy-plugin; the
+             release profile actually publishes via central-publishing-maven-plugin
+             (bound as a build extension, replacing maven-deploy-plugin's "deploy"
+             phase binding), which has its own skip switch, skipPublishing, and does
+             not read maven.deploy.skip. Both are set here so this module stays
+             unpublished regardless of which mechanism performs the deploy. -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <skipPublishing>true</skipPublishing>
     </properties>
 
     <dependencies>
