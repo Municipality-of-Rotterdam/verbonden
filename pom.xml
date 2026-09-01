@@ -58,7 +58,7 @@
         <wicket-webjars.version>4.0.14</wicket-webjars.version>
         <bootstrap.version>5.3.8</bootstrap.version>
         <!-- Pinned to match the PostgreSQL major version used by compose.yml -->
-        <embedded-postgres-binaries.version>18.4.0</embedded-postgres-binaries.version>
+        <embedded-postgres-binaries.version>18.6.0</embedded-postgres-binaries.version>
     </properties>
 
     <dependencyManagement>
