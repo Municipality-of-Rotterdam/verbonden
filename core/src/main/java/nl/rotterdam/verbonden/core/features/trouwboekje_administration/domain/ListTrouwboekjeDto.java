@@ -1,12 +1,11 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.domain;
+package nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record ListExtraDto(
+public record ListTrouwboekjeDto(
         long id,
-        ExtraType type,
         String naam,
         BigDecimal prijs,
         LocalDate startdatum,

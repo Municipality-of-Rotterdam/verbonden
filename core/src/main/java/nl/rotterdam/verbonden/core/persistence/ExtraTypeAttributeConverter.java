@@ -2,7 +2,7 @@ package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
+import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 
 @Converter(autoApply = false)
 public class ExtraTypeAttributeConverter implements AttributeConverter<ExtraType, String> {

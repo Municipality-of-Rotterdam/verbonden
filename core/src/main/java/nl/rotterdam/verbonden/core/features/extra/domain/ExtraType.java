@@ -1,4 +1,4 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.domain;
+package nl.rotterdam.verbonden.core.features.extra.domain;
 
 public enum ExtraType {
     TROUWBOEKJE("Trouwboekje", "trouwboekje"),

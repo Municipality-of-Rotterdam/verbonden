@@ -1,11 +1,10 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.domain;
+package nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record ChangeExtraDto(
+public record ChangeTrouwboekjeDto(
         long id,
-        ExtraType type,
         String naam,
         String omschrijving,
         String afbeelding,

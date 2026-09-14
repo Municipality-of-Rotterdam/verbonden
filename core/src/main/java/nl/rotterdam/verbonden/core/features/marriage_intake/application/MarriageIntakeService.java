@@ -8,7 +8,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenv
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ExtraDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
+import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;

@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
-import nl.rotterdam.verbonden.core.features.extra_administration.repository.ExtraRepository;
+import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
+import nl.rotterdam.verbonden.core.features.extra.repository.ExtraRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ExtraDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
