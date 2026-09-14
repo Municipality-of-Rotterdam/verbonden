@@ -3,7 +3,23 @@ SET is_active = FALSE
 WHERE type = 'internationaleAkte';
 
 INSERT INTO extras (type, naam, omschrijving, afbeelding, prijs, startdatum, einddatum, is_active)
-VALUES ('internationaleAkte', 'Internationale huwelijksakte', NULL, NULL, NULL, NULL, NULL, TRUE);
+SELECT 'internationaleAkte', 'Internationale huwelijksakte', NULL, NULL, NULL, NULL, NULL, TRUE
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM extras
+    WHERE type = 'internationaleAkte'
+      AND naam = 'Internationale huwelijksakte'
+);
+
+UPDATE extras
+SET is_active = TRUE,
+    omschrijving = NULL,
+    afbeelding = NULL,
+    prijs = NULL,
+    startdatum = NULL,
+    einddatum = NULL
+WHERE type = 'internationaleAkte'
+  AND naam = 'Internationale huwelijksakte';
 
 UPDATE huwelijksdossiers
 SET internationale_akte_id = (

@@ -13,6 +13,8 @@ import java.util.List;
 @Repository
 public interface ExtraRepository extends JpaRepository<ExtraEntity, Long> {
 
+    long countByType(ExtraType type);
+
     @Query("""
             SELECT e FROM ExtraEntity e
             WHERE e.type = :type

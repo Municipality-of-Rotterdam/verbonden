@@ -82,9 +82,7 @@ class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
     @Override
     @Transactional(readOnly = true)
     public long count() {
-        return extraRepository.findAll().stream()
-                .filter(this::isTrouwboekje)
-                .count();
+        return extraRepository.countByType(ExtraType.TROUWBOEKJE);
     }
 
     private ChangeExtraDto toChangeDto(ExtraEntity e) {
