@@ -26,6 +26,7 @@ SET internationale_akte_id = (
     SELECT id
     FROM extras
     WHERE type = 'internationaleAkte'
+      AND naam = 'Internationale huwelijksakte'
       AND is_active = TRUE
     ORDER BY id DESC
     LIMIT 1

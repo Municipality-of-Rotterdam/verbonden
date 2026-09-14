@@ -24,6 +24,8 @@ class ExtraAdministrationServiceIntegrationTest {
 
     @Test
     void findAll_toontAlleenTrouwboekjes() {
+        long aantalTrouwboekjesVooraf = extraAdministrationService.count();
+
         extraAdministrationService.create(new CreateExtraDto(
                 ExtraType.TROUWBOEKJE,
                 "Linnen trouwboekje",
@@ -36,8 +38,9 @@ class ExtraAdministrationServiceIntegrationTest {
 
         assertThat(extraAdministrationService.findAll())
                 .extracting(dto -> dto.naam())
-                .containsExactly("Linnen trouwboekje");
-        assertThat(extraAdministrationService.count()).isEqualTo(1);
+                .contains("Linnen trouwboekje")
+                .doesNotContain("Internationale huwelijksakte");
+        assertThat(extraAdministrationService.count()).isEqualTo(aantalTrouwboekjesVooraf + 1);
     }
 
     @Test
