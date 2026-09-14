@@ -6,7 +6,6 @@ import java.time.LocalDate;
 
 public record ListExtraDto(
         long id,
-        ExtraType type,
         String naam,
         BigDecimal prijs,
         LocalDate startdatum,

@@ -63,7 +63,7 @@ public abstract class AdministrationBasePage extends WebPage {
                 new RdSideNavRecord(null, "Trouwlocaties", LocationAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Huwelijkstypen", MarriageTypeAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Dossiers", DossierAdministrationPage.class, null, null, null),
-                new RdSideNavRecord(null, "Extra's", ExtraAdministrationPage.class, null, null, null)
+                new RdSideNavRecord(null, "Trouwboekjes", ExtraAdministrationPage.class, null, null, null)
         )));
 
         pageBody = new RdPageBodyBorder("pageBody");

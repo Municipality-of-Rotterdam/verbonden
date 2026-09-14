@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.features.extra_administration.application;
 
 import nl.rotterdam.verbonden.core.features.extra_administration.domain.ChangeExtraDto;
 import nl.rotterdam.verbonden.core.features.extra_administration.domain.CreateExtraDto;
+import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
 import nl.rotterdam.verbonden.core.features.extra_administration.domain.ListExtraDto;
 import nl.rotterdam.verbonden.core.features.extra_administration.repository.ExtraRepository;
 import nl.rotterdam.verbonden.core.persistence.ExtraEntity;
@@ -24,21 +25,24 @@ class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
     @Transactional(readOnly = true)
     public List<ListExtraDto> findAll() {
         return extraRepository.findAll().stream()
-                .map(e -> new ListExtraDto(e.getId(), e.getType(), e.getNaam(), e.getPrijs(), e.getStartdatum(), e.getEinddatum()))
+                .filter(this::isTrouwboekje)
+                .map(e -> new ListExtraDto(e.getId(), e.getNaam(), e.getPrijs(), e.getStartdatum(), e.getEinddatum()))
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<ChangeExtraDto> findById(long id) {
-        return extraRepository.findById(id).map(this::toChangeDto);
+        return extraRepository.findById(id)
+                .filter(this::isTrouwboekje)
+                .map(this::toChangeDto);
     }
 
     @Override
     @Transactional
     public long create(CreateExtraDto dto) {
         ExtraEntity entity = new ExtraEntity();
-        entity.setType(dto.type());
+        entity.setType(ExtraType.TROUWBOEKJE);
         entity.setNaam(dto.naam());
         entity.setOmschrijving(dto.omschrijving());
         entity.setAfbeelding(dto.afbeelding());
@@ -53,7 +57,10 @@ class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
     public void update(ChangeExtraDto dto) {
         ExtraEntity entity = extraRepository.findById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException("Extra niet gevonden: " + dto.id()));
-        entity.setType(dto.type());
+        if (!isTrouwboekje(entity)) {
+            throw new IllegalArgumentException("Alleen trouwboekjes kunnen worden beheerd: " + dto.id());
+        }
+        entity.setType(ExtraType.TROUWBOEKJE);
         entity.setNaam(dto.naam());
         entity.setOmschrijving(dto.omschrijving());
         entity.setAfbeelding(dto.afbeelding());
@@ -75,11 +82,17 @@ class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
     @Override
     @Transactional(readOnly = true)
     public long count() {
-        return extraRepository.count();
+        return extraRepository.findAll().stream()
+                .filter(this::isTrouwboekje)
+                .count();
     }
 
     private ChangeExtraDto toChangeDto(ExtraEntity e) {
         return new ChangeExtraDto(e.getId(), e.getType(), e.getNaam(), e.getOmschrijving(),
                 e.getAfbeelding(), e.getPrijs(), e.getStartdatum(), e.getEinddatum());
+    }
+
+    private boolean isTrouwboekje(ExtraEntity entity) {
+        return entity.getType() == ExtraType.TROUWBOEKJE;
     }
 }

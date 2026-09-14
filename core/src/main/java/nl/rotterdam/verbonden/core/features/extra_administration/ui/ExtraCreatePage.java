@@ -7,9 +7,7 @@ import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraTyp
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.LambdaChoiceRenderer;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
@@ -19,7 +17,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 public class ExtraCreatePage extends AdministrationBasePage {
 
@@ -47,10 +44,6 @@ public class ExtraCreatePage extends AdministrationBasePage {
             super.onInitialize();
             IModel<ExtraFormDto> model = getModel();
             add(
-                    new DropDownChoice<>("type",
-                            LambdaModel.of(model, ExtraFormDto::getType, ExtraFormDto::setType),
-                            List.of(ExtraType.values()),
-                            new LambdaChoiceRenderer<>(ExtraType::getLabel)).setRequired(true),
                     new RdFormFieldTextInput<>("naam",
                             LambdaModel.of(model, ExtraFormDto::getNaam, ExtraFormDto::setNaam),
                             Model.of("Naam")).setRequired(true),
@@ -83,7 +76,7 @@ public class ExtraCreatePage extends AdministrationBasePage {
         protected void onSubmit() {
             ExtraFormDto f = getModelObject();
             extraAdministrationService.create(new CreateExtraDto(
-                    f.getType(),
+                    ExtraType.TROUWBOEKJE,
                     f.getNaam(),
                     f.getOmschrijving(),
                     f.getAfbeelding(),

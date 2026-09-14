@@ -43,15 +43,6 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
     private Form<Void> buildExtrasTable() {
         List<IColumn<ListExtraDto, String>> columns = new ArrayList<>();
 
-        columns.add(new AbstractColumn<>(Model.of("Type"), "type") {
-            @Override
-            public void populateItem(Item<ICellPopulator<ListExtraDto>> cellItem,
-                                     String componentId,
-                                     IModel<ListExtraDto> rowModel) {
-                cellItem.add(new Label(componentId, rowModel.map(dto -> dto.type().getLabel())));
-            }
-        });
-
         columns.add(new AbstractColumn<>(Model.of("Naam"), "naam") {
             @Override
             public void populateItem(Item<ICellPopulator<ListExtraDto>> cellItem,
@@ -138,7 +129,6 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
 
     private static Comparator<ListExtraDto> comparatorFor(String property, boolean ascending) {
         Comparator<ListExtraDto> comparator = switch (property) {
-            case "type" -> Comparator.comparing(dto -> dto.type().getLabel(), Comparator.nullsLast(Comparator.naturalOrder()));
             case "prijs" -> Comparator.comparing(ListExtraDto::prijs, Comparator.nullsLast(Comparator.naturalOrder()));
             case "startdatum" -> Comparator.comparing(ListExtraDto::startdatum, Comparator.nullsLast(Comparator.naturalOrder()));
             case "einddatum" -> Comparator.comparing(ListExtraDto::einddatum, Comparator.nullsLast(Comparator.naturalOrder()));

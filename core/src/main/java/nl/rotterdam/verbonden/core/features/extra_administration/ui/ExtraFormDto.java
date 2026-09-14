@@ -1,7 +1,6 @@
 package nl.rotterdam.verbonden.core.features.extra_administration.ui;
 
 import nl.rotterdam.verbonden.core.features.extra_administration.domain.ChangeExtraDto;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -9,7 +8,6 @@ import java.time.LocalDate;
 
 public class ExtraFormDto implements Serializable {
 
-    private ExtraType type;
     private String naam;
     private String omschrijving;
     private String afbeelding;
@@ -23,7 +21,6 @@ public class ExtraFormDto implements Serializable {
 
     public static ExtraFormDto vanDto(ChangeExtraDto dto) {
         ExtraFormDto form = new ExtraFormDto();
-        form.setType(dto.type());
         form.setNaam(dto.naam());
         form.setOmschrijving(dto.omschrijving());
         form.setAfbeelding(dto.afbeelding());
@@ -31,14 +28,6 @@ public class ExtraFormDto implements Serializable {
         form.setStartdatum(dto.startdatum());
         form.setEinddatum(dto.einddatum());
         return form;
-    }
-
-    public ExtraType getType() {
-        return type;
-    }
-
-    public void setType(ExtraType type) {
-        this.type = type;
     }
 
     public String getNaam() {
