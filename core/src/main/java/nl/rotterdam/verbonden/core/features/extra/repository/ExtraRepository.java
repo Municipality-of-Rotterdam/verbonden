@@ -1,6 +1,6 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.repository;
+package nl.rotterdam.verbonden.core.features.extra.repository;
 
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
+import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 import nl.rotterdam.verbonden.core.persistence.ExtraEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

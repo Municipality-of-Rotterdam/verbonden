@@ -1,10 +1,10 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.application;
+package nl.rotterdam.verbonden.core.features.trouwboekje_administration.application;
 
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ChangeExtraDto;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.CreateExtraDto;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ListExtraDto;
-import nl.rotterdam.verbonden.core.features.extra_administration.repository.ExtraRepository;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ChangeTrouwboekjeDto;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.CreateTrouwboekjeDto;
+import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ListTrouwboekjeDto;
+import nl.rotterdam.verbonden.core.features.extra.repository.ExtraRepository;
 import nl.rotterdam.verbonden.core.persistence.ExtraEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,26 +13,26 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
+class TrouwboekjeAdministrationServiceImpl implements TrouwboekjeAdministrationService {
 
     private final ExtraRepository extraRepository;
 
-    ExtraAdministrationServiceImpl(ExtraRepository extraRepository) {
+    TrouwboekjeAdministrationServiceImpl(ExtraRepository extraRepository) {
         this.extraRepository = extraRepository;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ListExtraDto> findAll() {
+    public List<ListTrouwboekjeDto> findAll() {
         return extraRepository.findAll().stream()
                 .filter(this::isTrouwboekje)
-                .map(e -> new ListExtraDto(e.getId(), e.getNaam(), e.getPrijs(), e.getStartdatum(), e.getEinddatum()))
+                .map(e -> new ListTrouwboekjeDto(e.getId(), e.getNaam(), e.getPrijs(), e.getStartdatum(), e.getEinddatum()))
                 .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ChangeExtraDto> findById(long id) {
+    public Optional<ChangeTrouwboekjeDto> findById(long id) {
         return extraRepository.findById(id)
                 .filter(this::isTrouwboekje)
                 .map(this::toChangeDto);
@@ -40,7 +40,7 @@ class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
 
     @Override
     @Transactional
-    public long create(CreateExtraDto dto) {
+    public long create(CreateTrouwboekjeDto dto) {
         ExtraEntity entity = new ExtraEntity();
         entity.setType(ExtraType.TROUWBOEKJE);
         entity.setNaam(dto.naam());
@@ -54,9 +54,9 @@ class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
 
     @Override
     @Transactional
-    public void update(ChangeExtraDto dto) {
+    public void update(ChangeTrouwboekjeDto dto) {
         ExtraEntity entity = extraRepository.findById(dto.id())
-                .orElseThrow(() -> new IllegalArgumentException("Extra niet gevonden: " + dto.id()));
+                .orElseThrow(() -> new IllegalArgumentException("Trouwboekje niet gevonden: " + dto.id()));
         if (!isTrouwboekje(entity)) {
             throw new IllegalArgumentException("Alleen trouwboekjes kunnen worden beheerd: " + dto.id());
         }
@@ -85,8 +85,8 @@ class ExtraAdministrationServiceImpl implements ExtraAdministrationService {
         return extraRepository.countByType(ExtraType.TROUWBOEKJE);
     }
 
-    private ChangeExtraDto toChangeDto(ExtraEntity e) {
-        return new ChangeExtraDto(e.getId(), e.getType(), e.getNaam(), e.getOmschrijving(),
+    private ChangeTrouwboekjeDto toChangeDto(ExtraEntity e) {
+        return new ChangeTrouwboekjeDto(e.getId(), e.getNaam(), e.getOmschrijving(),
                 e.getAfbeelding(), e.getPrijs(), e.getStartdatum(), e.getEinddatum());
     }
 

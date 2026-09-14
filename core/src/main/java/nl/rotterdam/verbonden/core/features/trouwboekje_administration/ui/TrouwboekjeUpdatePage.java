@@ -1,9 +1,8 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.ui;
+package nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui;
 
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
-import nl.rotterdam.verbonden.core.features.extra_administration.application.ExtraAdministrationService;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ChangeExtraDto;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ChangeTrouwboekjeDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
@@ -19,80 +18,79 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class ExtraUpdatePage extends AdministrationBasePage {
+public class TrouwboekjeUpdatePage extends AdministrationBasePage {
 
     @SpringBean
-    private ExtraAdministrationService extraAdministrationService;
+    private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
 
-    public ExtraUpdatePage(PageParameters params) {
+    public TrouwboekjeUpdatePage(PageParameters params) {
         Long id = params.get("id").toOptionalLong();
         if (id == null) {
-            setResponsePage(ExtraAdministrationPage.class);
+            setResponsePage(TrouwboekjeAdministrationPage.class);
             return;
         }
-        ChangeExtraDto dto = extraAdministrationService.findById(id).orElse(null);
+        ChangeTrouwboekjeDto dto = trouwboekjeAdministrationService.findById(id).orElse(null);
         if (dto == null) {
-            setResponsePage(ExtraAdministrationPage.class);
+            setResponsePage(TrouwboekjeAdministrationPage.class);
             return;
         }
 
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         pageBody.add(
-                new BookmarkablePageLink<>("terugLink", ExtraAdministrationPage.class),
+                new BookmarkablePageLink<>("terugLink", TrouwboekjeAdministrationPage.class),
                 feedback,
-                new ChangeExtraForm("extraForm", dto)
+                new ChangeTrouwboekjeForm("extraForm", dto)
         );
     }
 
-    private class ChangeExtraForm extends Form<ExtraFormDto> {
+    private class ChangeTrouwboekjeForm extends Form<TrouwboekjeFormDto> {
 
-        private final long extraId;
+        private final long trouwboekjeId;
 
-        ChangeExtraForm(String id, ChangeExtraDto dto) {
-            super(id, Model.of(ExtraFormDto.vanDto(dto)));
-            extraId = dto.id();
+        ChangeTrouwboekjeForm(String id, ChangeTrouwboekjeDto dto) {
+            super(id, Model.of(TrouwboekjeFormDto.vanDto(dto)));
+            trouwboekjeId = dto.id();
         }
 
         @Override
         protected void onInitialize() {
             super.onInitialize();
-            IModel<ExtraFormDto> model = getModel();
+            IModel<TrouwboekjeFormDto> model = getModel();
             add(
                     new RdFormFieldTextInput<>("naam",
-                            LambdaModel.of(model, ExtraFormDto::getNaam, ExtraFormDto::setNaam),
+                            LambdaModel.of(model, TrouwboekjeFormDto::getNaam, TrouwboekjeFormDto::setNaam),
                             Model.of("Naam")).setRequired(true),
                     new RdFormFieldTextArea<>("omschrijving",
-                            LambdaModel.of(model, ExtraFormDto::getOmschrijving, ExtraFormDto::setOmschrijving),
+                            LambdaModel.of(model, TrouwboekjeFormDto::getOmschrijving, TrouwboekjeFormDto::setOmschrijving),
                             Model.of("Omschrijving"),
-                            Model.of("Korte beschrijving van de extra")),
+                            Model.of("Korte beschrijving van het trouwboekje")),
                     new RdFormFieldTextInput<>("afbeelding",
-                            LambdaModel.of(model, ExtraFormDto::getAfbeelding, ExtraFormDto::setAfbeelding),
+                            LambdaModel.of(model, TrouwboekjeFormDto::getAfbeelding, TrouwboekjeFormDto::setAfbeelding),
                             Model.of("Afbeelding URL"),
                             Model.of("URL naar de afbeelding")),
                     new RdFormFieldTextInput<>("prijs",
-                            LambdaModel.of(model, ExtraFormDto::getPrijs, ExtraFormDto::setPrijs),
+                            LambdaModel.of(model, TrouwboekjeFormDto::getPrijs, TrouwboekjeFormDto::setPrijs),
                             Model.of("Prijs"),
                             Model.of("Prijs in euro's, bijv. 40.50"))
                             .setModelType(BigDecimal.class),
                     new RdFormFieldTextInput<>("startdatum",
-                            LambdaModel.of(model, ExtraFormDto::getStartdatum, ExtraFormDto::setStartdatum),
+                            LambdaModel.of(model, TrouwboekjeFormDto::getStartdatum, TrouwboekjeFormDto::setStartdatum),
                             Model.of("Startdatum"),
-                            Model.of("Datum vanaf wanneer de extra beschikbaar is")).setHtmlInputType("date").setModelType(LocalDate.class),
+                            Model.of("Datum vanaf wanneer het trouwboekje beschikbaar is")).setHtmlInputType("date").setModelType(LocalDate.class),
                     new RdFormFieldTextInput<>("einddatum",
-                            LambdaModel.of(model, ExtraFormDto::getEinddatum, ExtraFormDto::setEinddatum),
+                            LambdaModel.of(model, TrouwboekjeFormDto::getEinddatum, TrouwboekjeFormDto::setEinddatum),
                             Model.of("Einddatum"),
-                            Model.of("Datum tot wanneer de extra beschikbaar is")).setHtmlInputType("date").setModelType(LocalDate.class),
+                            Model.of("Datum tot wanneer het trouwboekje beschikbaar is")).setHtmlInputType("date").setModelType(LocalDate.class),
                     new RdButton("opslaan", Model.of("Opslaan"))
             );
         }
 
         @Override
         protected void onSubmit() {
-            ExtraFormDto f = getModelObject();
-            extraAdministrationService.update(new ChangeExtraDto(
-                    extraId,
-                    ExtraType.TROUWBOEKJE,
+            TrouwboekjeFormDto f = getModelObject();
+            trouwboekjeAdministrationService.update(new ChangeTrouwboekjeDto(
+                    trouwboekjeId,
                     f.getNaam(),
                     f.getOmschrijving(),
                     f.getAfbeelding(),
@@ -100,7 +98,7 @@ public class ExtraUpdatePage extends AdministrationBasePage {
                     f.getStartdatum(),
                     f.getEinddatum()
             ));
-            setResponsePage(ExtraAdministrationPage.class);
+            setResponsePage(TrouwboekjeAdministrationPage.class);
         }
     }
 }

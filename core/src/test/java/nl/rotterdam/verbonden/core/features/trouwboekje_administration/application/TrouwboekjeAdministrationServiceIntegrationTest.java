@@ -1,7 +1,7 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.application;
+package nl.rotterdam.verbonden.core.features.trouwboekje_administration.application;
 
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.CreateExtraDto;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ExtraType;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.CreateTrouwboekjeDto;
+import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
 import org.junit.jupiter.api.Test;
@@ -14,20 +14,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 @VerbondenIntegrationTest
-class ExtraAdministrationServiceIntegrationTest {
+class TrouwboekjeAdministrationServiceIntegrationTest {
 
     @Autowired
-    private ExtraAdministrationService extraAdministrationService;
+    private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
 
     @Autowired
     private MarriageIntakeService marriageIntakeService;
 
     @Test
     void findAll_toontAlleenTrouwboekjes() {
-        long aantalTrouwboekjesVooraf = extraAdministrationService.count();
+        long aantalTrouwboekjesVooraf = trouwboekjeAdministrationService.count();
 
-        extraAdministrationService.create(new CreateExtraDto(
-                ExtraType.TROUWBOEKJE,
+        trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
                 "Linnen trouwboekje",
                 "Met linnen kaft",
                 null,
@@ -36,11 +35,11 @@ class ExtraAdministrationServiceIntegrationTest {
                 null
         ));
 
-        assertThat(extraAdministrationService.findAll())
+        assertThat(trouwboekjeAdministrationService.findAll())
                 .extracting(dto -> dto.naam())
                 .contains("Linnen trouwboekje")
                 .doesNotContain("Internationale huwelijksakte");
-        assertThat(extraAdministrationService.count()).isEqualTo(aantalTrouwboekjesVooraf + 1);
+        assertThat(trouwboekjeAdministrationService.count()).isEqualTo(aantalTrouwboekjesVooraf + 1);
     }
 
     @Test
@@ -50,6 +49,6 @@ class ExtraAdministrationServiceIntegrationTest {
                 .orElseThrow()
                 .id();
 
-        assertThat(extraAdministrationService.findById(internationaleAkteId)).isEmpty();
+        assertThat(trouwboekjeAdministrationService.findById(internationaleAkteId)).isEmpty();
     }
 }

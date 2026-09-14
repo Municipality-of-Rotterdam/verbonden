@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.core.administration_common;
 
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
-import nl.rotterdam.verbonden.core.features.extra_administration.ui.ExtraAdministrationPage;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
@@ -63,7 +63,7 @@ public abstract class AdministrationBasePage extends WebPage {
                 new RdSideNavRecord(null, "Trouwlocaties", LocationAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Huwelijkstypen", MarriageTypeAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Dossiers", DossierAdministrationPage.class, null, null, null),
-                new RdSideNavRecord(null, "Trouwboekjes", ExtraAdministrationPage.class, null, null, null)
+                new RdSideNavRecord(null, "Trouwboekjes", TrouwboekjeAdministrationPage.class, null, null, null)
         )));
 
         pageBody = new RdPageBodyBorder("pageBody");

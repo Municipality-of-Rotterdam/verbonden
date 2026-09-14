@@ -1,12 +1,12 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.ui;
+package nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui;
 
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ChangeExtraDto;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ChangeTrouwboekjeDto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class ExtraFormDto implements Serializable {
+public class TrouwboekjeFormDto implements Serializable {
 
     private String naam;
     private String omschrijving;
@@ -15,12 +15,12 @@ public class ExtraFormDto implements Serializable {
     private LocalDate startdatum;
     private LocalDate einddatum;
 
-    public static ExtraFormDto leeg() {
-        return new ExtraFormDto();
+    public static TrouwboekjeFormDto leeg() {
+        return new TrouwboekjeFormDto();
     }
 
-    public static ExtraFormDto vanDto(ChangeExtraDto dto) {
-        ExtraFormDto form = new ExtraFormDto();
+    public static TrouwboekjeFormDto vanDto(ChangeTrouwboekjeDto dto) {
+        TrouwboekjeFormDto form = new TrouwboekjeFormDto();
         form.setNaam(dto.naam());
         form.setOmschrijving(dto.omschrijving());
         form.setAfbeelding(dto.afbeelding());

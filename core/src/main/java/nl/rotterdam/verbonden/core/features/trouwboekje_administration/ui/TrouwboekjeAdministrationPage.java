@@ -1,8 +1,8 @@
-package nl.rotterdam.verbonden.core.features.extra_administration.ui;
+package nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui;
 
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
-import nl.rotterdam.verbonden.core.features.extra_administration.application.ExtraAdministrationService;
-import nl.rotterdam.verbonden.core.features.extra_administration.domain.ListExtraDto;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ListTrouwboekjeDto;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -27,36 +27,36 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExtraAdministrationPage extends AdministrationBasePage {
+public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
 
     @SpringBean
-    private ExtraAdministrationService extraAdministrationService;
+    private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
 
-    public ExtraAdministrationPage() {
+    public TrouwboekjeAdministrationPage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         pageBody.add(feedback);
-        pageBody.add(new BookmarkablePageLink<>("nieuwExtraLink", ExtraCreatePage.class));
+        pageBody.add(new BookmarkablePageLink<>("nieuwExtraLink", TrouwboekjeCreatePage.class));
         pageBody.add(buildExtrasTable());
     }
 
     private Form<Void> buildExtrasTable() {
-        List<IColumn<ListExtraDto, String>> columns = new ArrayList<>();
+        List<IColumn<ListTrouwboekjeDto, String>> columns = new ArrayList<>();
 
         columns.add(new AbstractColumn<>(Model.of("Naam"), "naam") {
             @Override
-            public void populateItem(Item<ICellPopulator<ListExtraDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListTrouwboekjeDto>> cellItem,
                                      String componentId,
-                                     IModel<ListExtraDto> rowModel) {
-                cellItem.add(new Label(componentId, rowModel.map(ListExtraDto::naam)));
+                                     IModel<ListTrouwboekjeDto> rowModel) {
+                cellItem.add(new Label(componentId, rowModel.map(ListTrouwboekjeDto::naam)));
             }
         });
 
         columns.add(new AbstractColumn<>(Model.of("Prijs"), "prijs") {
             @Override
-            public void populateItem(Item<ICellPopulator<ListExtraDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListTrouwboekjeDto>> cellItem,
                                      String componentId,
-                                     IModel<ListExtraDto> rowModel) {
+                                     IModel<ListTrouwboekjeDto> rowModel) {
                 cellItem.add(new Label(componentId,
                         rowModel.map(dto -> dto.prijs() != null ? dto.prijs().toPlainString() : "")));
             }
@@ -64,9 +64,9 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
 
         columns.add(new AbstractColumn<>(Model.of("Startdatum"), "startdatum") {
             @Override
-            public void populateItem(Item<ICellPopulator<ListExtraDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListTrouwboekjeDto>> cellItem,
                                      String componentId,
-                                     IModel<ListExtraDto> rowModel) {
+                                     IModel<ListTrouwboekjeDto> rowModel) {
                 cellItem.add(new Label(componentId,
                         rowModel.map(dto -> dto.startdatum() != null ? dto.startdatum().toString() : "")));
             }
@@ -74,9 +74,9 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
 
         columns.add(new AbstractColumn<>(Model.of("Einddatum"), "einddatum") {
             @Override
-            public void populateItem(Item<ICellPopulator<ListExtraDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListTrouwboekjeDto>> cellItem,
                                      String componentId,
-                                     IModel<ListExtraDto> rowModel) {
+                                     IModel<ListTrouwboekjeDto> rowModel) {
                 cellItem.add(new Label(componentId,
                         rowModel.map(dto -> dto.einddatum() != null ? dto.einddatum().toString() : "")));
             }
@@ -84,26 +84,26 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
 
         columns.add(new AbstractColumn<>(Model.of("Acties")) {
             @Override
-            public void populateItem(Item<ICellPopulator<ListExtraDto>> cellItem,
+            public void populateItem(Item<ICellPopulator<ListTrouwboekjeDto>> cellItem,
                                      String componentId,
-                                     IModel<ListExtraDto> rowModel) {
+                                     IModel<ListTrouwboekjeDto> rowModel) {
                 cellItem.add(new ActiesFragment(componentId, rowModel));
             }
         });
 
-        SortableDataProvider<ListExtraDto, String> provider = new SortableDataProvider<>() {
-            private transient List<ListExtraDto> cachedList;
+        SortableDataProvider<ListTrouwboekjeDto, String> provider = new SortableDataProvider<>() {
+            private transient List<ListTrouwboekjeDto> cachedList;
 
-            private List<ListExtraDto> getList() {
+            private List<ListTrouwboekjeDto> getList() {
                 if (cachedList == null) {
-                    cachedList = new ArrayList<>(extraAdministrationService.findAll());
+                    cachedList = new ArrayList<>(trouwboekjeAdministrationService.findAll());
                 }
                 return cachedList;
             }
 
             @Override
-            public Iterator<? extends ListExtraDto> iterator(long first, long count) {
-                List<ListExtraDto> list = new ArrayList<>(getList());
+            public Iterator<? extends ListTrouwboekjeDto> iterator(long first, long count) {
+                List<ListTrouwboekjeDto> list = new ArrayList<>(getList());
                 if (getSort() != null) {
                     list.sort(comparatorFor(getSort().getProperty(), getSort().isAscending()));
                 }
@@ -112,11 +112,11 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
 
             @Override
             public long size() {
-                return extraAdministrationService.count();
+                return trouwboekjeAdministrationService.count();
             }
 
             @Override
-            public IModel<ListExtraDto> model(ListExtraDto dto) {
+            public IModel<ListTrouwboekjeDto> model(ListTrouwboekjeDto dto) {
                 return Model.of(dto);
             }
         };
@@ -127,36 +127,36 @@ public class ExtraAdministrationPage extends AdministrationBasePage {
         return form;
     }
 
-    private static Comparator<ListExtraDto> comparatorFor(String property, boolean ascending) {
-        Comparator<ListExtraDto> comparator = switch (property) {
-            case "prijs" -> Comparator.comparing(ListExtraDto::prijs, Comparator.nullsLast(Comparator.naturalOrder()));
-            case "startdatum" -> Comparator.comparing(ListExtraDto::startdatum, Comparator.nullsLast(Comparator.naturalOrder()));
-            case "einddatum" -> Comparator.comparing(ListExtraDto::einddatum, Comparator.nullsLast(Comparator.naturalOrder()));
-            default -> Comparator.comparing(ListExtraDto::naam, Comparator.nullsLast(Comparator.naturalOrder()));
+    private static Comparator<ListTrouwboekjeDto> comparatorFor(String property, boolean ascending) {
+        Comparator<ListTrouwboekjeDto> comparator = switch (property) {
+            case "prijs" -> Comparator.comparing(ListTrouwboekjeDto::prijs, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "startdatum" -> Comparator.comparing(ListTrouwboekjeDto::startdatum, Comparator.nullsLast(Comparator.naturalOrder()));
+            case "einddatum" -> Comparator.comparing(ListTrouwboekjeDto::einddatum, Comparator.nullsLast(Comparator.naturalOrder()));
+            default -> Comparator.comparing(ListTrouwboekjeDto::naam, Comparator.nullsLast(Comparator.naturalOrder()));
         };
         return ascending ? comparator : comparator.reversed();
     }
 
     private final class ActiesFragment extends Fragment {
 
-        ActiesFragment(String id, IModel<ListExtraDto> model) {
-            super(id, "actiesFragment", ExtraAdministrationPage.this, model);
+        ActiesFragment(String id, IModel<ListTrouwboekjeDto> model) {
+            super(id, "actiesFragment", TrouwboekjeAdministrationPage.this, model);
 
-            ListExtraDto dto = model.getObject();
+            ListTrouwboekjeDto dto = model.getObject();
             PageParameters params = new PageParameters().add("id", dto.id());
 
-            add(new BookmarkablePageLink<>("bewerkLink", ExtraUpdatePage.class, params));
+            add(new BookmarkablePageLink<>("bewerkLink", TrouwboekjeUpdatePage.class, params));
 
             add(new Link<>("verwijderLink", model) {
                 @Override
                 public void onClick() {
                     try {
-                        extraAdministrationService.delete(getModelObject().id());
+                        trouwboekjeAdministrationService.delete(getModelObject().id());
                     } catch (DataIntegrityViolationException e) {
                         getPage().error(getString("extra.verwijder.fout.ingebruik"));
                         return;
                     }
-                    setResponsePage(ExtraAdministrationPage.class);
+                    setResponsePage(TrouwboekjeAdministrationPage.class);
                 }
             });
         }
