@@ -53,7 +53,7 @@
     <properties>
         <java.version>25</java.version>
         <wicket.version>10.11.0</wicket.version>
-        <wicket-stuff.version>10.10.0</wicket-stuff.version>
+        <wicket-stuff.version>10.11.0</wicket-stuff.version>
         <rotterdam-nlds.version>0.1.1</rotterdam-nlds.version>
         <wicket-webjars.version>4.0.15</wicket-webjars.version>
         <bootstrap.version>5.3.8</bootstrap.version>
