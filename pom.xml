@@ -57,6 +57,7 @@
         <rotterdam-nlds.version>0.1.1</rotterdam-nlds.version>
         <wicket-webjars.version>4.0.15</wicket-webjars.version>
         <bootstrap.version>5.3.8</bootstrap.version>
+        <wicket-spring-boot-starter.version>5.0.0</wicket-spring-boot-starter.version>
         <!-- Pinned to match the PostgreSQL major version used by compose.yml -->
         <embedded-postgres-binaries.version>18.6.0</embedded-postgres-binaries.version>
     </properties>
@@ -105,6 +106,23 @@
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-spring</artifactId>
                 <version>${wicket.version}</version>
+            </dependency>
+            <!-- Pulled in transitively by wicket-spring-boot-starter; without pinning it here it
+                 resolves to that starter's own bundled version, which trips its own startup
+                 WicketDependencyVersionChecker (fails hard on any org.apache.wicket artifact
+                 whose version differs from wicket-core's). -->
+            <dependency>
+                <groupId>org.apache.wicket</groupId>
+                <artifactId>wicket-auth-roles</artifactId>
+                <version>${wicket.version}</version>
+            </dependency>
+
+            <!-- Wicket/Spring Boot autoconfiguration, incl. the ApplicationInitExtension
+                 hook adapter modules use to customize WicketApplication -->
+            <dependency>
+                <groupId>com.giffing.wicket.spring.boot.starter</groupId>
+                <artifactId>wicket-spring-boot-starter</artifactId>
+                <version>${wicket-spring-boot-starter.version}</version>
             </dependency>
 
             <!-- Rotterdam NL Design System Wicket components -->

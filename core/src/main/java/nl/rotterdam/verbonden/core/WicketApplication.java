@@ -32,13 +32,12 @@ import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.Marr
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeCreatePage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeUpdatePage;
 import nl.rotterdam.verbonden.core.identity.BurgerLoginPageMount;
+import com.giffing.wicket.spring.boot.starter.app.WicketBootStandardWebApplication;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
 import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
 import org.apache.wicket.protocol.http.ResourceIsolationRequestCycleListener;
-import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -50,7 +49,7 @@ import static org.apache.wicket.csp.CSPDirectiveSrcValue.NONE;
 import static org.apache.wicket.csp.CSPDirectiveSrcValue.SELF;
 
 @Component
-public class WicketApplication extends WebApplication {
+public class WicketApplication extends WicketBootStandardWebApplication {
 
     private final List<BurgerLoginPageMount> burgerLoginPageMounts;
 
@@ -78,7 +77,6 @@ public class WicketApplication extends WebApplication {
     public void init() {
         super.init();
         WicketWebjars.install(this);
-        getComponentInstantiationListeners().add(new SpringComponentInjector(this));
 
         getMarkupSettings().setStripWicketTags(true);
 
