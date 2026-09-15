@@ -13,7 +13,7 @@
 
     <groupId>nl.rotterdam.verbonden</groupId>
     <artifactId>verbonden</artifactId>
-    <version>0.0.3-alpha</version>
+    <version>0.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>verbonden</name>
