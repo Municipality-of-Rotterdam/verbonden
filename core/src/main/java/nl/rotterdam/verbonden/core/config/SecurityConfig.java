@@ -10,6 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -64,7 +65,7 @@ public class SecurityConfig {
      */
     @Bean
     @Order(1)
-    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain adminSecurityFilterChain(HttpSecurity http) {
         http
                 .securityMatcher(new OrRequestMatcher(
                         PathPatternRequestMatcher.withDefaults().matcher("/beheer/**"),
@@ -73,7 +74,7 @@ public class SecurityConfig {
                         PathPatternRequestMatcher.withDefaults().matcher("/logout")
                 ))
                 // Apache Wicket 10 has its own CSRF protection; disable Spring Security's to avoid conflicts.
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers
                         .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
                 )
@@ -109,9 +110,9 @@ public class SecurityConfig {
      */
     @Bean
     @Order(2)
-    public SecurityFilterChain burgerSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain burgerSecurityFilterChain(HttpSecurity http) {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers -> headers
                         .contentSecurityPolicy(csp -> csp.policyDirectives(CONTENT_SECURITY_POLICY))
                 )
