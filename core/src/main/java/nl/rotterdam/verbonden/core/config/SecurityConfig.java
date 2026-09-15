@@ -119,6 +119,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/inloggen", "/inloggen/**").permitAll()
                         .requestMatchers("/wicket/resource/**").permitAll()
+                        .requestMatchers("/actuator", "/actuator/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
