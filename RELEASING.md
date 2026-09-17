@@ -132,10 +132,14 @@ Rotterdam-repositories, ook al mogen die repositories dezelfde gedeelde
      sources-/javadoc-jars voorzien en als één deployment naar Maven Central
      deployen (`mvnw -Prelease deploy`).
    - De versiebump committen en een tag `v<versie>` naar `main` pushen.
+   - Automatisch doorbumpen naar de eerstvolgende patch-`-SNAPSHOT`-versie
+     (bijv. `0.0.8-alpha` → `0.0.9-SNAPSHOT`) en dat als aparte commit
+     ("Set version to next snapshot") naar `main` pushen.
 
-Er is geen automatische bump terug naar een `-SNAPSHOT`-versie. Wil je
-verdergaan met ontwikkelen op een nieuwe snapshot-versie, dispatch de
-workflow dan opnieuw met bijvoorbeeld `1.0.1-SNAPSHOT`.
+De ingevoerde versie moet het patroon `<major>.<minor>.<patch>` volgen,
+optioneel gevolgd door een qualifier (bijv. `-alpha`, `-rc1`). Wijkt de versie
+daarvan af, dan faalt alleen de snapshot-bump-stap (de release zelf is dan al
+gepubliceerd) en moet je de versie handmatig zetten.
 
 ## Een release verifiëren
 
@@ -165,6 +169,17 @@ workflow dan opnieuw met bijvoorbeeld `1.0.1-SNAPSHOT`.
   versiebump met `versions-maven-plugin:set -DnewVersion=<versie>
   -DprocessAllModules`), commit, tag met `v<versie>`, en push beide naar
   `main`.
+- **Push van de snapshot-bump-commit mislukt**: zelfde retry-mechanisme (3x
+  fetch + rebase) als bij de release-commit. Faalt dat alsnog, dan is de
+  release zelf al geslaagd; zet de volgende `-SNAPSHOT`-versie handmatig met
+  `versions-maven-plugin:set -DnewVersion=<versie>-SNAPSHOT
+  -DprocessAllModules`, commit ("Set version to next snapshot") en push naar
+  `main`.
+- **Ingevoerde versie matcht niet `<major>.<minor>.<patch>[-qualifier]`**: de
+  stap "Compute next snapshot version" kan dan geen volgende snapshotversie
+  berekenen en faalt met een duidelijke foutmelding. De release zelf is op
+  dat moment al gepubliceerd en getagd; zet de volgende `-SNAPSHOT`-versie
+  handmatig (zie vorige punt).
 
 ## Credentials roteren
 

@@ -80,3 +80,48 @@ jobs:
 
           echo "::error::Failed to push the release commit/tag for v${VERSION} after 3 attempts. The Maven Central artifact is already published — see RELEASING.md Troubleshooting to push the commit and tag 'v${VERSION}' to main manually."
           exit 1
+
+      - name: Compute next snapshot version
+        id: next_version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ ! "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-.*)?$ ]]; then
+            echo "::error::Release version '${VERSION}' does not match <major>.<minor>.<patch>[-qualifier]; cannot compute the next snapshot version. Bump it manually."
+            exit 1
+          fi
+          major="${BASH_REMATCH[1]}"
+          minor="${BASH_REMATCH[2]}"
+          patch="${BASH_REMATCH[3]}"
+          next_version="${major}.${minor}.$((patch + 1))-SNAPSHOT"
+          echo "Next snapshot version: ${next_version}"
+          echo "next_version=${next_version}" >> "$GITHUB_OUTPUT"
+
+      - name: Set next snapshot version
+        env:
+          NEXT_VERSION: ${{ steps.next_version.outputs.next_version }}
+        run: |
+          ./mvnw --no-transfer-progress -B \
+            org.codehaus.mojo:versions-maven-plugin:2.21.0:set \
+            -DnewVersion="${NEXT_VERSION}" \
+            -DprocessAllModules \
+            -DgenerateBackupPoms=false
+
+      - name: Commit and push next snapshot version
+        env:
+          NEXT_VERSION: ${{ steps.next_version.outputs.next_version }}
+        run: |
+          git add pom.xml core/pom.xml remote-local/pom.xml app-local/pom.xml
+          git commit -m "Set version to next snapshot"
+
+          for attempt in 1 2 3; do
+            if git push origin main; then
+              exit 0
+            fi
+            echo "Push failed (attempt ${attempt}/3); fetching and rebasing onto origin/main..."
+            git fetch origin main
+            git rebase origin/main
+          done
+
+          echo "::error::Failed to push the next-snapshot version bump (${NEXT_VERSION}) after 3 attempts. The release itself already succeeded — push this commit to main manually, or rerun 'versions-maven-plugin:set -DnewVersion=${NEXT_VERSION} -DprocessAllModules' and push."
+          exit 1
