@@ -53,15 +53,25 @@ public class SecurityConfig {
     private String gebruikersConfig;
 
     private final ObjectProvider<ClientRegistrationRepository> clientRegistrationRepositoryProvider;
+    private final ObjectProvider<BurgerSecurityCustomizer> burgerSecurityCustomizerProvider;
+    private final ObjectProvider<AdminSecurityCustomizer> adminSecurityCustomizerProvider;
 
-    SecurityConfig(ObjectProvider<ClientRegistrationRepository> clientRegistrationRepositoryProvider) {
+    SecurityConfig(ObjectProvider<ClientRegistrationRepository> clientRegistrationRepositoryProvider,
+            ObjectProvider<BurgerSecurityCustomizer> burgerSecurityCustomizerProvider,
+            ObjectProvider<AdminSecurityCustomizer> adminSecurityCustomizerProvider) {
         this.clientRegistrationRepositoryProvider = clientRegistrationRepositoryProvider;
+        this.burgerSecurityCustomizerProvider = burgerSecurityCustomizerProvider;
+        this.adminSecurityCustomizerProvider = adminSecurityCustomizerProvider;
     }
 
     /**
      * Security filter chain for the /beheer administration section.
      * Uses Spring Security's built-in form login. The login page is served at /login,
      * which is also included in this chain's matcher so it is handled correctly.
+     *
+     * <p>An {@link AdminSecurityCustomizer} bean, if present, is applied last, so an
+     * adapter module can grant {@code ROLE_BEHEERDER} through another route (e.g. an
+     * upstream gateway header identifying internal users) alongside form login.
      */
     @Bean
     @Order(1)
@@ -92,6 +102,12 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 );
+
+        AdminSecurityCustomizer adminSecurityCustomizer = adminSecurityCustomizerProvider.getIfAvailable();
+        if (adminSecurityCustomizer != null) {
+            adminSecurityCustomizer.customize(http);
+        }
+
         return http.build();
     }
 
@@ -106,7 +122,18 @@ public class SecurityConfig {
      * <p>This chain is composable: when a {@link ClientRegistrationRepository} bean is
      * present on the classpath (brought in by a production adapter module), OIDC login
      * via {@code .oauth2Login(...)} is added alongside the mock-login route — see
-     * "Mock-login blijft werken naast OIDC" in {@code docs/modularize-app.md}.
+     * "Mock-login blijft werken naast OIDC" in {@code docs/modularize-app.md}. A
+     * {@link BurgerSecurityCustomizer} bean, if present, is applied last, so an adapter
+     * module can register e.g. a pre-authentication filter fed by an upstream gateway
+     * header.
+     *
+     * <p>Access is gated on the {@code ROLE_BURGER} authority rather than plain
+     * {@code authenticated()}, because a pre-authentication filter may populate the
+     * {@code SecurityContext} even for anonymous visitors (to expose "anonymous" as a
+     * distinct, inspectable identity) — {@code authenticated()} would then never be false.
+     * Every login path (mock login, {@code BurgerSecurityCustomizer}) must therefore grant
+     * {@code ROLE_BURGER} for a real citizen; once real OIDC/DigiD login is wired in here,
+     * its authorities need to be mapped onto {@code ROLE_BURGER} too.
      */
     @Bean
     @Order(2)
@@ -120,7 +147,7 @@ public class SecurityConfig {
                         .requestMatchers("/inloggen", "/inloggen/**").permitAll()
                         .requestMatchers("/wicket/resource/**").permitAll()
                         .requestMatchers("/actuator", "/actuator/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("BURGER")
                 )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/inloggen"))
@@ -134,6 +161,11 @@ public class SecurityConfig {
         ClientRegistrationRepository clientRegistrationRepository = clientRegistrationRepositoryProvider.getIfAvailable();
         if (clientRegistrationRepository != null) {
             http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/", true));
+        }
+
+        BurgerSecurityCustomizer burgerSecurityCustomizer = burgerSecurityCustomizerProvider.getIfAvailable();
+        if (burgerSecurityCustomizer != null) {
+            burgerSecurityCustomizer.customize(http);
         }
 
         return http.build();
