@@ -1,4 +1,4 @@
-package nl.rotterdam.verbonden.core.features.marriage_intake.domain;
+package nl.rotterdam.verbonden.core.domain;
 
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +58,7 @@ class EmailadresTest {
     @Test
     void toStringIncludesSimpleClassNameAndValue() {
         Emailadres email = new Emailadres("test@example.com");
-        assertThat(email.toString()).isEqualTo("Emailadres[test@example.com]");
+        assertThat(email.toString()).isEqualTo("Emailadres[value=test@example.com]");
     }
 
     @Test

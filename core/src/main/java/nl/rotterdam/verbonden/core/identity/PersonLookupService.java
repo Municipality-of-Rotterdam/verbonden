@@ -1,5 +1,7 @@
 package nl.rotterdam.verbonden.core.identity;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+
 import java.util.Optional;
 
 /**
@@ -10,5 +12,5 @@ import java.util.Optional;
  */
 public interface PersonLookupService {
 
-    Optional<PersonInfo> findByBsn(String bsn);
+    Optional<PersonInfo> findByBsn(BurgerServiceNummer bsn);
 }

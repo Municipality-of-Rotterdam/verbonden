@@ -76,7 +76,7 @@ public class DossierAdministrationPage extends AdministrationBasePage {
                                      String componentId,
                                      IModel<ListDossierDto> rowModel) {
                 cellItem.add(new Label(componentId,
-                        rowModel.map(dto -> dto.bsn1() != null ? dto.bsn1() : "")));
+                        rowModel.map(dto -> dto.bsn1() != null ? dto.bsn1().getValue() : "")));
             }
         });
 
@@ -86,7 +86,7 @@ public class DossierAdministrationPage extends AdministrationBasePage {
                                      String componentId,
                                      IModel<ListDossierDto> rowModel) {
                 cellItem.add(new Label(componentId,
-                        rowModel.map(dto -> dto.bsn2() != null ? dto.bsn2() : "")));
+                        rowModel.map(dto -> dto.bsn2() != null ? dto.bsn2().getValue() : "")));
             }
         });
 

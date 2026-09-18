@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.core.features.babs_administration.application;
 
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.BabsImportResult;
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.features.babs_administration.repository.BabsRepository;
 import nl.rotterdam.verbonden.core.persistence.BabsEntity;
 import org.jsoup.Jsoup;

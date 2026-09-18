@@ -3,7 +3,7 @@ package nl.rotterdam.verbonden.core.features.babs_administration.ui;
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.application.BabsAdministrationService;
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.ChangeBabsDto;
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;

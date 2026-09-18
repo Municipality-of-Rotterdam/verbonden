@@ -1,5 +1,7 @@
 package nl.rotterdam.verbonden.core.features.babs_administration.domain;
 
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;

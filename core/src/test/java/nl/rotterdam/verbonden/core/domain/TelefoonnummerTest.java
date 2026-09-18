@@ -1,4 +1,4 @@
-package nl.rotterdam.verbonden.core.features.marriage_intake.domain;
+package nl.rotterdam.verbonden.core.domain;
 
 import org.junit.jupiter.api.Test;
 
@@ -64,7 +64,7 @@ class TelefoonnummerTest {
     @Test
     void toStringIncludesSimpleClassNameAndValue() {
         Telefoonnummer nummer = new Telefoonnummer("0612345678");
-        assertThat(nummer.toString()).isEqualTo("Telefoonnummer[+31612345678]");
+        assertThat(nummer.toString()).isEqualTo("Telefoonnummer[value=+31612345678]");
     }
 
     @Test

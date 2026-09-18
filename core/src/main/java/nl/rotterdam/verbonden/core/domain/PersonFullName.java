@@ -1,6 +1,4 @@
-package nl.rotterdam.verbonden.core.features.babs_administration.domain;
-
-import nl.rotterdam.verbonden.core.domain.ValueHolder;
+package nl.rotterdam.verbonden.core.domain;
 
 import java.io.Serializable;
 
@@ -31,8 +29,4 @@ public record PersonFullName(String value) implements ValueHolder<String>, Seria
         return value;
     }
 
-    @Override
-    public String toString() {
-        return "PersonFullName[" + value + "]";
-    }
 }

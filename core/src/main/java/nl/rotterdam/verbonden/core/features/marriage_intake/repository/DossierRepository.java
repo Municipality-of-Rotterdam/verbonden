@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.repository;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.persistence.HuwelijksDossierEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,5 +13,5 @@ public interface DossierRepository extends JpaRepository<HuwelijksDossierEntity,
 
     Optional<HuwelijksDossierEntity> findByUuid(UUID uuid);
 
-    Optional<HuwelijksDossierEntity> findByPartners_Bsn(String bsn);
+    Optional<HuwelijksDossierEntity> findByPartners_Bsn(BurgerServiceNummer bsn);
 }

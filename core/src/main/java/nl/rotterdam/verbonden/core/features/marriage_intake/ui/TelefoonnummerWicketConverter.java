@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Telefoonnummer;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TelefoonnummerOngeldigException;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.domain.TelefoonnummerOngeldigException;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 

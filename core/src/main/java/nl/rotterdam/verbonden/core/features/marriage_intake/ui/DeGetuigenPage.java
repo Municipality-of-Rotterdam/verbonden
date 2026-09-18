@@ -1,6 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;

@@ -1,6 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +65,7 @@ class GetuigenItemFormDtoTest {
 
         List<GetuigenItemFormDto> items = GetuigenItemFormDto.vanGetuigen(1, bestaande);
 
-        assertThat(items.get(0).getNaam()).isNull();
+        assertThat(items.getFirst().getNaam()).isNull();
     }
 
     @Test
@@ -74,7 +74,7 @@ class GetuigenItemFormDtoTest {
 
         List<GetuigenItemFormDto> items = GetuigenItemFormDto.vanGetuigen(1, bestaande);
 
-        assertThat(items.get(0).getNaam()).isNull();
+        assertThat(items.getFirst().getNaam()).isNull();
     }
 
     @Test
@@ -83,6 +83,6 @@ class GetuigenItemFormDtoTest {
 
         List<GetuigenItemFormDto> items = GetuigenItemFormDto.vanGetuigen(1, bestaande);
 
-        assertThat(items.get(0).getNaam()).isNull();
+        assertThat(items.getFirst().getNaam()).isNull();
     }
 }

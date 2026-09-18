@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
@@ -27,26 +28,26 @@ class ExtrasPageTest extends BaseWicketTest {
     @Test
     @WithMockUser(username = "999990007")
     void kleinHuwelijk_toontInternationaleAkteOptie() {
-        assertInternationaleAkteZichtbaarVoor(CeremonieSoort.KLEIN, "999990007");
+        assertInternationaleAkteZichtbaarVoor(CeremonieSoort.KLEIN, new BurgerServiceNummer("999990007"));
     }
 
     @Test
     @WithMockUser(username = "999990019")
     void middelgrootHuwelijk_toontInternationaleAkteOptie() {
-        assertInternationaleAkteZichtbaarVoor(CeremonieSoort.MIDDELGROOT, "999990019");
+        assertInternationaleAkteZichtbaarVoor(CeremonieSoort.MIDDELGROOT, new BurgerServiceNummer("999990019"));
     }
 
     @Test
     @WithMockUser(username = "999990020")
     void grootHuwelijk_toontInternationaleAkteOptie() {
-        assertInternationaleAkteZichtbaarVoor(CeremonieSoort.GROOT, "999990020");
+        assertInternationaleAkteZichtbaarVoor(CeremonieSoort.GROOT, new BurgerServiceNummer("999990020"));
     }
 
     @Test
     @WithMockUser(username = "999990202")
     void geregistreerdPartnerschap_toontGeenInternationaleAkteOptie() {
         UUID dossierId = marriageIntakeService.create(
-                new CreateDossierDto(RegistratieType.GEREGISTREERD_PARTNERSCHAP, CeremonieSoort.GROOT, null, "999990202"));
+                new CreateDossierDto(RegistratieType.GEREGISTREERD_PARTNERSCHAP, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990202")));
 
         tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
 
@@ -54,7 +55,7 @@ class ExtrasPageTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString()).doesNotContain(INTERNATIONALE_AKTE_INTRO);
     }
 
-    private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, String bsn) {
+    private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, BurgerServiceNummer bsn) {
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, ceremonieSoort, null, bsn));
 

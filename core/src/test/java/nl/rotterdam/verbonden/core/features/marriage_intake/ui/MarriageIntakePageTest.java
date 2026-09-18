@@ -21,7 +21,7 @@ class MarriageIntakePageTest extends BaseWicketTest {
      * Spring Security context, making the intent explicit: this page is for logged-in citizens.
      */
     @Test
-    @WithMockUser
+    @WithMockUser(username = "999990007")
     void testRender() {
         tester.startPage(MarriageIntakePage.class);
         tester.assertRenderedPage(MarriageIntakePage.class);

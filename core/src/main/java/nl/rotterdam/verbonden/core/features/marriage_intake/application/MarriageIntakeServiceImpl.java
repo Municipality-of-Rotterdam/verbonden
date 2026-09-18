@@ -1,11 +1,11 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 import nl.rotterdam.verbonden.core.features.extra.repository.ExtraRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ExtraDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
-import nl.rotterdam.verbonden.core.persistence.ExtraEntity;
 import nl.rotterdam.verbonden.core.config.PlanningConfig;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.verbonden.core.features.location_administration.repository.BeschikbaarheidRepository;
@@ -16,12 +16,12 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeD
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.GetuigenRepository;
@@ -127,11 +127,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         return result;
     }
 
-    private PartnerGegevensDto convertToDto(String bsn, String gekozenAchternaam,
+    private PartnerGegevensDto convertToDto(BurgerServiceNummer bsn, String gekozenAchternaam,
                                             Telefoonnummer telefoonnummer, Emailadres emailadres) {
         Optional<PersonInfo> personInfo = personLookupService.findByBsn(bsn);
         if (personInfo.isEmpty()) {
-            return new PartnerGegevensDto(bsn, "Onbekend", bsn, null, "", "Onbekend", "Onbekend",
+            return new PartnerGegevensDto(bsn, "Onbekend", bsn.getValue(), null, "", "Onbekend", "Onbekend",
                     telefoonnummer, emailadres, gekozenAchternaam);
         }
         PersonInfo info = personInfo.get();
@@ -203,14 +203,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<UUID> findDossierIdByBsn(String bsn) {
+    public Optional<UUID> findDossierIdByBsn(BurgerServiceNummer bsn) {
         return dossierRepository.findByPartners_Bsn(bsn)
                 .map(HuwelijksDossierEntity::getUuid);
     }
 
     @Override
     @Transactional
-    public void ensureBsnAccess(UUID dossierId, String bsn) {
+    public void ensureBsnAccess(UUID dossierId, BurgerServiceNummer bsn) {
         HuwelijksDossierEntity e = getDossier(dossierId);
         boolean alreadyPartner = e.getPartners().stream().anyMatch(p -> bsn.equals(p.getBsn()));
         if (alreadyPartner) {
@@ -230,7 +230,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional
-    public DossierAccessOutcome resolveAccess(UUID requestedDossierId, String bsn) {
+    public DossierAccessOutcome resolveAccess(UUID requestedDossierId, BurgerServiceNummer bsn) {
         Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByPartners_Bsn(bsn);
 
         if (existingDossier.isPresent()) {
@@ -295,8 +295,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
 
         BigDecimal extrasTotaal = extraItems.stream()
-                .filter(item -> item.prijs() != null)
                 .map(SidebarExtraItemDto::prijs)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalPrijs = prijs != null ? prijs.add(extrasTotaal) : (extrasTotaal.compareTo(BigDecimal.ZERO) > 0 ? extrasTotaal : null);
 
@@ -561,7 +561,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional
-    public void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam) {
+    public void slaGekozenAchternaamOp(UUID dossierId, BurgerServiceNummer bsn, String gekozenAchternaam) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
                 .filter(p -> bsn.equals(p.getBsn()))
@@ -573,7 +573,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional
-    public void slaContactGegevensOp(UUID dossierId, String bsn, Telefoonnummer telefoonnummer, Emailadres emailadres) {
+    public void slaContactGegevensOp(UUID dossierId, BurgerServiceNummer bsn, Telefoonnummer telefoonnummer, Emailadres emailadres) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
                 .filter(p -> bsn.equals(p.getBsn()))

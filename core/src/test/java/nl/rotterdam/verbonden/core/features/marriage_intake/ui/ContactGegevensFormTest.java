@@ -1,12 +1,13 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -40,7 +41,7 @@ class ContactGegevensFormTest extends BaseWicketTest {
     @WithMockUser(username = "999990007")
     void testContactGegevensAutoSavesOnFieldChange() {
         createdDossierId = marriageIntakeService.create(
-                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990007"));
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
 
         PageParameters params = new PageParameters();
         params.add("dossierId", createdDossierId.toString());
@@ -58,7 +59,7 @@ class ContactGegevensFormTest extends BaseWicketTest {
         tester.getRequest().getPostParameters().setParameterValue(
                 telefoonnummerControl.getInputName(), "0612345999");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
-        tester.executeBehavior(telefoonnummerControl.getBehaviors(AjaxFormComponentUpdatingBehavior.class).get(0));
+        tester.executeBehavior(telefoonnummerControl.getBehaviors(AjaxFormComponentUpdatingBehavior.class).getFirst());
 
         // Trigger auto-save for emailadres via AjaxFormComponentUpdatingBehavior
         FormComponent<?> emailadresControl = (FormComponent<?>) tester.getComponentFromLastRenderedPage(
@@ -66,11 +67,11 @@ class ContactGegevensFormTest extends BaseWicketTest {
         tester.getRequest().getPostParameters().setParameterValue(
                 emailadresControl.getInputName(), "new@example.com");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
-        tester.executeBehavior(emailadresControl.getBehaviors(AjaxFormComponentUpdatingBehavior.class).get(0));
+        tester.executeBehavior(emailadresControl.getBehaviors(AjaxFormComponentUpdatingBehavior.class).getFirst());
 
         List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(createdDossierId);
         PartnerGegevensDto partner = partners.stream()
-                .filter(p -> "999990007".equals(p.bsn()))
+                .filter(p -> new BurgerServiceNummer("999990007").equals(p.bsn()))
                 .findFirst()
                 .orElseThrow();
 

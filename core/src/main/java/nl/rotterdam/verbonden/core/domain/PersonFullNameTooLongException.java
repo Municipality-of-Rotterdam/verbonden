@@ -1,4 +1,4 @@
-package nl.rotterdam.verbonden.core.features.babs_administration.domain;
+package nl.rotterdam.verbonden.core.domain;
 
 public class PersonFullNameTooLongException extends RuntimeException {
 

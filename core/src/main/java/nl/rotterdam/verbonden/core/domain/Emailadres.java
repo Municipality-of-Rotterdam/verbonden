@@ -1,6 +1,5 @@
-package nl.rotterdam.verbonden.core.features.marriage_intake.domain;
+package nl.rotterdam.verbonden.core.domain;
 
-import nl.rotterdam.verbonden.core.domain.ValueHolder;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.io.Serializable;
@@ -27,11 +26,6 @@ public record Emailadres(String value) implements ValueHolder<String>, Serializa
     @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String toString() {
-        return "Emailadres[" + value + "]";
     }
 
 }

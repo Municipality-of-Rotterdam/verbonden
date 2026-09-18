@@ -1,11 +1,12 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.domain.ValueHolder;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.nl_design_system.wicket.components.data_summary.RdDataSummary;
 import nl.rotterdam.nl_design_system.wicket.components.data_summary.SummaryItem;
 import nl.rotterdam.nl_design_system.wicket.components.data_summary.SummaryItemValue;
@@ -71,7 +72,7 @@ public class JullieGegevensPage extends IntakeBasePage {
         pageBody.add(new RdHeading("heading", getString("jullie.gegevens.heading"), 1));
 
         List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
-        String currentBsn = getCurrentBsn();
+        BurgerServiceNummer currentBsn = getCurrentBsn();
         boolean tweeBsns = partners.size() == 2;
 
         pageBody.add(new ListView<>("partnerCards", partners) {

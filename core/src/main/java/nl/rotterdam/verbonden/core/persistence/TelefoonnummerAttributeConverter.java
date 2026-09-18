@@ -2,9 +2,9 @@ package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 
-@Converter(autoApply = false)
+@Converter
 public class TelefoonnummerAttributeConverter implements AttributeConverter<Telefoonnummer, String> {
 
     @Override

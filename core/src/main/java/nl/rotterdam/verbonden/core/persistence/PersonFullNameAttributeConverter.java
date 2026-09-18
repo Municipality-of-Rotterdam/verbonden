@@ -2,9 +2,9 @@ package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
 
-@Converter(autoApply = false)
+@Converter
 public class PersonFullNameAttributeConverter implements AttributeConverter<PersonFullName, String> {
 
     @Override

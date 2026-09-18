@@ -1,8 +1,9 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Emailadres;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 
 @Entity
 @Table(name = "huwelijksdossiers_partners")
@@ -19,8 +20,9 @@ public class HuwelijksDossiersPartnerEntity {
     @Column(name = "volgorde", nullable = false)
     private int volgorde;
 
+    @Convert(converter = BurgerServiceNummerAttributeConverter.class)
     @Column(name = "bsn", length = 10, nullable = false)
-    private String bsn;
+    private BurgerServiceNummer bsn;
 
     @Column(name = "gekozen_achternaam")
     private String gekozenAchternaam;
@@ -57,11 +59,11 @@ public class HuwelijksDossiersPartnerEntity {
         this.volgorde = volgorde;
     }
 
-    public String getBsn() {
+    public BurgerServiceNummer getBsn() {
         return bsn;
     }
 
-    public void setBsn(String bsn) {
+    public void setBsn(BurgerServiceNummer bsn) {
         this.bsn = bsn;
     }
 

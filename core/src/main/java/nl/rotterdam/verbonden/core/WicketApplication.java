@@ -2,7 +2,7 @@ package nl.rotterdam.verbonden.core;
 
 import de.agilecoders.wicket.webjars.WicketWebjars;
 import nl.rotterdam.verbonden.core.burger_common.BurgerErrorPage;
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeCreatePage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeUpdatePage;
@@ -11,8 +11,8 @@ import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePag
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsUpdatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.PersonFullNameWicketConverter;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.domain.Emailadres;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.EmailadresWicketConverter;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.TelefoonnummerWicketConverter;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.BeschikbaarheidCreatePage;

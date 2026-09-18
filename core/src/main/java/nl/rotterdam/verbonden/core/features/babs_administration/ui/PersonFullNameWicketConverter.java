@@ -1,8 +1,8 @@
 package nl.rotterdam.verbonden.core.features.babs_administration.ui;
 
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullName;
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullNameTooLongException;
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullNameTooShortException;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullNameTooLongException;
+import nl.rotterdam.verbonden.core.domain.PersonFullNameTooShortException;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 import org.jspecify.annotations.Nullable;

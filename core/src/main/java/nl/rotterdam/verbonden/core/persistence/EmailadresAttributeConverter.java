@@ -2,9 +2,9 @@ package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.verbonden.core.domain.Emailadres;
 
-@Converter(autoApply = false)
+@Converter
 public class EmailadresAttributeConverter implements AttributeConverter<Emailadres, String> {
 
     @Override

@@ -1,11 +1,12 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
+import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ExtraDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
@@ -13,7 +14,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,7 +42,7 @@ public interface MarriageIntakeService {
      * Returns the UUID of the dossier in which the given BSN appears as bsn1 or bsn2,
      * or {@link Optional#empty()} when no such dossier exists.
      */
-    Optional<UUID> findDossierIdByBsn(String bsn);
+    Optional<UUID> findDossierIdByBsn(BurgerServiceNummer bsn);
 
     /**
      * Validates that the given BSN has access to the dossier.
@@ -51,7 +52,7 @@ public interface MarriageIntakeService {
      *   <li>Otherwise: {@link IllegalStateException} is thrown.</li>
      * </ul>
      */
-    void ensureBsnAccess(UUID dossierId, String bsn);
+    void ensureBsnAccess(UUID dossierId, BurgerServiceNummer bsn);
 
     /**
      * Determines and grants (or denies) access to a requested dossier for the given BSN.
@@ -66,7 +67,7 @@ public interface MarriageIntakeService {
      *       returns {@link DossierAccessOutcome.Scenario#NOT_AUTHORIZED} with a {@code null} dossier ID.</li>
      * </ul>
      */
-    DossierAccessOutcome resolveAccess(UUID requestedDossierId, String bsn);
+    DossierAccessOutcome resolveAccess(UUID requestedDossierId, BurgerServiceNummer bsn);
 
     DossierSamenvattingDto findByDossierId(UUID id);
 
@@ -86,9 +87,9 @@ public interface MarriageIntakeService {
 
     void slaGetuigeOp(UUID dossierId, SaveGetuigenDto getuige);
 
-    void slaGekozenAchternaamOp(UUID dossierId, String bsn, String gekozenAchternaam);
+    void slaGekozenAchternaamOp(UUID dossierId, BurgerServiceNummer bsn, String gekozenAchternaam);
 
-    void slaContactGegevensOp(UUID dossierId, String bsn, Telefoonnummer telefoonnummer, Emailadres emailadres);
+    void slaContactGegevensOp(UUID dossierId, BurgerServiceNummer bsn, Telefoonnummer telefoonnummer, Emailadres emailadres);
 
     void delete(UUID dossierId);
 

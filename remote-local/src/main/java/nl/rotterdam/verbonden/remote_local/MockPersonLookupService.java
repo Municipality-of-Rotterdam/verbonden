@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.remote_local;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.identity.PersonInfo;
 import nl.rotterdam.verbonden.core.identity.PersonLookupService;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ class MockPersonLookupService implements PersonLookupService {
     );
 
     @Override
-    public Optional<PersonInfo> findByBsn(String bsn) {
-        return Optional.ofNullable(MOCK_PERSONEN.get(bsn));
+    public Optional<PersonInfo> findByBsn(BurgerServiceNummer bsn) {
+        return Optional.ofNullable(MOCK_PERSONEN.get(bsn.getValue()));
     }
 }

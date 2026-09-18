@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
@@ -32,7 +33,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
     @WithMockUser(username = "999990007")
     void testRender() {
         createdDossierId = marriageIntakeService.create(
-                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990007"));
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
 
         PageParameters params = new PageParameters();
         params.add("dossierId", createdDossierId.toString());
@@ -44,7 +45,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
     @WithMockUser(username = "999990007")
     void sidebarLinkNaarJullieGegevensWerktVanafGetuigenPagina() {
         createdDossierId = marriageIntakeService.create(
-                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, "999990007"));
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
 
         PageParameters params = new PageParameters();
         params.add("dossierId", createdDossierId.toString());

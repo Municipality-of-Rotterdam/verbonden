@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.core.features.babs_administration.ui;
 
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.ChangeBabsDto;
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
 
 import java.io.Serializable;
 import java.time.DayOfWeek;

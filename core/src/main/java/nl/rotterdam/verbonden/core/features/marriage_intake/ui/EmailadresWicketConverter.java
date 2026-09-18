@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.Emailadres;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.EmailadresOngeldigException;
+import nl.rotterdam.verbonden.core.domain.Emailadres;
+import nl.rotterdam.verbonden.core.domain.EmailadresOngeldigException;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 

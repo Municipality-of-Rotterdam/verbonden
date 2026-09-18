@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.burger_common;
 
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
@@ -107,7 +108,7 @@ public abstract class BurgerBasePage extends WebPage {
         return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
     }
 
-    protected String getCurrentBsn() {
-        return currentUserProvider.getCurrentUser().getUserId();
+    protected BurgerServiceNummer getCurrentBsn() {
+        return new BurgerServiceNummer(currentUserProvider.getCurrentUser().getUserId());
     }
 }

@@ -1,10 +1,9 @@
-package nl.rotterdam.verbonden.core.features.marriage_intake.domain;
+package nl.rotterdam.verbonden.core.domain;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import jakarta.annotation.Nonnull;
-import nl.rotterdam.verbonden.core.domain.ValueHolder;
 
 import java.io.Serializable;
 
@@ -38,11 +37,6 @@ public record Telefoonnummer(String value) implements ValueHolder<String>, Seria
     @Override
     public String getValue() {
         return value;
-    }
-
-    @Override
-    public String toString() {
-        return "Telefoonnummer[" + value + "]";
     }
 
     private static String replacePrefix(@Nonnull String value, String prefix, String replacement) {
