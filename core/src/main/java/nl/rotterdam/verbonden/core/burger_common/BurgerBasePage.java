@@ -15,7 +15,6 @@ import nl.rotterdam.nl_design_system.wicket.components.page_header.RdPageHeaderB
 import nl.rotterdam.nl_design_system.wicket.components.page_layout.RdPageLayoutBorder;
 import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
 import org.apache.wicket.markup.head.CssHeaderItem;
-import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -100,7 +99,7 @@ public abstract class BurgerBasePage extends WebPage {
         if (!isAuthenticated()) {
             return "";
         }
-        return SecurityContextHolder.getContext().getAuthentication().getName();
+        return currentUserProvider.getCurrentUser().getUserId();
     }
 
     private boolean isAuthenticated() {
