@@ -93,11 +93,6 @@ public class WicketApplication extends WicketBootStandardWebApplication {
                 .add(IMG_SRC, "data:")
                 .add(FRAME_ANCESTORS, NONE);
 
-        // Enable Wicket's built-in CSRF protection via Fetch Metadata headers.
-        // Spring Security's CSRF filter is disabled in SecurityConfig to avoid conflicts
-        // with Wicket's own form submission mechanism (see SecurityConfig for details).
-        getRequestCycleListeners().add(new ResourceIsolationRequestCycleListener(new FetchMetadataResourceIsolationPolicy()));
-
         for (BurgerLoginPageMount mount : burgerLoginPageMounts) {
             mountPage(mount.getPath(), mount.getPageClass());
         }
