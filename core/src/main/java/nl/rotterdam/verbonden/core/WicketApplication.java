@@ -1,6 +1,5 @@
 package nl.rotterdam.verbonden.core;
 
-import de.agilecoders.wicket.webjars.WicketWebjars;
 import nl.rotterdam.verbonden.core.burger_common.BurgerErrorPage;
 import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
@@ -36,8 +35,6 @@ import com.giffing.wicket.spring.boot.starter.app.WicketBootStandardWebApplicati
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
-import org.apache.wicket.protocol.http.FetchMetadataResourceIsolationPolicy;
-import org.apache.wicket.protocol.http.ResourceIsolationRequestCycleListener;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -76,8 +73,6 @@ public class WicketApplication extends WicketBootStandardWebApplication {
     @Override
     public void init() {
         super.init();
-        WicketWebjars.install(this);
-
         getMarkupSettings().setStripWicketTags(true);
 
         getApplicationSettings().setInternalErrorPage(BurgerErrorPage.class);
