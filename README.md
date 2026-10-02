@@ -113,6 +113,18 @@ Extra beheerders kun je toevoegen via de eigenschap `beheer.gebruikers` in
 beheer.gebruikers=beheerder:rotterdam
 ```
 
+### Uitloggen
+
+De Uitloggen-links op beheer- en burgerpagina's zijn verplicht in te stellen; `core` heeft
+geen standaardwaarde, zodat een applicatie die ze vergeet niet opstart. Lokaal wijzen ze naar
+de logout-endpoints van Spring Security. In productie kan dit een URL zijn die de infra
+afvangt, bijvoorbeeld om ook bij de OIDC-provider uit te loggen.
+
+```properties
+verbonden.logout.beheer-url=/logout
+verbonden.logout.burger-url=/uitloggen
+```
+
 ## Bouwen en testen
 
 ```bash

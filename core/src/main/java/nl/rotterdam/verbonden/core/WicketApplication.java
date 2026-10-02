@@ -38,6 +38,8 @@ import com.giffing.wicket.spring.boot.starter.app.WicketBootStandardWebApplicati
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
+import org.apache.wicket.protocol.http.WebApplication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -52,9 +54,29 @@ import static org.apache.wicket.csp.CSPDirectiveSrcValue.SELF;
 public class WicketApplication extends WicketBootStandardWebApplication {
 
     private final List<BurgerLoginPageMount> burgerLoginPageMounts;
+    private final String beheerLogoutUrl;
+    private final String burgerLogoutUrl;
 
-    public WicketApplication(List<BurgerLoginPageMount> burgerLoginPageMounts) {
+    public WicketApplication(List<BurgerLoginPageMount> burgerLoginPageMounts,
+                             @Value("${verbonden.logout.beheer-url}") String beheerLogoutUrl,
+                             @Value("${verbonden.logout.burger-url}") String burgerLogoutUrl) {
         this.burgerLoginPageMounts = burgerLoginPageMounts;
+        this.beheerLogoutUrl = beheerLogoutUrl;
+        this.burgerLogoutUrl = burgerLogoutUrl;
+    }
+
+    public static WicketApplication get() {
+        return (WicketApplication) WebApplication.get();
+    }
+
+    /** URL van de Uitloggen-link op beheerpagina's ({@code verbonden.logout.beheer-url}). */
+    public String getBeheerLogoutUrl() {
+        return beheerLogoutUrl;
+    }
+
+    /** URL van de Uitloggen-link op burgerpagina's ({@code verbonden.logout.burger-url}). */
+    public String getBurgerLogoutUrl() {
+        return burgerLogoutUrl;
     }
 
     @Override

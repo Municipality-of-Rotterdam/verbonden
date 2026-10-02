@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.burger_common;
 
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
+import nl.rotterdam.verbonden.core.WicketApplication;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;
@@ -18,6 +19,7 @@ import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
@@ -75,8 +77,9 @@ public abstract class BurgerBasePage extends WebPage {
         userBar.add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
         userBar.add(new Label("userName", this::currentUserName));
-        userBar.add(new WebMarkupContainer("logOutIcon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
+        userBar.add(new ExternalLink("logOutLink", WicketApplication.get().getBurgerLogoutUrl())
+                .add(new WebMarkupContainer("logOutIcon")
+                        .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT))));
         pageHeader.add(userBar);
 
         pageBody = new RdPageBodyBorder("pageBody");

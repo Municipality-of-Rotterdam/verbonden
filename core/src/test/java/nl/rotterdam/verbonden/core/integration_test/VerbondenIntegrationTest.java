@@ -9,7 +9,10 @@ import java.lang.annotation.*;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
+        "verbonden.logout.beheer-url=/logout",
+        "verbonden.logout.burger-url=/uitloggen"
+})
 @AutoConfigureEmbeddedDatabase(provider = ZONKY)
 @AutoConfigureTestRestTemplate
 

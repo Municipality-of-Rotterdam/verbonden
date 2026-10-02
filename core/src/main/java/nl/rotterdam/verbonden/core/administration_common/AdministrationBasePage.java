@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.administration_common;
 
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
+import nl.rotterdam.verbonden.core.WicketApplication;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
@@ -23,6 +24,7 @@ import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.WebPage;
 
 import java.util.List;
@@ -55,8 +57,9 @@ public abstract class AdministrationBasePage extends WebPage {
                 .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
         pageHeader.add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
-        pageHeader.add(new WebMarkupContainer("logOutIcon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT)));
+        pageHeader.add(new ExternalLink("logOutLink", WicketApplication.get().getBeheerLogoutUrl())
+                .add(new WebMarkupContainer("logOutIcon")
+                        .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT))));
 
         pageLayout.add(new RdSideNavPanel("sideNav", List.of(
                 new RdSideNavRecord(null, "BABS ", BabsAdministrationPage.class, null, null, null),
