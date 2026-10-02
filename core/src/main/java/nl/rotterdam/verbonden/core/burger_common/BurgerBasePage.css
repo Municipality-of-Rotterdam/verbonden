@@ -87,6 +87,11 @@
     color: #333;
 }
 
+/* Zonder Bootstrap reboot is box-sizing content-box: width 100% + padding valt dan buiten de balk */
+.rd-top-bar > .container-fluid {
+    box-sizing: border-box;
+}
+
 .rd-top-bar a {
     color: #333;
     text-decoration: none;

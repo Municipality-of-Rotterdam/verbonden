@@ -4,6 +4,8 @@ import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReferenc
 import nl.rotterdam.verbonden.core.WicketApplication;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
+import nl.rotterdam.verbonden.core.identity.PersonInfo;
+import nl.rotterdam.verbonden.core.identity.PersonLookupService;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.NldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
@@ -23,11 +25,16 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 public abstract class BurgerBasePage extends WebPage {
 
@@ -36,12 +43,19 @@ public abstract class BurgerBasePage extends WebPage {
     private static final HeaderItem BOOTSTRAP_UTILITIES_HEADER_ITEM =
             CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-utilities.min.css"));
 
+    private static final Logger log = LoggerFactory.getLogger(BurgerBasePage.class);
+
+    private static final String OFFICIELE_NAAM_SESSION_KEY = BurgerBasePage.class.getName() + ".officieleNaam";
+
     private static final HeaderItem BURGER_BASE_PAGE_HEADER_ITEM = CssHeaderItem.forReference(new PackageResourceReference(BurgerBasePage.class, "BurgerBasePage.css"));
 
     protected final RdPageBodyBorder pageBody;
 
     @SpringBean
     private CurrentUserProvider currentUserProvider;
+
+    @SpringBean
+    private PersonLookupService personLookupService;
 
     protected abstract IModel<String> getTitleModel();
 
@@ -76,7 +90,7 @@ public abstract class BurgerBasePage extends WebPage {
         };
         userBar.add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
-        userBar.add(new Label("userName", this::currentUserName));
+        userBar.add(new Label("userName", LoadableDetachableModel.of(this::currentUserOfficieleNaam)));
         userBar.add(new ExternalLink("logOutLink", WicketApplication.get().getBurgerLogoutUrl())
                 .add(new WebMarkupContainer("logOutIcon")
                         .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT))));
@@ -98,11 +112,36 @@ public abstract class BurgerBasePage extends WebPage {
         response.render(BURGER_BASE_PAGE_HEADER_ITEM);
     }
 
-    private String currentUserName() {
+    /**
+     * De officiële naam (voorletters + achternaam) wordt één keer per sessie opgezocht (niet
+     * bij elke paginaweergave een BRP-bevraging) en gekoppeld aan het BSN, zodat een andere
+     * burger in dezelfde sessie nooit de naam van de vorige ziet. Faalt het opzoeken, dan blijft de naam leeg, zodat
+     * pagina's (en de foutpagina) blijven werken. Een ongeldig BSN blijft wel een harde fout.
+     */
+    private String currentUserOfficieleNaam() {
         if (!isAuthenticated()) {
             return "";
         }
-        return currentUserProvider.getCurrentUser().getUserId();
+        BurgerServiceNummer bsn = getCurrentBsn();
+        if (getSession().getAttribute(OFFICIELE_NAAM_SESSION_KEY) instanceof SessionOfficieleNaam(
+                String cachedBsn, String cachedOfficieleNaam
+        )
+                && cachedBsn.equals(bsn.getValue())) {
+            return cachedOfficieleNaam;
+        }
+        try {
+            String officieleNaam = personLookupService.findByBsn(bsn)
+                    .map(PersonInfo::officieleNaam)
+                    .orElse("");
+            getSession().setAttribute(OFFICIELE_NAAM_SESSION_KEY, new SessionOfficieleNaam(bsn.getValue(), officieleNaam));
+            return officieleNaam;
+        } catch (RuntimeException e) {
+            log.warn("Naam voor de header kon niet worden opgehaald", e);
+            return "";
+        }
+    }
+
+    private record SessionOfficieleNaam(String bsn, String officieleNaam) implements Serializable {
     }
 
     private boolean isAuthenticated() {

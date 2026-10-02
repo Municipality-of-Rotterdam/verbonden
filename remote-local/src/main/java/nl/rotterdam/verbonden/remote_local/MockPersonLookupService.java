@@ -19,17 +19,17 @@ import java.util.Optional;
 class MockPersonLookupService implements PersonLookupService {
 
     private static final Map<String, PersonInfo> MOCK_PERSONEN = Map.of(
-            "999990007", new PersonInfo("Van Muiswinkel", "Erik Jan",
+            "999990007", new PersonInfo("Van Muiswinkel", "Erik Jan", "E.J. van Muiswinkel",
                     LocalDate.of(1984, 5, 29), "Rotterdam", "Nederlandse", "Ongehuwd"),
-            "999990019", new PersonInfo("De Vries", "Sanne Maria",
+            "999990019", new PersonInfo("De Vries", "Sanne Maria", "S.M. de Vries",
                     LocalDate.of(1992, 3, 14), "Den Haag", "Nederlandse", "Ongehuwd"),
-            "999990020", new PersonInfo("Jansen", "Pieter",
+            "999990020", new PersonInfo("Jansen", "Pieter", "P. Jansen",
                     LocalDate.of(1988, 7, 22), "Groningen", "Nederlandse", "Gehuwd"),
-            "999990202", new PersonInfo("Bakker", "Willem Adriaan",
+            "999990202", new PersonInfo("Bakker", "Willem Adriaan", "W.A. Bakker",
                     LocalDate.of(1975, 11, 3), "Assen", "Nederlandse", "Gescheiden"),
-            "999990032", new PersonInfo("Dëhlano", "Chavéliën",
+            "999990032", new PersonInfo("Dëhlano", "Chavéliën", "C. Dëhlano",
                     LocalDate.of(2001, 6, 18), "Paramaribo", "Nederlandse", "Ongehuwd"),
-            "999990008", new PersonInfo("Hofstede", "Jan-Diederik, deIII",
+            "999990008", new PersonInfo("Hofstede", "Jan-Diederik, deIII", "J. Hofstede",
                     LocalDate.of(1999, 1, 1), "Rotterdam", "Nederlandse", "Ongehuwd")
     );
 

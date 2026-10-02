@@ -26,6 +26,7 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.resource.PackageResourceReference;
 
 import java.util.List;
 
@@ -35,6 +36,8 @@ public abstract class AdministrationBasePage extends WebPage {
             CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-grid.min.css"));
     private static final CssReferenceHeaderItem BOOTSTRAP_UTILITIES_HEADER_ITEM =
             CssHeaderItem.forReference(new WebjarsCssResourceReference("bootstrap/current/css/bootstrap-utilities.min.css"));
+    private static final CssReferenceHeaderItem ADMINISTRATION_BASE_PAGE_HEADER_ITEM =
+            CssHeaderItem.forReference(new PackageResourceReference(AdministrationBasePage.class, "AdministrationBasePage.css"));
 
     protected final RdPageBodyBorder pageBody;
 
@@ -82,5 +85,6 @@ public abstract class AdministrationBasePage extends WebPage {
         super.renderHead(response);
         response.render(BOOTSTRAP_GRID_HEADER_ITEM);
         response.render(BOOTSTRAP_UTILITIES_HEADER_ITEM);
+        response.render(ADMINISTRATION_BASE_PAGE_HEADER_ITEM);
     }
 }

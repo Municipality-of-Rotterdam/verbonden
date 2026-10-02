@@ -1,0 +1,4 @@
+/* Zonder Bootstrap reboot is box-sizing content-box: width 100% + padding valt dan buiten de balk */
+.rd-top-bar > .container-fluid {
+    box-sizing: border-box;
+}

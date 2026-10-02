@@ -115,8 +115,8 @@ public class SecurityConfig {
      * Security filter chain for citizen-facing pages.
      *
      * <p>Requires authentication for all pages except {@code /inloggen} (where a
-     * {@code BurgerLoginPageMount} adapter, e.g. the mock DigiD login page, is mounted)
-     * and static Wicket resources. Unauthenticated visitors are redirected to
+     * {@code BurgerLoginPageMount} adapter, e.g. the mock DigiD login page, is mounted),
+     * the {@code /error} page and static Wicket resources. Unauthenticated visitors are redirected to
      * {@code /inloggen}.
      *
      * <p>This chain is composable: when a {@link ClientRegistrationRepository} bean is
@@ -145,6 +145,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/inloggen", "/inloggen/**").permitAll()
+                        // Foutpagina: anders wordt een fout op een publieke pagina (bijv. tijdens inloggen) naar /inloggen omgeleid
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/wicket/resource/**").permitAll()
                         .requestMatchers("/actuator", "/actuator/**").permitAll()
                         .anyRequest().hasRole("BURGER")

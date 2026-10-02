@@ -3,12 +3,31 @@ package nl.rotterdam.verbonden.core.burger_common;
 import jakarta.servlet.RequestDispatcher;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @WithMockUser(username = "999990007")
 class BurgerErrorPageTest extends BaseWicketTest {
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    /**
+     * De foutpagina moet ook zonder inloggen bereikbaar zijn; anders wordt een fout op een
+     * publieke pagina (bijv. tijdens het inloggen) omgeleid naar {@code /inloggen}.
+     */
+    @Test
+    void errorPageIsReachableWithoutLogin() {
+        ResponseEntity<String> response = restTemplate.getForEntity("/error", String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getBody()).contains("Er is een fout opgetreden");
+    }
 
     @Test
     void containerErrorShowsStatusCodeFromRequestAttributes() {

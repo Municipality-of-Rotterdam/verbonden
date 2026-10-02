@@ -3,6 +3,7 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.http.client.HttpRedirects;
 import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ class MarriageIntakePageTest extends BaseWicketTest {
      */
     @Test
     void unauthenticatedRequestRedirectsToLogin() {
-        ResponseEntity<String> response = restTemplate.getForEntity("/", String.class);
+        ResponseEntity<String> response = restTemplate.withRedirects(HttpRedirects.DONT_FOLLOW).getForEntity("/", String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
         assertThat(response.getHeaders().getLocation()).hasPath("/inloggen");
     }
