@@ -1,6 +1,9 @@
 package nl.rotterdam.verbonden.core;
 
+import nl.rotterdam.verbonden.core.burger_common.BurgerAccessDeniedPage;
 import nl.rotterdam.verbonden.core.burger_common.BurgerErrorPage;
+import nl.rotterdam.verbonden.core.burger_common.BurgerInternalErrorPage;
+import nl.rotterdam.verbonden.core.burger_common.BurgerPageExpiredPage;
 import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeCreatePage;
@@ -75,9 +78,9 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         super.init();
         getMarkupSettings().setStripWicketTags(true);
 
-        getApplicationSettings().setInternalErrorPage(BurgerErrorPage.class);
-        getApplicationSettings().setPageExpiredErrorPage(BurgerErrorPage.class);
-        getApplicationSettings().setAccessDeniedPage(BurgerErrorPage.class);
+        getApplicationSettings().setInternalErrorPage(BurgerInternalErrorPage.class);
+        getApplicationSettings().setPageExpiredErrorPage(BurgerPageExpiredPage.class);
+        getApplicationSettings().setAccessDeniedPage(BurgerAccessDeniedPage.class);
 
         // Extend Wicket's default blocking CSP to allow data: images (needed for QR codes)
         // and style-src 'self'. Wicket's internalInit() already calls reportBack(), so
