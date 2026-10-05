@@ -1,9 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
-import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
-import nl.rotterdam.verbonden.core.features.extra.repository.ExtraRepository;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ExtraDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.config.PlanningConfig;
@@ -20,13 +17,16 @@ import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.GetuigenRepository;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.repository.MarriageTypeRepository;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.repository.TrouwboekjeRepository;
 import nl.rotterdam.verbonden.core.identity.PersonInfo;
 import nl.rotterdam.verbonden.core.identity.PersonLookupService;
 import nl.rotterdam.verbonden.core.persistence.AfspraakEntity;
@@ -60,7 +60,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final AfspraakRepository afspraakRepository;
     private final PlanningConfig planningConfig;
     private final GetuigenRepository getuigenRepository;
-    private final ExtraRepository extraRepository;
+    private final TrouwboekjeRepository trouwboekjeRepository;
     private final PersonLookupService personLookupService;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
@@ -72,7 +72,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               AfspraakRepository afspraakRepository,
                               PlanningConfig planningConfig,
                               GetuigenRepository getuigenRepository,
-                              ExtraRepository extraRepository,
+                              TrouwboekjeRepository trouwboekjeRepository,
                               PersonLookupService personLookupService) {
         this.dossierRepository = dossierRepository;
         this.beschikbaarheidRepository = beschikbaarheidRepository;
@@ -83,7 +83,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         this.afspraakRepository = afspraakRepository;
         this.planningConfig = planningConfig;
         this.getuigenRepository = getuigenRepository;
-        this.extraRepository = extraRepository;
+        this.trouwboekjeRepository = trouwboekjeRepository;
         this.personLookupService = personLookupService;
     }
 
@@ -290,8 +290,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         if (e.getTrouwboekje() != null) {
             extraItems.add(new SidebarExtraItemDto(e.getTrouwboekje().getNaam(), e.getTrouwboekje().getPrijs()));
         }
-        if (e.getInternationaleAkte() != null) {
-            extraItems.add(new SidebarExtraItemDto(e.getInternationaleAkte().getNaam(), e.getInternationaleAkte().getPrijs()));
+        if (e.isInternationaleAkte()) {
+            extraItems.add(new SidebarExtraItemDto("Internationale huwelijksakte", null));
         }
 
         BigDecimal extrasTotaal = extraItems.stream()
@@ -597,15 +597,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public SaveExtrasDto findExtrasSelecties(UUID dossierId) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         Long trouwboekjeId = dossier.getTrouwboekje() != null ? dossier.getTrouwboekje().getId() : null;
-        Long internationaleAkteId = dossier.getInternationaleAkte() != null ? dossier.getInternationaleAkte().getId() : null;
-        return new SaveExtrasDto(dossier.isRingenUitwisselen(), dossier.isMuziek(), trouwboekjeId, internationaleAkteId);
+        return new SaveExtrasDto(dossier.isRingenUitwisselen(), dossier.isMuziek(), trouwboekjeId, dossier.isInternationaleAkte());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ExtraDto> findActiefExtras(ExtraType type) {
-        return extraRepository.findActiefByType(type, LocalDate.now()).stream()
-                .map(e -> new ExtraDto(e.getId(), e.getNaam(), e.getOmschrijving(), e.getAfbeelding(), e.getPrijs()))
+    public List<TrouwboekjeKeuzeDto> findActieveTrouwboekjes() {
+        return trouwboekjeRepository.findActief(LocalDate.now()).stream()
+                .map(e -> new TrouwboekjeKeuzeDto(e.getId(), e.getNaam(), e.getOmschrijving(), e.getAfbeelding(), e.getPrijs()))
                 .toList();
     }
 
@@ -617,11 +616,10 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         boolean isGroot = dossier.getCeremonieSoort() == CeremonieSoort.GROOT;
         dossier.setMuziek(isGroot && dto.muziek());
         dossier.setTrouwboekje(dto.trouwboekjeId() != null
-                ? extraRepository.findById(dto.trouwboekjeId()).orElse(null)
+                ? trouwboekjeRepository.findById(dto.trouwboekjeId()).orElse(null)
                 : null);
-        dossier.setInternationaleAkte(dto.internationaleAkteId() != null
-                ? extraRepository.findById(dto.internationaleAkteId()).orElse(null)
-                : null);
+        boolean isHuwelijk = dossier.getRegistratieType() == RegistratieType.HUWELIJK;
+        dossier.setInternationaleAkte(isHuwelijk && dto.internationaleAkte());
         dossierRepository.save(dossier);
     }
 }

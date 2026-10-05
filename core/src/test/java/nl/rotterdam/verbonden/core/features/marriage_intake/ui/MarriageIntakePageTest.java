@@ -29,6 +29,17 @@ class MarriageIntakePageTest extends BaseWicketTest {
     }
 
     /**
+     * De Stencil-iconen lezen de CSP-nonce uit {@code <meta name="csp-nonce">} voor hun eigen
+     * {@code <style>}-blokken; zonder die tag blokkeert de browser ze.
+     */
+    @Test
+    @WithMockUser(username = "999990007")
+    void rendertCspNonceMetaTagVoorStencilIconen() {
+        tester.startPage(MarriageIntakePage.class);
+        assertThat(tester.getLastResponseAsString()).containsPattern("<meta name=\"csp-nonce\" content=\"[^\"]+\"");
+    }
+
+    /**
      * Verifies that an unauthenticated HTTP request to the home page is redirected to the
      * citizen login page ({@code /inloggen}). This test exercises the real Spring Security
      * filter chain, unlike the WicketTester-based test above.

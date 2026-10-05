@@ -9,14 +9,14 @@ public class ExtrasFormDto implements Serializable {
     private boolean ringenUitwisselen;
     private boolean muziek;
     private Long trouwboekjeId;
-    private Long internationaleAkteId;
+    private boolean internationaleAkte;
 
     public static ExtrasFormDto vanSelecties(SaveExtrasDto dto) {
         ExtrasFormDto form = new ExtrasFormDto();
         form.setRingenUitwisselen(dto.ringenUitwisselen());
         form.setMuziek(dto.muziek());
         form.setTrouwboekjeId(dto.trouwboekjeId());
-        form.setInternationaleAkteId(dto.internationaleAkteId());
+        form.setInternationaleAkte(dto.internationaleAkte());
         return form;
     }
 
@@ -44,11 +44,11 @@ public class ExtrasFormDto implements Serializable {
         this.trouwboekjeId = trouwboekjeId;
     }
 
-    public Long getInternationaleAkteId() {
-        return internationaleAkteId;
+    public boolean isInternationaleAkte() {
+        return internationaleAkte;
     }
 
-    public void setInternationaleAkteId(Long internationaleAkteId) {
-        this.internationaleAkteId = internationaleAkteId;
+    public void setInternationaleAkte(boolean internationaleAkte) {
+        this.internationaleAkte = internationaleAkte;
     }
 }

@@ -2,10 +2,9 @@ package nl.rotterdam.verbonden.core.features.trouwboekje_administration.applicat
 
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ChangeTrouwboekjeDto;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.CreateTrouwboekjeDto;
-import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ListTrouwboekjeDto;
-import nl.rotterdam.verbonden.core.features.extra.repository.ExtraRepository;
-import nl.rotterdam.verbonden.core.persistence.ExtraEntity;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.repository.TrouwboekjeRepository;
+import nl.rotterdam.verbonden.core.persistence.TrouwboekjeEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,17 +14,16 @@ import java.util.Optional;
 @Service
 class TrouwboekjeAdministrationServiceImpl implements TrouwboekjeAdministrationService {
 
-    private final ExtraRepository extraRepository;
+    private final TrouwboekjeRepository trouwboekjeRepository;
 
-    TrouwboekjeAdministrationServiceImpl(ExtraRepository extraRepository) {
-        this.extraRepository = extraRepository;
+    TrouwboekjeAdministrationServiceImpl(TrouwboekjeRepository trouwboekjeRepository) {
+        this.trouwboekjeRepository = trouwboekjeRepository;
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ListTrouwboekjeDto> findAll() {
-        return extraRepository.findAll().stream()
-                .filter(this::isTrouwboekje)
+        return trouwboekjeRepository.findAll().stream()
                 .map(e -> new ListTrouwboekjeDto(e.getId(), e.getNaam(), e.getPrijs(), e.getStartdatum(), e.getEinddatum()))
                 .toList();
     }
@@ -33,64 +31,54 @@ class TrouwboekjeAdministrationServiceImpl implements TrouwboekjeAdministrationS
     @Override
     @Transactional(readOnly = true)
     public Optional<ChangeTrouwboekjeDto> findById(long id) {
-        return extraRepository.findById(id)
-                .filter(this::isTrouwboekje)
+        return trouwboekjeRepository.findById(id)
                 .map(this::toChangeDto);
     }
 
     @Override
     @Transactional
     public long create(CreateTrouwboekjeDto dto) {
-        ExtraEntity entity = new ExtraEntity();
-        entity.setType(ExtraType.TROUWBOEKJE);
+        TrouwboekjeEntity entity = new TrouwboekjeEntity();
         entity.setNaam(dto.naam());
         entity.setOmschrijving(dto.omschrijving());
         entity.setAfbeelding(dto.afbeelding());
         entity.setPrijs(dto.prijs());
         entity.setStartdatum(dto.startdatum());
         entity.setEinddatum(dto.einddatum());
-        return extraRepository.save(entity).getId();
+        return trouwboekjeRepository.save(entity).getId();
     }
 
     @Override
     @Transactional
     public void update(ChangeTrouwboekjeDto dto) {
-        ExtraEntity entity = extraRepository.findById(dto.id())
+        TrouwboekjeEntity entity = trouwboekjeRepository.findById(dto.id())
                 .orElseThrow(() -> new IllegalArgumentException("Trouwboekje niet gevonden: " + dto.id()));
-        if (!isTrouwboekje(entity)) {
-            throw new IllegalArgumentException("Alleen trouwboekjes kunnen worden beheerd: " + dto.id());
-        }
-        entity.setType(ExtraType.TROUWBOEKJE);
         entity.setNaam(dto.naam());
         entity.setOmschrijving(dto.omschrijving());
         entity.setAfbeelding(dto.afbeelding());
         entity.setPrijs(dto.prijs());
         entity.setStartdatum(dto.startdatum());
         entity.setEinddatum(dto.einddatum());
-        extraRepository.save(entity);
+        trouwboekjeRepository.save(entity);
     }
 
     @Override
     @Transactional
     public void delete(long id) {
-        extraRepository.findById(id).ifPresent(extra -> {
-            extra.setActive(false);
-            extraRepository.save(extra);
+        trouwboekjeRepository.findById(id).ifPresent(trouwboekje -> {
+            trouwboekje.setActive(false);
+            trouwboekjeRepository.save(trouwboekje);
         });
     }
 
     @Override
     @Transactional(readOnly = true)
     public long count() {
-        return extraRepository.countByType(ExtraType.TROUWBOEKJE);
+        return trouwboekjeRepository.count();
     }
 
-    private ChangeTrouwboekjeDto toChangeDto(ExtraEntity e) {
+    private ChangeTrouwboekjeDto toChangeDto(TrouwboekjeEntity e) {
         return new ChangeTrouwboekjeDto(e.getId(), e.getNaam(), e.getOmschrijving(),
                 e.getAfbeelding(), e.getPrijs(), e.getStartdatum(), e.getEinddatum());
-    }
-
-    private boolean isTrouwboekje(ExtraEntity entity) {
-        return entity.getType() == ExtraType.TROUWBOEKJE;
     }
 }

@@ -1,12 +1,11 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
-import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ExtraDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -19,6 +18,7 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
@@ -52,7 +52,7 @@ public class ExtrasPage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return Model.of(marriageIntakeService.findByDossierId(dossierId));
+        return LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
     }
 
     public static void respond(UUID dossierId) {
@@ -80,6 +80,7 @@ public class ExtrasPage extends IntakeBasePage {
 
         private final boolean isGroot;
         private final boolean isHuwelijk;
+        private WebMarkupContainer trouwboekjeSection;
 
         ExtrasForm(String id, SaveExtrasDto selecties, boolean isGroot, boolean isHuwelijk) {
             super(id, Model.of(ExtrasFormDto.vanSelecties(selecties)));
@@ -101,6 +102,7 @@ public class ExtrasPage extends IntakeBasePage {
                 @Override
                 protected void onUpdate(AjaxRequestTarget target) {
                     slaOp();
+                    target.add(keuzesSidebar);
                 }
             });
             ringenSection.add(ringenCheckbox);
@@ -120,20 +122,21 @@ public class ExtrasPage extends IntakeBasePage {
                 @Override
                 protected void onUpdate(AjaxRequestTarget target) {
                     slaOp();
+                    target.add(keuzesSidebar);
                 }
             });
             muziekSection.add(muziekCheckbox);
             add(muziekSection);
 
             // --- Trouwboekje ---
-            List<ExtraDto> trouwboekjes = marriageIntakeService.findActiefExtras(ExtraType.TROUWBOEKJE);
-            WebMarkupContainer trouwboekjeSection = new WebMarkupContainer("trouwboekjeSection");
-            trouwboekjeSection.add(bouwExtraKeuzeList("trouwboekjeKeuzes", trouwboekjes,
+            List<TrouwboekjeKeuzeDto> trouwboekjes = marriageIntakeService.findActieveTrouwboekjes();
+            trouwboekjeSection = new WebMarkupContainer("trouwboekjeSection");
+            trouwboekjeSection.setOutputMarkupId(true);
+            trouwboekjeSection.add(bouwTrouwboekjeKeuzeList("trouwboekjeKeuzes", trouwboekjes,
                     LambdaModel.of(model, ExtrasFormDto::getTrouwboekjeId, ExtrasFormDto::setTrouwboekjeId)));
             add(trouwboekjeSection);
 
             // --- Internationale akte ---
-            List<ExtraDto> internationaleAktes = marriageIntakeService.findActiefExtras(ExtraType.INTERNATIONALE_AKTE);
             WebMarkupContainer internationaleAkteSection = new WebMarkupContainer("internationaleAkteSection") {
                 @Override
                 protected void onConfigure() {
@@ -141,62 +144,68 @@ public class ExtrasPage extends IntakeBasePage {
                     setVisible(isHuwelijk);
                 }
             };
-            internationaleAkteSection.add(bouwExtraKeuzeList("internationaleAkteKeuzes", internationaleAktes,
-                    LambdaModel.of(model, ExtrasFormDto::getInternationaleAkteId, ExtrasFormDto::setInternationaleAkteId)));
+            CheckBox internationaleAkteCheckbox = new CheckBox("internationaleAkteCheckbox",
+                    LambdaModel.of(model, ExtrasFormDto::isInternationaleAkte, ExtrasFormDto::setInternationaleAkte));
+            internationaleAkteCheckbox.add(new AjaxFormComponentUpdatingBehavior("change") {
+                @Override
+                protected void onUpdate(AjaxRequestTarget target) {
+                    slaOp();
+                    target.add(keuzesSidebar);
+                }
+            });
+            internationaleAkteSection.add(internationaleAkteCheckbox);
             add(internationaleAkteSection);
         }
 
-        private ListView<ExtraDto> bouwExtraKeuzeList(String id, List<ExtraDto> extras,
-                                                       IModel<Long> geselecteerdIdModel) {
-            return new ListView<>(id, new ListModel<>(extras)) {
+        private ListView<TrouwboekjeKeuzeDto> bouwTrouwboekjeKeuzeList(String id, List<TrouwboekjeKeuzeDto> trouwboekjes,
+                                                                       IModel<Long> geselecteerdIdModel) {
+            return new ListView<>(id, new ListModel<>(trouwboekjes)) {
                 @Override
-                protected void populateItem(ListItem<ExtraDto> item) {
-                    ExtraDto extra = item.getModelObject();
+                protected void populateItem(ListItem<TrouwboekjeKeuzeDto> item) {
+                    TrouwboekjeKeuzeDto trouwboekje = item.getModelObject();
 
                     WebMarkupContainer keuzeItem = new WebMarkupContainer("keuzeItem");
-                    boolean isGeselecteerd = Objects.equals(extra.id(), geselecteerdIdModel.getObject());
-                    if (isGeselecteerd) {
-                        keuzeItem.add(AttributeModifier.append("class", " rd-extra-keuze--geselecteerd"));
+                    boolean isGeselecteerd = Objects.equals(trouwboekje.id(), geselecteerdIdModel.getObject());
+
+                    if (trouwboekje.afbeelding() != null && !trouwboekje.afbeelding().isBlank()) {
+                        keuzeItem.add(new WebMarkupContainer("afbeelding")
+                                .add(AttributeModifier.replace("src", trouwboekje.afbeelding())));
+                    } else {
+                        keuzeItem.add(new WebMarkupContainer("afbeelding").setVisible(false));
                     }
 
-                    if (extra.afbeelding() != null && !extra.afbeelding().isBlank()) {
-                        keuzeItem.add(new WebMarkupContainer("extraAfbeelding")
-                                .add(AttributeModifier.replace("src", extra.afbeelding())));
-                    } else {
-                        keuzeItem.add(new WebMarkupContainer("extraAfbeelding").setVisible(false));
-                    }
+                    keuzeItem.add(new Label("naam", Model.of(trouwboekje.naam())));
 
-                    keuzeItem.add(new Label("extraNaam", Model.of(extra.naam())));
-
-                    WebMarkupContainer prijsContainer = new WebMarkupContainer("extraPrijsContainer");
-                    prijsContainer.setVisible(extra.prijs() != null);
-                    if (extra.prijs() != null) {
-                        prijsContainer.add(new Label("extraPrijs", Model.of(formatPrijs(extra.prijs()))));
+                    WebMarkupContainer prijsContainer = new WebMarkupContainer("prijsContainer");
+                    prijsContainer.setVisible(trouwboekje.prijs() != null);
+                    if (trouwboekje.prijs() != null) {
+                        prijsContainer.add(new Label("prijs", Model.of(formatPrijs(trouwboekje.prijs()))));
                     } else {
-                        prijsContainer.add(new Label("extraPrijs", Model.of("")));
+                        prijsContainer.add(new Label("prijs", Model.of("")));
                     }
                     keuzeItem.add(prijsContainer);
 
-                    if (extra.omschrijving() != null) {
-                        keuzeItem.add(new Label("extraOmschrijving", Model.of(extra.omschrijving())));
+                    if (trouwboekje.omschrijving() != null) {
+                        keuzeItem.add(new Label("omschrijving", Model.of(trouwboekje.omschrijving())));
                     } else {
-                        keuzeItem.add(new Label("extraOmschrijving", Model.of("")).setVisible(false));
+                        keuzeItem.add(new Label("omschrijving", Model.of("")).setVisible(false));
                     }
 
                     CheckBox selectCheckbox = new CheckBox("selectCheckbox", Model.of(isGeselecteerd));
-                    selectCheckbox.add(AttributeModifier.replace("aria-label", extra.naam()));
-                    selectCheckbox.setOutputMarkupId(true);
-                    selectCheckbox.add(AttributeModifier.replace("aria-label", extra.naam()));
+                    // Vaste markup-id, zodat Wicket de focus na het verversen van de keuzes terugzet
+                    selectCheckbox.setMarkupId("trouwboekje-" + trouwboekje.id());
                     selectCheckbox.add(new AjaxFormComponentUpdatingBehavior("change") {
                         @Override
                         protected void onUpdate(AjaxRequestTarget target) {
                             Boolean checked = ((CheckBox) getComponent()).getModelObject();
                             if (Boolean.TRUE.equals(checked)) {
-                                geselecteerdIdModel.setObject(extra.id());
+                                geselecteerdIdModel.setObject(trouwboekje.id());
                             } else {
                                 geselecteerdIdModel.setObject(null);
                             }
                             slaOp();
+                            // Andere kaarten opnieuw renderen zodat er maximaal één trouwboekje gekozen is
+                            target.add(trouwboekjeSection, keuzesSidebar);
                         }
                     });
                     keuzeItem.add(selectCheckbox);
@@ -212,6 +221,7 @@ public class ExtrasPage extends IntakeBasePage {
         @Override
         protected void onSubmit() {
             slaOp();
+            setResponsePage(ExtrasPage.class, makeDossierPageParameters(dossierId));
         }
 
         private void slaOp() {
@@ -220,9 +230,8 @@ public class ExtrasPage extends IntakeBasePage {
                     f.isRingenUitwisselen(),
                     f.isMuziek(),
                     f.getTrouwboekjeId(),
-                    f.getInternationaleAkteId()
+                    f.isInternationaleAkte()
             ));
-            setResponsePage(ExtrasPage.class, makeDossierPageParameters(dossierId));
         }
     }
 }

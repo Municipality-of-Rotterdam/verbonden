@@ -12,6 +12,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.ui.ExtrasPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsUpdatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.PersonFullNameWicketConverter;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
@@ -135,6 +136,7 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/mijn-dag/${dossierId}/jullie-gegevens", JullieGegevensPage.class);
         mountPage("/mijn-dag/${dossierId}/de-getuigen", DeGetuigenPage.class);
         mountPage("/mijn-dag/${dossierId}/datum-kiezen", DatumKiezenPage.class);
+        mountPage("/beheer/dossiers", DossierAdministrationPage.class);
         mountPage("/beheer/extras", TrouwboekjeAdministrationPage.class);
         mountPage("/beheer/extras/nieuw", TrouwboekjeCreatePage.class);
         mountPage("/beheer/extras/${id}", TrouwboekjeUpdatePage.class);

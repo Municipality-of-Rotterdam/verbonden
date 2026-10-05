@@ -1,22 +1,17 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
-import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "extras")
-public class ExtraEntity {
+@Table(name = "trouwboekjes")
+public class TrouwboekjeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Convert(converter = ExtraTypeAttributeConverter.class)
-    @Column(name = "type", nullable = false)
-    private ExtraType type;
 
     @Column(name = "naam", nullable = false)
     private String naam;
@@ -48,14 +43,6 @@ public class ExtraEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public ExtraType getType() {
-        return type;
-    }
-
-    public void setType(ExtraType type) {
-        this.type = type;
     }
 
     public String getNaam() {
@@ -114,11 +101,4 @@ public class ExtraEntity {
         this.active = active;
     }
 
-    public LocalDateTime getAangemaaktOp() {
-        return aangemaaktOp;
-    }
-
-    public void setAangemaaktOp(LocalDateTime aangemaaktOp) {
-        this.aangemaaktOp = aangemaaktOp;
-    }
 }
