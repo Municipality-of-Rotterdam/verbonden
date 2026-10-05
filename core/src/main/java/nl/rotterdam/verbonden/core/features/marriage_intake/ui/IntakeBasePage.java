@@ -62,6 +62,8 @@ public abstract class IntakeBasePage extends BurgerBasePage {
                     dossierId = outcome.dossierId();
                     showWrongDossierWarning = true;
                 }
+                case INVITED -> throw new RestartResponseException(
+                        DossierUitnodigingPage.class, makeDossierPageParameters(requestedDossierId));
                 case NOT_AUTHORIZED -> showNotAuthorizedWarning = true;
             }
         } else {

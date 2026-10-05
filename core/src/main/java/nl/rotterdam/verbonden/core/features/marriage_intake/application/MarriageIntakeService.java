@@ -44,29 +44,30 @@ public interface MarriageIntakeService {
     Optional<UUID> findDossierIdByBsn(BurgerServiceNummer bsn);
 
     /**
-     * Validates that the given BSN has access to the dossier.
-     * <ul>
-     *   <li>If bsn matches bsn1 or bsn2: access granted, no changes.</li>
-     *   <li>If bsn2 is null and bsn is different from bsn1: bsn is registered as bsn2, access granted.</li>
-     *   <li>Otherwise: {@link IllegalStateException} is thrown.</li>
-     * </ul>
-     */
-    void ensureBsnAccess(UUID dossierId, BurgerServiceNummer bsn);
-
-    /**
-     * Determines and grants (or denies) access to a requested dossier for the given BSN.
+     * Determines access to a requested dossier for the given BSN. Never changes a dossier: joining
+     * as second partner requires an explicit {@link #acceptInvitation}, so that merely opening a
+     * dossier link (a GET) does not link anyone to a dossier.
      * <ul>
      *   <li>If bsn matches bsn1 or bsn2 of the requested dossier:
      *       returns {@link DossierAccessOutcome.Scenario#GRANTED} with the requested dossier ID.</li>
      *   <li>If bsn belongs to a different existing dossier:
      *       returns {@link DossierAccessOutcome.Scenario#SWITCHED_DOSSIER} with that dossier's ID.</li>
      *   <li>If bsn is not in any dossier and the requested dossier has no bsn2 yet:
-     *       registers bsn as bsn2 and returns {@link DossierAccessOutcome.Scenario#GRANTED}.</li>
-     *   <li>If bsn is not in any dossier and the requested dossier already has two BSNs:
+     *       returns {@link DossierAccessOutcome.Scenario#INVITED} with the requested dossier ID.</li>
+     *   <li>If the requested dossier does not exist, or already has two BSNs:
      *       returns {@link DossierAccessOutcome.Scenario#NOT_AUTHORIZED} with a {@code null} dossier ID.</li>
      * </ul>
      */
     DossierAccessOutcome resolveAccess(UUID requestedDossierId, BurgerServiceNummer bsn);
+
+    /**
+     * Registers the BSN as second partner of the dossier, after the citizen explicitly accepted the
+     * invitation. Re-checks the {@link DossierAccessOutcome.Scenario#INVITED} conditions, since the
+     * dossier may have changed since the invitation was shown.
+     *
+     * @throws IllegalStateException when the BSN is not (or no longer) invited to this dossier
+     */
+    void acceptInvitation(UUID dossierId, BurgerServiceNummer bsn);
 
     DossierSamenvattingDto findByDossierId(UUID id);
 

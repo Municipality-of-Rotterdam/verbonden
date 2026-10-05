@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+<wicket:extend>
+
+    <div class="container py-4">
+
+        <h1 wicket:id="heading">Je bent uitgenodigd</h1>
+
+        <p><wicket:message key="intake.uitnodiging.uitleg">Uitleg</wicket:message></p>
+        <p><wicket:message key="intake.uitnodiging.vraag">Vraag</wicket:message></p>
+
+        <form wicket:id="form">
+            <button type="submit" wicket:id="accepteerButton" class="rd-button rd-button--primary"></button>
+        </form>
+
+        <a wicket:id="weigerLink" class="rd-button rd-button--secondary mt-4">
+            <wicket:message key="intake.uitnodiging.weiger">Nee, ik maak een eigen dossier aan</wicket:message>
+        </a>
+
+    </div>
+
+</wicket:extend>
+</body>
+</html>

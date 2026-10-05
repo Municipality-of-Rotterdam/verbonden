@@ -13,6 +13,8 @@ import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
@@ -162,9 +164,12 @@ class DatumKiezenPageTest extends BaseWicketTest {
                         "Geen locatie gekoppeld aan " + soort));
     }
 
+    /** Dossier van de ingelogde burger (zie {@code @WithMockUser}), zoals de intake het aanmaakt. */
     private UUID maakDossier(CeremonieSoort soort) {
+        BurgerServiceNummer ingelogd = new BurgerServiceNummer(
+                SecurityContextHolder.getContext().getAuthentication().getName());
         return marriageIntakeService.create(
-                new CreateDossierDto(RegistratieType.HUWELIJK, soort, null, null));
+                new CreateDossierDto(RegistratieType.HUWELIJK, soort, null, ingelogd));
     }
 
     private void maakBeschikbaarheid(long locatieId, HuwelijksType type,

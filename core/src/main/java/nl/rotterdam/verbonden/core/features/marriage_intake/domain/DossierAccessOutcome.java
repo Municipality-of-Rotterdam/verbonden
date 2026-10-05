@@ -12,11 +12,17 @@ import java.util.UUID;
 public record DossierAccessOutcome(Scenario scenario, UUID dossierId) {
 
     public enum Scenario {
-        /** BSN already linked to the requested dossier, or just registered as bsn2. */
+        /** BSN already linked to the requested dossier. */
         GRANTED,
+        /**
+         * BSN has no dossier yet and the requested dossier still has room for a second partner:
+         * the BSN may join, but only after explicitly accepting (see
+         * {@code MarriageIntakeService#acceptInvitation}). {@code dossierId} is the requested dossier.
+         */
+        INVITED,
         /** BSN has its own (different) dossier; {@code dossierId} refers to that dossier. */
         SWITCHED_DOSSIER,
-        /** Requested dossier already has two BSNs and does not include this BSN. */
+        /** Requested dossier does not exist, or already has two BSNs and does not include this BSN. */
         NOT_AUTHORIZED
     }
 }

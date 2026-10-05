@@ -209,27 +209,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     }
 
     @Override
-    @Transactional
-    public void ensureBsnAccess(UUID dossierId, BurgerServiceNummer bsn) {
-        HuwelijksDossierEntity e = getDossier(dossierId);
-        boolean alreadyPartner = e.getPartners().stream().anyMatch(p -> bsn.equals(p.getBsn()));
-        if (alreadyPartner) {
-            return;
-        }
-        if (e.getPartners().size() < 2) {
-            HuwelijksDossiersPartnerEntity newPartner = new HuwelijksDossiersPartnerEntity();
-            newPartner.setDossier(e);
-            newPartner.setVolgorde(e.getPartners().isEmpty() ? 1 : 2);
-            newPartner.setBsn(bsn);
-            e.getPartners().add(newPartner);
-            dossierRepository.save(e);
-            return;
-        }
-        throw new IllegalStateException("Toegang geweigerd: BSN heeft geen toegang tot dit dossier");
-    }
-
-    @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public DossierAccessOutcome resolveAccess(UUID requestedDossierId, BurgerServiceNummer bsn) {
         Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByPartners_Bsn(bsn);
 
@@ -242,18 +222,27 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             }
         }
 
-        HuwelijksDossierEntity requested = getDossier(requestedDossierId);
-        if (requested.getPartners().size() < 2) {
-            HuwelijksDossiersPartnerEntity partner2 = new HuwelijksDossiersPartnerEntity();
-            partner2.setDossier(requested);
-            partner2.setVolgorde(2);
-            partner2.setBsn(bsn);
-            requested.getPartners().add(partner2);
-            dossierRepository.save(requested);
-            return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
-        }
+        boolean roomForPartner = dossierRepository.findByUuid(requestedDossierId)
+                .map(requested -> requested.getPartners().size() < 2)
+                .orElse(false);
+        return roomForPartner
+                ? new DossierAccessOutcome(DossierAccessOutcome.Scenario.INVITED, requestedDossierId)
+                : new DossierAccessOutcome(DossierAccessOutcome.Scenario.NOT_AUTHORIZED, null);
+    }
 
-        return new DossierAccessOutcome(DossierAccessOutcome.Scenario.NOT_AUTHORIZED, null);
+    @Override
+    @Transactional
+    public void acceptInvitation(UUID dossierId, BurgerServiceNummer bsn) {
+        if (resolveAccess(dossierId, bsn).scenario() != DossierAccessOutcome.Scenario.INVITED) {
+            throw new IllegalStateException("Toegang geweigerd: BSN is niet uitgenodigd voor dit dossier");
+        }
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossiersPartnerEntity partner = new HuwelijksDossiersPartnerEntity();
+        partner.setDossier(dossier);
+        partner.setVolgorde(dossier.getPartners().isEmpty() ? 1 : 2);
+        partner.setBsn(bsn);
+        dossier.getPartners().add(partner);
+        dossierRepository.save(dossier);
     }
 
     @Override
