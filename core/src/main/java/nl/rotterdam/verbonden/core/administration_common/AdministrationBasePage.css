@@ -2,3 +2,16 @@
 .rd-top-bar > .container-fluid {
     box-sizing: border-box;
 }
+
+/* Voorbeeld van de afbeelding van een trouwboekje in beheer */
+.rd-trouwboekje-beheer__afbeelding {
+    display: block;
+    max-width: 6rem;
+    max-height: 4rem;
+    object-fit: contain;
+}
+
+.rd-trouwboekje-beheer__afbeelding--groot {
+    max-width: 16rem;
+    max-height: 12rem;
+}

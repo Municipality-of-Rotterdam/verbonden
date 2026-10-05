@@ -7,6 +7,7 @@ import java.time.LocalDate;
 public record ListTrouwboekjeDto(
         long id,
         String naam,
+        String afbeelding,
         BigDecimal prijs,
         LocalDate startdatum,
         LocalDate einddatum

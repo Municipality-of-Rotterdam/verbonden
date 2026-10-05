@@ -42,6 +42,7 @@ import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
 import org.apache.wicket.Session;
+import org.apache.wicket.markup.html.SecurePackageResourceGuard;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
@@ -124,6 +125,12 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         getApplicationSettings().setAccessDeniedPage(BurgerAccessDeniedPage.class);
         // Kiest bij een /beheer-request de beheervariant van bovenstaande foutpagina's
         setExceptionMapperProvider(VerbondenExceptionMapper::new);
+
+        // Wicket staat webp standaard niet toe als package resource (avif wel); nodig voor o.a. de foto's
+        // op de keuzekaarten van DeDagPage, die naast marriage-intake.css staan.
+        if (getResourceSettings().getPackageResourceGuard() instanceof SecurePackageResourceGuard guard) {
+            guard.addPattern("+*.webp");
+        }
 
         // Extend Wicket's default blocking CSP to allow data: images (needed for QR codes)
         // and style-src 'self'. Wicket's internalInit() already calls reportBack(), so

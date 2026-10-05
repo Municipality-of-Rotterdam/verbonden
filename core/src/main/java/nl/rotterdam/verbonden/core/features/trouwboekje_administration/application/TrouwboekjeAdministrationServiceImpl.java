@@ -24,7 +24,7 @@ class TrouwboekjeAdministrationServiceImpl implements TrouwboekjeAdministrationS
     @Transactional(readOnly = true)
     public List<ListTrouwboekjeDto> findAll() {
         return trouwboekjeRepository.findAll().stream()
-                .map(e -> new ListTrouwboekjeDto(e.getId(), e.getNaam(), e.getPrijs(), e.getStartdatum(), e.getEinddatum()))
+                .map(e -> new ListTrouwboekjeDto(e.getId(), e.getNaam(), e.getAfbeelding(), e.getPrijs(), e.getStartdatum(), e.getEinddatum()))
                 .toList();
     }
 

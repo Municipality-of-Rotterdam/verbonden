@@ -9,6 +9,8 @@ import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -42,6 +44,15 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
 
     private Form<Void> buildExtrasTable() {
         List<IColumn<ListTrouwboekjeDto, String>> columns = new ArrayList<>();
+
+        columns.add(new AbstractColumn<>(Model.of("Afbeelding")) {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListTrouwboekjeDto>> cellItem,
+                                     String componentId,
+                                     IModel<ListTrouwboekjeDto> rowModel) {
+                cellItem.add(new AfbeeldingFragment(componentId, rowModel));
+            }
+        });
 
         columns.add(new AbstractColumn<>(Model.of("Naam"), "naam") {
             @Override
@@ -135,6 +146,20 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
             default -> Comparator.comparing(ListTrouwboekjeDto::naam, Comparator.nullsLast(Comparator.naturalOrder()));
         };
         return ascending ? comparator : comparator.reversed();
+    }
+
+    private final class AfbeeldingFragment extends Fragment {
+
+        AfbeeldingFragment(String id, IModel<ListTrouwboekjeDto> model) {
+            super(id, "afbeeldingFragment", TrouwboekjeAdministrationPage.this, model);
+
+            ListTrouwboekjeDto dto = model.getObject();
+            boolean heeftAfbeelding = dto.afbeelding() != null && !dto.afbeelding().isBlank();
+            add(new WebMarkupContainer("afbeelding")
+                    .add(AttributeModifier.replace("src", heeftAfbeelding ? dto.afbeelding() : ""))
+                    .add(AttributeModifier.replace("alt", "Afbeelding van trouwboekje " + dto.naam()))
+                    .setVisible(heeftAfbeelding));
+        }
     }
 
     private final class ActiesFragment extends Fragment {

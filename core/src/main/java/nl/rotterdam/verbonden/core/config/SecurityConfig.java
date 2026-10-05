@@ -153,6 +153,8 @@ public class SecurityConfig {
                         // Foutpagina: anders wordt een fout op een publieke pagina (bijv. tijdens inloggen) naar /inloggen omgeleid
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/wicket/resource/**").permitAll()
+                        // Afbeeldingen van trouwboekjes: ook zichtbaar in beheer, voor medewerkers zonder ROLE_BURGER
+                        .requestMatchers("/trouwboekjes/**").permitAll()
                         .requestMatchers("/actuator", "/actuator/**").permitAll()
                         .anyRequest().hasRole("BURGER")
                 )

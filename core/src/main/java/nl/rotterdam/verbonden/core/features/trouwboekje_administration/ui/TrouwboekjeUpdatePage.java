@@ -6,6 +6,8 @@ import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.Ch
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -69,6 +71,16 @@ public class TrouwboekjeUpdatePage extends AdministrationBasePage {
                             LambdaModel.of(model, TrouwboekjeFormDto::getAfbeelding, TrouwboekjeFormDto::setAfbeelding),
                             Model.of("Afbeelding URL"),
                             Model.of("URL naar de afbeelding")),
+                    new WebMarkupContainer("afbeeldingVoorbeeld") {
+                        @Override
+                        protected void onConfigure() {
+                            super.onConfigure();
+                            String afbeelding = model.getObject().getAfbeelding();
+                            setVisible(afbeelding != null && !afbeelding.isBlank());
+                        }
+                    }
+                            .add(AttributeModifier.replace("src", model.map(TrouwboekjeFormDto::getAfbeelding)))
+                            .add(AttributeModifier.replace("alt", model.map(f -> "Afbeelding van trouwboekje " + f.getNaam()))),
                     new RdFormFieldTextInput<>("prijs",
                             LambdaModel.of(model, TrouwboekjeFormDto::getPrijs, TrouwboekjeFormDto::setPrijs),
                             Model.of("Prijs"),
