@@ -10,6 +10,7 @@ De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.verbonden.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
 - `nl.rotterdam.verbonden.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
 - `nl.rotterdam.verbonden.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
+- `nl.rotterdam.verbonden.error_common` — gedeelde foutafhandeling voor burger- en beheerfoutpagina's: `ServletErrorAttributes` en `VerbondenExceptionMapper` (kiest bij een `/beheer`-request de `Administration*ErrorPage` in plaats van de `Burger*ErrorPage`).
 - `nl.rotterdam.verbonden.config` — Spring Boot configuratieklassen.
 - `nl.rotterdam.verbonden.identity` — publiek SPI-contract (adapter-poorten zoals `PersonLookupService`, `BurgerLoginPageMount`, `CurrentUserProvider`) waartegen adapter-modules zoals `remote-local` bouwen. Bewuste uitzondering op de feature-packageconventie hieronder: dit is geen feature maar een cross-cutting contract, gebruikt door meerdere features én door `WicketApplication`/`config`.
 

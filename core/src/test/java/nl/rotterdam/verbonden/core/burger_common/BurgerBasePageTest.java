@@ -21,7 +21,7 @@ class BurgerBasePageTest extends BaseWicketTest {
     private TestPersonLookupService personLookupService;
 
     @Test
-    @WithMockUser(username = "999990007")
+    @WithMockUser(username = "999990007", roles = "BURGER")
     void headerShowsOfficieleNaamInsteadOfBsn() {
         tester.startPage(BurgerInternalErrorPage.class);
 
@@ -29,7 +29,7 @@ class BurgerBasePageTest extends BaseWicketTest {
     }
 
     @Test
-    @WithMockUser(username = "999990019")
+    @WithMockUser(username = "999990019", roles = "BURGER")
     void officieleNaamIsLookedUpOncePerSession() {
         int lookupsBefore = personLookupService.getLookupCount("999990019");
 
@@ -41,12 +41,24 @@ class BurgerBasePageTest extends BaseWicketTest {
     }
 
     @Test
-    @WithMockUser(username = TestPersonLookupService.ONBEREIKBAAR_BSN)
+    @WithMockUser(username = TestPersonLookupService.ONBEREIKBAAR_BSN, roles = "BURGER")
     void pageStillRendersWhenLookupFails() {
         tester.startPage(BurgerInternalErrorPage.class);
 
         tester.assertRenderedPage(BurgerInternalErrorPage.class);
         assertThat(userName()).isEmpty();
+    }
+
+    /**
+     * Een medewerker heeft geen BSN; de header mag de gebruikersnaam dan niet als BSN opvatten.
+     */
+    @Test
+    @WithMockUser(username = "medewerker", roles = "BEHEERDER")
+    void headerHidesUserBarForNonBurger() {
+        tester.startPage(BurgerInternalErrorPage.class);
+
+        tester.assertRenderedPage(BurgerInternalErrorPage.class);
+        tester.assertContainsNot("href=\"/uitloggen\"");
     }
 
     private String userName() {

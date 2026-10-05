@@ -13,7 +13,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 class LogoutLinkTest extends BaseWicketTest {
 
     @Test
-    @WithMockUser(username = "999990007")
+    @WithMockUser(username = "999990007", roles = "BURGER")
     void burgerPageLinksToConfiguredLogoutUrl() {
         tester.startPage(MarriageIntakePage.class);
 

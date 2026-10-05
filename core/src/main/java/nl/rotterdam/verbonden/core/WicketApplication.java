@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.burger_common.BurgerErrorPage;
 import nl.rotterdam.verbonden.core.burger_common.BurgerInternalErrorPage;
 import nl.rotterdam.verbonden.core.burger_common.BurgerPageExpiredPage;
 import nl.rotterdam.verbonden.core.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.error_common.VerbondenExceptionMapper;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeCreatePage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeUpdatePage;
@@ -120,6 +121,8 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         getApplicationSettings().setInternalErrorPage(BurgerInternalErrorPage.class);
         getApplicationSettings().setPageExpiredErrorPage(BurgerPageExpiredPage.class);
         getApplicationSettings().setAccessDeniedPage(BurgerAccessDeniedPage.class);
+        // Kiest bij een /beheer-request de beheervariant van bovenstaande foutpagina's
+        setExceptionMapperProvider(VerbondenExceptionMapper::new);
 
         // Extend Wicket's default blocking CSP to allow data: images (needed for QR codes)
         // and style-src 'self'. Wicket's internalInit() already calls reportBack(), so

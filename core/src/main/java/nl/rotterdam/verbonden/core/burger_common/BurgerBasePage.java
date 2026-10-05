@@ -30,9 +30,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +84,7 @@ public abstract class BurgerBasePage extends WebPage {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                setVisible(isAuthenticated());
+                setVisible(isBurger());
             }
         };
         userBar.add(new WebMarkupContainer("userIcon")
@@ -125,7 +122,7 @@ public abstract class BurgerBasePage extends WebPage {
      * pagina's (en de foutpagina) blijven werken. Een ongeldig BSN blijft wel een harde fout.
      */
     private String currentUserOfficieleNaam() {
-        if (!isAuthenticated()) {
+        if (!isBurger()) {
             return "";
         }
         BurgerServiceNummer bsn = getCurrentBsn();
@@ -150,9 +147,12 @@ public abstract class BurgerBasePage extends WebPage {
     private record SessionOfficieleNaam(String bsn, String officieleNaam) implements Serializable {
     }
 
-    private boolean isAuthenticated() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
+    /**
+     * Alleen een burger heeft een BSN. Ook een medewerker of een anoniem gemaakte bezoeker kan een
+     * (fout)pagina met deze header zien; voor hen blijft de gebruikersbalk weg.
+     */
+    private boolean isBurger() {
+        return currentUserProvider.getCurrentUser().hasRole("BURGER");
     }
 
     protected BurgerServiceNummer getCurrentBsn() {
