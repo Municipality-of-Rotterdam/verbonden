@@ -1,6 +1,5 @@
 package nl.rotterdam.verbonden.core.config;
 
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
 /**
@@ -9,6 +8,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
  * pre-authentication filter fed by an upstream gateway header instead of (or alongside) the
  * {@code oauth2Login} path. Implement this as a bean in the adapter module; when no such
  * bean is present, the burger chain behaves exactly as before.
+ *
+ * <p>Deliberately not a {@code Customizer<HttpSecurity>}: Spring Security 7 applies every bean of
+ * that type to <em>every</em> {@code HttpSecurity}, i.e. to both filter chains, on top of the
+ * explicit call in {@link SecurityConfig}.
  */
-public interface BurgerSecurityCustomizer extends Customizer<HttpSecurity> {
+@FunctionalInterface
+public interface BurgerSecurityCustomizer {
+
+    void customize(HttpSecurity http);
 }

@@ -39,7 +39,11 @@ import com.giffing.wicket.spring.boot.starter.app.WicketBootStandardWebApplicati
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
+import org.apache.wicket.Session;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -57,13 +61,16 @@ public class WicketApplication extends WicketBootStandardWebApplication {
     private final List<BurgerLoginPageMount> burgerLoginPageMounts;
     private final String beheerLogoutUrl;
     private final String burgerLogoutUrl;
+    private final ObjectProvider<WicketSessionFactory> sessionFactoryProvider;
 
     public WicketApplication(List<BurgerLoginPageMount> burgerLoginPageMounts,
                              @Value("${verbonden.logout.beheer-url}") String beheerLogoutUrl,
-                             @Value("${verbonden.logout.burger-url}") String burgerLogoutUrl) {
+                             @Value("${verbonden.logout.burger-url}") String burgerLogoutUrl,
+                             ObjectProvider<WicketSessionFactory> sessionFactoryProvider) {
         this.burgerLoginPageMounts = burgerLoginPageMounts;
         this.beheerLogoutUrl = beheerLogoutUrl;
         this.burgerLogoutUrl = burgerLogoutUrl;
+        this.sessionFactoryProvider = sessionFactoryProvider;
     }
 
     public static WicketApplication get() {
@@ -89,6 +96,15 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         locator.set(Telefoonnummer.class, new TelefoonnummerWicketConverter());
         locator.set(Emailadres.class, new EmailadresWicketConverter());
         return locator;
+    }
+
+    /** Delegeert naar een {@link WicketSessionFactory}-bean als een adapter-module die aanbiedt. */
+    @Override
+    public Session newSession(Request request, Response response) {
+        WicketSessionFactory sessionFactory = sessionFactoryProvider.getIfAvailable();
+        return sessionFactory != null
+                ? sessionFactory.newSession(request, response)
+                : super.newSession(request, response);
     }
 
     @Override
