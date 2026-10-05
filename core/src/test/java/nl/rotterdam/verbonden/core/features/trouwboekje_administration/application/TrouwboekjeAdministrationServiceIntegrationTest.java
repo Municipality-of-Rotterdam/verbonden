@@ -1,8 +1,7 @@
 package nl.rotterdam.verbonden.core.features.trouwboekje_administration.application;
 
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.CreateTrouwboekjeDto;
-import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
-import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ListTrouwboekjeDto;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +18,8 @@ class TrouwboekjeAdministrationServiceIntegrationTest {
     @Autowired
     private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
 
-    @Autowired
-    private MarriageIntakeService marriageIntakeService;
-
     @Test
-    void findAll_toontAlleenTrouwboekjes() {
+    void create_voegtTrouwboekjeToe() {
         long aantalTrouwboekjesVooraf = trouwboekjeAdministrationService.count();
 
         trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
@@ -36,19 +32,8 @@ class TrouwboekjeAdministrationServiceIntegrationTest {
         ));
 
         assertThat(trouwboekjeAdministrationService.findAll())
-                .extracting(dto -> dto.naam())
-                .contains("Linnen trouwboekje")
-                .doesNotContain("Internationale huwelijksakte");
+                .extracting(ListTrouwboekjeDto::naam)
+                .contains("Linnen trouwboekje");
         assertThat(trouwboekjeAdministrationService.count()).isEqualTo(aantalTrouwboekjesVooraf + 1);
-    }
-
-    @Test
-    void findById_verbergtInternationaleAkteVoorBeheer() {
-        long internationaleAkteId = marriageIntakeService.findActiefExtras(ExtraType.INTERNATIONALE_AKTE).stream()
-                .findFirst()
-                .orElseThrow()
-                .id();
-
-        assertThat(trouwboekjeAdministrationService.findById(internationaleAkteId)).isEmpty();
     }
 }

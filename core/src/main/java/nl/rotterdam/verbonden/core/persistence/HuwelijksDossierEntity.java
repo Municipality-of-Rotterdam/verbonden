@@ -51,11 +51,10 @@ public class HuwelijksDossierEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trouwboekje_id")
-    private ExtraEntity trouwboekje;
+    private TrouwboekjeEntity trouwboekje;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "internationale_akte_id")
-    private ExtraEntity internationaleAkte;
+    @Column(name = "internationale_akte", nullable = false)
+    private boolean internationaleAkte = false;
 
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
@@ -120,19 +119,19 @@ public class HuwelijksDossierEntity {
         this.muziek = muziek;
     }
 
-    public ExtraEntity getTrouwboekje() {
+    public TrouwboekjeEntity getTrouwboekje() {
         return trouwboekje;
     }
 
-    public void setTrouwboekje(ExtraEntity trouwboekje) {
+    public void setTrouwboekje(TrouwboekjeEntity trouwboekje) {
         this.trouwboekje = trouwboekje;
     }
 
-    public ExtraEntity getInternationaleAkte() {
+    public boolean isInternationaleAkte() {
         return internationaleAkte;
     }
 
-    public void setInternationaleAkte(ExtraEntity internationaleAkte) {
+    public void setInternationaleAkte(boolean internationaleAkte) {
         this.internationaleAkte = internationaleAkte;
     }
 

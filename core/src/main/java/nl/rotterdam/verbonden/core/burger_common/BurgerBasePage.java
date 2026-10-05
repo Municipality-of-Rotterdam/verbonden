@@ -20,6 +20,8 @@ import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentCon
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.HeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.MetaDataHeaderItem;
+import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.WebPage;
@@ -110,6 +112,10 @@ public abstract class BurgerBasePage extends WebPage {
         response.render(BOOTSTRAP_GRID_HEADER_ITEM);
         response.render(BOOTSTRAP_UTILITIES_HEADER_ITEM);
         response.render(BURGER_BASE_PAGE_HEADER_ITEM);
+        // De Stencil-iconen (rods-icon-*) voegen zelf <style>-blokken toe; via deze meta-tag geven ze
+        // die de CSP-nonce mee, anders blokkeert de style-src-directive ze.
+        response.render(MetaDataHeaderItem.forMetaTag("csp-nonce",
+                WebApplication.get().getCspSettings().getNonce(getRequestCycle())));
     }
 
     /**

@@ -16,7 +16,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.model.util.ListModel;
 import org.jspecify.annotations.Nullable;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
@@ -225,7 +224,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             return (d != null && d.extras() != null) ? d.extras() : List.of();
         });
 
-        ListView<SidebarExtraItemDto> extrasListView = new ListView<>("extrasList", new ListModel<>(extrasListModel.getObject())) {
+        ListView<SidebarExtraItemDto> extrasListView = new ListView<>("extrasList", extrasListModel) {
             @Override
             protected void onConfigure() {
                 super.onConfigure();

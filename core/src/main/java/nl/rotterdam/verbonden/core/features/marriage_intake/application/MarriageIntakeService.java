@@ -7,9 +7,8 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossier
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ExtraDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
-import nl.rotterdam.verbonden.core.features.extra.domain.ExtraType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
@@ -93,7 +92,7 @@ public interface MarriageIntakeService {
 
     void delete(UUID dossierId);
 
-    List<ExtraDto> findActiefExtras(ExtraType type);
+    List<TrouwboekjeKeuzeDto> findActieveTrouwboekjes();
 
     SaveExtrasDto findExtrasSelecties(UUID dossierId);
 
