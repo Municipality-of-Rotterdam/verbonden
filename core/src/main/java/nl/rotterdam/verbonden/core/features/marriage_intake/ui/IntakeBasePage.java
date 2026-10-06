@@ -7,8 +7,8 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenv
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
-import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
-import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
+import nl.rotterdam.verbonden.core.burger_common.MijnLoketBreadcrumbPanel;
+import nl.rotterdam.verbonden.core.burger_common.MijnLoketBreadcrumbPanel.Kruimel;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -88,11 +88,8 @@ public abstract class IntakeBasePage extends BurgerBasePage {
             throw new RestartResponseException(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));
         }
 
-        List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
-                new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijnloket"), MarriageIntakePage.class),
-                new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijndag"), MarriageIntakePage.class)
-        );
-        pageBody.add(new RdBreadcrumbNavPanel("breadcrumb", breadcrumbs));
+        pageBody.add(new MijnLoketBreadcrumbPanel("breadcrumb", List.of(
+                new Kruimel(getString("intake.breadcrumb.mijndag"), MarriageIntakePage.class))));
 
         RdAlert wrongDossierAlert = new RdAlert("wrongDossierAlert",
                 new ResourceModel("intake.alert.wrong.dossier"), RdAlertType.WARNING);

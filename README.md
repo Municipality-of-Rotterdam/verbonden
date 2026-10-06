@@ -125,6 +125,15 @@ verbonden.logout.beheer-url=/logout
 verbonden.logout.burger-url=/uitloggen
 ```
 
+### Mijn Loket
+
+De breadcrumb op burgerpagina's begint met een link naar Mijn Loket. Standaard is dat
+`/mijnloket`; met een volledige URL kan Mijn Loket ook op een andere host staan.
+
+```properties
+verbonden.mijn-loket-url=https://loket.amsterdam.nl/jouwloket
+```
+
 ## Bouwen en testen
 
 ```bash

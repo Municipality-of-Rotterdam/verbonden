@@ -65,15 +65,18 @@ public class WicketApplication extends WicketBootStandardWebApplication {
     private final List<BurgerLoginPageMount> burgerLoginPageMounts;
     private final String beheerLogoutUrl;
     private final String burgerLogoutUrl;
+    private final String mijnLoketUrl;
     private final ObjectProvider<WicketSessionFactory> sessionFactoryProvider;
 
     public WicketApplication(List<BurgerLoginPageMount> burgerLoginPageMounts,
                              @Value("${verbonden.logout.beheer-url}") String beheerLogoutUrl,
                              @Value("${verbonden.logout.burger-url}") String burgerLogoutUrl,
+                             @Value("${verbonden.mijn-loket-url:/mijnloket}") String mijnLoketUrl,
                              ObjectProvider<WicketSessionFactory> sessionFactoryProvider) {
         this.burgerLoginPageMounts = burgerLoginPageMounts;
         this.beheerLogoutUrl = beheerLogoutUrl;
         this.burgerLogoutUrl = burgerLogoutUrl;
+        this.mijnLoketUrl = mijnLoketUrl;
         this.sessionFactoryProvider = sessionFactoryProvider;
     }
 
@@ -89,6 +92,15 @@ public class WicketApplication extends WicketBootStandardWebApplication {
     /** URL van de Uitloggen-link op burgerpagina's ({@code verbonden.logout.burger-url}). */
     public String getBurgerLogoutUrl() {
         return burgerLogoutUrl;
+    }
+
+    /**
+     * URL van Mijn Loket, het eerste item van de breadcrumb op burgerpagina's
+     * ({@code verbonden.mijn-loket-url}, standaard {@code /mijnloket}). Kan ook op een andere host staan,
+     * bijvoorbeeld {@code https://loket.amsterdam.nl/jouwloket}.
+     */
+    public String getMijnLoketUrl() {
+        return mijnLoketUrl;
     }
 
     @Override
