@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.burger_common.BurgerBasePage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavRecord;
@@ -55,6 +56,12 @@ public class DatumKiezenPage extends BurgerBasePage {
     @Override
     protected void onInitialize() {
         super.onInitialize();
+
+        // Only the partners of this dossier may choose a date. In all other cases DeDagPage (via
+        // IntakeBasePage) determines where the citizen belongs: own dossier, invitation or a new dossier.
+        if (marriageIntakeService.resolveAccess(dossierId, getCurrentBsn()).scenario() != DossierAccessOutcome.Scenario.GRANTED) {
+            throw new RestartResponseException(DeDagPage.class, makeDossierPageParameters(dossierId));
+        }
 
         if (marriageIntakeService.findStatus(dossierId) != DossierStatus.CONCEPT) {
             throw new RestartResponseException(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));

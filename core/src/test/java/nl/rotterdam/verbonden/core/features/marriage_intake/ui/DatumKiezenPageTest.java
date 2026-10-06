@@ -164,6 +164,54 @@ class DatumKiezenPageTest extends BaseWicketTest {
                         "Geen locatie gekoppeld aan " + soort));
     }
 
+    @Test
+    @WithMockUser(username = "999990019", roles = "BURGER")
+    void dossierVanIemandAnders_stuurtDoorNaarEigenDossier() {
+        UUID eigenDossierId = maakDossier(CeremonieSoort.KLEIN);
+        UUID anderDossierId = maakDossierVoor("999990007");
+
+        tester.startPage(DatumKiezenPage.class, dossierParams(anderDossierId));
+
+        tester.assertRenderedPage(DeDagPage.class);
+        // The links on the page point to the citizen's own dossier
+        assertThat(tester.getLastResponseAsString()).contains(eigenDossierId.toString());
+        tester.assertContains("U bent automatisch omgeleid naar uw eigen dossier");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020", roles = "BURGER")
+    void volDossierVanAnderen_zonderEigenDossier_wordtGeweigerd() {
+        UUID anderDossierId = maakDossierVoor("999990007");
+        marriageIntakeService.acceptInvitation(anderDossierId, new BurgerServiceNummer("999990202"));
+
+        tester.startPage(DatumKiezenPage.class, dossierParams(anderDossierId));
+
+        tester.assertRenderedPage(MarriageIntakePage.class);
+        tester.assertContains("U bent niet gemachtigd om het opgevraagde dossier in te zien");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020", roles = "BURGER")
+    void dossierMetPlekVoorPartner_toontEerstUitnodiging() {
+        UUID anderDossierId = maakDossierVoor("999990007");
+
+        tester.startPage(DatumKiezenPage.class, dossierParams(anderDossierId));
+
+        tester.assertRenderedPage(DossierUitnodigingPage.class);
+        assertThat(marriageIntakeService.findPartnerGegevens(anderDossierId)).hasSize(1);
+    }
+
+    private UUID maakDossierVoor(String bsn) {
+        return marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer(bsn)));
+    }
+
+    private static PageParameters dossierParams(UUID dossierId) {
+        PageParameters params = new PageParameters();
+        params.add("dossierId", dossierId.toString());
+        return params;
+    }
+
     /** Dossier van de ingelogde burger (zie {@code @WithMockUser}), zoals de intake het aanmaakt. */
     private UUID maakDossier(CeremonieSoort soort) {
         BurgerServiceNummer ingelogd = new BurgerServiceNummer(
