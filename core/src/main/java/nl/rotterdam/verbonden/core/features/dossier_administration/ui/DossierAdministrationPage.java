@@ -3,7 +3,9 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
+import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -14,6 +16,7 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvid
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -36,8 +39,10 @@ public class DossierAdministrationPage extends AdministrationBasePage {
 
     private final Model<String> zoektermModel = Model.of("");
 
+    private final RdDataTable<ListDossierDto, String> dossierTable;
+
     public DossierAdministrationPage() {
-        RdDataTable<ListDossierDto, String> dossierTable = buildDossierTable();
+        dossierTable = buildDossierTable();
         dossierTable.setOutputMarkupId(true);
 
         Form<?> zoekForm = new Form<>("zoekForm");
@@ -48,13 +53,10 @@ public class DossierAdministrationPage extends AdministrationBasePage {
                 target.add(dossierTable);
             }
 
-            @Override
-            protected void onError(AjaxRequestTarget target) {
-            }
         });
 
         pageBody.add(zoekForm);
-        pageBody.add(dossierTable);
+        pageBody.add(new Form<>("actiesForm").add(dossierTable));
     }
 
     private RdDataTable<ListDossierDto, String> buildDossierTable() {
@@ -121,7 +123,37 @@ public class DossierAdministrationPage extends AdministrationBasePage {
             }
         });
 
-        SortableDataProvider<ListDossierDto, String> provider = new SortableDataProvider<>() {
+        columns.add(new AbstractColumn<>(Model.of("Status"), "status") {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListDossierDto>> cellItem,
+                                     String componentId,
+                                     IModel<ListDossierDto> rowModel) {
+                cellItem.add(new Label(componentId,
+                        rowModel.map(dto -> dto.status() != null ? dto.status().getLabel() : "")));
+            }
+        });
+
+        columns.add(new AbstractColumn<>(Model.of("Ingediend op"), "ingediendOp") {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListDossierDto>> cellItem,
+                                     String componentId,
+                                     IModel<ListDossierDto> rowModel) {
+                cellItem.add(new Label(componentId,
+                        rowModel.map(dto -> dto.ingediendOp() != null
+                                ? dto.ingediendOp().format(DATUM_TIJD_FORMATTER) : "")));
+            }
+        });
+
+        columns.add(new AbstractColumn<>(Model.of("Acties")) {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListDossierDto>> cellItem,
+                                     String componentId,
+                                     IModel<ListDossierDto> rowModel) {
+                cellItem.add(new ActiesFragment(componentId, rowModel));
+            }
+        });
+
+                SortableDataProvider<ListDossierDto, String> provider = new SortableDataProvider<>() {
             @Override
             public Iterator<? extends ListDossierDto> iterator(long first, long count) {
                 boolean ascending = getSort() == null || getSort().isAscending();
@@ -149,5 +181,36 @@ public class DossierAdministrationPage extends AdministrationBasePage {
         provider.setSort("aangemaaktOp", SortOrder.DESCENDING);
 
         return new RdDataTable<>("dossierTable", columns, provider, 20);
+    }
+
+    /**
+     * Accepteren / afwijzen — alleen voor dossiers die door de burger zijn ingediend.
+     */
+    private final class ActiesFragment extends Fragment {
+
+        ActiesFragment(String id, IModel<ListDossierDto> dtoModel) {
+            super(id, "actiesFragment", DossierAdministrationPage.this, dtoModel);
+            setVisible(dtoModel.getObject().status() == DossierStatus.INGEDIEND);
+
+            RdAjaxButton accepteerButton = new RdAjaxButton("accepteerButton", Model.of("Accepteren")) {
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    dossierAdministrationService.accepteer(dtoModel.getObject().dossierId());
+                    target.add(dossierTable);
+                }
+            };
+            accepteerButton.setAppearance(RdButtonAppearance.PRIMARY_ACTION);
+
+            RdAjaxButton wijsAfButton = new RdAjaxButton("wijsAfButton", Model.of("Afwijzen")) {
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    dossierAdministrationService.wijsAf(dtoModel.getObject().dossierId());
+                    target.add(dossierTable);
+                }
+            };
+            wijsAfButton.setAppearance(RdButtonAppearance.SECONDARY_ACTION);
+
+            add(accepteerButton, wijsAfButton);
+        }
     }
 }

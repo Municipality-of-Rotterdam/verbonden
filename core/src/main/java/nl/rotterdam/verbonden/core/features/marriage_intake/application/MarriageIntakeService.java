@@ -6,6 +6,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
@@ -70,6 +71,19 @@ public interface MarriageIntakeService {
     void acceptInvitation(UUID dossierId, BurgerServiceNummer bsn);
 
     DossierSamenvattingDto findByDossierId(UUID id);
+
+    DossierStatus findStatus(UUID dossierId);
+
+    /**
+     * Legt de keuzes van het dossier definitief vast: het dossier krijgt de status
+     * {@link DossierStatus#INGEDIEND} en kan daarna niet meer door de burger worden gewijzigd.
+     *
+     * @throws nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException
+     *         wanneer het dossier geen {@link DossierStatus#CONCEPT} meer is
+     * @throws nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException
+     *         wanneer nog niet alle keuzes en gegevens zijn ingevuld
+     */
+    void dienIn(UUID dossierId);
 
     Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand);
 

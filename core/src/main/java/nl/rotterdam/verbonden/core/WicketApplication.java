@@ -24,6 +24,7 @@ import nl.rotterdam.verbonden.core.features.location_administration.ui.Beschikba
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationCreatePage;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationUpdatePage;
+import nl.rotterdam.verbonden.core.features.marriage_intake.ui.AanvraagStatusPage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.DatumKiezenPage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.DeDagPage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.DeGetuigenPage;
@@ -169,6 +170,7 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/beheer/extras/nieuw", TrouwboekjeCreatePage.class);
         mountPage("/beheer/extras/${id}", TrouwboekjeUpdatePage.class);
         mountPage("/mijn-dag/${dossierId}/extras", ExtrasPage.class);
+        mountPage("/mijn-dag/${dossierId}/aanvraag", AanvraagStatusPage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/nieuw", NietBeschikbareDagCreatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/${id}", NietBeschikbareDagUpdatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/importeren", NietBeschikbareDagImportPage.class);

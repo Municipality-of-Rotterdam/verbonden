@@ -9,8 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Repository
 public interface DossierAdministrationRepository extends JpaRepository<HuwelijksDossierEntity, Long> {
+
+    Optional<HuwelijksDossierEntity> findByUuid(UUID uuid);
 
     @Query(value = """
             SELECT new nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto(
@@ -19,7 +24,9 @@ public interface DossierAdministrationRepository extends JpaRepository<Huwelijks
                 (SELECT p2.bsn FROM HuwelijksDossiersPartnerEntity p2 WHERE p2.dossier = d AND p2.volgorde = 2),
                 d.registratieType,
                 d.ceremonieSoort,
-                d.aangemaaktOp)
+                d.aangemaaktOp,
+                d.status,
+                d.ingediendOp)
             FROM HuwelijksDossierEntity d
             WHERE :zoekterm IS NULL OR :zoekterm = ''
                OR EXISTS (SELECT p FROM HuwelijksDossiersPartnerEntity p

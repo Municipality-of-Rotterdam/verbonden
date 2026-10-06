@@ -12,7 +12,10 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
@@ -178,7 +181,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
         dossier.setCeremonieSoort(ceremonieSoort);
         if (ceremonieSoort != CeremonieSoort.GROOT) {
             dossier.setMuziek(false);
@@ -188,7 +191,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void updateIntake(UUID dossierId, ChangeIntakeDto dto) {
-        HuwelijksDossierEntity e = getDossier(dossierId);
+        HuwelijksDossierEntity e = getWijzigbaarDossier(dossierId);
         e.setRegistratieType(dto.registratieType());
         e.setCeremonieSoort(dto.ceremonieSoort());
         if (dto.ceremonieSoort() != CeremonieSoort.GROOT) {
@@ -250,9 +253,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public DossierSamenvattingDto findByDossierId(UUID id) {
         HuwelijksDossierEntity e = getDossier(id);
 
-        LocalDateTime datumTijdHuwelijk = afspraakRepository.findFirstByDossier_Id(e.getId())
-                .map(a -> LocalDateTime.of(a.getDatum(), a.getStartTijd()))
-                .orElse(null);
+        LocalDateTime datumTijdHuwelijk = findDatumTijdHuwelijk(e);
 
         String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
 
@@ -260,14 +261,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .map(MarriageTypeEntity::getPrijs)
                 .orElse(null);
 
-        int vereistAantalGetuigen = e.getCeremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
         long aantalGetuigenIngevuld = getuigenRepository.countByDossier_IdAndNaamIsNotNull(e.getId());
-        boolean getuigenBevestigd = aantalGetuigenIngevuld >= vereistAantalGetuigen;
+        boolean getuigenBevestigd = aantalGetuigenIngevuld >= vereistAantalGetuigen(e);
         boolean getuigenGedeeltelijkIngevuld = aantalGetuigenIngevuld > 0 && !getuigenBevestigd;
 
-        int aantalGekozenAchternamen = (int) e.getPartners().stream()
-                .filter(p -> p.getGekozenAchternaam() != null)
-                .count();
+        int aantalGekozenAchternamen = aantalGekozenAchternamen(e);
 
         List<SidebarExtraItemDto> extraItems = new ArrayList<>();
         if (e.isRingenUitwisselen()) {
@@ -301,7 +299,55 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 getuigenGedeeltelijkIngevuld,
                 extraItems,
                 aantalGekozenAchternamen,
-                totalPrijs);
+                totalPrijs,
+                e.getStatus(),
+                e.getIngediendOp(),
+                isCompleet(e));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DossierStatus findStatus(UUID dossierId) {
+        return getDossier(dossierId).getStatus();
+    }
+
+    @Override
+    @Transactional
+    public void dienIn(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
+        if (!isCompleet(dossier)) {
+            throw new DossierNietCompleetException(dossierId);
+        }
+        dossier.setStatus(DossierStatus.INGEDIEND);
+        dossier.setIngediendOp(LocalDateTime.now());
+    }
+
+    /**
+     * Een dossier is compleet wanneer datum en locatie gekozen zijn, beide partners hun achternaam
+     * hebben gekozen en alle vereiste getuigen zijn ingevuld.
+     */
+    private boolean isCompleet(HuwelijksDossierEntity dossier) {
+        return findDatumTijdHuwelijk(dossier) != null
+                && dossier.getLocatie() != null
+                && dossier.getPartners().size() == 2
+                && aantalGekozenAchternamen(dossier) == 2
+                && getuigenRepository.countByDossier_IdAndNaamIsNotNull(dossier.getId()) >= vereistAantalGetuigen(dossier);
+    }
+
+    private LocalDateTime findDatumTijdHuwelijk(HuwelijksDossierEntity dossier) {
+        return afspraakRepository.findFirstByDossier_Id(dossier.getId())
+                .map(a -> LocalDateTime.of(a.getDatum(), a.getStartTijd()))
+                .orElse(null);
+    }
+
+    private static int vereistAantalGetuigen(HuwelijksDossierEntity dossier) {
+        return dossier.getCeremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
+    }
+
+    private static int aantalGekozenAchternamen(HuwelijksDossierEntity dossier) {
+        return (int) dossier.getPartners().stream()
+                .filter(p -> p.getGekozenAchternaam() != null)
+                .count();
     }
 
     @Override
@@ -394,7 +440,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void slaAfspraakOp(UUID dossierId, LocalDate datum, LocalTime startTijd) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
         List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
 
@@ -499,6 +545,17 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + uuid));
     }
 
+    /**
+     * Haalt een dossier op dat de burger nog mag wijzigen, d.w.z. met status {@link DossierStatus#CONCEPT}.
+     */
+    private HuwelijksDossierEntity getWijzigbaarDossier(UUID uuid) {
+        HuwelijksDossierEntity dossier = getDossier(uuid);
+        if (dossier.getStatus() != DossierStatus.CONCEPT) {
+            throw new DossierNietWijzigbaarException(uuid, dossier.getStatus(), DossierStatus.CONCEPT);
+        }
+        return dossier;
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<GetuigeDto> findGetuigen(UUID dossierId) {
@@ -513,7 +570,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void slaGetuigenOp(UUID dossierId, List<SaveGetuigenDto> getuigen) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
         getuigenRepository.deleteByDossier_Id(dossier.getId());
         for (SaveGetuigenDto dto : getuigen) {
             if (dto.naam() == null || dto.naam().isBlank()) {
@@ -530,7 +587,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void slaGetuigeOp(UUID dossierId, SaveGetuigenDto dto) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
         GetuigeEntity entity = getuigenRepository
                 .findByDossier_IdAndVolgnummer(dossier.getId(), dto.volgnummer())
                 .orElseGet(GetuigeEntity::new);
@@ -551,7 +608,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void slaGekozenAchternaamOp(UUID dossierId, BurgerServiceNummer bsn, String gekozenAchternaam) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
         HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
                 .filter(p -> bsn.equals(p.getBsn()))
                 .findFirst()
@@ -563,7 +620,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void slaContactGegevensOp(UUID dossierId, BurgerServiceNummer bsn, Telefoonnummer telefoonnummer, Emailadres emailadres) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
         HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
                 .filter(p -> bsn.equals(p.getBsn()))
                 .findFirst()
@@ -600,7 +657,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional
     public void slaExtrasOp(UUID dossierId, SaveExtrasDto dto) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
         dossier.setRingenUitwisselen(dto.ringenUitwisselen());
         boolean isGroot = dossier.getCeremonieSoort() == CeremonieSoort.GROOT;
         dossier.setMuziek(isGroot && dto.muziek());

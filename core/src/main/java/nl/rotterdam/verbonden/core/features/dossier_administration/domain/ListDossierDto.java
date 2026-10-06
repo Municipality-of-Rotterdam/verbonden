@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.domain;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 
 import java.io.Serializable;
@@ -14,6 +15,8 @@ public record ListDossierDto(
         BurgerServiceNummer bsn2,
         RegistratieType registratieType,
         CeremonieSoort ceremonieSoort,
-        LocalDateTime aangemaaktOp
+        LocalDateTime aangemaaktOp,
+        DossierStatus status,
+        LocalDateTime ingediendOp
 ) implements Serializable {
 }
