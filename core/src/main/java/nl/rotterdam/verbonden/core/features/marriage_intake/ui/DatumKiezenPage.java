@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.Objects.requireNonNull;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.extractDossierId;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.MarriageIntakeHeaderItems.MARRIAGE_INTAKE_CSS;
@@ -46,7 +45,12 @@ public class DatumKiezenPage extends BurgerBasePage {
     }
 
     public DatumKiezenPage(PageParameters params) {
-        this.dossierId = requireNonNull(extractDossierId(params));
+        UUID requestedDossierId = extractDossierId(params);
+        if (requestedDossierId == null) {
+            // No dossier in the URL: the intake start page finds the citizen's own dossier, if any
+            throw new RestartResponseException(MarriageIntakePage.class);
+        }
+        this.dossierId = requestedDossierId;
     }
 
     public static void  respond(UUID dossierId) {

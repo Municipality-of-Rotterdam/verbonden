@@ -30,6 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class DatumKiezenPageTest extends BaseWicketTest {
 
+    private static final String VERDER_CONTAINER = "pageLayout:pageLayout_body:pageBody:pageBody_body:verderContainer";
+
     @Autowired
     private MarriageIntakeService marriageIntakeService;
 
@@ -199,6 +201,27 @@ class DatumKiezenPageTest extends BaseWicketTest {
 
         tester.assertRenderedPage(DossierUitnodigingPage.class);
         assertThat(marriageIntakeService.findPartnerGegevens(anderDossierId)).hasSize(1);
+    }
+
+    @Test
+    @WithMockUser(username = "999990019", roles = "BURGER")
+    void zonderDossierId_metEigenDossier_toontStartpaginaVanEigenDossier() {
+        maakDossier(CeremonieSoort.KLEIN);
+
+        tester.startPage(DatumKiezenPage.class, new PageParameters());
+
+        tester.assertRenderedPage(MarriageIntakePage.class);
+        // "Verder naar Mijn dag" is only shown when the citizen's own dossier was found
+        tester.assertVisible(VERDER_CONTAINER);
+    }
+
+    @Test
+    @WithMockUser(username = "999990020", roles = "BURGER")
+    void zonderDossierId_zonderEigenDossier_toontStartpagina() {
+        tester.startPage(DatumKiezenPage.class, new PageParameters());
+
+        tester.assertRenderedPage(MarriageIntakePage.class);
+        tester.assertInvisible(VERDER_CONTAINER);
     }
 
     private UUID maakDossierVoor(String bsn) {
