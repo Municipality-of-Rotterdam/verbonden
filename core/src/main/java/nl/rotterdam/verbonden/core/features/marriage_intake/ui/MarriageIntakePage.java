@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeD
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
@@ -24,7 +25,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.math.BigDecimal;
@@ -78,10 +78,11 @@ public class MarriageIntakePage extends IntakeBasePage {
                 return new DossierSamenvattingDto(d.id(), registratieType, d.ceremonieSoort(),
                         d.prijs(), d.datumTijdHuwelijk(), d.huwelijksLocatie(),
                         d.gegevensBevestigd(), d.getuigenBevestigd(), d.getuigenGedeeltelijkIngevuld(), d.extras(),
-                        d.aantalGekozenAchternamen(), d.totalPrijs());
+                        d.aantalGekozenAchternamen(), d.totalPrijs(), d.status(), d.ingediendOp(), d.compleet());
             };
         }
-        return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, false, List.of(), 0, null);
+        return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, false, List.of(), 0, null,
+                DossierStatus.CONCEPT, null, false);
     }
 
     @Override

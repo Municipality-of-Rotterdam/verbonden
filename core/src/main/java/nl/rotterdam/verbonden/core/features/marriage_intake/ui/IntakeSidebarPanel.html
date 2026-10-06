@@ -112,17 +112,42 @@
 
     <hr class="rd-keuzes-divider"/>
 
-    <!-- Confirm button (RdButton inside its own form) -->
+    <!-- Status (shown once the dossier has been submitted) -->
+    <div wicket:id="statusContainer" class="rd-keuzes-status" role="status">
+        <span class="rd-keuzes-status__label">
+            <wicket:message key="intake.sidebar.status">Status</wicket:message>
+        </span>
+        <span wicket:id="statusLabel" class="rd-keuzes-status__badge">Ingediend</span>
+    </div>
+
+    <!-- Confirm button + confirmation dialog -->
     <form wicket:id="bevestigForm">
         <button wicket:id="bevestigButton" type="submit"></button>
+        <p wicket:id="nogNietCompleetHint" class="rd-keuzes-hint">
+            <wicket:message key="intake.sidebar.bevestig.nognietcompleet">Vul eerst alle onderdelen in. Daarna kunnen jullie je keuzes bevestigen.</wicket:message>
+        </p>
+
+        <dialog wicket:id="bevestigDialog" class="rd-bevestig-dialog">
+            <p class="rd-bevestig-dialog__factuur">
+                <span class="rd-bevestig-dialog__factuur-icoon" aria-hidden="true">&#x20AC;</span>
+                <wicket:message key="intake.bevestig.dialog.factuur">Rotterdam stuurt je een factuur voor de kosten.</wicket:message>
+            </p>
+        </dialog>
     </form>
 
     <!-- Info box -->
-    <div class="rd-keuzes-info" role="note">
+    <div wicket:id="reserveringInfo" class="rd-keuzes-info" role="note">
         <span class="rd-keuzes-info__icon" aria-hidden="true">&#9432;</span>
         <wicket:message key="intake.sidebar.reservering.info">Jullie keuze blijft 3 dagen gereserveerd.</wicket:message>
     </div>
 
 </div>
+
+<wicket:fragment wicket:id="bevestigDialogActies">
+    <div wicket:id="acties">
+        <button wicket:id="indienenButton" type="submit"></button>
+        <button wicket:id="annulerenButton" type="submit" class="rd-bevestig-dialog__annuleren"></button>
+    </div>
+</wicket:fragment>
 
 </wicket:panel>

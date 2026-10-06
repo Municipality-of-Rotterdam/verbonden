@@ -13,7 +13,16 @@
         <button wicket:id="zoekButton" type="submit" class="utrecht-button utrecht-button--primary-action">Zoeken</button>
     </form>
 
-    <table wicket:id="dossierTable"></table>
+    <form wicket:id="actiesForm">
+        <table wicket:id="dossierTable"></table>
+    </form>
+
+    <wicket:fragment wicket:id="actiesFragment">
+        <span class="d-flex gap-2">
+            <button wicket:id="accepteerButton" type="submit" class="text-nowrap"></button>
+            <button wicket:id="wijsAfButton" type="submit" class="text-nowrap"></button>
+        </span>
+    </wicket:fragment>
 </wicket:extend>
 </body>
 </html>

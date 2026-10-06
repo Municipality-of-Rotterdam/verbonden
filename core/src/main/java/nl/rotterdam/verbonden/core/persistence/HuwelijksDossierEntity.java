@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 
 import java.time.LocalDateTime;
@@ -58,6 +59,13 @@ public class HuwelijksDossierEntity {
 
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private DossierStatus status = DossierStatus.CONCEPT;
+
+    @Column(name = "ingediend_op")
+    private LocalDateTime ingediendOp;
 
     public Long getId() {
         return id;
@@ -141,5 +149,21 @@ public class HuwelijksDossierEntity {
 
     public void setAangemaaktOp(LocalDateTime aangemaaktOp) {
         this.aangemaaktOp = aangemaaktOp;
+    }
+
+    public DossierStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DossierStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getIngediendOp() {
+        return ingediendOp;
+    }
+
+    public void setIngediendOp(LocalDateTime ingediendOp) {
+        this.ingediendOp = ingediendOp;
     }
 }

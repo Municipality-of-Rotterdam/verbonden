@@ -4,6 +4,7 @@ import nl.rotterdam.verbonden.core.burger_common.BurgerBasePage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdBreadcrumbNavPanel;
@@ -15,7 +16,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.List;
@@ -49,6 +49,15 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         return true;
     }
 
+    /**
+     * Returns {@code true} when the page may be shown for a dossier that has already been submitted.
+     * All other intake pages change the dossier, so they redirect to the {@link AanvraagStatusPage}
+     * once the dossier is no longer a {@link DossierStatus#CONCEPT}.
+     */
+    protected boolean isToegestaanNaIndienen() {
+        return false;
+    }
+
     @Override
     protected void onInitialize() {
         super.onInitialize();
@@ -74,6 +83,11 @@ public abstract class IntakeBasePage extends BurgerBasePage {
             throw new RestartResponseException(MarriageIntakePage.class, makeDossierPageParameters(extractDossierId(getPageParameters())));
         }
 
+        boolean ingediend = dossierId != null && marriageIntakeService.findStatus(dossierId) != DossierStatus.CONCEPT;
+        if (ingediend && !isToegestaanNaIndienen()) {
+            throw new RestartResponseException(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));
+        }
+
         List<RdBreadcrumbNavRecord<? extends org.apache.wicket.request.component.IRequestablePage>> breadcrumbs = List.of(
                 new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijnloket"), MarriageIntakePage.class),
                 new RdBreadcrumbNavRecord<>(null, getString("intake.breadcrumb.mijndag"), MarriageIntakePage.class)
@@ -90,12 +104,16 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         notAuthorizedAlert.setVisible(showNotAuthorizedWarning);
         pageBody.add(notAuthorizedAlert);
 
-        pageBody.add(
-                createTabLink("tabDedag", IntakeStep.DE_DAG, DeDagPage.class),
+        // The steps are only useful while the dossier can still be changed
+        WebMarkupContainer stappen = new WebMarkupContainer("stappen");
+        stappen.setVisible(!ingediend);
+        stappen.add(
+                createTabLink("tabDeDag", IntakeStep.DE_DAG, DeDagPage.class),
                 createTabLink("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS, JullieGegevensPage.class),
                 createTabLink("tabGetuigen", IntakeStep.DE_GETUIGEN, DeGetuigenPage.class),
                 createTabLink("tabExtras", IntakeStep.EXTRAS, ExtrasPage.class)
         );
+        pageBody.add(stappen);
 
         keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel());
         pageBody.add(keuzesSidebar);
@@ -115,17 +133,6 @@ public abstract class IntakeBasePage extends BurgerBasePage {
                 return dossierId != null;
             }
         };
-        boolean isActive = getActiveStep() == step;
-        tab.add(AttributeModifier.replace("aria-selected", String.valueOf(isActive)));
-        if (isActive) {
-            tab.add(AttributeModifier.append("class", " rd-tab--active"));
-            tab.add(AttributeModifier.replace("aria-current", "step"));
-        }
-        return tab;
-    }
-
-    private WebMarkupContainer createDisabledTab(String id, IntakeStep step) {
-        WebMarkupContainer tab = new WebMarkupContainer(id);
         boolean isActive = getActiveStep() == step;
         tab.add(AttributeModifier.replace("aria-selected", String.valueOf(isActive)));
         if (isActive) {
