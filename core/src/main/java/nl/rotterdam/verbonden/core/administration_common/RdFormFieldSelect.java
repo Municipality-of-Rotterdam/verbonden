@@ -4,19 +4,29 @@ import nl.rotterdam.nl_design_system.wicket.components.form_field.RdFormFieldBor
 import nl.rotterdam.nl_design_system.wicket.components.select.RdSelect;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.util.ListModel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class RdFormFieldSelect<T> extends RdFormFieldBorder<T, RdSelect<T>> {
 
-    private final List<? extends T> choices;
+    private final IModel<? extends List<? extends T>> choices;
     private final IChoiceRenderer<? super T> renderer;
     private boolean required;
     private boolean nullValid;
 
     public RdFormFieldSelect(String id, IModel<T> model, IModel<String> label,
                              List<? extends T> choices, IChoiceRenderer<? super T> renderer) {
+        this(id, model, label, new ListModel<T>(new ArrayList<>(choices)), renderer);
+    }
+
+    /**
+     * Met keuzes die kunnen veranderen, bijvoorbeeld afhankelijk van een ander veld.
+     */
+    public RdFormFieldSelect(String id, IModel<T> model, IModel<String> label,
+                             IModel<? extends List<? extends T>> choices, IChoiceRenderer<? super T> renderer) {
         super(id, model, label);
         this.choices = choices;
         this.renderer = renderer;

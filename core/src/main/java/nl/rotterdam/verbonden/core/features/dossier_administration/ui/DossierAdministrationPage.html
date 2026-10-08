@@ -8,14 +8,20 @@
 <wicket:extend>
     <h1>Dossiers</h1>
 
+    <p><a wicket:id="nieuwDossierLink" class="utrecht-button utrecht-button--primary-action">Nieuw dossier (balie of video)</a></p>
+
     <form wicket:id="zoekForm" class="d-flex gap-2 mb-3">
-        <input wicket:id="zoektermVeld" type="text" class="utrecht-textbox" placeholder="Zoek op dossier-ID of BSN"/>
+        <input wicket:id="zoektermVeld" type="text" class="utrecht-textbox" placeholder="Zoek op dossier-ID, BSN, persoonsnummer of achternaam"/>
         <button wicket:id="zoekButton" type="submit" class="utrecht-button utrecht-button--primary-action">Zoeken</button>
     </form>
 
     <form wicket:id="actiesForm">
         <table wicket:id="dossierTable"></table>
     </form>
+
+    <wicket:fragment wicket:id="dossierLinkFragment">
+        <a wicket:id="link"><span wicket:id="dossierId"></span></a>
+    </wicket:fragment>
 
     <wicket:fragment wicket:id="actiesFragment">
         <span class="d-flex gap-2">

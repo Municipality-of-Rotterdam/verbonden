@@ -102,7 +102,7 @@ class DossierIndienenIntegrationTest {
                 .isInstanceOf(DossierNietWijzigbaarException.class);
         assertThatThrownBy(() -> marriageIntakeService.slaExtrasOp(dossierId, new SaveExtrasDto(true, false, null, false)))
                 .isInstanceOf(DossierNietWijzigbaarException.class);
-        assertThatThrownBy(() -> marriageIntakeService.slaPartnerGegevensOp(dossierId, BSN_PARTNER_1, "Anders"))
+        assertThatThrownBy(() -> marriageIntakeService.slaPartnerGegevensOp(dossierId, 1, "Anders"))
                 .isInstanceOf(DossierNietWijzigbaarException.class);
         assertThatThrownBy(() -> marriageIntakeService.dienIn(dossierId))
                 .isInstanceOf(DossierNietWijzigbaarException.class);

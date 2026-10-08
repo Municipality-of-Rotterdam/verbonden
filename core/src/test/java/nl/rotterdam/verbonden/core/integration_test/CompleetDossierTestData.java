@@ -56,6 +56,23 @@ public class CompleetDossierTestData {
      */
     public UUID maakCompleetDossier() {
         UUID dossierId = maakConceptDossier();
+        maakBeschikbaarheidVoorKleinHuwelijk();
+        LocalDateTime slot = marriageIntakeService.findAllBeschikbareSlots(dossierId).iterator().next();
+        marriageIntakeService.slaAfspraakOp(dossierId, slot.toLocalDate(), slot.toLocalTime());
+
+        marriageIntakeService.acceptInvitation(dossierId, BSN_PARTNER_2);
+        marriageIntakeService.slaPartnerGegevensOp(dossierId, 1, "Jansen");
+        marriageIntakeService.slaPartnerGegevensOp(dossierId, 2, "Jansen");
+        marriageIntakeService.slaGetuigenOp(dossierId, List.of(
+                new SaveGetuigenDto(1, "Kwik van Willegenburgh"),
+                new SaveGetuigenDto(2, "Kwek van Willegenburgh")));
+        return dossierId;
+    }
+
+    /**
+     * Elke dag van 9:00 tot 10:00 tijdsloten van 10 minuten op de locatie van een klein huwelijk.
+     */
+    public void maakBeschikbaarheidVoorKleinHuwelijk() {
         long locatieId = marriageIntakeService.findAllMarriageTypes().stream()
                 .filter(mt -> mt.soort() == CeremonieSoort.KLEIN)
                 .map(IntakeMarriageTypeDto::locatieId)
@@ -67,15 +84,5 @@ public class CompleetDossierTestData {
                     locatieId, HuwelijksType.GRATIS, dag, LocalTime.of(9, 0), LocalTime.of(10, 0), 10,
                     BigDecimal.ZERO, LocalDate.now().minusMonths(1), LocalDate.now().plusYears(2)));
         }
-        LocalDateTime slot = marriageIntakeService.findAllBeschikbareSlots(dossierId).iterator().next();
-        marriageIntakeService.slaAfspraakOp(dossierId, slot.toLocalDate(), slot.toLocalTime());
-
-        marriageIntakeService.acceptInvitation(dossierId, BSN_PARTNER_2);
-        marriageIntakeService.slaPartnerGegevensOp(dossierId, BSN_PARTNER_1, "Jansen");
-        marriageIntakeService.slaPartnerGegevensOp(dossierId, BSN_PARTNER_2, "Jansen");
-        marriageIntakeService.slaGetuigenOp(dossierId, List.of(
-                new SaveGetuigenDto(1, "Kwik van Willegenburgh"),
-                new SaveGetuigenDto(2, "Kwek van Willegenburgh")));
-        return dossierId;
     }
 }

@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.dossier_administration.repository;
 
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto;
 import nl.rotterdam.verbonden.core.persistence.HuwelijksDossierEntity;
 import org.springframework.data.domain.Page;
@@ -17,13 +18,17 @@ public interface DossierAdministrationRepository extends JpaRepository<Huwelijks
 
     Optional<HuwelijksDossierEntity> findByUuid(UUID uuid);
 
+    boolean existsByPartners_Bsn(BurgerServiceNummer bsn);
+
     @Query(value = """
             SELECT new nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto(
                 d.uuid,
                 (SELECT p1.bsn FROM HuwelijksDossiersPartnerEntity p1 WHERE p1.dossier = d AND p1.volgorde = 1),
                 (SELECT p2.bsn FROM HuwelijksDossiersPartnerEntity p2 WHERE p2.dossier = d AND p2.volgorde = 2),
+                (SELECT p3.buitenlandsPersoonsnummer FROM HuwelijksDossiersPartnerEntity p3 WHERE p3.dossier = d AND p3.volgorde = 2),
                 d.registratieType,
                 d.ceremonieSoort,
+                d.kanaal,
                 d.aangemaaktOp,
                 d.status,
                 d.ingediendOp)
@@ -32,6 +37,7 @@ public interface DossierAdministrationRepository extends JpaRepository<Huwelijks
                OR EXISTS (SELECT p FROM HuwelijksDossiersPartnerEntity p
                           WHERE p.dossier = d
                             AND (p.bsn LIKE CONCAT('%', :zoekterm, '%')
+                                 OR p.buitenlandsPersoonsnummer LIKE CONCAT('%', :zoekterm, '%')
                                  OR LOWER(p.gekozenAchternaam) LIKE LOWER(CONCAT('%', :zoekterm, '%'))))
                OR LOWER(CAST(d.uuid AS String)) LIKE LOWER(CONCAT('%', :zoekterm, '%'))
             """,
@@ -41,6 +47,7 @@ public interface DossierAdministrationRepository extends JpaRepository<Huwelijks
                OR EXISTS (SELECT p FROM HuwelijksDossiersPartnerEntity p
                           WHERE p.dossier = d
                             AND (p.bsn LIKE CONCAT('%', :zoekterm, '%')
+                                 OR p.buitenlandsPersoonsnummer LIKE CONCAT('%', :zoekterm, '%')
                                  OR LOWER(p.gekozenAchternaam) LIKE LOWER(CONCAT('%', :zoekterm, '%'))))
                OR LOWER(CAST(d.uuid AS String)) LIKE LOWER(CONCAT('%', :zoekterm, '%'))
             """)
@@ -52,6 +59,7 @@ public interface DossierAdministrationRepository extends JpaRepository<Huwelijks
                OR EXISTS (SELECT p FROM HuwelijksDossiersPartnerEntity p
                           WHERE p.dossier = d
                             AND (p.bsn LIKE CONCAT('%', :zoekterm, '%')
+                                 OR p.buitenlandsPersoonsnummer LIKE CONCAT('%', :zoekterm, '%')
                                  OR LOWER(p.gekozenAchternaam) LIKE LOWER(CONCAT('%', :zoekterm, '%'))))
                OR LOWER(CAST(d.uuid AS String)) LIKE LOWER(CONCAT('%', :zoekterm, '%'))
             """)

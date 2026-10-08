@@ -33,7 +33,7 @@ class PartnerGegevensWijzigenIntegrationTest {
         UUID dossierId = testData.maakConceptDossier();
         long versie = partner(dossierId, BSN_PARTNER_1).versie();
 
-        long nieuweVersie = marriageIntakeService.slaContactGegevensOp(dossierId, BSN_PARTNER_1, versie,
+        long nieuweVersie = marriageIntakeService.slaContactGegevensOp(dossierId, 1, versie,
                 new Telefoonnummer("0612345678"), new Emailadres("partner1@example.com"));
 
         PartnerGegevensDto partner = partner(dossierId, BSN_PARTNER_1);
@@ -47,10 +47,10 @@ class PartnerGegevensWijzigenIntegrationTest {
     void slaContactGegevensOp_metVerouderdeVersie_wordtGeweigerd() {
         UUID dossierId = testData.maakConceptDossier();
         long versie = partner(dossierId, BSN_PARTNER_1).versie();
-        marriageIntakeService.slaContactGegevensOp(dossierId, BSN_PARTNER_1, versie,
+        marriageIntakeService.slaContactGegevensOp(dossierId, 1, versie,
                 new Telefoonnummer("0612345678"), null);
 
-        assertThatThrownBy(() -> marriageIntakeService.slaContactGegevensOp(dossierId, BSN_PARTNER_1, versie,
+        assertThatThrownBy(() -> marriageIntakeService.slaContactGegevensOp(dossierId, 1, versie,
                 null, new Emailadres("partner1@example.com")))
                 .isInstanceOf(OptimisticLockingFailureException.class);
 
@@ -64,8 +64,8 @@ class PartnerGegevensWijzigenIntegrationTest {
         UUID dossierId = testData.maakConceptDossier();
         marriageIntakeService.acceptInvitation(dossierId, BSN_PARTNER_2);
 
-        marriageIntakeService.slaPartnerGegevensOp(dossierId, BSN_PARTNER_2, "Jansen");
-        marriageIntakeService.slaContactGegevensOp(dossierId, BSN_PARTNER_2, partner(dossierId, BSN_PARTNER_2).versie(),
+        marriageIntakeService.slaPartnerGegevensOp(dossierId, 2, "Jansen");
+        marriageIntakeService.slaContactGegevensOp(dossierId, 2, partner(dossierId, BSN_PARTNER_2).versie(),
                 new Telefoonnummer("0687654321"), null);
 
         assertThat(partner(dossierId, BSN_PARTNER_2).gekozenAchternaam()).isEqualTo("Jansen");
@@ -78,8 +78,8 @@ class PartnerGegevensWijzigenIntegrationTest {
         UUID dossierId = testData.maakConceptDossier();
         long versie = partner(dossierId, BSN_PARTNER_1).versie();
 
-        marriageIntakeService.slaPartnerGegevensOp(dossierId, BSN_PARTNER_1, "Jansen");
-        marriageIntakeService.slaContactGegevensOp(dossierId, BSN_PARTNER_1, versie,
+        marriageIntakeService.slaPartnerGegevensOp(dossierId, 1, "Jansen");
+        marriageIntakeService.slaContactGegevensOp(dossierId, 1, versie,
                 new Telefoonnummer("0612345678"), null);
 
         assertThat(partner(dossierId, BSN_PARTNER_1).telefoonnummer()).isEqualTo(new Telefoonnummer("0612345678"));

@@ -15,3 +15,27 @@
     max-width: 16rem;
     max-height: 12rem;
 }
+
+/* Detailpagina van een dossier: onderdelen met label/waarde-paren */
+.rd-dossier-sectie {
+    margin-block-end: 2rem;
+}
+
+.rd-dossier-gegevens {
+    display: grid;
+    grid-template-columns: max-content auto;
+    gap: 0.25rem 1.5rem;
+    margin: 0;
+}
+
+.rd-dossier-gegevens dt {
+    font-weight: bold;
+}
+
+.rd-dossier-gegevens dd {
+    margin: 0;
+}
+
+.rd-dossier-partner {
+    min-width: 22rem;
+}

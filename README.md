@@ -86,9 +86,15 @@ docker compose down -v
 
 ### 2. Start de Spring Boot applicatie
 
+Installeer eerst de modules (o.a. `core`) in je lokale Maven-repository, en start daarna alleen `app-local`:
+
 ```bash
-./mvnw spring-boot:run -pl app-local -am
+./mvnw install -DskipTests
+./mvnw spring-boot:run -pl app-local
 ```
+
+Doe de eerste stap opnieuw na wijzigingen in `core` of `remote-local`; `spring-boot:run` gebruikt de geïnstalleerde
+versie van die modules. (Met `-am` probeert Maven ook de parent-module te starten, en dat mislukt.)
 
 De applicatie is daarna bereikbaar op <http://localhost:8080>.
 

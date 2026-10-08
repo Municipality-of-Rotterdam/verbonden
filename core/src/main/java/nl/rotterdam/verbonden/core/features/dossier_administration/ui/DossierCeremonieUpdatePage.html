@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Ceremonie wijzigen</title>
+</head>
+<body>
+<wicket:extend>
+    <h1 wicket:id="titel">Ceremonie wijzigen</h1>
+
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar dossier</a></p>
+
+    <p>
+        Bij een andere ceremonie horen mogelijk een andere locatie, een ander aantal getuigen en andere extra's.
+        Controleer daarna de datum, de getuigen en de extra's.
+    </p>
+
+    <div wicket:id="feedback"></div>
+
+    <form wicket:id="ceremonieForm" class="d-flex flex-column gap-3">
+        <div wicket:id="registratieType">
+            <select wicket:id="input"></select>
+        </div>
+        <div wicket:id="ceremonieSoort">
+            <select wicket:id="input"></select>
+        </div>
+        <div>
+            <button wicket:id="opslaan" type="submit"></button>
+        </div>
+    </form>
+</wicket:extend>
+</body>
+</html>

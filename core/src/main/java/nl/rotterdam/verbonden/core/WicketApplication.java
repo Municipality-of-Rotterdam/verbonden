@@ -13,7 +13,18 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.ui.ExtrasPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsUpdatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
+import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BuitenlandsPersoonsnummerWicketConverter;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BurgerServiceNummerWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAfspraakUpdatePage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierCeremonieUpdatePage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierCreatePage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierDetailPage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierExtrasUpdatePage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierGetuigenUpdatePage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierPartnerUpdatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.PersonFullNameWicketConverter;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
@@ -111,6 +122,8 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
         locator.set(Telefoonnummer.class, new TelefoonnummerWicketConverter());
         locator.set(Emailadres.class, new EmailadresWicketConverter());
+        locator.set(BurgerServiceNummer.class, new BurgerServiceNummerWicketConverter());
+        locator.set(BuitenlandsPersoonsnummer.class, new BuitenlandsPersoonsnummerWicketConverter());
         return locator;
     }
 
@@ -178,6 +191,13 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/mijn-dag/${dossierId}/de-getuigen", DeGetuigenPage.class);
         mountPage("/mijn-dag/${dossierId}/datum-kiezen", DatumKiezenPage.class);
         mountPage("/beheer/dossiers", DossierAdministrationPage.class);
+        mountPage("/beheer/dossiers/nieuw", DossierCreatePage.class);
+        mountPage("/beheer/dossiers/${dossierId}", DossierDetailPage.class);
+        mountPage("/beheer/dossiers/${dossierId}/ceremonie", DossierCeremonieUpdatePage.class);
+        mountPage("/beheer/dossiers/${dossierId}/datum", DossierAfspraakUpdatePage.class);
+        mountPage("/beheer/dossiers/${dossierId}/partners/${volgorde}", DossierPartnerUpdatePage.class);
+        mountPage("/beheer/dossiers/${dossierId}/getuigen", DossierGetuigenUpdatePage.class);
+        mountPage("/beheer/dossiers/${dossierId}/extras", DossierExtrasUpdatePage.class);
         mountPage("/beheer/extras", TrouwboekjeAdministrationPage.class);
         mountPage("/beheer/extras/nieuw", TrouwboekjeCreatePage.class);
         mountPage("/beheer/extras/${id}", TrouwboekjeUpdatePage.class);

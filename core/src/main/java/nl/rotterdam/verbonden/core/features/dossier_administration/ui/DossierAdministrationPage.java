@@ -16,6 +16,7 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvid
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -55,6 +56,7 @@ public class DossierAdministrationPage extends AdministrationBasePage {
 
         });
 
+        pageBody.add(new BookmarkablePageLink<>("nieuwDossierLink", DossierCreatePage.class));
         pageBody.add(zoekForm);
         pageBody.add(new Form<>("actiesForm").add(dossierTable));
     }
@@ -67,8 +69,7 @@ public class DossierAdministrationPage extends AdministrationBasePage {
             public void populateItem(Item<ICellPopulator<ListDossierDto>> cellItem,
                                      String componentId,
                                      IModel<ListDossierDto> rowModel) {
-                cellItem.add(new Label(componentId,
-                        rowModel.map(dto -> dto.dossierId() != null ? dto.dossierId().toString() : "")));
+                cellItem.add(new DossierLinkFragment(componentId, rowModel));
             }
         });
 
@@ -87,8 +88,13 @@ public class DossierAdministrationPage extends AdministrationBasePage {
             public void populateItem(Item<ICellPopulator<ListDossierDto>> cellItem,
                                      String componentId,
                                      IModel<ListDossierDto> rowModel) {
-                cellItem.add(new Label(componentId,
-                        rowModel.map(dto -> dto.bsn2() != null ? dto.bsn2().getValue() : "")));
+                cellItem.add(new Label(componentId, rowModel.map(dto -> {
+                    if (dto.bsn2() != null) {
+                        return dto.bsn2().getValue();
+                    }
+                    // Partner 2 zonder BSN: toon het persoonsnummer uit het paspoort
+                    return dto.persoonsnummer2() != null ? dto.persoonsnummer2().getValue() + " (paspoort)" : "";
+                })));
             }
         });
 
@@ -109,6 +115,16 @@ public class DossierAdministrationPage extends AdministrationBasePage {
                                      IModel<ListDossierDto> rowModel) {
                 cellItem.add(new Label(componentId,
                         rowModel.map(dto -> dto.ceremonieSoort() != null ? dto.ceremonieSoort().getLabel() : "")));
+            }
+        });
+
+        columns.add(new AbstractColumn<>(Model.of("Kanaal"), "kanaal") {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListDossierDto>> cellItem,
+                                     String componentId,
+                                     IModel<ListDossierDto> rowModel) {
+                cellItem.add(new Label(componentId,
+                        rowModel.map(dto -> dto.kanaal() != null ? dto.kanaal().getLabel() : "")));
             }
         });
 
@@ -153,7 +169,7 @@ public class DossierAdministrationPage extends AdministrationBasePage {
             }
         });
 
-                SortableDataProvider<ListDossierDto, String> provider = new SortableDataProvider<>() {
+        SortableDataProvider<ListDossierDto, String> provider = new SortableDataProvider<>() {
             @Override
             public Iterator<? extends ListDossierDto> iterator(long first, long count) {
                 boolean ascending = getSort() == null || getSort().isAscending();
@@ -181,6 +197,20 @@ public class DossierAdministrationPage extends AdministrationBasePage {
         provider.setSort("aangemaaktOp", SortOrder.DESCENDING);
 
         return new RdDataTable<>("dossierTable", columns, provider, 20);
+    }
+
+    /**
+     * Het dossier-ID als link naar de detailpagina.
+     */
+    private final class DossierLinkFragment extends Fragment {
+
+        DossierLinkFragment(String id, IModel<ListDossierDto> dtoModel) {
+            super(id, "dossierLinkFragment", DossierAdministrationPage.this, dtoModel);
+            BookmarkablePageLink<Void> link = new BookmarkablePageLink<>("link", DossierDetailPage.class,
+                    DossierBeheerBasePage.parametersVoor(dtoModel.getObject().dossierId()));
+            link.add(new Label("dossierId", dtoModel.getObject().dossierId().toString()));
+            add(link);
+        }
     }
 
     /**

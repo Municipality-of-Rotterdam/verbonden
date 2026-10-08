@@ -3,11 +3,8 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
-import nl.rotterdam.verbonden.core.config.PlanningConfig;
-import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
-import nl.rotterdam.verbonden.core.features.location_administration.repository.BeschikbaarheidRepository;
 import nl.rotterdam.verbonden.core.features.location_administration.repository.LocatieRepository;
-import nl.rotterdam.verbonden.core.features.location_administration.repository.NietBeschikbareDagRepository;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
@@ -21,7 +18,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
@@ -33,11 +29,9 @@ import nl.rotterdam.verbonden.core.features.marriage_type_administration.reposit
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.repository.TrouwboekjeRepository;
 import nl.rotterdam.verbonden.core.identity.PersonInfo;
 import nl.rotterdam.verbonden.core.identity.PersonLookupService;
-import nl.rotterdam.verbonden.core.persistence.AfspraakEntity;
 import nl.rotterdam.verbonden.core.persistence.GetuigeEntity;
 import nl.rotterdam.verbonden.core.persistence.HuwelijksDossierEntity;
 import nl.rotterdam.verbonden.core.persistence.HuwelijksDossiersPartnerEntity;
-import nl.rotterdam.verbonden.core.persistence.LocatieBeschikbaarheidEntity;
 import nl.rotterdam.verbonden.core.persistence.MarriageTypeEntity;
 import nl.rotterdam.verbonden.core.persistence.MarriageTypeLocationEntity;
 import nl.rotterdam.verbonden.core.persistence.TrouwlocatieEntity;
@@ -57,36 +51,30 @@ import java.util.UUID;
 class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     private final DossierRepository dossierRepository;
-    private final BeschikbaarheidRepository beschikbaarheidRepository;
-    private final NietBeschikbareDagRepository nietBeschikbareDagRepository;
     private final LocatieRepository locatieRepository;
     private final MarriageTypeLocationRepository marriageTypeLocationRepository;
     private final MarriageTypeRepository marriageTypeRepository;
     private final AfspraakRepository afspraakRepository;
-    private final PlanningConfig planningConfig;
+    private final AfspraakPlanningService afspraakPlanningService;
     private final GetuigenRepository getuigenRepository;
     private final TrouwboekjeRepository trouwboekjeRepository;
     private final PersonLookupService personLookupService;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
-                              BeschikbaarheidRepository beschikbaarheidRepository,
-                              NietBeschikbareDagRepository nietBeschikbareDagRepository,
                               LocatieRepository locatieRepository,
                               MarriageTypeLocationRepository marriageTypeLocationRepository,
                               MarriageTypeRepository marriageTypeRepository,
                               AfspraakRepository afspraakRepository,
-                              PlanningConfig planningConfig,
+                              AfspraakPlanningService afspraakPlanningService,
                               GetuigenRepository getuigenRepository,
                               TrouwboekjeRepository trouwboekjeRepository,
                               PersonLookupService personLookupService) {
         this.dossierRepository = dossierRepository;
-        this.beschikbaarheidRepository = beschikbaarheidRepository;
-        this.nietBeschikbareDagRepository = nietBeschikbareDagRepository;
         this.locatieRepository = locatieRepository;
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
         this.marriageTypeRepository = marriageTypeRepository;
         this.afspraakRepository = afspraakRepository;
-        this.planningConfig = planningConfig;
+        this.afspraakPlanningService = afspraakPlanningService;
         this.getuigenRepository = getuigenRepository;
         this.trouwboekjeRepository = trouwboekjeRepository;
         this.personLookupService = personLookupService;
@@ -112,7 +100,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                                     .map(String::trim)
                                     .filter(s -> !s.isEmpty())
                                     .toList(),
-                            computeEersteGelegenheid(e.getSoort()),
+                            afspraakPlanningService.findEersteGelegenheid(e.getSoort()),
                             e.isActive(),
                             locatieId,
                             locatieNaam
@@ -134,42 +122,32 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     private PartnerGegevensDto convertToDto(HuwelijksDossiersPartnerEntity partner) {
         BurgerServiceNummer bsn = partner.getBsn();
+        if (bsn == null) {
+            // Partner zonder BSN: de persoonsgegevens zijn door een medewerker ingevoerd
+            return new PartnerGegevensDto(partner.getVolgorde(), null, partner.getBuitenlandsPersoonsnummer(),
+                    partner.getAchternaam(), partner.getVoornamen(), partner.getGeboortedatum(),
+                    partner.getGeboorteplaats(), partner.getNationaliteit(), partner.getBurgerlijkeStaat(),
+                    partner.getTelefoonnummer(), partner.getEmailadres(), partner.getGekozenAchternaam(), partner.getVersie());
+        }
         Optional<PersonInfo> personInfo = personLookupService.findByBsn(bsn);
         if (personInfo.isEmpty()) {
-            return new PartnerGegevensDto(bsn, "Onbekend", bsn.getValue(), null, "", "Onbekend", "Onbekend",
+            return new PartnerGegevensDto(partner.getVolgorde(), bsn, null, "Onbekend", bsn.getValue(), null, "",
+                    "Onbekend", "Onbekend",
                     partner.getTelefoonnummer(), partner.getEmailadres(), partner.getGekozenAchternaam(), partner.getVersie());
         }
         PersonInfo info = personInfo.get();
-        return new PartnerGegevensDto(bsn, info.achternaam(), info.voornamen(), info.geboortedatum(),
-                info.geboorteplaats(), info.nationaliteit(), info.burgerlijkeStaat(),
+        return new PartnerGegevensDto(partner.getVolgorde(), bsn, null, info.achternaam(), info.voornamen(),
+                info.geboortedatum(), info.geboorteplaats(), info.nationaliteit(), info.burgerlijkeStaat(),
                 partner.getTelefoonnummer(), partner.getEmailadres(), partner.getGekozenAchternaam(), partner.getVersie());
-    }
-
-    private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {
-        HuwelijksType huwelijksType = toHuwelijksType(ceremonieSoort);
-        List<TrouwlocatieEntity> locaties = resolveLocaties(ceremonieSoort);
-        LocalDate datum = LocalDate.now().plusDays(1);
-        LocalDate limiet = datum.plusYears(1);
-        while (!datum.isAfter(limiet)) {
-            for (TrouwlocatieEntity locatie : locaties) {
-                if (heeftVrijSlot(locatie.getId(), huwelijksType, datum)) {
-                    return datum;
-                }
-            }
-            datum = datum.plusDays(1);
-        }
-        return null;
     }
 
     @Override
     @Transactional
     public UUID create(CreateDossierDto dto) {
-        HuwelijksDossierEntity entity = new HuwelijksDossierEntity();
-        entity.setRegistratieType(dto.registratieType());
-        entity.setCeremonieSoort(dto.ceremonieSoort());
-        if (dto.locatieId() != null) {
-            locatieRepository.findById(dto.locatieId()).ifPresent(entity::setLocatie);
-        }
+        HuwelijksDossierEntity entity = new HuwelijksDossierEntity(AanmaakKanaal.ONLINE, null);
+        entity.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), dto.locatieId() != null
+                ? locatieRepository.findById(dto.locatieId()).orElse(null)
+                : null);
         if (dto.bsn1() != null) {
             entity.voegPartnerToe(dto.bsn1());
         }
@@ -180,16 +158,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Transactional
     public void updateIntake(UUID dossierId, ChangeIntakeDto dto) {
         HuwelijksDossierEntity e = getWijzigbaarDossier(dossierId);
-        e.setRegistratieType(dto.registratieType());
-        e.setCeremonieSoort(dto.ceremonieSoort());
-        if (dto.ceremonieSoort() != CeremonieSoort.GROOT) {
-            e.setMuziek(false);
-        }
-        if (dto.locatieId() != null) {
-            locatieRepository.findById(dto.locatieId()).ifPresent(e::setLocatie);
-        } else {
-            e.setLocatie(null);
-        }
+        e.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), dto.locatieId() != null
+                ? locatieRepository.findById(dto.locatieId()).orElse(null)
+                : null);
     }
 
     @Override
@@ -343,7 +314,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     }
 
     private static int vereistAantalGetuigen(HuwelijksDossierEntity dossier) {
-        return dossier.getCeremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
+        return dossier.getCeremonieSoort().getAantalGetuigen();
     }
 
     private static int aantalGekozenAchternamen(HuwelijksDossierEntity dossier) {
@@ -355,190 +326,32 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional(readOnly = true)
     public Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
-        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
-
-        Set<LocalDate> beschikbaar = new HashSet<>();
-        LocalDate vandaag = LocalDate.now();
-        LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
-        LocalDate laatste = vandaag.plusDays(planningConfig.getTotDagen());
-        LocalDate start = maand.atDay(1).isBefore(vroegste) ? vroegste : maand.atDay(1);
-        LocalDate einde = maand.atEndOfMonth().isAfter(laatste) ? laatste : maand.atEndOfMonth();
-
-        for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
-            for (TrouwlocatieEntity locatie : locaties) {
-                if (heeftVrijSlot(locatie.getId(), huwelijksType, datum)) {
-                    beschikbaar.add(datum);
-                    break;
-                }
-            }
-        }
-        return beschikbaar;
+        return afspraakPlanningService.findBeschikbareDatums(getDossier(dossierId).getCeremonieSoort(), maand);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<LocalDateTime> findBeschikbareSlots(UUID dossierId, YearMonth maand) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
-        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
-
-        List<LocalDateTime> slots = new ArrayList<>();
-        LocalDate vandaag = LocalDate.now();
-        LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
-        LocalDate laatste = vandaag.plusDays(planningConfig.getTotDagen());
-        LocalDate start = maand.atDay(1).isBefore(vroegste) ? vroegste : maand.atDay(1);
-        LocalDate einde = maand.atEndOfMonth().isAfter(laatste) ? laatste : maand.atEndOfMonth();
-
-        for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
-            Set<LocalTime> tijdenVoorDatum = new TreeSet<>();
-            for (TrouwlocatieEntity locatie : locaties) {
-                tijdenVoorDatum.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
-            }
-            LocalDate finalDatum = datum;
-            tijdenVoorDatum.forEach(tijd -> slots.add(LocalDateTime.of(finalDatum, tijd)));
-        }
-        return slots;
+        return afspraakPlanningService.findBeschikbareSlots(getDossier(dossierId).getCeremonieSoort(), maand);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Collection<LocalDateTime> findAllBeschikbareSlots(UUID dossierId) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
-        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
-
-        List<LocalDateTime> slots = new ArrayList<>();
-        LocalDate vandaag = LocalDate.now();
-        LocalDate start = vandaag.plusDays(planningConfig.getVanafDagen());
-        LocalDate einde = vandaag.plusDays(planningConfig.getTotDagen());
-
-        for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
-            Set<LocalTime> tijdenVoorDatum = new TreeSet<>();
-            for (TrouwlocatieEntity locatie : locaties) {
-                tijdenVoorDatum.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
-            }
-            LocalDate finalDatum = datum;
-            tijdenVoorDatum.forEach(tijd -> slots.add(LocalDateTime.of(finalDatum, tijd)));
-        }
-        return slots;
+        return afspraakPlanningService.findAllBeschikbareSlots(getDossier(dossierId).getCeremonieSoort());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum) {
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
-        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
-
-        Set<LocalTime> tijden = new TreeSet<>();
-        for (TrouwlocatieEntity locatie : locaties) {
-            tijden.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
-        }
-        return new ArrayList<>(tijden);
+        return afspraakPlanningService.findBeschikbareTijden(getDossier(dossierId).getCeremonieSoort(), datum);
     }
 
     @Override
     @Transactional
     public void slaAfspraakOp(UUID dossierId, LocalDate datum, LocalTime startTijd) {
-        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
-        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
-        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
-
-        for (TrouwlocatieEntity locatie : locaties) {
-            List<LocatieBeschikbaarheidEntity> slots = beschikbaarheidRepository.findBeschikbareSlots(
-                    locatie.getId(), huwelijksType, datum.getDayOfWeek(), datum);
-
-            for (LocatieBeschikbaarheidEntity slot : slots) {
-                if (isSlotVrij(slot, datum, startTijd)) {
-                    LocalTime eindTijd = startTijd.plusMinutes(slot.getDuurInMinuten());
-
-                    afspraakRepository.deleteByDossier_Id(dossier.getId());
-
-                    AfspraakEntity afspraak = new AfspraakEntity(dossier);
-                    afspraak.setLocatie(locatie);
-                    afspraak.setDatum(datum);
-                    afspraak.setStartTijd(startTijd);
-                    afspraak.setEindTijd(eindTijd);
-                    afspraakRepository.save(afspraak);
-                    return;
-                }
-            }
-        }
-        throw new IllegalStateException("Geen beschikbaar tijdslot gevonden voor " + datum + " " + startTijd);
-    }
-
-    private List<TrouwlocatieEntity> resolveLocaties(CeremonieSoort ceremonieSoort) {
-        return marriageTypeLocationRepository.findByMarriageType_Soort(ceremonieSoort)
-                .map(mapping -> List.of(mapping.getLocatie()))
-                .orElseGet(locatieRepository::findAll);
-    }
-
-    private boolean heeftVrijSlot(long locatieId, HuwelijksType huwelijksType, LocalDate datum) {
-        if (nietBeschikbareDagRepository.existsByLocatie_IdAndDatum(locatieId, datum)) {
-            return false;
-        }
-        List<LocatieBeschikbaarheidEntity> beschikbaarheden = beschikbaarheidRepository
-                .findBeschikbareSlots(locatieId, huwelijksType, datum.getDayOfWeek(), datum);
-        if (beschikbaarheden.isEmpty()) {
-            return false;
-        }
-        for (LocatieBeschikbaarheidEntity b : beschikbaarheden) {
-            List<LocalTime> slots = genereerSlots(b);
-            Set<LocalTime> bezet = bezetteTijden(locatieId, datum);
-            for (LocalTime slot : slots) {
-                if (!bezet.contains(slot)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private List<LocalTime> vrijeTijdslotenVoor(long locatieId, HuwelijksType huwelijksType, LocalDate datum) {
-        if (nietBeschikbareDagRepository.existsByLocatie_IdAndDatum(locatieId, datum)) {
-            return List.of();
-        }
-        List<LocatieBeschikbaarheidEntity> beschikbaarheden = beschikbaarheidRepository
-                .findBeschikbareSlots(locatieId, huwelijksType, datum.getDayOfWeek(), datum);
-        Set<LocalTime> bezet = bezetteTijden(locatieId, datum);
-        List<LocalTime> vrij = new ArrayList<>();
-        for (LocatieBeschikbaarheidEntity b : beschikbaarheden) {
-            for (LocalTime slot : genereerSlots(b)) {
-                if (!bezet.contains(slot)) {
-                    vrij.add(slot);
-                }
-            }
-        }
-        return vrij;
-    }
-
-    private boolean isSlotVrij(LocatieBeschikbaarheidEntity beschikbaarheid, LocalDate datum, LocalTime startTijd) {
-        List<LocalTime> slots = genereerSlots(beschikbaarheid);
-        if (!slots.contains(startTijd)) {
-            return false;
-        }
-        return !bezetteTijden(beschikbaarheid.getLocatie().getId(), datum).contains(startTijd);
-    }
-
-    private List<LocalTime> genereerSlots(LocatieBeschikbaarheidEntity beschikbaarheid) {
-        List<LocalTime> slots = new ArrayList<>();
-        LocalTime current = beschikbaarheid.getStartTijd();
-        int duur = beschikbaarheid.getDuurInMinuten();
-        while (!current.plusMinutes(duur).isAfter(beschikbaarheid.getEindTijd())) {
-            slots.add(current);
-            current = current.plusMinutes(duur);
-        }
-        return slots;
-    }
-
-    private Set<LocalTime> bezetteTijden(long locatieId, LocalDate datum) {
-        Set<LocalTime> bezet = new HashSet<>();
-        for (AfspraakEntity a : afspraakRepository.findByLocatie_IdAndDatum(locatieId, datum)) {
-            bezet.add(a.getStartTijd());
-        }
-        return bezet;
+        getWijzigbaarDossier(dossierId);
+        afspraakPlanningService.boekAfspraak(dossierId, datum, startTijd);
     }
 
     private HuwelijksDossierEntity getDossier(UUID uuid) {
@@ -594,26 +407,18 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         getuigenRepository.save(entity);
     }
 
-    private static HuwelijksType toHuwelijksType(CeremonieSoort ceremonieSoort) {
-        return switch (ceremonieSoort) {
-            case KLEIN -> HuwelijksType.GRATIS;
-            case MIDDELGROOT -> HuwelijksType.EENVOUDIG;
-            case GROOT -> HuwelijksType.REGULIER;
-        };
-    }
-
     @Override
     @Transactional
-    public void slaPartnerGegevensOp(UUID dossierId, BurgerServiceNummer partnerBsn, String gekozenAchternaam) {
-        HuwelijksDossiersPartnerEntity partner = getPartner(getWijzigbaarDossier(dossierId), partnerBsn);
+    public void slaPartnerGegevensOp(UUID dossierId, int volgorde, String gekozenAchternaam) {
+        HuwelijksDossiersPartnerEntity partner = getPartner(getWijzigbaarDossier(dossierId), volgorde);
         partner.setGekozenAchternaam(gekozenAchternaam);
     }
 
     @Override
     @Transactional
-    public long slaContactGegevensOp(UUID dossierId, BurgerServiceNummer partnerBsn, long versie,
+    public long slaContactGegevensOp(UUID dossierId, int volgorde, long versie,
                                      Telefoonnummer telefoonnummer, Emailadres emailadres) {
-        HuwelijksDossiersPartnerEntity partner = getPartner(getWijzigbaarDossier(dossierId), partnerBsn);
+        HuwelijksDossiersPartnerEntity partner = getPartner(getWijzigbaarDossier(dossierId), volgorde);
         if (partner.getVersie() != versie) {
             throw new OptimisticLockingFailureException("Contactgegevens van partner in dossier " + dossierId
                     + " zijn gewijzigd: versie " + partner.getVersie() + ", verwacht " + versie);
@@ -625,11 +430,12 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         return partner.getVersie();
     }
 
-    private static HuwelijksDossiersPartnerEntity getPartner(HuwelijksDossierEntity dossier, BurgerServiceNummer bsn) {
+    private static HuwelijksDossiersPartnerEntity getPartner(HuwelijksDossierEntity dossier, int volgorde) {
         return dossier.getPartners().stream()
-                .filter(p -> bsn.equals(p.getBsn()))
+                .filter(p -> p.getVolgorde() == volgorde)
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("BSN is geen partner in dit dossier: " + bsn));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Dossier " + dossier.getUuid() + " heeft geen partner " + volgorde));
     }
 
     @Override
@@ -660,14 +466,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Transactional
     public void slaExtrasOp(UUID dossierId, SaveExtrasDto dto) {
         HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
-        dossier.setRingenUitwisselen(dto.ringenUitwisselen());
-        boolean isGroot = dossier.getCeremonieSoort() == CeremonieSoort.GROOT;
-        dossier.setMuziek(isGroot && dto.muziek());
-        dossier.setTrouwboekje(dto.trouwboekjeId() != null
+        dossier.wijzigExtras(dto.ringenUitwisselen(), dto.muziek(), dto.trouwboekjeId() != null
                 ? trouwboekjeRepository.findById(dto.trouwboekjeId()).orElse(null)
-                : null);
-        boolean isHuwelijk = dossier.getRegistratieType() == RegistratieType.HUWELIJK;
-        dossier.setInternationaleAkte(isHuwelijk && dto.internationaleAkte());
-        dossierRepository.save(dossier);
+                : null, dto.internationaleAkte());
     }
 }

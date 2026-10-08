@@ -2,7 +2,6 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
@@ -64,7 +63,7 @@ public class DeGetuigenPage extends IntakeBasePage {
         pageBody.add(new Label("intro", new ResourceModel("de.getuigen.intro")));
 
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
-        int maxGetuigen = dossier.ceremonieSoort() == CeremonieSoort.KLEIN ? 2 : 4;
+        int maxGetuigen = dossier.ceremonieSoort().getAantalGetuigen();
         List<GetuigeDto> bestaande = marriageIntakeService.findGetuigen(dossierId);
         List<GetuigenItemFormDto> items = GetuigenItemFormDto.vanGetuigen(maxGetuigen, bestaande);
 

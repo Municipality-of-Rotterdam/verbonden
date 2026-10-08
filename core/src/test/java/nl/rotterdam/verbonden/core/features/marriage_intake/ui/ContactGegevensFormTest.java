@@ -105,7 +105,7 @@ class ContactGegevensFormTest extends BaseWicketTest {
         startJullieGegevensPage();
 
         // Partner 1 wijzigt intussen in een eigen sessie het e-mailadres
-        marriageIntakeService.slaContactGegevensOp(createdDossierId, PARTNER_1, partner(PARTNER_1).versie(),
+        marriageIntakeService.slaContactGegevensOp(createdDossierId, 1, partner(PARTNER_1).versie(),
                 null, new Emailadres("partner1@example.com"));
 
         wijzigTelefoonnummerOpKaart(0, "0612345999");

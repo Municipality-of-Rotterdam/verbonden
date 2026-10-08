@@ -106,13 +106,13 @@ public interface MarriageIntakeService {
     void slaGetuigeOp(UUID dossierId, SaveGetuigenDto getuige);
 
     /**
-     * Legt de gekozen achternaam vast van de partner met {@code partnerBsn}. Zodra beide partners
+     * Legt de gekozen achternaam vast van de partner met {@code volgorde} (1 of 2). Zodra beide partners
      * gekoppeld zijn, mag elke partner dit ook voor de ander doen.
      */
-    void slaPartnerGegevensOp(UUID dossierId, BurgerServiceNummer partnerBsn, String gekozenAchternaam);
+    void slaPartnerGegevensOp(UUID dossierId, int volgorde, String gekozenAchternaam);
 
     /**
-     * Legt de contactgegevens vast van de partner met {@code partnerBsn}. Zodra beide partners gekoppeld
+     * Legt de contactgegevens vast van de partner met {@code volgorde} (1 of 2). Zodra beide partners gekoppeld
      * zijn, mag elke partner dit ook voor de ander doen; {@code versie} voorkomt dat ze daarbij elkaars
      * wijzigingen ongemerkt overschrijven.
      *
@@ -121,7 +121,7 @@ public interface MarriageIntakeService {
      * @throws org.springframework.dao.OptimisticLockingFailureException wanneer de contactgegevens
      *         intussen door iemand anders zijn gewijzigd
      */
-    long slaContactGegevensOp(UUID dossierId, BurgerServiceNummer partnerBsn, long versie,
+    long slaContactGegevensOp(UUID dossierId, int volgorde, long versie,
                               Telefoonnummer telefoonnummer, Emailadres emailadres);
 
     void delete(UUID dossierId);

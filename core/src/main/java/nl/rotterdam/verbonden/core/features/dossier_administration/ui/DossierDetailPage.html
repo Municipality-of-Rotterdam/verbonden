@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Dossier</title>
+</head>
+<body>
+<wicket:extend>
+    <h1 wicket:id="titel">Dossier</h1>
+
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar overzicht</a></p>
+
+    <div wicket:id="feedback"></div>
+
+    <section class="rd-dossier-sectie">
+        <h2>Algemeen</h2>
+        <dl class="rd-dossier-gegevens">
+            <dt>Status</dt>
+            <dd wicket:id="status">Concept</dd>
+            <dt>Aangemaakt via</dt>
+            <dd wicket:id="kanaal">Online</dd>
+            <dt>Aangemaakt op</dt>
+            <dd><span wicket:id="aangemaaktOp">01-01-2026 10:00</span> <span wicket:id="aangemaaktDoor"></span></dd>
+            <dt>Ingediend op</dt>
+            <dd wicket:id="ingediendOp">-</dd>
+        </dl>
+        <p wicket:id="nietCompleet"></p>
+        <form wicket:id="actiesForm" class="d-flex gap-2">
+            <button wicket:id="indienen" type="submit"></button>
+            <button wicket:id="accepteren" type="submit"></button>
+            <button wicket:id="afwijzen" type="submit"></button>
+        </form>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <div class="d-flex gap-3 align-items-baseline">
+            <h2>Ceremonie</h2>
+            <a wicket:id="ceremonieWijzigen">Wijzigen</a>
+        </div>
+        <dl class="rd-dossier-gegevens">
+            <dt>Soort registratie</dt>
+            <dd wicket:id="registratieType">Huwelijk</dd>
+            <dt>Ceremonie</dt>
+            <dd wicket:id="ceremonieSoort">Klein</dd>
+            <dt>Prijs ceremonie</dt>
+            <dd wicket:id="ceremoniePrijs">-</dd>
+            <dt>Locatie</dt>
+            <dd wicket:id="locatie">-</dd>
+        </dl>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <div class="d-flex gap-3 align-items-baseline">
+            <h2>Datum en tijd</h2>
+            <a wicket:id="afspraakWijzigen">Wijzigen</a>
+        </div>
+        <p wicket:id="datumTijdHuwelijk">Nog niet gekozen</p>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <h2>Partners</h2>
+        <div class="d-flex flex-wrap gap-4">
+            <div wicket:id="partners" class="rd-dossier-partner">
+                <div class="d-flex gap-3 align-items-baseline">
+                    <h3 wicket:id="titel">Partner 1</h3>
+                    <a wicket:id="wijzigen">Wijzigen</a>
+                </div>
+                <dl class="rd-dossier-gegevens">
+                    <dt wicket:id="identificatieLabel">BSN</dt>
+                    <dd wicket:id="identificatie">-</dd>
+                    <dt>Persoonsgegevens</dt>
+                    <dd wicket:id="bron">Uit de BRP</dd>
+                    <dt>Achternaam</dt>
+                    <dd wicket:id="achternaam">-</dd>
+                    <dt>Voornamen</dt>
+                    <dd wicket:id="voornamen">-</dd>
+                    <dt>Geboortedatum</dt>
+                    <dd wicket:id="geboortedatum">-</dd>
+                    <dt>Geboorteplaats</dt>
+                    <dd wicket:id="geboorteplaats">-</dd>
+                    <dt>Nationaliteit</dt>
+                    <dd wicket:id="nationaliteit">-</dd>
+                    <dt>Burgerlijke staat</dt>
+                    <dd wicket:id="burgerlijkeStaat">-</dd>
+                    <dt>Gekozen achternaam</dt>
+                    <dd wicket:id="gekozenAchternaam">-</dd>
+                    <dt>Telefoonnummer</dt>
+                    <dd wicket:id="telefoonnummer">-</dd>
+                    <dt>E-mailadres</dt>
+                    <dd wicket:id="emailadres">-</dd>
+                    <dt>Identiteit</dt>
+                    <dd wicket:id="identiteit">-</dd>
+                </dl>
+            </div>
+        </div>
+        <p wicket:id="partner2NietGekoppeld"></p>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <div class="d-flex gap-3 align-items-baseline">
+            <h2>Getuigen</h2>
+            <a wicket:id="getuigenWijzigen">Wijzigen</a>
+        </div>
+        <p wicket:id="getuigenAantal">0 van 2 ingevuld</p>
+        <ul class="utrecht-unordered-list">
+            <li wicket:id="getuigen" class="utrecht-unordered-list__item"><span wicket:id="naam">Naam</span></li>
+        </ul>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <div class="d-flex gap-3 align-items-baseline">
+            <h2>Extra's en kosten</h2>
+            <a wicket:id="extrasWijzigen">Wijzigen</a>
+        </div>
+        <dl class="rd-dossier-gegevens">
+            <wicket:container wicket:id="extras">
+                <dt wicket:id="naam">Extra</dt>
+                <dd wicket:id="prijs"></dd>
+            </wicket:container>
+        </dl>
+        <p wicket:id="geenExtras"></p>
+        <p><strong>Totaal: <span wicket:id="totaalPrijs">-</span></strong></p>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <h2>Bestanden</h2>
+        <table class="utrecht-table">
+            <thead class="utrecht-table__header">
+            <tr class="utrecht-table__row">
+                <th class="utrecht-table__header-cell">Bestand</th>
+                <th class="utrecht-table__header-cell">Grootte</th>
+                <th class="utrecht-table__header-cell">Toegevoegd</th>
+                <th class="utrecht-table__header-cell"></th>
+            </tr>
+            </thead>
+            <tbody class="utrecht-table__body">
+            <tr wicket:id="bestanden" class="utrecht-table__row">
+                <td class="utrecht-table__cell"><a wicket:id="download"><span wicket:id="bestandsnaam">bestand.pdf</span></a></td>
+                <td class="utrecht-table__cell" wicket:id="grootte">1 KB</td>
+                <td class="utrecht-table__cell" wicket:id="toegevoegd">-</td>
+                <td class="utrecht-table__cell">
+                    <form wicket:id="verwijderForm">
+                        <button wicket:id="verwijderen" type="submit"></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p wicket:id="geenBestanden"></p>
+
+        <h3>Bestand toevoegen</h3>
+        <form wicket:id="bestandToevoegenForm" class="d-flex flex-column gap-3">
+            <div wicket:id="bestand">
+                <input wicket:id="input" type="file"/>
+            </div>
+            <p wicket:id="toegestaan"></p>
+            <div>
+                <button wicket:id="toevoegen" type="submit"></button>
+            </div>
+        </form>
+    </section>
+</wicket:extend>
+</body>
+</html>

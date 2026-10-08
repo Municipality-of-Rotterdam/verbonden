@@ -1,9 +1,9 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
-import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.domain.ValueHolder;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.NaamgebruikOpties;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
@@ -35,7 +35,6 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
@@ -73,13 +72,13 @@ public class JullieGegevensPage extends IntakeBasePage {
 
         List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
         // Zodra beide partners gekoppeld zijn, mag elke partner ook de gegevens van de ander invullen
-        boolean tweeBsns = partners.size() == 2;
+        boolean beidePartnersGekoppeld = partners.size() == 2;
 
         pageBody.add(new ListView<>("partnerCards", partners) {
             @Override
             protected void populateItem(ListItem<PartnerGegevensDto> item) {
                 PartnerGegevensDto partner = item.getModelObject();
-                boolean kanKiezen = tweeBsns;
+                boolean kanKiezen = beidePartnersGekoppeld;
 
                 item.add(
                         new Label("achternaam", partner.achternaam()),
@@ -205,30 +204,23 @@ public class JullieGegevensPage extends IntakeBasePage {
     }
 
     private List<String> berekenNaamOpties(PartnerGegevensDto eigenPartner, List<PartnerGegevensDto> allePartners) {
-        String eigenAchternaam = eigenPartner.achternaam();
         String andereAchternaam = allePartners.stream()
-                .filter(p -> !p.bsn().equals(eigenPartner.bsn()))
+                .filter(p -> p.volgorde() != eigenPartner.volgorde())
                 .map(PartnerGegevensDto::achternaam)
                 .findFirst()
                 .orElse("");
-
-        List<String> opties = new ArrayList<>();
-        opties.add(andereAchternaam);
-        opties.add(andereAchternaam + " - " + eigenAchternaam);
-        opties.add(eigenAchternaam + " - " + andereAchternaam);
-        opties.add(eigenAchternaam);
-        return opties;
+        return NaamgebruikOpties.voor(eigenPartner.achternaam(), andereAchternaam);
     }
 
     private class NaamKiezenForm extends Form<Void> {
 
-        private final BurgerServiceNummer partnerBsn;
+        private final int volgorde;
         private final RadioGroup<String> naamRadioGroup;
 
         NaamKiezenForm(String id, PartnerGegevensDto partner, List<String> naamOpties,
                        WebMarkupContainer dialogContainer, IModel<Boolean> dialogTonen) {
             super(id);
-            this.partnerBsn = partner.bsn();
+            this.volgorde = partner.volgorde();
             String initialNaam = partner.gekozenAchternaam() != null ? partner.gekozenAchternaam() : naamOpties.getFirst();
 
             naamRadioGroup = new RadioGroup<>("naamRadioGroup", Model.of(initialNaam));
@@ -255,18 +247,18 @@ public class JullieGegevensPage extends IntakeBasePage {
         @Override
         protected void onSubmit() {
             String gekozenNaam = naamRadioGroup.getModelObject();
-            marriageIntakeService.slaPartnerGegevensOp(dossierId, partnerBsn, gekozenNaam);
+            marriageIntakeService.slaPartnerGegevensOp(dossierId, volgorde, gekozenNaam);
             setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
         }
     }
 
     private class ContactGegevensForm extends Form<ContactGegevensFormDto> {
 
-        private final BurgerServiceNummer partnerBsn;
+        private final int volgorde;
 
         ContactGegevensForm(String id, PartnerGegevensDto partner) {
             super(id);
-            this.partnerBsn = partner.bsn();
+            this.volgorde = partner.volgorde();
             ContactGegevensFormDto dto = new ContactGegevensFormDto();
             dto.setTelefoonnummer(partner.telefoonnummer());
             dto.setEmailadres(partner.emailadres());
@@ -308,7 +300,7 @@ public class JullieGegevensPage extends IntakeBasePage {
                     ContactGegevensFormDto f = getModelObject();
                     try {
                         f.setVersie(marriageIntakeService.slaContactGegevensOp(
-                                dossierId, partnerBsn, f.getVersie(), f.getTelefoonnummer(), f.getEmailadres()));
+                                dossierId, volgorde, f.getVersie(), f.getTelefoonnummer(), f.getEmailadres()));
                         target.add(rdFormFieldTextInput);
                     } catch (OptimisticLockingFailureException e) {
                         laadActueleContactGegevens();
@@ -325,7 +317,7 @@ public class JullieGegevensPage extends IntakeBasePage {
          */
         private void laadActueleContactGegevens() {
             PartnerGegevensDto actueel = marriageIntakeService.findPartnerGegevens(dossierId).stream()
-                    .filter(p -> p.bsn().equals(partnerBsn))
+                    .filter(p -> p.volgorde() == volgorde)
                     .findFirst()
                     .orElseThrow();
             ContactGegevensFormDto f = getModelObject();

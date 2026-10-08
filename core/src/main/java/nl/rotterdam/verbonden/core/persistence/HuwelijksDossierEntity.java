@@ -1,7 +1,9 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
+import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
@@ -72,6 +74,25 @@ public class HuwelijksDossierEntity {
     @Column(name = "ingediend_op")
     private LocalDateTime ingediendOp;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "kanaal", nullable = false, updatable = false)
+    private AanmaakKanaal kanaal;
+
+    /**
+     * De medewerker die het dossier aan de balie of in een videogesprek aanmaakte; {@code null} bij
+     * {@link AanmaakKanaal#ONLINE}.
+     */
+    @Column(name = "aangemaakt_door", updatable = false)
+    private String aangemaaktDoor;
+
+    protected HuwelijksDossierEntity() {
+    }
+
+    public HuwelijksDossierEntity(AanmaakKanaal kanaal, String aangemaaktDoor) {
+        this.kanaal = kanaal;
+        this.aangemaaktDoor = aangemaaktDoor;
+    }
+
     public Long getId() {
         return id;
     }
@@ -84,24 +105,12 @@ public class HuwelijksDossierEntity {
         return registratieType;
     }
 
-    public void setRegistratieType(RegistratieType registratieType) {
-        this.registratieType = registratieType;
-    }
-
     public CeremonieSoort getCeremonieSoort() {
         return ceremonieSoort;
     }
 
-    public void setCeremonieSoort(CeremonieSoort ceremonieSoort) {
-        this.ceremonieSoort = ceremonieSoort;
-    }
-
     public TrouwlocatieEntity getLocatie() {
         return locatie;
-    }
-
-    public void setLocatie(TrouwlocatieEntity locatie) {
-        this.locatie = locatie;
     }
 
     public List<HuwelijksDossiersPartnerEntity> getPartners() {
@@ -109,47 +118,88 @@ public class HuwelijksDossierEntity {
     }
 
     /**
-     * Voegt een partner toe aan het dossier; de eerste partner krijgt volgorde 1, de tweede volgorde 2.
+     * Voegt een partner toe die zich online met DigiD heeft geïdentificeerd; de eerste partner krijgt
+     * volgorde 1, de tweede volgorde 2.
      *
      * @throws IllegalStateException wanneer het dossier al twee partners heeft
      */
     public void voegPartnerToe(BurgerServiceNummer bsn) {
+        voegToe(bsn, null, null);
+    }
+
+    /**
+     * Voegt een partner met BSN toe van wie een medewerker de identiteit heeft gecontroleerd.
+     *
+     * @throws IllegalStateException wanneer het dossier al twee partners heeft
+     */
+    public void voegPartnerToe(BurgerServiceNummer bsn, String identiteitGecontroleerdDoor) {
+        voegToe(bsn, null, identiteitGecontroleerdDoor);
+    }
+
+    /**
+     * Voegt een partner zonder BSN toe, van wie een medewerker de identiteit heeft gecontroleerd. De
+     * persoonsgegevens komen dan niet uit de BRP: de aanroeper legt ze vast op de teruggegeven partner.
+     *
+     * @throws IllegalStateException wanneer het dossier al twee partners heeft, of nog geen partner met BSN
+     */
+    public HuwelijksDossiersPartnerEntity voegPartnerZonderBsnToe(BuitenlandsPersoonsnummer persoonsnummer,
+                                                                  String identiteitGecontroleerdDoor) {
+        if (partners.isEmpty()) {
+            throw new IllegalStateException("De eerste partner van dossier " + uuid + " moet een BSN hebben");
+        }
+        return voegToe(null, persoonsnummer, identiteitGecontroleerdDoor);
+    }
+
+    private HuwelijksDossiersPartnerEntity voegToe(BurgerServiceNummer bsn, BuitenlandsPersoonsnummer persoonsnummer,
+                                                   String identiteitGecontroleerdDoor) {
         if (partners.size() >= 2) {
             throw new IllegalStateException("Dossier " + uuid + " heeft al twee partners");
         }
-        partners.add(new HuwelijksDossiersPartnerEntity(this, partners.size() + 1, bsn));
+        HuwelijksDossiersPartnerEntity partner = new HuwelijksDossiersPartnerEntity(
+                this, partners.size() + 1, bsn, persoonsnummer, identiteitGecontroleerdDoor);
+        partners.add(partner);
+        return partner;
+    }
+
+    /**
+     * Wijzigt het soort registratie en de ceremonie. Muziek kan alleen bij een grote ceremonie.
+     */
+    public void wijzigCeremonie(RegistratieType registratieType, CeremonieSoort ceremonieSoort,
+                                TrouwlocatieEntity locatie) {
+        this.registratieType = registratieType;
+        this.ceremonieSoort = ceremonieSoort;
+        this.locatie = locatie;
+        if (ceremonieSoort != CeremonieSoort.GROOT) {
+            this.muziek = false;
+        }
+    }
+
+    /**
+     * Wijzigt de extra's. Muziek kan alleen bij een grote ceremonie, een internationale akte alleen bij een
+     * huwelijk; zo'n keuze wordt anders genegeerd.
+     */
+    public void wijzigExtras(boolean ringenUitwisselen, boolean muziek, TrouwboekjeEntity trouwboekje,
+                             boolean internationaleAkte) {
+        this.ringenUitwisselen = ringenUitwisselen;
+        this.muziek = ceremonieSoort == CeremonieSoort.GROOT && muziek;
+        this.trouwboekje = trouwboekje;
+        this.internationaleAkte = registratieType == RegistratieType.HUWELIJK && internationaleAkte;
     }
 
     public boolean isRingenUitwisselen() {
         return ringenUitwisselen;
     }
 
-    public void setRingenUitwisselen(boolean ringenUitwisselen) {
-        this.ringenUitwisselen = ringenUitwisselen;
-    }
-
     public boolean isMuziek() {
         return muziek;
-    }
-
-    public void setMuziek(boolean muziek) {
-        this.muziek = muziek;
     }
 
     public TrouwboekjeEntity getTrouwboekje() {
         return trouwboekje;
     }
 
-    public void setTrouwboekje(TrouwboekjeEntity trouwboekje) {
-        this.trouwboekje = trouwboekje;
-    }
-
     public boolean isInternationaleAkte() {
         return internationaleAkte;
-    }
-
-    public void setInternationaleAkte(boolean internationaleAkte) {
-        this.internationaleAkte = internationaleAkte;
     }
 
     public BigDecimal getInternationaleAktePrijs() {
@@ -166,6 +216,14 @@ public class HuwelijksDossierEntity {
 
     public void setAangemaaktOp(LocalDateTime aangemaaktOp) {
         this.aangemaaktOp = aangemaaktOp;
+    }
+
+    public AanmaakKanaal getKanaal() {
+        return kanaal;
+    }
+
+    public String getAangemaaktDoor() {
+        return aangemaaktDoor;
     }
 
     public DossierStatus getStatus() {

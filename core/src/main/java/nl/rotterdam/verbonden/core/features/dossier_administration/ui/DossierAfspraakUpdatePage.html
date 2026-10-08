@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Datum en tijd wijzigen</title>
+</head>
+<body>
+<wicket:extend>
+    <h1 wicket:id="titel">Datum en tijd wijzigen</h1>
+
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar dossier</a></p>
+
+    <p>Huidige datum en tijd: <strong wicket:id="huidig">-</strong></p>
+
+    <div wicket:id="feedback"></div>
+
+    <form wicket:id="afspraakForm" class="d-flex flex-column gap-3">
+        <div wicket:id="datum"></div>
+        <div wicket:id="startTijd">
+            <select wicket:id="input"></select>
+        </div>
+        <div>
+            <button wicket:id="opslaan" type="submit"></button>
+        </div>
+    </form>
+</wicket:extend>
+</body>
+</html>

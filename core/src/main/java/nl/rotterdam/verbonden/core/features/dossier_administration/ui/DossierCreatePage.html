@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Nieuw dossier</title>
+</head>
+<body>
+<wicket:extend>
+    <h1>Nieuw dossier (balie of videogesprek)</h1>
+
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar overzicht</a></p>
+
+    <p>
+        Gebruik dit formulier wanneer beide partners aan de balie of in een videogesprek aanwezig zijn. Controleer de
+        identiteit van beide partners aan de hand van hun identiteitsbewijs. Een partner met BSN kan daarna ook zelf
+        met DigiD verder in het dossier.
+    </p>
+
+    <div wicket:id="feedback"></div>
+
+    <form wicket:id="dossierForm" class="d-flex flex-column gap-4">
+        <section class="d-flex flex-column gap-3">
+            <h2>Gesprek en ceremonie</h2>
+            <div wicket:id="kanaal">
+                <select wicket:id="input"></select>
+            </div>
+            <div class="d-flex flex-wrap gap-3">
+                <div wicket:id="registratieType">
+                    <select wicket:id="input"></select>
+                </div>
+                <div wicket:id="ceremonieSoort">
+                    <select wicket:id="input"></select>
+                </div>
+            </div>
+        </section>
+
+        <section class="d-flex flex-column gap-3">
+            <h2>Partner 1</h2>
+            <div wicket:id="bsnPartner1"></div>
+            <div wicket:id="identiteitPartner1Gecontroleerd"></div>
+        </section>
+
+        <section wicket:id="partner2" class="d-flex flex-column gap-3">
+            <h2>Partner 2</h2>
+            <div wicket:id="partner2ZonderBsn"></div>
+            <div wicket:id="bsnPartner2"></div>
+            <div wicket:id="persoonsgegevensPartner2"></div>
+            <div wicket:id="identiteitPartner2Gecontroleerd"></div>
+        </section>
+
+        <div>
+            <button wicket:id="aanmaken" type="submit"></button>
+        </div>
+    </form>
+</wicket:extend>
+</body>
+</html>
