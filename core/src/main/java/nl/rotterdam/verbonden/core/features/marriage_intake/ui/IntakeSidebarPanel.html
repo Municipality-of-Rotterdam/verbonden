@@ -76,6 +76,15 @@
             <span wicket:id="getuigenStatusEmpty" class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
             <a href="#" wicket:id="getuigenLink"><wicket:message key="intake.sidebar.getuigen.link">Getuigen</wicket:message></a>
         </div>
+
+        <!-- Herinnering zolang de tweede partner het dossier nog niet heeft gekoppeld -->
+        <div wicket:id="partnerHerinnering" class="rd-keuzes-info rd-keuzes-herinnering" role="note">
+            <span class="rd-keuzes-info__icon" aria-hidden="true">&#9432;</span>
+            <span>
+                <wicket:message key="intake.sidebar.partner.nietgekoppeld">Uw partner heeft het dossier nog niet gekoppeld.</wicket:message>
+                <a href="#" wicket:id="partnerUitnodigenLink"><wicket:message key="intake.sidebar.partner.uitnodigen">Partner uitnodigen</wicket:message></a>
+            </span>
+        </div>
     </div>
 
     <hr class="rd-keuzes-divider"/>

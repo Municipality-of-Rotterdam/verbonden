@@ -29,6 +29,7 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.wicketstuff.minis.behavior.EnabledModelBehavior;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
@@ -226,6 +227,8 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
         add(new GetuigenRegel());
 
+        add(new PartnerHerinnering());
+
         // Extra's list
         WebMarkupContainer extrasNogNiet = new WebMarkupContainer("extrasNogNiet") {
             @Override
@@ -324,12 +327,12 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                 RdDialogHeadingLevel.LEVEL_2) {
 
             @Override
-            protected Component newFooterContent(String id) {
+            protected @NonNull Component newFooterContent(@NonNull String id) {
                 return new BevestigDialogActies(id, this);
             }
 
             @Override
-            protected void onClose(AjaxRequestTarget target) {
+            protected void onClose(@NonNull AjaxRequestTarget target) {
                 close(target);
             }
         };
@@ -414,6 +417,32 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             return "";
         }
         return String.valueOf(mapper.apply(extractor.apply(d)));
+    }
+
+    private class PartnerHerinnering extends WebMarkupContainer {
+
+        public PartnerHerinnering() {
+            super("partnerHerinnering");
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            add(new Link<Void>("partnerUitnodigenLink") {
+                @Override
+                public void onClick() {
+                    setResponsePage(JullieGegevensPage.class,
+                            makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
+                }
+            });
+        }
+
+        @Override
+        protected void onConfigure() {
+            super.onConfigure();
+            DossierSamenvattingDto d = getDossierModelObject();
+            setVisible(d != null && d.id() != null && !d.partnerGekoppeld() && isWijzigbaar());
+        }
     }
 
     private class GetuigenRegel extends WebMarkupContainer {

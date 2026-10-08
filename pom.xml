@@ -246,6 +246,7 @@
                     <include>**/*.xml</include>
                     <include>**/*.css</include>
                     <include>**/*.webp</include>
+                    <include>**/*.js</include>
                 </includes>
             </resource>
         </resources>

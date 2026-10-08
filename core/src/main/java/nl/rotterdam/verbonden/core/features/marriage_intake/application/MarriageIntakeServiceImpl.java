@@ -299,6 +299,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 getuigenGedeeltelijkIngevuld,
                 extraItems,
                 aantalGekozenAchternamen,
+                e.getPartners().size() == 2,
                 totalPrijs,
                 e.getStatus(),
                 e.getIngediendOp(),

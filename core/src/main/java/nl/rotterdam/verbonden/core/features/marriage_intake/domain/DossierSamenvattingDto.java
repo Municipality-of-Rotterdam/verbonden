@@ -18,6 +18,7 @@ public record DossierSamenvattingDto(
         boolean getuigenGedeeltelijkIngevuld,
         List<SidebarExtraItemDto> extras,
         int aantalGekozenAchternamen,
+        boolean partnerGekoppeld,
         BigDecimal totalPrijs,
         DossierStatus status,
         LocalDateTime ingediendOp,

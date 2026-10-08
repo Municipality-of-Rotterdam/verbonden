@@ -562,73 +562,6 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     color: var(--rd-color-green-500, #007a3e);
 }
 
-/* =============================================================
-   Partner akkoord card
-   ============================================================= */
-
-.rd-partner-akkoord {
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    background: #fff;
-}
-
-.rd-partner-akkoord__heading {
-    font-size: 1.125rem;
-    font-weight: 700;
-    margin: 0 0 0.75rem;
-}
-
-.rd-partner-akkoord__tekst {
-    font-size: 0.9375rem;
-    margin: 0 0 1rem;
-    color: #333;
-}
-
-.rd-partner-akkoord__buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.rd-digid-logo {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3.5rem;
-    height: 2.5rem;
-    background-color: #1b1b1b;
-    border-radius: 3px;
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: #fff;
-    flex-shrink: 0;
-}
-
-.rd-digid-logo span {
-    color: #f7941d;
-}
-
-.rd-digid-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.625rem 1.25rem;
-    background-color: var(--rd-color-green-700, #005a2d);
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    font-size: 0.9375rem;
-    font-weight: 700;
-    font-family: inherit;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.rd-digid-button:hover {
-    background-color: var(--rd-color-green-800, #004022);
-    color: #fff;
-}
 
 /* =============================================================
    Sidebar info box
@@ -645,6 +578,10 @@ a.rd-keuze-card:not([href]):hover .rd-keuze-card__overlay {
     font-size: 0.875rem;
     color: #1a3a5c;
     margin-top: 0.75rem;
+}
+
+.rd-keuzes-herinnering {
+    margin-top: 0.5rem;
 }
 
 .rd-keuzes-info__icon {
@@ -878,6 +815,36 @@ form.rd-getuige-form {
     height: 200px;
     border: 1px solid #d0d0d0;
     border-radius: 4px;
+}
+
+.rd-partner-uitnodigen__optie-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1rem 0 0.25rem;
+}
+
+.rd-partner-uitnodigen__link-rij {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.rd-partner-uitnodigen__link-input {
+    flex: 1 1 12rem;
+    min-width: 0;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+    font-size: 0.9375rem;
+    font-family: inherit;
+    background: #f5f5f5;
+}
+
+.rd-partner-uitnodigen__melding {
+    min-height: 1.5em;
+    margin: 0.5rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--rd-color-green-700, #005a2d);
 }
 
 /* =============================================================
@@ -1373,4 +1340,129 @@ form.rd-getuige-form {
         flex-direction: column;
         padding: 1.5rem;
     }
+}
+
+/* =============================================================
+   DossierUitnodigingPage – uitnodiging voor de tweede partner
+   ============================================================= */
+
+.rd-uitnodiging {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 56rem;
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e5e5;
+}
+
+@media (min-width: 768px) {
+    .rd-uitnodiging {
+        grid-template-columns: 2fr 3fr;
+    }
+}
+
+/* Foto staat als package resource naast deze stylesheet; de kleur is zichtbaar zolang hij laadt. */
+.rd-uitnodiging__foto {
+    min-height: 12rem;
+    background-color: #6f9fbf;
+    background-image: url("keuze-card-datum.webp");
+    background-size: cover;
+    background-position: center 35%;
+}
+
+.rd-uitnodiging__inhoud {
+    padding: 2rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .rd-uitnodiging__inhoud {
+        padding: 2.5rem 2.5rem 2rem;
+    }
+}
+
+.rd-uitnodiging__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0 0 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--rd-color-green-700, #005a2d);
+}
+
+.rd-uitnodiging__hart {
+    color: var(--rd-color-pink, #c0006a);
+    font-size: 1rem;
+}
+
+.rd-uitnodiging__titel {
+    margin: 0 0 0.75rem;
+}
+
+.rd-uitnodiging__intro {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    hyphens: manual;
+    color: #333;
+    margin: 0 0 1.5rem;
+}
+
+.rd-uitnodiging__stappen-titel {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem;
+}
+
+/* Genummerde stappen met de nummers in groene cirkels */
+.rd-uitnodiging__stappen {
+    list-style: none;
+    counter-reset: stap;
+    padding: 0;
+    margin: 0 0 2rem;
+}
+
+.rd-uitnodiging__stappen li {
+    counter-increment: stap;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+    color: #333;
+}
+
+.rd-uitnodiging__stappen li::before {
+    content: counter(stap);
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--rd-color-green-700, #005a2d);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+/* Tekst van een stap op één lijn met het midden van de cirkel */
+.rd-uitnodiging__stappen li {
+    line-height: 1.75rem;
+}
+
+.rd-uitnodiging__actie {
+    margin: 0 0 1.5rem;
+}
+
+.rd-uitnodiging__weigeren {
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e5e5;
+    font-size: 0.9375rem;
+    color: #555;
 }

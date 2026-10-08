@@ -6,6 +6,7 @@ import nl.rotterdam.verbonden.core.burger_common.BurgerBasePage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import org.apache.wicket.RestartResponseException;
+import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.IModel;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.extractDossierId;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
+import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.MarriageIntakeHeaderItems.MARRIAGE_INTAKE_CSS;
 
 /**
  * Bevestigingsstap voor een burger die via de dossierlink van zijn partner binnenkomt en nog geen
@@ -62,5 +64,11 @@ public class DossierUitnodigingPage extends BurgerBasePage {
 
         // Zonder dossierparameter: dan kan de burger een eigen dossier aanmaken.
         pageBody.add(new BookmarkablePageLink<>("weigerLink", MarriageIntakePage.class));
+    }
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.render(MARRIAGE_INTAKE_CSS);
     }
 }

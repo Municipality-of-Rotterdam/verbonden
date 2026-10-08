@@ -113,17 +113,43 @@
                 </h3>
                 <p class="rd-partner-card__wachten-melding">
                     <wicket:message key="jullie.gegevens.partner.uitnodigen.instructie">
-                        Uw partner heeft de aanvraag nog niet bevestigd. Laat uw partner de QR-code scannen om in te loggen, of gebruik de knop hieronder.
+                        Uw partner moet zelf inloggen met DigiD om het dossier te koppelen.
                     </wicket:message>
                 </p>
+
+                <!-- Optie 1: QR-code scannen op het eigen apparaat van de partner -->
+                <h4 class="rd-partner-uitnodigen__optie-heading">
+                    <wicket:message key="jullie.gegevens.partner.uitnodigen.qr.heading">Op de telefoon van uw partner</wicket:message>
+                </h4>
+                <p class="rd-partner-card__wachten-melding">
+                    <wicket:message key="jullie.gegevens.partner.uitnodigen.qr.uitleg">Laat uw partner de QR-code scannen.</wicket:message>
+                </p>
                 <div class="rd-partner-qr-code-wrapper">
-                    <img wicket:id="partnerQrCode" class="rd-partner-qr-code" alt="QR code om in te loggen als partner"/>
+                    <img wicket:id="partnerQrCode" class="rd-partner-qr-code" wicket:message="alt:jullie.gegevens.partner.uitnodigen.qr.alt"/>
                 </div>
-                <div class="rd-partner-card__actions">
-                    <a wicket:id="partnerLoginLink" class="rd-partner-card__action-button" target="_blank" rel="noopener noreferrer">
-                        <wicket:message key="jullie.gegevens.partner.inloggen">Inloggen als partner</wicket:message>
-                    </a>
+
+                <!-- Optie 2: link kopiëren. Een knop die de link opent werkt niet: een nieuw tabblad deelt de
+                     DigiD-sessie van de ingelogde partner, dus de partner moet een andere browser(sessie) gebruiken. -->
+                <h4 class="rd-partner-uitnodigen__optie-heading">
+                    <wicket:message key="jullie.gegevens.partner.uitnodigen.link.heading">Link sturen of zelf openen</wicket:message>
+                </h4>
+                <p class="rd-partner-card__wachten-melding">
+                    <wicket:message key="jullie.gegevens.partner.uitnodigen.link.uitleg">Kopieer de link en stuur deze naar uw partner.</wicket:message>
+                </p>
+                <label for="partner-uitnodiging-url" class="rd-partner-card__label">
+                    <wicket:message key="jullie.gegevens.partner.uitnodigen.link.label">Link voor uw partner</wicket:message>
+                </label>
+                <div class="rd-partner-uitnodigen__link-rij">
+                    <input wicket:id="partnerUitnodigingUrl" id="partner-uitnodiging-url" type="text" readonly="readonly"
+                           class="rd-partner-uitnodigen__link-input"/>
+                    <button type="button" class="rd-partner-card__action-button"
+                            data-kopieer-doel="partner-uitnodiging-url"
+                            data-kopieer-melding="partner-uitnodiging-melding"
+                            wicket:message="data-tekst-gekopieerd:jullie.gegevens.partner.uitnodigen.gekopieerd,data-tekst-mislukt:jullie.gegevens.partner.uitnodigen.kopieren.mislukt">
+                        <wicket:message key="jullie.gegevens.partner.uitnodigen.kopieer">Kopieer link</wicket:message>
+                    </button>
                 </div>
+                <p id="partner-uitnodiging-melding" class="rd-partner-uitnodigen__melding" aria-live="polite"></p>
             </div>
         </div>
     </div>

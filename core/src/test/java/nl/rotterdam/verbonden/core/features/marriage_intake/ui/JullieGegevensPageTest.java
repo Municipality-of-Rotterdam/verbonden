@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossier
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,14 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class JullieGegevensPageTest extends BaseWicketTest {
 
     @Autowired
     private MarriageIntakeService marriageIntakeService;
+
+    private static final String SIDEBAR = "pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar:";
 
     private UUID createdDossierId;
 
@@ -43,6 +48,25 @@ class JullieGegevensPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990007")
+    void toontKopieerbareUitnodigingslinkZolangPartnerNietIsGekoppeld() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
+
+        PageParameters params = new PageParameters();
+        params.add("dossierId", createdDossierId.toString());
+        tester.startPage(JullieGegevensPage.class, params);
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html).containsPattern("id=\"partner-uitnodiging-url\"[^>]*value=\"[^\"]*/huwelijk/" + createdDossierId + "\"");
+        assertThat(html).contains("data-kopieer-doel=\"partner-uitnodiging-url\"");
+        assertThat(html).contains("link-kopieren");
+
+        tester.startResourceReference(new PackageResourceReference(JullieGegevensPage.class, "link-kopieren.js"));
+        assertThat(tester.getLastResponseAsString()).contains("navigator.clipboard");
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
     void sidebarLinkNaarJullieGegevensWerktVanafGetuigenPagina() {
         createdDossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
@@ -58,5 +82,39 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.clickLink("pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar:gegevensStatusIcon:jullieGegevensLink");
 
         tester.assertRenderedPage(JullieGegevensPage.class);
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void zijbalkHerinnertAanPartnerUitnodigenEnLinktNaarJullieGegevens() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
+
+        PageParameters params = new PageParameters();
+        params.add("dossierId", createdDossierId.toString());
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.startPage(DeGetuigenPage.class, params);
+        tester.assertVisible(SIDEBAR + "partnerHerinnering");
+
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(SIDEBAR + "partnerHerinnering:partnerUitnodigenLink");
+
+        tester.assertRenderedPage(JullieGegevensPage.class);
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void zijbalkToontGeenHerinneringAlsPartnerGekoppeldIs() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
+        marriageIntakeService.acceptInvitation(createdDossierId, new BurgerServiceNummer("999990019"));
+
+        PageParameters params = new PageParameters();
+        params.add("dossierId", createdDossierId.toString());
+        tester.startPage(DeGetuigenPage.class, params);
+
+        tester.assertInvisible(SIDEBAR + "partnerHerinnering");
     }
 }

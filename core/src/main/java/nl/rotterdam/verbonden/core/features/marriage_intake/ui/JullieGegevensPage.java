@@ -16,6 +16,8 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -31,6 +33,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.NonNull;
 
@@ -203,19 +206,23 @@ public class JullieGegevensPage extends IntakeBasePage {
         qrCodeImg.setVisible(!qrDataUri.isEmpty());
         partnerNogBevestigenCard.add(qrCodeImg);
 
-        WebMarkupContainer loginLink = new WebMarkupContainer("partnerLoginLink") {
+        partnerNogBevestigenCard.add(new WebMarkupContainer("partnerUitnodigingUrl") {
             @Override
             protected void onComponentTag(ComponentTag tag) {
                 super.onComponentTag(tag);
-                tag.put("href", loginUrl);
+                tag.put("value", loginUrl);
             }
-        };
-        loginLink.setVisible(!loginUrl.isEmpty());
-        partnerNogBevestigenCard.add(loginLink);
+        });
 
         pageBody.add(partnerNogBevestigenCard);
 
         pageBody.add(new BookmarkablePageLink<>("deGetuigenLink", DeGetuigenPage.class, makeDossierPageParameters(dossierId)));
+    }
+
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(JullieGegevensPage.class, "link-kopieren.js")));
     }
 
     private List<String> berekenNaamOpties(PartnerGegevensDto eigenPartner, List<PartnerGegevensDto> allePartners) {

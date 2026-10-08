@@ -3,20 +3,48 @@
 <body>
 <wicket:extend>
 
-    <div class="container py-4">
+    <div class="container py-4 py-md-5">
 
-        <h1 wicket:id="heading">Je bent uitgenodigd</h1>
+        <div class="rd-uitnodiging">
 
-        <p><wicket:message key="intake.uitnodiging.uitleg">Uitleg</wicket:message></p>
-        <p><wicket:message key="intake.uitnodiging.vraag">Vraag</wicket:message></p>
+            <!-- Sfeerfoto; decoratief, daarom geen alt-tekst -->
+            <div class="rd-uitnodiging__foto" aria-hidden="true"></div>
 
-        <form wicket:id="form">
-            <button type="submit" wicket:id="accepteerButton" class="rd-button rd-button--primary"></button>
-        </form>
+            <div class="rd-uitnodiging__inhoud">
 
-        <a wicket:id="weigerLink" class="rd-button rd-button--secondary mt-4">
-            <wicket:message key="intake.uitnodiging.weiger">Nee, ik maak een eigen dossier aan</wicket:message>
-        </a>
+                <p class="rd-uitnodiging__label">
+                    <span class="rd-uitnodiging__hart" aria-hidden="true">&#x2665;</span>
+                    <wicket:message key="intake.uitnodiging.label">Uitnodiging</wicket:message>
+                </p>
+
+                <h1 wicket:id="heading" class="rd-uitnodiging__titel">Je bent uitgenodigd</h1>
+
+                <p class="rd-uitnodiging__intro">
+                    <wicket:message key="intake.uitnodiging.uitleg">Uitleg</wicket:message>
+                </p>
+
+                <h2 class="rd-uitnodiging__stappen-titel">
+                    <wicket:message key="intake.uitnodiging.stappen.heading">Zo werkt het</wicket:message>
+                </h2>
+                <ol class="rd-uitnodiging__stappen">
+                    <li><wicket:message key="intake.uitnodiging.stap1">Bevestig dat je meedoet.</wicket:message></li>
+                    <li><wicket:message key="intake.uitnodiging.stap2">Controleer je gegevens en kies je achternaam.</wicket:message></li>
+                    <li><wicket:message key="intake.uitnodiging.stap3">Plan samen jullie dag.</wicket:message></li>
+                </ol>
+
+                <form wicket:id="form" class="rd-uitnodiging__actie">
+                    <button type="submit" wicket:id="accepteerButton"></button>
+                </form>
+
+                <p class="rd-uitnodiging__weigeren">
+                    <wicket:message key="intake.uitnodiging.weiger.vraag">Heb je deze link niet van je partner gekregen?</wicket:message>
+                    <a wicket:id="weigerLink">
+                        <wicket:message key="intake.uitnodiging.weiger">Maak dan een eigen dossier aan</wicket:message>
+                    </a>
+                </p>
+
+            </div>
+        </div>
 
     </div>
 
