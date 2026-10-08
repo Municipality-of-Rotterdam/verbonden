@@ -33,10 +33,6 @@ public class LocatieNietBeschikbareDagEntity {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public TrouwlocatieEntity getLocatie() {
         return locatie;
     }

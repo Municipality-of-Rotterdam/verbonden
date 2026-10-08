@@ -54,7 +54,6 @@ class NietBeschikbareDagImportServiceImplTest {
     void setUp() {
         service = new NietBeschikbareDagImportServiceImpl(locatieRepository, repository, currentUserProvider);
         locatie = new TrouwlocatieEntity();
-        locatie.setId(1L);
         locatie.setNaam("Stadhuis Rotterdam");
 
         lenient().when(currentUserProvider.getCurrentUser()).thenReturn(authenticatedUser);

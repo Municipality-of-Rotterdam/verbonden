@@ -58,7 +58,8 @@ public class DossierUitnodigingPage extends BurgerBasePage {
             @Override
             public void onSubmit() {
                 marriageIntakeService.acceptInvitation(dossierId, getCurrentBsn());
-                setResponsePage(MarriageIntakePage.class, makeDossierPageParameters(dossierId));
+                // Direct naar de gegevens: daar vult de partner zijn contactgegevens en naamgebruik in
+                setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
             }
         });
 

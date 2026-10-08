@@ -38,7 +38,7 @@ class DossierUitnodigingPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = PARTNER_2)
-    void bevestigenKoppeltEnToontDossier() {
+    void bevestigenKoppeltEnToontJullieGegevens() {
         UUID dossierId = maakDossierVanPartner1();
         tester.startPage(DossierUitnodigingPage.class, dossierParameters(dossierId));
 
@@ -48,7 +48,7 @@ class DossierUitnodigingPageTest extends BaseWicketTest {
                 .submit("accepteerButton");
 
         assertThat(marriageIntakeService.findDossierIdByBsn(new BurgerServiceNummer(PARTNER_2))).contains(dossierId);
-        tester.assertRenderedPage(MarriageIntakePage.class);
+        tester.assertRenderedPage(JullieGegevensPage.class);
     }
 
     private UUID maakDossierVanPartner1() {

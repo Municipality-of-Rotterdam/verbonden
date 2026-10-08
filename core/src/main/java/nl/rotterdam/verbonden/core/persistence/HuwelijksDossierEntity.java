@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
@@ -71,16 +72,8 @@ public class HuwelijksDossierEntity {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public UUID getUuid() {
         return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
     }
 
     public RegistratieType getRegistratieType() {
@@ -109,6 +102,18 @@ public class HuwelijksDossierEntity {
 
     public List<HuwelijksDossiersPartnerEntity> getPartners() {
         return partners;
+    }
+
+    /**
+     * Voegt een partner toe aan het dossier; de eerste partner krijgt volgorde 1, de tweede volgorde 2.
+     *
+     * @throws IllegalStateException wanneer het dossier al twee partners heeft
+     */
+    public void voegPartnerToe(BurgerServiceNummer bsn) {
+        if (partners.size() >= 2) {
+            throw new IllegalStateException("Dossier " + uuid + " heeft al twee partners");
+        }
+        partners.add(new HuwelijksDossiersPartnerEntity(this, partners.size() + 1, bsn));
     }
 
     public boolean isRingenUitwisselen() {

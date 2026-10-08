@@ -14,7 +14,7 @@ public class AfspraakEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dossier_id", nullable = false)
+    @JoinColumn(name = "dossier_id", nullable = false, updatable = false)
     private HuwelijksDossierEntity dossier;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,20 +30,19 @@ public class AfspraakEntity {
     @Column(name = "eind_tijd", nullable = false)
     private LocalTime eindTijd;
 
+    protected AfspraakEntity() {
+    }
+
+    public AfspraakEntity(HuwelijksDossierEntity dossier) {
+        this.dossier = dossier;
+    }
+
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public HuwelijksDossierEntity getDossier() {
         return dossier;
-    }
-
-    public void setDossier(HuwelijksDossierEntity dossier) {
-        this.dossier = dossier;
     }
 
     public TrouwlocatieEntity getLocatie() {

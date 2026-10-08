@@ -44,10 +44,6 @@ public class MarriageTypeEntity {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getTitel() {
         return titel;
     }

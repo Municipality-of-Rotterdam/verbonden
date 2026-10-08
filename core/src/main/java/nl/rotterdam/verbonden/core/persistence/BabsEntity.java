@@ -49,10 +49,6 @@ public class BabsEntity {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public PersonFullName getNaam() {
         return naam;
     }

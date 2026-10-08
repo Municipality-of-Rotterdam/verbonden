@@ -170,11 +170,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             locatieRepository.findById(dto.locatieId()).ifPresent(entity::setLocatie);
         }
         if (dto.bsn1() != null) {
-            HuwelijksDossiersPartnerEntity partner1 = new HuwelijksDossiersPartnerEntity();
-            partner1.setDossier(entity);
-            partner1.setVolgorde(1);
-            partner1.setBsn(dto.bsn1());
-            entity.getPartners().add(partner1);
+            entity.voegPartnerToe(dto.bsn1());
         }
         return dossierRepository.save(entity).getUuid();
     }
@@ -230,14 +226,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         if (resolveAccess(dossierId, bsn).scenario() != DossierAccessOutcome.Scenario.INVITED) {
             throw new IllegalStateException("Toegang geweigerd: BSN is niet uitgenodigd voor dit dossier");
         }
-        HuwelijksDossierEntity dossier = getDossier(dossierId);
-
-        HuwelijksDossiersPartnerEntity partner = new HuwelijksDossiersPartnerEntity();
-        partner.setDossier(dossier);
-        partner.setVolgorde(dossier.getPartners().isEmpty() ? 1 : 2);
-        partner.setBsn(bsn);
-        dossier.getPartners().add(partner);
-        dossierRepository.save(dossier);
+        getDossier(dossierId).voegPartnerToe(bsn);
     }
 
     @Override
@@ -447,8 +436,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
                     afspraakRepository.deleteByDossier_Id(dossier.getId());
 
-                    AfspraakEntity afspraak = new AfspraakEntity();
-                    afspraak.setDossier(dossier);
+                    AfspraakEntity afspraak = new AfspraakEntity(dossier);
                     afspraak.setLocatie(locatie);
                     afspraak.setDatum(datum);
                     afspraak.setStartTijd(startTijd);
@@ -569,9 +557,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             if (dto.naam() == null || dto.naam().isBlank()) {
                 continue;
             }
-            GetuigeEntity entity = new GetuigeEntity();
-            entity.setDossier(dossier);
-            entity.setVolgnummer(dto.volgnummer());
+            GetuigeEntity entity = new GetuigeEntity(dossier, dto.volgnummer());
             entity.setNaam(dto.naam());
             getuigenRepository.save(entity);
         }
@@ -583,9 +569,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
         GetuigeEntity entity = getuigenRepository
                 .findByDossier_IdAndVolgnummer(dossier.getId(), dto.volgnummer())
-                .orElseGet(GetuigeEntity::new);
-        entity.setDossier(dossier);
-        entity.setVolgnummer(dto.volgnummer());
+                .orElseGet(() -> new GetuigeEntity(dossier, dto.volgnummer()));
         entity.setNaam(dto.naam());
         getuigenRepository.save(entity);
     }

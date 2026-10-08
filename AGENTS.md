@@ -51,6 +51,9 @@ Elke feature-package bevat de volgende sub-packages:
 ### Algemeen
 - Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
 - JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`) en staan in `nl.rotterdam.verbonden.persistence`.
+- **Niet-wijzigbare velden van een Entity gaan via de constructor, niet via setters.** Velden die na het aanmaken nooit meer wijzigen (bijv. de parent-relatie, een BSN, een volgnummer) krijgen `updatable = false` op `@Column`/`@JoinColumn`, worden gezet in een constructor met argumenten en krijgen **geen setter**. Alleen velden die mogen wijzigen krijgen een setter. `@Id`- en `@Version`-velden krijgen nooit een setter. Een Entity met zo'n constructor heeft daarnaast een `protected` no-arg constructor, uitsluitend voor JPA. Gebruik geen `final` op entity-velden (niet toegestaan door de JPA-specificatie).
+    - Kinderen die bij een parent-collectie horen, worden bij voorkeur via een methode op de parent aangemaakt (bijv. `HuwelijksDossierEntity.voegPartnerToe(bsn)`), zodat de parent afleidbare waarden zoals de volgorde bepaalt en de relatie in beide richtingen consistent blijft.
+    - `EntityConventiesTest` (ArchUnit) bewaakt deze regel voor alle velden met `@Id`, `@Version` of `updatable = false`.
 - Voeg geen JPA-annotaties toe aan klassen buiten het `persistence`-package.
 - Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsCreatePage` en `BapsUpdatePage`).
 - Genereer nooit methoden of klassen die nergens worden aangeroepen of gebruikt.

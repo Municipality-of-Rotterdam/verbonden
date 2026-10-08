@@ -45,8 +45,7 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
         if (dto.locatieId() != null) {
             TrouwlocatieEntity locatie = locatieRepository.findById(dto.locatieId())
                     .orElseThrow(() -> new IllegalArgumentException("Locatie niet gevonden: " + dto.locatieId()));
-            MarriageTypeLocationEntity location = new MarriageTypeLocationEntity();
-            location.setMarriageType(entity);
+            MarriageTypeLocationEntity location = new MarriageTypeLocationEntity(entity);
             location.setLocatie(locatie);
             entity.setLocation(location);
         }
@@ -70,8 +69,7 @@ class MarriageTypeAdministrationServiceImpl implements MarriageTypeAdministratio
                     .orElseThrow(() -> new IllegalArgumentException("Locatie niet gevonden: " + dto.locatieId()));
             MarriageTypeLocationEntity existingLocation = entity.getLocation();
             if (existingLocation == null) {
-                existingLocation = new MarriageTypeLocationEntity();
-                existingLocation.setMarriageType(entity);
+                existingLocation = new MarriageTypeLocationEntity(entity);
                 entity.setLocation(existingLocation);
             }
             existingLocation.setLocatie(locatie);

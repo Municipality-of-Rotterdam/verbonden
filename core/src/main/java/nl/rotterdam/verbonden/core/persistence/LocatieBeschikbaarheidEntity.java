@@ -50,10 +50,6 @@ public class LocatieBeschikbaarheidEntity {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public TrouwlocatieEntity getLocatie() {
         return locatie;
     }

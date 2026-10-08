@@ -15,14 +15,14 @@ public class HuwelijksDossiersPartnerEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dossier_id", nullable = false)
+    @JoinColumn(name = "dossier_id", nullable = false, updatable = false)
     private HuwelijksDossierEntity dossier;
 
-    @Column(name = "volgorde", nullable = false)
+    @Column(name = "volgorde", nullable = false, updatable = false)
     private int volgorde;
 
     @Convert(converter = BurgerServiceNummerAttributeConverter.class)
-    @Column(name = "bsn", length = 10, nullable = false)
+    @Column(name = "bsn", length = 10, nullable = false, updatable = false)
     private BurgerServiceNummer bsn;
 
     /**
@@ -45,36 +45,32 @@ public class HuwelijksDossiersPartnerEntity {
     @Column(name = "versie", nullable = false)
     private long versie;
 
-    public Long getId() {
-        return id;
+    protected HuwelijksDossiersPartnerEntity() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    /**
+     * Alleen via {@link HuwelijksDossierEntity#voegPartnerToe}, dat de volgorde bepaalt.
+     */
+    HuwelijksDossiersPartnerEntity(HuwelijksDossierEntity dossier, int volgorde, BurgerServiceNummer bsn) {
+        this.dossier = dossier;
+        this.volgorde = volgorde;
+        this.bsn = bsn;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public HuwelijksDossierEntity getDossier() {
         return dossier;
     }
 
-    public void setDossier(HuwelijksDossierEntity dossier) {
-        this.dossier = dossier;
-    }
-
     public int getVolgorde() {
         return volgorde;
     }
 
-    public void setVolgorde(int volgorde) {
-        this.volgorde = volgorde;
-    }
-
     public BurgerServiceNummer getBsn() {
         return bsn;
-    }
-
-    public void setBsn(BurgerServiceNummer bsn) {
-        this.bsn = bsn;
     }
 
     public String getGekozenAchternaam() {

@@ -12,27 +12,26 @@ public class MarriageTypeLocationEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "marriage_type_id")
+    @JoinColumn(name = "marriage_type_id", updatable = false)
     private MarriageTypeEntity marriageType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locatie_id", nullable = false)
     private TrouwlocatieEntity locatie;
 
+    protected MarriageTypeLocationEntity() {
+    }
+
+    public MarriageTypeLocationEntity(MarriageTypeEntity marriageType) {
+        this.marriageType = marriageType;
+    }
+
     public Long getMarriageTypeId() {
         return marriageTypeId;
     }
 
-    public void setMarriageTypeId(Long marriageTypeId) {
-        this.marriageTypeId = marriageTypeId;
-    }
-
     public MarriageTypeEntity getMarriageType() {
         return marriageType;
-    }
-
-    public void setMarriageType(MarriageTypeEntity marriageType) {
-        this.marriageType = marriageType;
     }
 
     public TrouwlocatieEntity getLocatie() {

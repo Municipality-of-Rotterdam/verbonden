@@ -11,10 +11,10 @@ public class GetuigeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dossier_id", nullable = false)
+    @JoinColumn(name = "dossier_id", nullable = false, updatable = false)
     private HuwelijksDossierEntity dossier;
 
-    @Column(name = "volgnummer", nullable = false)
+    @Column(name = "volgnummer", nullable = false, updatable = false)
     private int volgnummer;
 
     @Column(name = "naam", length = 500)
@@ -26,28 +26,24 @@ public class GetuigeEntity {
     @Column(name = "bestand_data")
     private byte[] bestandData;
 
-    public Long getId() {
-        return id;
+    protected GetuigeEntity() {
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public GetuigeEntity(HuwelijksDossierEntity dossier, int volgnummer) {
+        this.dossier = dossier;
+        this.volgnummer = volgnummer;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public HuwelijksDossierEntity getDossier() {
         return dossier;
     }
 
-    public void setDossier(HuwelijksDossierEntity dossier) {
-        this.dossier = dossier;
-    }
-
     public int getVolgnummer() {
         return volgnummer;
-    }
-
-    public void setVolgnummer(int volgnummer) {
-        this.volgnummer = volgnummer;
     }
 
     public String getNaam() {
