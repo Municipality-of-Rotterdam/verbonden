@@ -30,14 +30,7 @@
                     <span wicket:id="burgerlijkeStaat">Burgerlijke staat</span>
                 </div>
 
-                <!-- Telefoonnummer & E-mailadres: read-only (shown for partner's card) -->
-                <div wicket:id="contactGegevensReadOnly">
-
-                    <dl wicket:id="contactGegevensSummary"/>
-
-                </div>
-
-                <!-- Telefoonnummer & E-mailadres: editable form (shown for current user's card) -->
+                <!-- Telefoonnummer & E-mailadres -->
                 <form wicket:id="contactGegevensForm" class="rd-partner-card__contact-form d-flex flex-column gap-3">
                     <div wicket:id="telefoonnummerInput"></div>
                     <div wicket:id="emailadresInput"></div>
@@ -65,7 +58,7 @@
                 <div wicket:id="kiesAchternaamSection" class="rd-partner-card__actions">
                     <a wicket:id="kiesAchternaamButton" class="rd-partner-card__action-button">
                         <span class="rd-partner-card__action-icon" aria-hidden="true">&#x1F517;</span>
-                        <wicket:message key="jullie.gegevens.kies.achternaam">Kies je achternaam</wicket:message>
+                        <wicket:message key="jullie.gegevens.kies.achternaam">Kies achternaam</wicket:message>
                     </a>
                 </div>
 
@@ -75,7 +68,7 @@
                         <div class="rd-naam-kiezen-dialog__header">
                             <span class="rd-naam-kiezen-dialog__icon" aria-hidden="true">&#x2665;</span>
                             <h2 class="rd-naam-kiezen-dialog__title">
-                                <wicket:message key="jullie.gegevens.kies.achternaam.titel">Kies hier uw nieuwe achternaam</wicket:message>
+                                <wicket:message key="jullie.gegevens.kies.achternaam.titel">Kies hier de nieuwe achternaam</wicket:message>
                             </h2>
                         </div>
 

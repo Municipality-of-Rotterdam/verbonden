@@ -9,6 +9,7 @@ public class ContactGegevensFormDto implements Serializable {
 
     private Telefoonnummer telefoonnummer;
     private Emailadres emailadres;
+    private long versie;
 
     public Telefoonnummer getTelefoonnummer() {
         return telefoonnummer;
@@ -24,5 +25,13 @@ public class ContactGegevensFormDto implements Serializable {
 
     public void setEmailadres(Emailadres emailadres) {
         this.emailadres = emailadres;
+    }
+
+    public long getVersie() {
+        return versie;
+    }
+
+    public void setVersie(long versie) {
+        this.versie = versie;
     }
 }

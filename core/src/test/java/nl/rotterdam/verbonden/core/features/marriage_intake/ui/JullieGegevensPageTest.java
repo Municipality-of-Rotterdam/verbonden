@@ -24,6 +24,8 @@ class JullieGegevensPageTest extends BaseWicketTest {
 
     private static final String SIDEBAR = "pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar:";
 
+    private static final String PARTNER_CARDS = "pageLayout:pageLayout_body:pageBody:pageBody_body:partnerCards:";
+
     private UUID createdDossierId;
 
     @AfterEach
@@ -116,5 +118,35 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.startPage(DeGetuigenPage.class, params);
 
         tester.assertInvisible(SIDEBAR + "partnerHerinnering");
+    }
+
+    @Test
+    @WithMockUser(username = "999990019")
+    void partnerKanAchternaamVanDeAnderKiezen() {
+        BurgerServiceNummer partner1 = new BurgerServiceNummer("999990007");
+        BurgerServiceNummer partner2 = new BurgerServiceNummer("999990019");
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, partner1));
+        marriageIntakeService.acceptInvitation(createdDossierId, partner2);
+
+        PageParameters params = new PageParameters();
+        params.add("dossierId", createdDossierId.toString());
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.startPage(JullieGegevensPage.class, params);
+        tester.assertVisible(PARTNER_CARDS + "0:kiesAchternaamSection");
+        tester.assertVisible(PARTNER_CARDS + "1:kiesAchternaamSection");
+
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.newFormTester(PARTNER_CARDS + "0:naamKiezenDialog:naamKiezenForm").submit();
+
+        assertThat(marriageIntakeService.findPartnerGegevens(createdDossierId))
+                .filteredOn(p -> p.bsn().equals(partner1))
+                .singleElement()
+                .satisfies(p -> assertThat(p.gekozenAchternaam()).isNotNull());
+        assertThat(marriageIntakeService.findPartnerGegevens(createdDossierId))
+                .filteredOn(p -> p.bsn().equals(partner2))
+                .singleElement()
+                .satisfies(p -> assertThat(p.gekozenAchternaam()).isNull());
     }
 }

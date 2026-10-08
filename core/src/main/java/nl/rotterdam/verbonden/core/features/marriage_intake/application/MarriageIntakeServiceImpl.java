@@ -40,6 +40,7 @@ import nl.rotterdam.verbonden.core.persistence.LocatieBeschikbaarheidEntity;
 import nl.rotterdam.verbonden.core.persistence.MarriageTypeEntity;
 import nl.rotterdam.verbonden.core.persistence.MarriageTypeLocationEntity;
 import nl.rotterdam.verbonden.core.persistence.TrouwlocatieEntity;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,22 +126,22 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         List<PartnerGegevensDto> result = new ArrayList<>();
         for (HuwelijksDossiersPartnerEntity partner : dossier.getPartners()) {
-            result.add(convertToDto(partner.getBsn(), partner.getGekozenAchternaam(), partner.getTelefoonnummer(), partner.getEmailadres()));
+            result.add(convertToDto(partner));
         }
         return result;
     }
 
-    private PartnerGegevensDto convertToDto(BurgerServiceNummer bsn, String gekozenAchternaam,
-                                            Telefoonnummer telefoonnummer, Emailadres emailadres) {
+    private PartnerGegevensDto convertToDto(HuwelijksDossiersPartnerEntity partner) {
+        BurgerServiceNummer bsn = partner.getBsn();
         Optional<PersonInfo> personInfo = personLookupService.findByBsn(bsn);
         if (personInfo.isEmpty()) {
             return new PartnerGegevensDto(bsn, "Onbekend", bsn.getValue(), null, "", "Onbekend", "Onbekend",
-                    telefoonnummer, emailadres, gekozenAchternaam);
+                    partner.getTelefoonnummer(), partner.getEmailadres(), partner.getGekozenAchternaam(), partner.getVersie());
         }
         PersonInfo info = personInfo.get();
         return new PartnerGegevensDto(bsn, info.achternaam(), info.voornamen(), info.geboortedatum(),
                 info.geboorteplaats(), info.nationaliteit(), info.burgerlijkeStaat(),
-                telefoonnummer, emailadres, gekozenAchternaam);
+                partner.getTelefoonnummer(), partner.getEmailadres(), partner.getGekozenAchternaam(), partner.getVersie());
     }
 
     private LocalDate computeEersteGelegenheid(CeremonieSoort ceremonieSoort) {
@@ -176,16 +177,6 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             entity.getPartners().add(partner1);
         }
         return dossierRepository.save(entity).getUuid();
-    }
-
-    @Override
-    @Transactional
-    public void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort) {
-        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
-        dossier.setCeremonieSoort(ceremonieSoort);
-        if (ceremonieSoort != CeremonieSoort.GROOT) {
-            dossier.setMuziek(false);
-        }
     }
 
     @Override
@@ -240,6 +231,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             throw new IllegalStateException("Toegang geweigerd: BSN is niet uitgenodigd voor dit dossier");
         }
         HuwelijksDossierEntity dossier = getDossier(dossierId);
+
         HuwelijksDossiersPartnerEntity partner = new HuwelijksDossiersPartnerEntity();
         partner.setDossier(dossier);
         partner.setVolgorde(dossier.getPartners().isEmpty() ? 1 : 2);
@@ -608,27 +600,32 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional
-    public void slaGekozenAchternaamOp(UUID dossierId, BurgerServiceNummer bsn, String gekozenAchternaam) {
-        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
-        HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
-                .filter(p -> bsn.equals(p.getBsn()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn));
+    public void slaPartnerGegevensOp(UUID dossierId, BurgerServiceNummer partnerBsn, String gekozenAchternaam) {
+        HuwelijksDossiersPartnerEntity partner = getPartner(getWijzigbaarDossier(dossierId), partnerBsn);
         partner.setGekozenAchternaam(gekozenAchternaam);
-        dossierRepository.save(dossier);
     }
 
     @Override
     @Transactional
-    public void slaContactGegevensOp(UUID dossierId, BurgerServiceNummer bsn, Telefoonnummer telefoonnummer, Emailadres emailadres) {
-        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
-        HuwelijksDossiersPartnerEntity partner = dossier.getPartners().stream()
-                .filter(p -> bsn.equals(p.getBsn()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("BSN heeft geen toegang tot dit dossier: " + bsn));
+    public long slaContactGegevensOp(UUID dossierId, BurgerServiceNummer partnerBsn, long versie,
+                                     Telefoonnummer telefoonnummer, Emailadres emailadres) {
+        HuwelijksDossiersPartnerEntity partner = getPartner(getWijzigbaarDossier(dossierId), partnerBsn);
+        if (partner.getVersie() != versie) {
+            throw new OptimisticLockingFailureException("Contactgegevens van partner in dossier " + dossierId
+                    + " zijn gewijzigd: versie " + partner.getVersie() + ", verwacht " + versie);
+        }
         partner.setTelefoonnummer(telefoonnummer);
         partner.setEmailadres(emailadres);
-        dossierRepository.save(dossier);
+        // Flush, zodat Hibernate de versie ophoogt (en controleert) voordat we hem teruggeven
+        dossierRepository.flush();
+        return partner.getVersie();
+    }
+
+    private static HuwelijksDossiersPartnerEntity getPartner(HuwelijksDossierEntity dossier, BurgerServiceNummer bsn) {
+        return dossier.getPartners().stream()
+                .filter(p -> bsn.equals(p.getBsn()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("BSN is geen partner in dit dossier: " + bsn));
     }
 
     @Override

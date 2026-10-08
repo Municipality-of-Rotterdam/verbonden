@@ -27,6 +27,9 @@ class ContactGegevensFormTest extends BaseWicketTest {
     @Autowired
     private MarriageIntakeService marriageIntakeService;
 
+    private static final BurgerServiceNummer PARTNER_1 = new BurgerServiceNummer("999990007");
+    private static final BurgerServiceNummer PARTNER_2 = new BurgerServiceNummer("999990019");
+
     private UUID createdDossierId;
 
     @AfterEach
@@ -77,5 +80,71 @@ class ContactGegevensFormTest extends BaseWicketTest {
 
         assertThat(partner.telefoonnummer()).isEqualTo(new Telefoonnummer("0612345999"));
         assertThat(partner.emailadres()).isEqualTo(new Emailadres("new@example.com"));
+    }
+
+    @Test
+    @WithMockUser(username = "999990019")
+    void partnerKanContactGegevensVanDeAnderWijzigen() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, PARTNER_1));
+        marriageIntakeService.acceptInvitation(createdDossierId, PARTNER_2);
+        startJullieGegevensPage();
+
+        wijzigTelefoonnummerOpKaart(0, "0612345999");
+
+        assertThat(partner(PARTNER_1).telefoonnummer()).isEqualTo(new Telefoonnummer("0612345999"));
+        assertThat(partner(PARTNER_2).telefoonnummer()).isNull();
+    }
+
+    @Test
+    @WithMockUser(username = "999990019")
+    void gelijktijdigeWijzigingDoorPartnerOverschrijftNietMaarToontActueleGegevens() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, PARTNER_1));
+        marriageIntakeService.acceptInvitation(createdDossierId, PARTNER_2);
+        startJullieGegevensPage();
+
+        // Partner 1 wijzigt intussen in een eigen sessie het e-mailadres
+        marriageIntakeService.slaContactGegevensOp(createdDossierId, PARTNER_1, partner(PARTNER_1).versie(),
+                null, new Emailadres("partner1@example.com"));
+
+        wijzigTelefoonnummerOpKaart(0, "0612345999");
+
+        PartnerGegevensDto partner1 = partner(PARTNER_1);
+        assertThat(partner1.telefoonnummer()).isNull();
+        assertThat(partner1.emailadres()).isEqualTo(new Emailadres("partner1@example.com"));
+        assertThat(tester.getLastResponseAsString())
+                .contains("intussen door uw partner gewijzigd")
+                .contains("partner1@example.com");
+
+        // Na het verversen kan de wijziging alsnog worden doorgevoerd
+        wijzigTelefoonnummerOpKaart(0, "0612345999");
+
+        partner1 = partner(PARTNER_1);
+        assertThat(partner1.telefoonnummer()).isEqualTo(new Telefoonnummer("0612345999"));
+        assertThat(partner1.emailadres()).isEqualTo(new Emailadres("partner1@example.com"));
+    }
+
+    private void startJullieGegevensPage() {
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.startPage(JullieGegevensPage.class, new PageParameters().add("dossierId", createdDossierId.toString()));
+        tester.assertRenderedPage(JullieGegevensPage.class);
+    }
+
+    private void wijzigTelefoonnummerOpKaart(int kaart, String telefoonnummer) {
+        FormComponent<?> control = (FormComponent<?>) tester.getComponentFromLastRenderedPage(
+                "pageLayout:pageLayout_body:pageBody:pageBody_body:partnerCards:" + kaart
+                        + ":contactGegevensForm:telefoonnummerInput:input-container:control");
+        tester.getRequest().getPostParameters().setParameterValue(control.getInputName(), telefoonnummer);
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.executeBehavior(control.getBehaviors(AjaxFormComponentUpdatingBehavior.class).getFirst());
+    }
+
+    private PartnerGegevensDto partner(BurgerServiceNummer bsn) {
+        return marriageIntakeService.findPartnerGegevens(createdDossierId).stream()
+                .filter(p -> bsn.equals(p.bsn()))
+                .findFirst()
+                .orElseThrow();
     }
 }

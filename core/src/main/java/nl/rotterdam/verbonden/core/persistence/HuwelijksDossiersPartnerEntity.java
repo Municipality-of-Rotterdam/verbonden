@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
+import org.hibernate.annotations.OptimisticLock;
 
 @Entity
 @Table(name = "huwelijksdossiers_partners")
@@ -24,6 +25,11 @@ public class HuwelijksDossiersPartnerEntity {
     @Column(name = "bsn", length = 10, nullable = false)
     private BurgerServiceNummer bsn;
 
+    /**
+     * Valt buiten de optimistic lock: de naamkeuze is een expliciete, volledige keuze, en zou anders een
+     * gelijktijdige wijziging van de contactgegevens onterecht als conflict laten zien.
+     */
+    @OptimisticLock(excluded = true)
     @Column(name = "gekozen_achternaam")
     private String gekozenAchternaam;
 
@@ -34,6 +40,10 @@ public class HuwelijksDossiersPartnerEntity {
     @Convert(converter = EmailadresAttributeConverter.class)
     @Column(name = "emailadres", length = 255)
     private Emailadres emailadres;
+
+    @Version
+    @Column(name = "versie", nullable = false)
+    private long versie;
 
     public Long getId() {
         return id;
@@ -89,5 +99,9 @@ public class HuwelijksDossiersPartnerEntity {
 
     public void setEmailadres(Emailadres emailadres) {
         this.emailadres = emailadres;
+    }
+
+    public long getVersie() {
+        return versie;
     }
 }

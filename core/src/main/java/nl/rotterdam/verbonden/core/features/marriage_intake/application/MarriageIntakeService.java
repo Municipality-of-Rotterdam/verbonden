@@ -2,7 +2,6 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
@@ -33,8 +32,6 @@ public interface MarriageIntakeService {
     List<PartnerGegevensDto> findPartnerGegevens(UUID dossierId);
 
     UUID create(CreateDossierDto dto);
-
-    void updateCeremonie(UUID dossierId, CeremonieSoort ceremonieSoort);
 
     void updateIntake(UUID dossierId, ChangeIntakeDto dto);
 
@@ -101,9 +98,24 @@ public interface MarriageIntakeService {
 
     void slaGetuigeOp(UUID dossierId, SaveGetuigenDto getuige);
 
-    void slaGekozenAchternaamOp(UUID dossierId, BurgerServiceNummer bsn, String gekozenAchternaam);
+    /**
+     * Legt de gekozen achternaam vast van de partner met {@code partnerBsn}. Zodra beide partners
+     * gekoppeld zijn, mag elke partner dit ook voor de ander doen.
+     */
+    void slaPartnerGegevensOp(UUID dossierId, BurgerServiceNummer partnerBsn, String gekozenAchternaam);
 
-    void slaContactGegevensOp(UUID dossierId, BurgerServiceNummer bsn, Telefoonnummer telefoonnummer, Emailadres emailadres);
+    /**
+     * Legt de contactgegevens vast van de partner met {@code partnerBsn}. Zodra beide partners gekoppeld
+     * zijn, mag elke partner dit ook voor de ander doen; {@code versie} voorkomt dat ze daarbij elkaars
+     * wijzigingen ongemerkt overschrijven.
+     *
+     * @param versie de {@link PartnerGegevensDto#versie()} waarop de wijziging is gebaseerd
+     * @return de nieuwe versie, als basis voor een volgende wijziging
+     * @throws org.springframework.dao.OptimisticLockingFailureException wanneer de contactgegevens
+     *         intussen door iemand anders zijn gewijzigd
+     */
+    long slaContactGegevensOp(UUID dossierId, BurgerServiceNummer partnerBsn, long versie,
+                              Telefoonnummer telefoonnummer, Emailadres emailadres);
 
     void delete(UUID dossierId);
 

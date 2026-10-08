@@ -7,9 +7,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenv
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
-import nl.rotterdam.nl_design_system.wicket.components.data_summary.RdDataSummary;
-import nl.rotterdam.nl_design_system.wicket.components.data_summary.SummaryItem;
-import nl.rotterdam.nl_design_system.wicket.components.data_summary.SummaryItemValue;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -30,12 +27,12 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.Url;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.NonNull;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -75,15 +72,14 @@ public class JullieGegevensPage extends IntakeBasePage {
         pageBody.add(new RdHeading("heading", getString("jullie.gegevens.heading"), 1));
 
         List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
-        BurgerServiceNummer currentBsn = getCurrentBsn();
+        // Zodra beide partners gekoppeld zijn, mag elke partner ook de gegevens van de ander invullen
         boolean tweeBsns = partners.size() == 2;
 
         pageBody.add(new ListView<>("partnerCards", partners) {
             @Override
             protected void populateItem(ListItem<PartnerGegevensDto> item) {
                 PartnerGegevensDto partner = item.getModelObject();
-                boolean kanKiezen = tweeBsns && partner.bsn().equals(currentBsn);
-                boolean kanContactBewerken = partner.bsn().equals(currentBsn);
+                boolean kanKiezen = tweeBsns;
 
                 item.add(
                         new Label("achternaam", partner.achternaam()),
@@ -94,24 +90,7 @@ public class JullieGegevensPage extends IntakeBasePage {
                         new Label("burgerlijkeStaat", partner.burgerlijkeStaat())
                 );
 
-                // Contact gegevens: read-only display (shown for partner's card)
-                WebMarkupContainer contactGegevensReadOnly = new WebMarkupContainer("contactGegevensReadOnly");
-                contactGegevensReadOnly.setVisible(!kanContactBewerken);
-
-                contactGegevensReadOnly.add(
-                        new RdDataSummary("contactGegevensSummary",
-                                new ListModel<>(
-                                        List.of(
-                                                new SummaryItem(new ResourceModel("jullie.gegevens.telefoonnummer"), new SummaryItemValue(partner.telefoonnummer(), false)),
-                                                new SummaryItem(new ResourceModel("jullie.gegevens.emailadres"), new SummaryItemValue(partner.emailadres(), false))
-                                        ))));
-
-                item.add(contactGegevensReadOnly);
-
-                // Contact gegevens: editable form (shown for current user's card)
-                ContactGegevensForm contactGegevensForm = new ContactGegevensForm("contactGegevensForm", partner);
-                contactGegevensForm.setVisible(kanContactBewerken);
-                item.add(contactGegevensForm);
+                item.add(new ContactGegevensForm("contactGegevensForm", partner));
 
                 // "Gekozen achternaam" display section (with edit icon inside)
                 WebMarkupContainer gekozenAchternaamSection = new WebMarkupContainer("gekozenAchternaamSection");
@@ -243,11 +222,13 @@ public class JullieGegevensPage extends IntakeBasePage {
 
     private class NaamKiezenForm extends Form<Void> {
 
+        private final BurgerServiceNummer partnerBsn;
         private final RadioGroup<String> naamRadioGroup;
 
         NaamKiezenForm(String id, PartnerGegevensDto partner, List<String> naamOpties,
                        WebMarkupContainer dialogContainer, IModel<Boolean> dialogTonen) {
             super(id);
+            this.partnerBsn = partner.bsn();
             String initialNaam = partner.gekozenAchternaam() != null ? partner.gekozenAchternaam() : naamOpties.getFirst();
 
             naamRadioGroup = new RadioGroup<>("naamRadioGroup", Model.of(initialNaam));
@@ -274,19 +255,24 @@ public class JullieGegevensPage extends IntakeBasePage {
         @Override
         protected void onSubmit() {
             String gekozenNaam = naamRadioGroup.getModelObject();
-            marriageIntakeService.slaGekozenAchternaamOp(dossierId, getCurrentBsn(), gekozenNaam);
+            marriageIntakeService.slaPartnerGegevensOp(dossierId, partnerBsn, gekozenNaam);
             setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
         }
     }
 
     private class ContactGegevensForm extends Form<ContactGegevensFormDto> {
 
+        private final BurgerServiceNummer partnerBsn;
+
         ContactGegevensForm(String id, PartnerGegevensDto partner) {
             super(id);
+            this.partnerBsn = partner.bsn();
             ContactGegevensFormDto dto = new ContactGegevensFormDto();
             dto.setTelefoonnummer(partner.telefoonnummer());
             dto.setEmailadres(partner.emailadres());
+            dto.setVersie(partner.versie());
             setDefaultModel(Model.of(dto));
+            setOutputMarkupId(true);
         }
 
         @Override
@@ -320,10 +306,32 @@ public class JullieGegevensPage extends IntakeBasePage {
                 @Override
                 protected void onUpdate(AjaxRequestTarget target) {
                     ContactGegevensFormDto f = getModelObject();
-                    marriageIntakeService.slaContactGegevensOp(dossierId, getCurrentBsn(), f.getTelefoonnummer(), f.getEmailadres());
-                    target.add(rdFormFieldTextInput);
+                    try {
+                        f.setVersie(marriageIntakeService.slaContactGegevensOp(
+                                dossierId, partnerBsn, f.getVersie(), f.getTelefoonnummer(), f.getEmailadres()));
+                        target.add(rdFormFieldTextInput);
+                    } catch (OptimisticLockingFailureException e) {
+                        laadActueleContactGegevens();
+                        rdFormFieldTextInput.getTextField().error(getString("jullie.gegevens.contact.intussen.gewijzigd"));
+                        target.add(ContactGegevensForm.this);
+                    }
                 }
             };
+        }
+
+        /**
+         * Vervangt de ingevoerde contactgegevens door wat er nu is opgeslagen, nadat de (andere) partner
+         * ze intussen heeft gewijzigd.
+         */
+        private void laadActueleContactGegevens() {
+            PartnerGegevensDto actueel = marriageIntakeService.findPartnerGegevens(dossierId).stream()
+                    .filter(p -> p.bsn().equals(partnerBsn))
+                    .findFirst()
+                    .orElseThrow();
+            ContactGegevensFormDto f = getModelObject();
+            f.setTelefoonnummer(actueel.telefoonnummer());
+            f.setEmailadres(actueel.emailadres());
+            f.setVersie(actueel.versie());
         }
     }
 }

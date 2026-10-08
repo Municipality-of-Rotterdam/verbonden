@@ -71,8 +71,8 @@ public class CompleetDossierTestData {
         marriageIntakeService.slaAfspraakOp(dossierId, slot.toLocalDate(), slot.toLocalTime());
 
         marriageIntakeService.acceptInvitation(dossierId, BSN_PARTNER_2);
-        marriageIntakeService.slaGekozenAchternaamOp(dossierId, BSN_PARTNER_1, "Jansen");
-        marriageIntakeService.slaGekozenAchternaamOp(dossierId, BSN_PARTNER_2, "Jansen");
+        marriageIntakeService.slaPartnerGegevensOp(dossierId, BSN_PARTNER_1, "Jansen");
+        marriageIntakeService.slaPartnerGegevensOp(dossierId, BSN_PARTNER_2, "Jansen");
         marriageIntakeService.slaGetuigenOp(dossierId, List.of(
                 new SaveGetuigenDto(1, "Kwik van Willegenburgh"),
                 new SaveGetuigenDto(2, "Kwek van Willegenburgh")));
