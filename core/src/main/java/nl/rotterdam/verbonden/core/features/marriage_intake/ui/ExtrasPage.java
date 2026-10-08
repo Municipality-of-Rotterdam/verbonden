@@ -153,7 +153,8 @@ public class ExtrasPage extends IntakeBasePage {
                     target.add(keuzesSidebar);
                 }
             });
-            internationaleAkteSection.add(internationaleAkteCheckbox);
+            internationaleAkteSection.add(internationaleAkteCheckbox, new Label("internationaleAktePrijs",
+                    formatPrijs(marriageIntakeService.findInternationaleAktePrijs(dossierId))));
             add(internationaleAkteSection);
         }
 

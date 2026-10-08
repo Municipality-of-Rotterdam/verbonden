@@ -4,14 +4,17 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCo
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +22,7 @@ import java.util.UUID;
 import static nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData.BSN_PARTNER_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 
 @VerbondenIntegrationTest
 @Transactional
@@ -71,6 +75,22 @@ class DossierIndienenIntegrationTest {
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
         assertThat(dossier.status()).isEqualTo(DossierStatus.INGEDIEND);
         assertThat(dossier.ingediendOp()).isAfterOrEqualTo(voorIndienen);
+    }
+
+    @Test
+    void dienIn_metInternationaleAkte_legtPrijsVanDatumVanIndienenVast() {
+        UUID dossierId = testData.maakCompleetDossier();
+        marriageIntakeService.slaExtrasOp(dossierId, new SaveExtrasDto(false, false, null, true));
+
+        marriageIntakeService.dienIn(dossierId);
+
+        DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
+        BigDecimal tarief = InternationaleAkteTarief.prijsOp(dossier.ingediendOp().toLocalDate());
+        assertThat(marriageIntakeService.findInternationaleAktePrijs(dossierId)).isEqualByComparingTo(tarief);
+        assertThat(dossier.extras())
+                .extracting(SidebarExtraItemDto::naam, SidebarExtraItemDto::prijs)
+                .containsExactly(tuple("Internationale huwelijksakte", tarief));
+        assertThat(dossier.totalPrijs()).isEqualByComparingTo(dossier.prijs().add(tarief));
     }
 
     @Test

@@ -15,6 +15,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegeve
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -81,6 +82,12 @@ public interface MarriageIntakeService {
      *         wanneer nog niet alle keuzes en gegevens zijn ingevuld
      */
     void dienIn(UUID dossierId);
+
+    /**
+     * Geeft de prijs van de internationale huwelijksakte: de bij het indienen vastgelegde prijs, of — zolang
+     * het dossier nog niet is ingediend — het tarief van vandaag.
+     */
+    BigDecimal findInternationaleAktePrijs(UUID dossierId);
 
     Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand);
 

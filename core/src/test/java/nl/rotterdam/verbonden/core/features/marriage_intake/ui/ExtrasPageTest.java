@@ -4,6 +4,7 @@ import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.CreateTrouwboekjeDto;
@@ -19,6 +20,10 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.time.LocalDate;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -102,5 +107,8 @@ class ExtrasPageTest extends BaseWicketTest {
         tester.assertRenderedPage(ExtrasPage.class);
         assertThat(tester.getLastResponseAsString()).contains(INTERNATIONALE_AKTE_INTRO);
         assertThat(tester.getLastResponseAsString()).contains("Internationale huwelijksakte");
+        tester.assertLabel("pageLayout:pageLayout_body:pageBody:pageBody_body:extrasForm:internationaleAkteSection:internationaleAktePrijs",
+                new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL")))
+                        .format(InternationaleAkteTarief.prijsOp(LocalDate.now())));
     }
 }

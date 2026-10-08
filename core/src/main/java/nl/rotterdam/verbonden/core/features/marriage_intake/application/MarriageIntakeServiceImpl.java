@@ -19,6 +19,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
@@ -259,7 +260,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             extraItems.add(new SidebarExtraItemDto(e.getTrouwboekje().getNaam(), e.getTrouwboekje().getPrijs()));
         }
         if (e.isInternationaleAkte()) {
-            extraItems.add(new SidebarExtraItemDto("Internationale huwelijksakte", null));
+            extraItems.add(new SidebarExtraItemDto("Internationale huwelijksakte", internationaleAktePrijs(e)));
         }
 
         BigDecimal extrasTotaal = extraItems.stream()
@@ -300,8 +301,27 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         if (!isCompleet(dossier)) {
             throw new DossierNietCompleetException(dossierId);
         }
+        LocalDateTime ingediendOp = LocalDateTime.now();
         dossier.setStatus(DossierStatus.INGEDIEND);
-        dossier.setIngediendOp(LocalDateTime.now());
+        dossier.setIngediendOp(ingediendOp);
+        dossier.setInternationaleAktePrijs(dossier.isInternationaleAkte()
+                ? InternationaleAkteTarief.prijsOp(ingediendOp.toLocalDate())
+                : null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal findInternationaleAktePrijs(UUID dossierId) {
+        return internationaleAktePrijs(getDossier(dossierId));
+    }
+
+    /**
+     * De bij het indienen vastgelegde prijs; zolang het dossier nog niet is ingediend het tarief van vandaag.
+     */
+    private BigDecimal internationaleAktePrijs(HuwelijksDossierEntity dossier) {
+        return dossier.getInternationaleAktePrijs() != null
+                ? dossier.getInternationaleAktePrijs()
+                : InternationaleAkteTarief.prijsOp(LocalDate.now());
     }
 
     /**

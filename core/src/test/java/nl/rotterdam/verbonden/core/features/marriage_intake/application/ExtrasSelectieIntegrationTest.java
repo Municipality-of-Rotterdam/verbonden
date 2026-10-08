@@ -3,6 +3,7 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,9 +39,11 @@ class ExtrasSelectieIntegrationTest {
         marriageIntakeService.slaExtrasOp(dossierId, new SaveExtrasDto(false, false, null, true));
 
         assertThat(marriageIntakeService.findExtrasSelecties(dossierId).internationaleAkte()).isTrue();
+        BigDecimal tariefVandaag = InternationaleAkteTarief.prijsOp(LocalDate.now());
         assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
-                .extracting(SidebarExtraItemDto::naam)
-                .containsExactly("Internationale huwelijksakte");
+                .extracting(SidebarExtraItemDto::naam, SidebarExtraItemDto::prijs)
+                .containsExactly(tuple("Internationale huwelijksakte", tariefVandaag));
+        assertThat(marriageIntakeService.findInternationaleAktePrijs(dossierId)).isEqualByComparingTo(tariefVandaag);
     }
 
     @Test
