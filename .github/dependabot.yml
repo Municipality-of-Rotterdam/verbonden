@@ -9,3 +9,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # Maven 3.10 writes maven-metadata-local.xml/_remote.repositories into the
+      # central-publishing-maven-plugin staging dir, so Central rejects the bundle
+      # ("Bundle has content that does NOT have a .pom file"). Stay on 3.9.x until
+      # the plugin supports 3.10.
+      - dependency-name: "org.apache.maven:apache-maven"
+        versions: [">= 3.10.0"]
