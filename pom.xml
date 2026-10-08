@@ -202,7 +202,7 @@
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit-junit5</artifactId>
-                <version>1.5.0</version>
+                <version>1.5.1</version>
             </dependency>
 
             <!-- Zonky embedded-database-spring-test: real Postgres binaries as a subprocess, no Docker required -->
