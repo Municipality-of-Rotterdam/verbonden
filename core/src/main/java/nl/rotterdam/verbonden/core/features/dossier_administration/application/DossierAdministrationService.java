@@ -108,6 +108,15 @@ public interface DossierAdministrationService {
     void wijsAf(UUID dossierId);
 
     /**
+     * Annuleert een actief dossier, bijvoorbeeld omdat het paar afziet van het huwelijk. Alleen de backoffice kan
+     * een dossier annuleren. Het dossier blijft bewaard, maar de partners kunnen daarna een nieuw dossier aanmaken
+     * en het gereserveerde tijdslot komt vrij.
+     *
+     * @throws DossierNietWijzigbaarException wanneer het dossier geen status uit {@link DossierStatus#ACTIEF} heeft
+     */
+    void annuleer(UUID dossierId);
+
+    /**
      * Voegt een bestand toe aan het dossier, namens de ingelogde medewerker.
      *
      * @return het id van het bestand

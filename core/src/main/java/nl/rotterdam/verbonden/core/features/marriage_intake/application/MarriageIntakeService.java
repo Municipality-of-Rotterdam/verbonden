@@ -37,8 +37,9 @@ public interface MarriageIntakeService {
     void updateIntake(UUID dossierId, ChangeIntakeDto dto);
 
     /**
-     * Returns the UUID of the dossier in which the given BSN appears as bsn1 or bsn2,
-     * or {@link Optional#empty()} when no such dossier exists.
+     * Returns the UUID of the active dossier (see {@link DossierStatus#ACTIEF}) in which the given BSN appears
+     * as partner, or {@link Optional#empty()} when no such dossier exists. Rejected and cancelled dossiers are
+     * kept for the retention period, but are not returned.
      */
     Optional<UUID> findDossierIdByBsn(BurgerServiceNummer bsn);
 
@@ -46,15 +47,20 @@ public interface MarriageIntakeService {
      * Determines access to a requested dossier for the given BSN. Never changes a dossier: joining
      * as second partner requires an explicit {@link #acceptInvitation}, so that merely opening a
      * dossier link (a GET) does not link anyone to a dossier.
+     * Only active dossiers (see {@link DossierStatus#ACTIEF}) count.
      * <ul>
-     *   <li>If bsn matches bsn1 or bsn2 of the requested dossier:
+     *   <li>If the requested dossier is the active dossier of bsn:
      *       returns {@link DossierAccessOutcome.Scenario#GRANTED} with the requested dossier ID.</li>
-     *   <li>If bsn belongs to a different existing dossier:
+     *   <li>If the requested dossier is a concept without second partner, and bsn has no active dossier or only
+     *       a concept in which it is the sole partner: returns {@link DossierAccessOutcome.Scenario#INVITED}
+     *       with the requested dossier ID.</li>
+     *   <li>If the requested dossier is such a concept, but the active dossier of bsn is submitted or has a
+     *       second partner: returns {@link DossierAccessOutcome.Scenario#INVITATION_BLOCKED} with the ID of
+     *       the dossier of bsn.</li>
+     *   <li>Otherwise, if bsn has an active dossier:
      *       returns {@link DossierAccessOutcome.Scenario#SWITCHED_DOSSIER} with that dossier's ID.</li>
-     *   <li>If bsn is not in any dossier and the requested dossier has no bsn2 yet:
-     *       returns {@link DossierAccessOutcome.Scenario#INVITED} with the requested dossier ID.</li>
-     *   <li>If the requested dossier does not exist, or already has two BSNs:
-     *       returns {@link DossierAccessOutcome.Scenario#NOT_AUTHORIZED} with a {@code null} dossier ID.</li>
+     *   <li>Otherwise: returns {@link DossierAccessOutcome.Scenario#NOT_AUTHORIZED} with a {@code null}
+     *       dossier ID.</li>
      * </ul>
      */
     DossierAccessOutcome resolveAccess(UUID requestedDossierId, BurgerServiceNummer bsn);
@@ -62,7 +68,8 @@ public interface MarriageIntakeService {
     /**
      * Registers the BSN as second partner of the dossier, after the citizen explicitly accepted the
      * invitation. Re-checks the {@link DossierAccessOutcome.Scenario#INVITED} conditions, since the
-     * dossier may have changed since the invitation was shown.
+     * dossier may have changed since the invitation was shown. A concept of the BSN itself is cancelled
+     * ({@link DossierStatus#GEANNULEERD}): a BSN has at most one active dossier.
      *
      * @throws IllegalStateException when the BSN is not (or no longer) invited to this dossier
      */

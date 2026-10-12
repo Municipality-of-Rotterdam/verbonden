@@ -1,5 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.verbonden.core.burger_common.BurgerBasePage;
@@ -21,7 +23,7 @@ import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.MarriageIn
 
 /**
  * Bevestigingsstap voor een burger die via de dossierlink van zijn partner binnenkomt en nog geen
- * eigen dossier heeft. Pas na het versturen van het formulier (POST) wordt de burger als tweede
+ * eigen dossier heeft, of alleen een eigen concept dat bij accepteren vervalt. Pas na het versturen van het formulier (POST) wordt de burger als tweede
  * partner gekoppeld; alleen de link openen (GET) verandert niets. Toont bewust geen gegevens uit
  * het dossier: die zijn pas zichtbaar na bevestigen.
  */
@@ -51,6 +53,11 @@ public class DossierUitnodigingPage extends BurgerBasePage {
         dossierId = requested;
 
         pageBody.add(new RdHeading("heading", getString("intake.uitnodiging.heading"), 1));
+
+        RdAlert eigenConceptAlert = new RdAlert("eigenConceptAlert",
+                new ResourceModel("intake.uitnodiging.eigen.concept"), RdAlertType.WARNING);
+        eigenConceptAlert.setVisible(marriageIntakeService.findDossierIdByBsn(getCurrentBsn()).isPresent());
+        pageBody.add(eigenConceptAlert);
 
         Form<Void> form = new Form<>("form");
         pageBody.add(form);

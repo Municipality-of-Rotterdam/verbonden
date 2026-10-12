@@ -6,6 +6,7 @@ import nl.rotterdam.verbonden.core.features.location_administration.repository.B
 import nl.rotterdam.verbonden.core.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.verbonden.core.features.location_administration.repository.NietBeschikbareDagRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
@@ -242,7 +243,9 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
 
     private Set<LocalTime> bezetteTijden(long locatieId, LocalDate datum) {
         Set<LocalTime> bezet = new HashSet<>();
-        for (AfspraakEntity a : afspraakRepository.findByLocatie_IdAndDatum(locatieId, datum)) {
+        // De afspraak van een geannuleerd dossier blijft bewaard, maar houdt het tijdslot niet bezet
+        for (AfspraakEntity a : afspraakRepository.findByLocatie_IdAndDatumAndDossier_StatusIn(
+                locatieId, datum, DossierStatus.ACTIEF)) {
             bezet.add(a.getStartTijd());
         }
         return bezet;

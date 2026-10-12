@@ -159,11 +159,21 @@ public class DossierDetailPage extends DossierBeheerBasePage {
             };
             afwijzen.setAppearance(RdButtonAppearance.SECONDARY_ACTION);
 
+            RdButton annuleren = new RdButton("annuleren", Model.of("Annuleren")) {
+                @Override
+                public void onSubmit() {
+                    dossierAdministrationService.annuleer(dossierId);
+                    naarDetailPagina();
+                }
+            };
+            annuleren.setAppearance(RdButtonAppearance.SECONDARY_ACTION);
+            annuleren.setVisible(dossier.status().isActief());
+
             boolean ingediend = dossier.status() == DossierStatus.INGEDIEND;
             accepteren.setVisible(ingediend);
             afwijzen.setVisible(ingediend);
 
-            add(indienen, accepteren, afwijzen);
+            add(indienen, accepteren, afwijzen, annuleren);
         }
     }
 

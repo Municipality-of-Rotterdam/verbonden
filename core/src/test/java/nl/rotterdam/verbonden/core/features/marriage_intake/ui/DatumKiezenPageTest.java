@@ -168,9 +168,10 @@ class DatumKiezenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990019", roles = "BURGER")
-    void dossierVanIemandAnders_stuurtDoorNaarEigenDossier() {
+    void volDossierVanIemandAnders_stuurtDoorNaarEigenDossier() {
         UUID eigenDossierId = maakDossier(CeremonieSoort.KLEIN);
         UUID anderDossierId = maakDossierVoor("999990007");
+        marriageIntakeService.acceptInvitation(anderDossierId, new BurgerServiceNummer("999990202"));
 
         tester.startPage(DatumKiezenPage.class, dossierParams(anderDossierId));
 

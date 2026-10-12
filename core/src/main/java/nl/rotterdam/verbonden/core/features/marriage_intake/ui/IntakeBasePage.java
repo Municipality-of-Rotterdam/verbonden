@@ -32,6 +32,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
     protected UUID dossierId;
 
     private boolean showWrongDossierWarning;
+    private boolean showInvitationBlockedWarning;
     private boolean showNotAuthorizedWarning;
 
     protected IntakeSidebarPanel keuzesSidebar;
@@ -71,6 +72,10 @@ public abstract class IntakeBasePage extends BurgerBasePage {
                     dossierId = outcome.dossierId();
                     showWrongDossierWarning = true;
                 }
+                case INVITATION_BLOCKED -> {
+                    dossierId = outcome.dossierId();
+                    showInvitationBlockedWarning = true;
+                }
                 case INVITED -> throw new RestartResponseException(
                         DossierUitnodigingPage.class, makeDossierPageParameters(requestedDossierId));
                 case NOT_AUTHORIZED -> showNotAuthorizedWarning = true;
@@ -95,6 +100,11 @@ public abstract class IntakeBasePage extends BurgerBasePage {
                 new ResourceModel("intake.alert.wrong.dossier"), RdAlertType.WARNING);
         wrongDossierAlert.setVisible(showWrongDossierWarning);
         pageBody.add(wrongDossierAlert);
+
+        RdAlert invitationBlockedAlert = new RdAlert("invitationBlockedAlert",
+                new ResourceModel("intake.alert.invitation.blocked"), RdAlertType.WARNING);
+        invitationBlockedAlert.setVisible(showInvitationBlockedWarning);
+        pageBody.add(invitationBlockedAlert);
 
         RdAlert notAuthorizedAlert = new RdAlert("notAuthorizedAlert",
                 new ResourceModel("intake.alert.not.authorized"), RdAlertType.WARNING);

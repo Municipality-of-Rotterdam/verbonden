@@ -4,6 +4,7 @@ import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome.Scenario.GRANTED;
+import static nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome.Scenario.INVITATION_BLOCKED;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome.Scenario.INVITED;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome.Scenario.NOT_AUTHORIZED;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome.Scenario.SWITCHED_DOSSIER;
@@ -65,14 +67,42 @@ class DossierUitnodigingIntegrationTest {
     }
 
     @Test
-    void burgerMetEigenDossierKanNietAccepteren() {
+    void eigenConceptVervaltBijAccepteren() {
         UUID dossierId = maakDossier(PARTNER_1);
         UUID eigenDossier = maakDossier(DERDE);
 
         assertThat(marriageIntakeService.resolveAccess(dossierId, DERDE))
-                .isEqualTo(new DossierAccessOutcome(SWITCHED_DOSSIER, eigenDossier));
+                .isEqualTo(new DossierAccessOutcome(INVITED, dossierId));
+
+        marriageIntakeService.acceptInvitation(dossierId, DERDE);
+
+        assertThat(marriageIntakeService.findDossierIdByBsn(DERDE)).contains(dossierId);
+        assertThat(marriageIntakeService.findStatus(eigenDossier)).isEqualTo(DossierStatus.GEANNULEERD);
+        assertThat(marriageIntakeService.resolveAccess(eigenDossier, DERDE))
+                .isEqualTo(new DossierAccessOutcome(SWITCHED_DOSSIER, dossierId));
+    }
+
+    @Test
+    void eigenDossierMetPartnerBlokkeertUitnodiging() {
+        UUID dossierId = maakDossier(PARTNER_1);
+        UUID eigenDossier = maakDossier(DERDE);
+        marriageIntakeService.acceptInvitation(eigenDossier, PARTNER_2);
+
+        assertThat(marriageIntakeService.resolveAccess(dossierId, DERDE))
+                .isEqualTo(new DossierAccessOutcome(INVITATION_BLOCKED, eigenDossier));
         assertThatThrownBy(() -> marriageIntakeService.acceptInvitation(dossierId, DERDE))
                 .isInstanceOf(IllegalStateException.class);
+        assertThat(marriageIntakeService.findStatus(eigenDossier)).isEqualTo(DossierStatus.CONCEPT);
+    }
+
+    @Test
+    void volDossierStuurtDoorNaarEigenDossier() {
+        UUID dossierId = maakDossier(PARTNER_1);
+        marriageIntakeService.acceptInvitation(dossierId, PARTNER_2);
+        UUID eigenDossier = maakDossier(DERDE);
+
+        assertThat(marriageIntakeService.resolveAccess(dossierId, DERDE))
+                .isEqualTo(new DossierAccessOutcome(SWITCHED_DOSSIER, eigenDossier));
     }
 
     @Test

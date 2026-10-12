@@ -182,7 +182,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         if (personLookupService.findByBsn(bsn).isEmpty()) {
             throw new PartnerNietInBrpException(bsn);
         }
-        if (dossierAdministrationRepository.existsByPartners_Bsn(bsn)) {
+        if (dossierAdministrationRepository.existsByPartners_BsnAndStatusIn(bsn, DossierStatus.ACTIEF)) {
             throw new PartnerHeeftAlDossierException(bsn);
         }
     }
@@ -319,6 +319,16 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Transactional
     public void wijsAf(UUID dossierId) {
         beoordeel(dossierId, DossierStatus.AFGEWEZEN);
+    }
+
+    @Override
+    @Transactional
+    public void annuleer(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        if (!dossier.getStatus().isActief()) {
+            throw new DossierNietWijzigbaarException(dossierId, dossier.getStatus(), DossierStatus.ACTIEF);
+        }
+        dossier.setStatus(DossierStatus.GEANNULEERD);
     }
 
     private void beoordeel(UUID dossierId, DossierStatus nieuweStatus) {

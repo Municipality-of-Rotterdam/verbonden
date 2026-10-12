@@ -166,30 +166,46 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional(readOnly = true)
     public Optional<UUID> findDossierIdByBsn(BurgerServiceNummer bsn) {
-        return dossierRepository.findByPartners_Bsn(bsn)
-                .map(HuwelijksDossierEntity::getUuid);
+        return findActiefDossier(bsn).map(HuwelijksDossierEntity::getUuid);
     }
 
     @Override
     @Transactional(readOnly = true)
     public DossierAccessOutcome resolveAccess(UUID requestedDossierId, BurgerServiceNummer bsn) {
-        Optional<HuwelijksDossierEntity> existingDossier = dossierRepository.findByPartners_Bsn(bsn);
-
-        if (existingDossier.isPresent()) {
-            UUID existingId = existingDossier.get().getUuid();
-            if (existingId.equals(requestedDossierId)) {
-                return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
-            } else {
-                return new DossierAccessOutcome(DossierAccessOutcome.Scenario.SWITCHED_DOSSIER, existingId);
-            }
+        Optional<HuwelijksDossierEntity> eigenDossier = findActiefDossier(bsn);
+        if (eigenDossier.isPresent() && eigenDossier.get().getUuid().equals(requestedDossierId)) {
+            return new DossierAccessOutcome(DossierAccessOutcome.Scenario.GRANTED, requestedDossierId);
         }
 
-        boolean roomForPartner = dossierRepository.findByUuid(requestedDossierId)
+        boolean uitgenodigd = dossierRepository.findByUuid(requestedDossierId)
+                .filter(requested -> requested.getStatus() == DossierStatus.CONCEPT)
                 .map(requested -> requested.getPartners().size() < 2)
                 .orElse(false);
-        return roomForPartner
+
+        if (eigenDossier.isEmpty()) {
+            return uitgenodigd
+                    ? new DossierAccessOutcome(DossierAccessOutcome.Scenario.INVITED, requestedDossierId)
+                    : new DossierAccessOutcome(DossierAccessOutcome.Scenario.NOT_AUTHORIZED, null);
+        }
+        UUID eigenDossierId = eigenDossier.get().getUuid();
+        if (!uitgenodigd) {
+            return new DossierAccessOutcome(DossierAccessOutcome.Scenario.SWITCHED_DOSSIER, eigenDossierId);
+        }
+        return vervaltBijAccepteren(eigenDossier.get())
                 ? new DossierAccessOutcome(DossierAccessOutcome.Scenario.INVITED, requestedDossierId)
-                : new DossierAccessOutcome(DossierAccessOutcome.Scenario.NOT_AUTHORIZED, null);
+                : new DossierAccessOutcome(DossierAccessOutcome.Scenario.INVITATION_BLOCKED, eigenDossierId);
+    }
+
+    /**
+     * Alleen een concept waarin de burger nog alleen staat, mag vervallen wanneer hij een uitnodiging accepteert:
+     * een ingediend dossier of een dossier met een partner kan alleen de backoffice annuleren.
+     */
+    private static boolean vervaltBijAccepteren(HuwelijksDossierEntity eigenDossier) {
+        return eigenDossier.getStatus() == DossierStatus.CONCEPT && eigenDossier.getPartners().size() == 1;
+    }
+
+    private Optional<HuwelijksDossierEntity> findActiefDossier(BurgerServiceNummer bsn) {
+        return dossierRepository.findByPartners_BsnAndStatusIn(bsn, DossierStatus.ACTIEF);
     }
 
     @Override
@@ -198,6 +214,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         if (resolveAccess(dossierId, bsn).scenario() != DossierAccessOutcome.Scenario.INVITED) {
             throw new IllegalStateException("Toegang geweigerd: BSN is niet uitgenodigd voor dit dossier");
         }
+        findActiefDossier(bsn).ifPresent(eigenConcept -> eigenConcept.setStatus(DossierStatus.GEANNULEERD));
         getDossier(dossierId).voegPartnerToe(bsn);
     }
 

@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.domain;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -10,5 +11,10 @@ public class DossierNietWijzigbaarException extends IllegalStateException {
 
     public DossierNietWijzigbaarException(UUID dossierId, DossierStatus huidigeStatus, DossierStatus vereisteStatus) {
         super("Dossier " + dossierId + " heeft status " + huidigeStatus + "; vereist is " + vereisteStatus);
+    }
+
+    public DossierNietWijzigbaarException(UUID dossierId, DossierStatus huidigeStatus,
+                                          Set<DossierStatus> vereisteStatussen) {
+        super("Dossier " + dossierId + " heeft status " + huidigeStatus + "; vereist is een van " + vereisteStatussen);
     }
 }

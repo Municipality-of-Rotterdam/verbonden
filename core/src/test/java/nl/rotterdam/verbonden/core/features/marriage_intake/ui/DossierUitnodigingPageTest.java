@@ -51,6 +51,37 @@ class DossierUitnodigingPageTest extends BaseWicketTest {
         tester.assertRenderedPage(JullieGegevensPage.class);
     }
 
+    @Test
+    @WithMockUser(username = PARTNER_2)
+    void metEigenConcept_waarschuwtDatDatVervalt() {
+        UUID dossierId = maakDossierVanPartner1();
+        maakDossier(PARTNER_2);
+
+        tester.startPage(MarriageIntakePage.class, dossierParameters(dossierId));
+
+        tester.assertRenderedPage(DossierUitnodigingPage.class);
+        tester.assertContains("dan vervalt je eigen aanvraag");
+    }
+
+    @Test
+    @WithMockUser(username = PARTNER_2)
+    void eigenDossierMetPartner_uitnodigingKanNiet() {
+        UUID dossierId = maakDossierVanPartner1();
+        UUID eigenDossierId = maakDossier(PARTNER_2);
+        marriageIntakeService.acceptInvitation(eigenDossierId, new BurgerServiceNummer("999990202"));
+
+        tester.startPage(MarriageIntakePage.class, dossierParameters(dossierId));
+
+        tester.assertRenderedPage(MarriageIntakePage.class);
+        tester.assertContains("Daarom kunt u deze uitnodiging niet accepteren");
+        assertThat(marriageIntakeService.findDossierIdByBsn(new BurgerServiceNummer(PARTNER_2))).contains(eigenDossierId);
+    }
+
+    private UUID maakDossier(String bsn) {
+        return marriageIntakeService.create(new CreateDossierDto(
+                RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer(bsn)));
+    }
+
     private UUID maakDossierVanPartner1() {
         return marriageIntakeService.create(new CreateDossierDto(
                 RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990111")));
