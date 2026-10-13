@@ -58,8 +58,6 @@ public abstract class AdministrationBasePage extends WebPage {
         logo.add(new RotterdamLogoImage("rotterdamLogoImage"));
         pageHeader.add(logo);
 
-        pageHeader.add(new WebMarkupContainer("globeIcon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
         pageHeader.add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
         pageHeader.add(new ExternalLink("logOutLink", WicketApplication.get().getBeheerLogoutUrl())

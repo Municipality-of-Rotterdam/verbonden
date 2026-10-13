@@ -77,9 +77,6 @@ public abstract class BurgerBasePage extends WebPage {
         logo.add(new RotterdamLogoImage("rotterdamLogoImage"));
         pageHeader.add(logo);
 
-        pageHeader.add(new WebMarkupContainer("globeIcon")
-                .add(new RotterdamIconBehavior(RotterdamIconType.GLOBE)));
-
         WebMarkupContainer userBar = new WebMarkupContainer("userBar") {
             @Override
             protected void onConfigure() {
