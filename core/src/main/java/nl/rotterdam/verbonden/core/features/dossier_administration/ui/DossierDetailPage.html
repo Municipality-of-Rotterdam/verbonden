@@ -8,7 +8,10 @@
 <wicket:extend>
     <h1 wicket:id="titel">Dossier</h1>
 
-    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar overzicht</a></p>
+    <p class="d-flex gap-3 align-items-center">
+        <a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar overzicht</a>
+        <a wicket:id="jsonLink" target="_blank" rel="noopener">Bekijk als JSON</a>
+    </p>
 
     <div wicket:id="feedback"></div>
 

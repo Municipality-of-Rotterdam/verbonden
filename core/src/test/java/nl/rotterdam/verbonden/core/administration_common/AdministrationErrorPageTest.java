@@ -27,7 +27,7 @@ class AdministrationErrorPageTest extends BaseWicketTest {
         tester.startPage(BurgerErrorPage.class);
 
         tester.assertRenderedPage(AdministrationErrorPage.class);
-        assertErrorPage(404, "Pagina niet gevonden");
+        assertErrorPage(404, "Pagina niet gevonden. Misschien is het adres verkeerd getypt of bestaat de pagina niet meer.");
     }
 
     @Test

@@ -23,6 +23,9 @@ import org.apache.wicket.util.visit.IVisit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.http.client.HttpRedirects;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +53,9 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
     @Autowired
     private DossierInzageRepository dossierInzageRepository;
 
+    @Autowired
+    private TestRestTemplate restTemplate;
+
     @TempDir
     private Path tempDir;
 
@@ -74,6 +80,44 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
     }
 
     @Test
+    void json_bevatAlleGegevensEnLegtInzageVast() {
+        UUID dossierId = maakDossierMetPartnerZonderBsn();
+        tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+        tester.assertContains("href=\"./" + dossierId + "/json\"");
+        int inzagesVoor = dossierInzageRepository.findByDossierUuidAndActie(dossierId, InzageActie.DOSSIER_BEKEKEN).size();
+
+        tester.executeUrl("beheer/dossiers/" + dossierId + "/json");
+
+        assertThat(tester.getLastResponse().getContentType()).startsWith("application/json");
+        assertThat(tester.getLastResponseAsString())
+                .contains("\"dossierId\" : \"" + dossierId + "\"")
+                // Value types als hun waarde, niet als {"value": ...}
+                .contains("\"bsn\" : \"999990007\"")
+                .contains("\"buitenlandsPersoonsnummer\" : \"123-45-6789\"")
+                .contains("\"achternaam\" : \"Smith\"")
+                .contains("\"ceremonieSoort\" : \"KLEIN\"");
+        assertThat(dossierInzageRepository.findByDossierUuidAndActie(dossierId, InzageActie.DOSSIER_BEKEKEN))
+                .hasSize(inzagesVoor + 1);
+    }
+
+    @Test
+    void json_onbekendDossier_geeft404() {
+        tester.executeUrl("beheer/dossiers/" + UUID.randomUUID() + "/json");
+
+        assertThat(tester.getLastResponse().getStatus()).isEqualTo(404);
+    }
+
+    /** WicketTester slaat de Spring Security filter chain over; dit gaat via een echt HTTP-request. */
+    @Test
+    void json_zonderInloggen_isNietBereikbaar() {
+        ResponseEntity<String> response = restTemplate.withRedirects(HttpRedirects.DONT_FOLLOW)
+                .getForEntity("/beheer/dossiers/" + UUID.randomUUID() + "/json", String.class);
+
+        assertThat(response.getStatusCode().is3xxRedirection()).isTrue();
+        assertThat(response.getHeaders().getLocation()).hasPath("/login");
+    }
+
+    @Test
     void detailPagina_onbekendDossier_gaatTerugNaarOverzicht() {
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(UUID.randomUUID()));
 
@@ -84,7 +128,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
     void detailPagina_bestandToevoegen() throws IOException {
         UUID dossierId = maakDossierMetPartnerZonderBsn();
         Path pdf = tempDir.resolve("paspoort.pdf");
-        Files.write(pdf, "%PDF-1.7 paspoort".getBytes(StandardCharsets.US_ASCII));
+        Files.writeString(pdf, "%PDF-1.7 paspoort", StandardCharsets.US_ASCII);
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
         FormTester form = formTester("bestandToevoegenForm");
@@ -103,7 +147,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
     void detailPagina_nietToegestaanBestand_toontMelding() throws IOException {
         UUID dossierId = maakDossierMetPartnerZonderBsn();
         Path exe = tempDir.resolve("programma.exe");
-        Files.write(exe, "MZ".getBytes(StandardCharsets.US_ASCII));
+        Files.writeString(exe, "MZ", StandardCharsets.US_ASCII);
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
         FormTester form = formTester("bestandToevoegenForm");

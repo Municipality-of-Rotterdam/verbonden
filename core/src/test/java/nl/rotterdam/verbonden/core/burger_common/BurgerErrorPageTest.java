@@ -35,7 +35,20 @@ class BurgerErrorPageTest extends BaseWicketTest {
 
         tester.startPage(BurgerErrorPage.class);
 
-        assertErrorPage(404, "Pagina niet gevonden");
+        assertErrorPage(404, "Pagina niet gevonden. Misschien is het adres verkeerd getypt of bestaat de pagina niet meer.");
+    }
+
+    @Test
+    void technischeMeldingVanContainerWordtNietGetoond() {
+        tester.getRequest().setAttribute(RequestDispatcher.ERROR_STATUS_CODE, 404);
+        tester.getRequest().setAttribute(RequestDispatcher.ERROR_MESSAGE, "No static resource bestaat-niet.");
+        tester.getRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION, new IllegalStateException("Interne details"));
+
+        tester.startPage(BurgerErrorPage.class);
+
+        assertErrorPage(404, "Pagina niet gevonden. Misschien is het adres verkeerd getypt of bestaat de pagina niet meer.");
+        tester.assertContainsNot("No static resource");
+        tester.assertContainsNot("Interne details");
     }
 
     @Test

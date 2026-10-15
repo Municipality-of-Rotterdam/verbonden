@@ -67,6 +67,11 @@
 @media (max-width: 575.98px) {
     .rd-tab {
         padding: 0.625rem 0.5rem;
+        /* Het thema zet hyphens: auto en word-break: break-word; op een smal scherm gaf dat "Ceremo-nie"
+           en "Ex-tra's". Tablabels breken alleen op spaties ("Jullie / gegevens") */
+        hyphens: manual;
+        word-break: normal;
+        overflow-wrap: normal;
     }
 }
 
@@ -643,6 +648,16 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
    Datum kiezen page
    ============================================================ */
 
+/* Breadcrumb en terug-link naast elkaar; op een smal scherm komt de link eronder */
+.datum-kiezen__kop {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 1rem;
+    margin-bottom: 1rem;
+}
+
 .datum-kiezen__terug-link {
     font-size: 0.875rem;
     color: var(--rods-color-base-green);
@@ -1154,6 +1169,11 @@ form.rd-getuige-form {
     padding-left: 1.25rem;
 }
 
+/* Ruimte tussen de links, zodat ze op een touchscreen apart aan te tikken zijn */
+.rd-keuzes-hint__lijst li + li {
+    margin-top: 0.5rem;
+}
+
 /* Status of a submitted dossier in the sidebar */
 .rd-keuzes-status {
     display: flex;
@@ -1493,4 +1513,25 @@ form.rd-getuige-form {
     border-top: 1px solid #e5e5e5;
     font-size: 0.9375rem;
     color: #555;
+}
+
+/* =============================================================
+   ExtrasPage – checkboxes
+   ============================================================= */
+
+/* Standaard checkbox is 13px: te klein om op een telefoon aan te tikken. Het hele label is aantikbaar. */
+.rd-extra-keuze-item label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+}
+
+.rd-extra-keuze-item input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--rods-color-base-green, #00811f);
 }

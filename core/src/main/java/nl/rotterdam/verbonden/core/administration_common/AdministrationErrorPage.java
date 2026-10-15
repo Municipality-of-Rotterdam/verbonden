@@ -33,10 +33,11 @@ public class AdministrationErrorPage extends AdministrationBasePage {
         super.onInitialize();
 
         Throwable cause = ServletErrorAttributes.resolveException();
+        String technicalMessage = ServletErrorAttributes.resolveTechnicalMessage();
         if (errorCode >= 400 && errorCode < 500) {
-            log.warn("Error page displayed [{} {}]", errorCode, errorMessage, cause);
+            log.warn("Error page displayed [{} {}] {}", errorCode, errorMessage, technicalMessage, cause);
         } else {
-            log.error("Error page displayed [{} {}]", errorCode, errorMessage, cause);
+            log.error("Error page displayed [{} {}] {}", errorCode, errorMessage, technicalMessage, cause);
         }
 
         pageBody.add(new Label("errorCode", String.valueOf(errorCode)));

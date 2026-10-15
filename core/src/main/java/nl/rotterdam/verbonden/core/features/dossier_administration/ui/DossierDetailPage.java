@@ -15,7 +15,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
@@ -60,6 +59,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         pageBody.add(
                 new Label("titel", "Dossier " + dossierId),
                 new BookmarkablePageLink<>("terugLink", DossierAdministrationPage.class),
+                new ResourceLink<>("jsonLink", new DossierJsonResourceReference(), dossierParams),
                 feedback,
 
                 new Label("status", dossier.status().getLabel()),

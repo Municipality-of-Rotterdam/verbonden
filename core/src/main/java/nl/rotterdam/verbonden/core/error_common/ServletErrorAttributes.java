@@ -21,21 +21,30 @@ public final class ServletErrorAttributes {
         return statusCode != null ? statusCode : 500;
     }
 
+    /**
+     * Melding voor de bezoeker. Bewust alleen op basis van de statuscode: de melding van de container of
+     * exceptie is technisch en Engelstalig (bijv. "No static resource bestaat-niet.") en kan interne details
+     * prijsgeven. Die staat in {@link #resolveTechnicalMessage()} en hoort alleen in de log.
+     */
     public static String resolveErrorMessage(int errorCode) {
+        return switch (errorCode) {
+            case 400 -> "Ongeldig verzoek";
+            case 403 -> "Toegang geweigerd";
+            case 404 -> "Pagina niet gevonden. Misschien is het adres verkeerd getypt of bestaat de pagina niet meer.";
+            default -> "Er is een interne fout opgetreden";
+        };
+    }
+
+    /**
+     * Technische melding van de servlet container, of anders van de exceptie; alleen voor de log.
+     */
+    public static String resolveTechnicalMessage() {
         String message = servletAttribute(RequestDispatcher.ERROR_MESSAGE);
         if (message != null && !message.isBlank()) {
             return message;
         }
         Throwable ex = resolveException();
-        if (ex != null && ex.getMessage() != null && !ex.getMessage().isBlank()) {
-            return ex.getMessage();
-        }
-        return switch (errorCode) {
-            case 400 -> "Ongeldig verzoek";
-            case 403 -> "Toegang geweigerd";
-            case 404 -> "Pagina niet gevonden";
-            default -> "Er is een interne fout opgetreden";
-        };
+        return ex != null ? ex.getMessage() : null;
     }
 
     public static Throwable resolveException() {
