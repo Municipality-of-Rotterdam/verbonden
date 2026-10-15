@@ -87,8 +87,10 @@
     color: #333;
 }
 
-/* Zonder Bootstrap reboot is box-sizing content-box: width 100% + padding valt dan buiten de balk */
-.rd-top-bar > .container-fluid {
+/* Zonder Bootstrap reboot is box-sizing content-box: width 100% + padding valt dan buiten het scherm
+   en geeft op mobiel een horizontale scrollbar */
+.container,
+.container-fluid {
     box-sizing: border-box;
 }
 

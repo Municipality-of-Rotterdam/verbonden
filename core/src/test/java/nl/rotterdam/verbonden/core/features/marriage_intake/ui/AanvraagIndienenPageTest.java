@@ -41,7 +41,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
 
         tester.assertDisabled(BEVESTIG_BUTTON);
-        tester.assertContains("Vul eerst alle onderdelen in");
+        tester.assertContains("Dit moet nog gebeuren voordat jullie je keuzes kunnen bevestigen");
     }
 
     @Test

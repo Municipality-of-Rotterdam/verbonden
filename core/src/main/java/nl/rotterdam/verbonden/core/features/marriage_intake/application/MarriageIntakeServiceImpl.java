@@ -13,6 +13,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCo
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
@@ -273,7 +274,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 totalPrijs,
                 e.getStatus(),
                 e.getIngediendOp(),
-                isCompleet(e));
+                ontbrekendeOnderdelen(e));
     }
 
     @Override
@@ -286,7 +287,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Transactional
     public void dienIn(UUID dossierId) {
         HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
-        if (!isCompleet(dossier)) {
+        if (!ontbrekendeOnderdelen(dossier).isEmpty()) {
             throw new DossierNietCompleetException(dossierId);
         }
         LocalDateTime ingediendOp = LocalDateTime.now();
@@ -316,12 +317,24 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
      * Een dossier is compleet wanneer datum en locatie gekozen zijn, beide partners hun achternaam
      * hebben gekozen en alle vereiste getuigen zijn ingevuld.
      */
-    private boolean isCompleet(HuwelijksDossierEntity dossier) {
-        return findDatumTijdHuwelijk(dossier) != null
-                && dossier.getLocatie() != null
-                && dossier.getPartners().size() == 2
-                && aantalGekozenAchternamen(dossier) == 2
-                && getuigenRepository.countByDossier_IdAndNaamIsNotNull(dossier.getId()) >= vereistAantalGetuigen(dossier);
+    private List<OntbrekendOnderdeel> ontbrekendeOnderdelen(HuwelijksDossierEntity dossier) {
+        List<OntbrekendOnderdeel> ontbrekend = new ArrayList<>();
+        if (findDatumTijdHuwelijk(dossier) == null) {
+            ontbrekend.add(OntbrekendOnderdeel.DATUM);
+        }
+        if (dossier.getLocatie() == null) {
+            ontbrekend.add(OntbrekendOnderdeel.LOCATIE);
+        }
+        if (dossier.getPartners().size() != 2) {
+            ontbrekend.add(OntbrekendOnderdeel.PARTNER_GEKOPPELD);
+        }
+        if (aantalGekozenAchternamen(dossier) != 2) {
+            ontbrekend.add(OntbrekendOnderdeel.ACHTERNAMEN);
+        }
+        if (getuigenRepository.countByDossier_IdAndNaamIsNotNull(dossier.getId()) < vereistAantalGetuigen(dossier)) {
+            ontbrekend.add(OntbrekendOnderdeel.GETUIGEN);
+        }
+        return List.copyOf(ontbrekend);
     }
 
     private LocalDateTime findDatumTijdHuwelijk(HuwelijksDossierEntity dossier) {

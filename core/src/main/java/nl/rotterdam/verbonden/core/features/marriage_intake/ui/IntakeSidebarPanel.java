@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
@@ -15,6 +16,7 @@ import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance
 import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogBorder;
 import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogHeadingLevel;
 import org.apache.wicket.Component;
+import org.apache.wicket.Page;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -362,10 +364,71 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                     }
                     .setDefaultFormProcessing(false)
                     .add(new EnabledModelBehavior(dossierModel.map(DossierSamenvattingDto::compleet))),
-                    new WebMarkupContainer("nogNietCompleetHint")
-                            .add(new VisibleModelBehavior(LambdaModel.of(() -> !isCompleet()))),
+                    new NogNietCompleetHint(),
                     bevestigDialog
             );
+        }
+    }
+
+    /**
+     * Tells the citizen which parts still have to be filled in before the choices can be confirmed,
+     * each with a link to the tab where it can be done.
+     */
+    private class NogNietCompleetHint extends WebMarkupContainer {
+
+        NogNietCompleetHint() {
+            super("nogNietCompleetHint");
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            IModel<List<OntbrekendOnderdeel>> ontbrekendModel = LambdaModel.of(() -> {
+                DossierSamenvattingDto d = getDossierModelObject();
+                return d != null && d.id() != null ? d.ontbrekendeOnderdelen() : List.of();
+            });
+            add(
+                    // A dossier that has not been created yet: nothing specific to point to
+                    new WebMarkupContainer("algemeen")
+                            .add(new VisibleModelBehavior(ontbrekendModel.map(List::isEmpty))),
+                    new WebMarkupContainer("specifiek")
+                            .add(new OntbrekendeOnderdelen(ontbrekendModel))
+                            .add(new VisibleModelBehavior(ontbrekendModel.map(l -> !l.isEmpty())))
+            );
+        }
+
+        @Override
+        protected void onConfigure() {
+            super.onConfigure();
+            setVisible(!isCompleet());
+        }
+    }
+
+    private class OntbrekendeOnderdelen extends ListView<OntbrekendOnderdeel> {
+
+        OntbrekendeOnderdelen(IModel<List<OntbrekendOnderdeel>> model) {
+            super("onderdelen", model);
+        }
+
+        @Override
+        protected void populateItem(ListItem<OntbrekendOnderdeel> item) {
+            OntbrekendOnderdeel onderdeel = item.getModelObject();
+            item.add(new Link<Void>("link") {
+                @Override
+                public void onClick() {
+                    setResponsePage(pageVoor(onderdeel),
+                            makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
+                }
+            }.add(new Label("label", new ResourceModel("intake.sidebar.ontbrekend." + onderdeel.name()))));
+        }
+
+        private Class<? extends Page> pageVoor(OntbrekendOnderdeel onderdeel) {
+            return switch (onderdeel) {
+                case DATUM -> DatumKiezenPage.class;
+                case LOCATIE -> DeDagPage.class;
+                case PARTNER_GEKOPPELD, ACHTERNAMEN -> JullieGegevensPage.class;
+                case GETUIGEN -> DeGetuigenPage.class;
+            };
         }
     }
 

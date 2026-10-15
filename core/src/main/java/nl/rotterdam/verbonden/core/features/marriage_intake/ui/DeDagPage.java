@@ -1,8 +1,13 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
@@ -19,6 +24,16 @@ public class DeDagPage extends IntakeBasePage {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
+
+    private final Model<String> nietBeschikbaarMelding = Model.of();
+
+    private final RdAlert nietBeschikbaarAlert = new RdAlert("nietBeschikbaarAlert", nietBeschikbaarMelding, RdAlertType.INFO) {
+        @Override
+        protected void onConfigure() {
+            super.onConfigure();
+            setVisible(nietBeschikbaarMelding.getObject() != null);
+        }
+    };
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -48,6 +63,11 @@ public class DeDagPage extends IntakeBasePage {
 
         pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
+        // With a small ceremony only the date can be chosen, so the generic "start with what matters most" text does not apply
+        CeremonieSoort soort = marriageIntakeService.findByDossierId(dossierId).ceremonieSoort();
+        pageBody.add(new Label("intro", new ResourceModel(
+                soort == CeremonieSoort.KLEIN ? "intake.intro.dedag.klein" : "intake.intro.dedag")));
+
         pageBody.add(new Link<Void>("datumLink") {
             @Override
             public void onClick() {
@@ -55,25 +75,32 @@ public class DeDagPage extends IntakeBasePage {
             }
         });
 
-        Link<Void> locatieLink = new Link<      >("locatieLink") {
-            @Override
-            public void onClick() {
-                // Navigation to location picker — to be implemented in a future iteration
-            }
-        };
-        locatieLink.setEnabled(false);
-        pageBody.add(locatieLink);
-
-        Link<Void> babsLink = new Link<>("babsLink") {
-            @Override
-            public void onClick() {
-                // Navigation to BABS picker — to be implemented in a future iteration
-            }
-        };
-        babsLink.setEnabled(false);
-        pageBody.add(babsLink);
+        // Location and BABS cannot be chosen yet; clicking a card explains why instead of doing nothing
+        pageBody.add(
+                nietBeschikbaarAlert,
+                new NietBeschikbaarLink("locatieLink", "intake.card.locatie.niet.beschikbaar"),
+                new NietBeschikbaarLink("babsLink", "intake.card.babs.niet.beschikbaar")
+        );
 
         pageBody.add(new BookmarkablePageLink<>("jullieGegevensLink", JullieGegevensPage.class, makeDossierPageParameters(dossierId)));
+    }
+
+    private class NietBeschikbaarLink extends Link<Void> {
+
+        private final String meldingKey;
+
+        NietBeschikbaarLink(String id, String meldingKey) {
+            super(id);
+            this.meldingKey = meldingKey;
+            add(AttributeModifier.append("class", " rd-keuze-card--niet-beschikbaar"));
+        }
+
+        @Override
+        public void onClick() {
+            CeremonieSoort soort = marriageIntakeService.findByDossierId(dossierId).ceremonieSoort();
+            String key = soort == CeremonieSoort.GROOT ? meldingKey : meldingKey + ".klein";
+            nietBeschikbaarMelding.setObject(getString(key));
+        }
     }
 }
 

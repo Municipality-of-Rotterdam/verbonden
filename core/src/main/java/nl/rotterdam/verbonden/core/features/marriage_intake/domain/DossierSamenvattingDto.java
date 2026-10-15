@@ -22,6 +22,10 @@ public record DossierSamenvattingDto(
         BigDecimal totalPrijs,
         DossierStatus status,
         LocalDateTime ingediendOp,
-        boolean compleet
+        List<OntbrekendOnderdeel> ontbrekendeOnderdelen
 ) implements Serializable {
+
+    public boolean compleet() {
+        return ontbrekendeOnderdelen.isEmpty();
+    }
 }

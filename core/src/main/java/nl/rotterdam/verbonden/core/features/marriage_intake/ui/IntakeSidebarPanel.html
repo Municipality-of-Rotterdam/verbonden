@@ -132,9 +132,19 @@
     <!-- Confirm button + confirmation dialog -->
     <form wicket:id="bevestigForm">
         <button wicket:id="bevestigButton" type="submit"></button>
-        <p wicket:id="nogNietCompleetHint" class="rd-keuzes-hint">
-            <wicket:message key="intake.sidebar.bevestig.nognietcompleet">Vul eerst alle onderdelen in. Daarna kunnen jullie je keuzes bevestigen.</wicket:message>
-        </p>
+        <div wicket:id="nogNietCompleetHint" class="rd-keuzes-hint">
+            <p wicket:id="algemeen" class="rd-keuzes-hint__tekst">
+                <wicket:message key="intake.sidebar.bevestig.nognietcompleet">Vul eerst alle onderdelen in. Daarna kunnen jullie je keuzes bevestigen.</wicket:message>
+            </p>
+            <wicket:container wicket:id="specifiek">
+                <p class="rd-keuzes-hint__tekst">
+                    <wicket:message key="intake.sidebar.bevestig.nogintevullen">Dit moet nog gebeuren voordat jullie je keuzes kunnen bevestigen:</wicket:message>
+                </p>
+                <ul class="rd-keuzes-hint__lijst">
+                    <li wicket:id="onderdelen"><a href="#" wicket:id="link"><span wicket:id="label">onderdeel</span></a></li>
+                </ul>
+            </wicket:container>
+        </div>
 
         <dialog wicket:id="bevestigDialog" class="rd-bevestig-dialog">
             <p class="rd-bevestig-dialog__factuur">

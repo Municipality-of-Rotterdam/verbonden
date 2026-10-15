@@ -78,11 +78,11 @@ public class MarriageIntakePage extends IntakeBasePage {
                 return new DossierSamenvattingDto(d.id(), registratieType, d.ceremonieSoort(),
                         d.prijs(), d.datumTijdHuwelijk(), d.huwelijksLocatie(),
                         d.gegevensBevestigd(), d.getuigenBevestigd(), d.getuigenGedeeltelijkIngevuld(), d.extras(),
-                        d.aantalGekozenAchternamen(), d.partnerGekoppeld(), d.totalPrijs(), d.status(), d.ingediendOp(), d.compleet());
+                        d.aantalGekozenAchternamen(), d.partnerGekoppeld(), d.totalPrijs(), d.status(), d.ingediendOp(), d.ontbrekendeOnderdelen());
             };
         }
         return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, false, List.of(), 0, false, null,
-                DossierStatus.CONCEPT, null, false);
+                DossierStatus.CONCEPT, null, List.of());
     }
 
     @Override
