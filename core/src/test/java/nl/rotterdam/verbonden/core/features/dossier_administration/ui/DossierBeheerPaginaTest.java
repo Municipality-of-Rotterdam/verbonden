@@ -13,13 +13,8 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
-import org.apache.wicket.Component;
-import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.tester.FormTester;
-import org.apache.wicket.util.visit.IVisit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -218,39 +213,5 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
                 RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, BSN_PARTNER_1, null,
                 new BuitenlandsPersoonsnummer("123-45-6789"),
                 new PersoonsgegevensDto("Smith", "John", LocalDate.of(1990, 4, 1), "Boston", "Amerikaanse", "Ongehuwd")));
-    }
-
-    private FormTester formTester(String formId) {
-        return tester.newFormTester(pad(formId));
-    }
-
-    /** Het pad van een component op de laatst getoonde pagina, op basis van zijn wicket:id. */
-    private String pad(String id) {
-        Component component = tester.getLastRenderedPage().visitChildren(
-                (Component c, IVisit<Component> visit) -> {
-                    if (c.getId().equals(id)) {
-                        visit.stop(c);
-                    }
-                });
-        return component.getPageRelativePath();
-    }
-
-    /**
-     * Het pad, relatief aan het formulier, van het invoerelement binnen het formulierveld met deze wicket:id.
-     */
-    private String veld(String formId, String id) {
-        Form<?> form = (Form<?>) tester.getComponentFromLastRenderedPage(pad(formId));
-        Component veld = form.visitChildren((Component c, IVisit<Component> visit) -> {
-            if (c.getId().equals(id)) {
-                visit.stop(c);
-            }
-        });
-        Component invoer = veld instanceof FormComponent<?> || !(veld instanceof MarkupContainer container)
-                ? veld
-                : container.visitChildren(FormComponent.class, (FormComponent<?> c, IVisit<Component> visit) -> visit.stop(c));
-        if (invoer == null) {
-            invoer = veld;
-        }
-        return invoer.getPageRelativePath().substring(form.getPageRelativePath().length() + 1);
     }
 }

@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.babs_administration.ui;
 
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
+import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.features.babs_administration.application.BabsAdministrationService;
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.CreateBabsDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
@@ -15,6 +16,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,10 +50,19 @@ public class BabsCreatePage extends AdministrationBasePage {
                     model,
                     BabsFormDto::getBeschikbareDagen,
                     (f, v) -> f.setBeschikbareDagen(new ArrayList<>(v)));
+            RdFormFieldTextInput<LocalDate> actiefVanaf = new RdFormFieldTextInput<>("actiefVanaf",
+                    LambdaModel.of(model, BabsFormDto::getActiefVanaf, BabsFormDto::setActiefVanaf),
+                    Model.of("Actief Vanaf"),
+                    Model.of("Datum in formaat JJJJ-MM-DD")).setHtmlInputType("date").setModelType(LocalDate.class);
+            RdFormFieldTextInput<LocalDate> actiefTotEnMet = new RdFormFieldTextInput<>("actiefTotEnMet",
+                    LambdaModel.of(model, BabsFormDto::getActiefTotEnMet, BabsFormDto::setActiefTotEnMet),
+                    Model.of("Actief Tot en Met"),
+                    Model.of("Datum in formaat JJJJ-MM-DD")).setHtmlInputType("date").setModelType(LocalDate.class);
             add(
                     new RdFormFieldTextInput<>("naam",
                             LambdaModel.of(model, BabsFormDto::getNaam, BabsFormDto::setNaam),
-                            Model.of("Naam")).setRequired(true),
+                            Model.of("Naam")).setRequired(true)
+                            .setModelType(PersonFullName.class),
                     new RdFormFieldTextInput<>("fotoUrl",
                             LambdaModel.of(model, BabsFormDto::getFotoUrl, BabsFormDto::setFotoUrl),
                             Model.of("Foto URL"),
@@ -64,16 +75,11 @@ public class BabsCreatePage extends AdministrationBasePage {
                     new RdFormFieldCheckbox("actief",
                             LambdaModel.of(model, BabsFormDto::isActief, BabsFormDto::setActief),
                             Model.of("Actief")),
-                    new RdFormFieldTextInput<>("actiefVanaf",
-                            LambdaModel.of(model, BabsFormDto::getActiefVanaf, BabsFormDto::setActiefVanaf),
-                            Model.of("Actief Vanaf"),
-                            Model.of("Datum in formaat JJJJ-MM-DD")).setHtmlInputType("date"),
-                    new RdFormFieldTextInput<>("actiefTotEnMet",
-                            LambdaModel.of(model, BabsFormDto::getActiefTotEnMet, BabsFormDto::setActiefTotEnMet),
-                            Model.of("Actief Tot en Met"),
-                            Model.of("Datum in formaat JJJJ-MM-DD")).setHtmlInputType("date"),
+                    actiefVanaf,
+                    actiefTotEnMet,
                     new RdButton("opslaan", Model.of("Toevoegen"))
             );
+            add(new ActiefPeriodeValidator(actiefVanaf, actiefTotEnMet));
         }
 
         @Override

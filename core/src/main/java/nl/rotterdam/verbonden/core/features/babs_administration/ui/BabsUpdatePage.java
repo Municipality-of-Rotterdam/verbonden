@@ -17,6 +17,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -64,6 +65,16 @@ public class BabsUpdatePage extends AdministrationBasePage {
                     model,
                     BabsFormDto::getBeschikbareDagen,
                     (f, v) -> f.setBeschikbareDagen(new ArrayList<>(v)));
+            RdFormFieldTextInput<LocalDate> actiefVanaf = new RdFormFieldTextInput<>("actiefVanaf",
+                    LambdaModel.of(model, BabsFormDto::getActiefVanaf, BabsFormDto::setActiefVanaf),
+                    Model.of("Actief Vanaf"),
+                    Model.of("Datum in formaat JJJJ-MM-DD"))
+                    .setHtmlInputType("date").setModelType(LocalDate.class);
+            RdFormFieldTextInput<LocalDate> actiefTotEnMet = new RdFormFieldTextInput<>("actiefTotEnMet",
+                    LambdaModel.of(model, BabsFormDto::getActiefTotEnMet, BabsFormDto::setActiefTotEnMet),
+                    Model.of("Actief Tot en Met"),
+                    Model.of("Datum in formaat JJJJ-MM-DD"))
+                    .setHtmlInputType("date").setModelType(LocalDate.class);
             add(
                     new RdFormFieldTextInput<>("naam",
                             LambdaModel.of(model, BabsFormDto::getNaam, BabsFormDto::setNaam),
@@ -81,18 +92,11 @@ public class BabsUpdatePage extends AdministrationBasePage {
                     new RdFormFieldCheckbox("actief",
                             LambdaModel.of(model, BabsFormDto::isActief, BabsFormDto::setActief),
                             Model.of("Actief")),
-                    new RdFormFieldTextInput<>("actiefVanaf",
-                            LambdaModel.of(model, BabsFormDto::getActiefVanaf, BabsFormDto::setActiefVanaf),
-                            Model.of("Actief Vanaf"),
-                            Model.of("Datum in formaat JJJJ-MM-DD"))
-                            .setHtmlInputType("date"),
-                    new RdFormFieldTextInput<>("actiefTotEnMet",
-                            LambdaModel.of(model, BabsFormDto::getActiefTotEnMet, BabsFormDto::setActiefTotEnMet),
-                            Model.of("Actief Tot en Met"),
-                            Model.of("Datum in formaat JJJJ-MM-DD"))
-                            .setHtmlInputType("date"),
+                    actiefVanaf,
+                    actiefTotEnMet,
                     new RdButton("opslaan", Model.of("Opslaan"))
             );
+            add(new ActiefPeriodeValidator(actiefVanaf, actiefTotEnMet));
         }
 
         @Override
