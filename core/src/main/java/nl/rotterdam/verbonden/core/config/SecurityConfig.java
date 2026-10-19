@@ -72,7 +72,7 @@ public class SecurityConfig {
      * which is also included in this chain's matcher so it is handled correctly.
      *
      * <p>An {@link AdminSecurityCustomizer} bean, if present, is applied last, so an
-     * adapter module can grant {@code ROLE_BEHEER} through another route (e.g. an
+     * adapter module can grant roles such as {@code ROLE_BEHEER} or {@code ROLE_BABS} through another route (e.g. an
      * upstream gateway header identifying internal users) alongside form login.
      */
     @Bean
@@ -94,9 +94,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/login/**").permitAll()
-                        .requestMatchers("/beheer/babs/**").hasAnyRole(Roles.BEHEER.name(), Roles.BABS.name())
-                        .requestMatchers("/beheer/").hasAnyRole(Roles.BABS.name())
-                        .requestMatchers("/beheer/**").hasAnyRole(Roles.BEHEER.name(), Roles.BABS.name())
+                        // Welke rol welke pagina mag openen, bepaalt Wicket via @AuthorizeInstantiation
+                        .requestMatchers("/beheer/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
@@ -202,7 +201,7 @@ public class SecurityConfig {
                     users.add(User.builder()
                             .username(parts[0].trim())
                             .password(encodedPassword)
-                            .roles("BEHEER")
+                            .roles(Roles.BEHEER)
                             .build());
                 }
             }
@@ -215,7 +214,7 @@ public class SecurityConfig {
             users.add(User.builder()
                     .username("beheerder")
                     .password("{noop}rotterdam")
-                    .roles("BEHEER")
+                    .roles(Roles.BEHEER)
                     .build());
         }
 

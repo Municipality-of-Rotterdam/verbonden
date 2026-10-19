@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministr
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
@@ -20,6 +21,9 @@ import nl.rotterdam.nl_design_system.wicket.components.page_layout.RdPageLayoutB
 import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
 import nl.rotterdam.nl_design_system.wicket.components.side_nav.RdSideNavPanel;
 import nl.rotterdam.nl_design_system.wicket.components.side_nav.RdSideNavRecord;
+import org.apache.wicket.Application;
+import org.apache.wicket.Page;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -30,8 +34,15 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.resource.PackageResourceReference;
 
-import java.util.List;
+import java.util.stream.Stream;
 
+/**
+ * Basis voor alle beheerpagina's. Standaard mogen alle medewerkersrollen behalve {@code BABS} een beheerpagina
+ * openen; een pagina die ook (of juist alleen) voor andere rollen is, overschrijft dit met een eigen
+ * {@link AuthorizeInstantiation}. De rolnamen staan in {@link Roles}.
+ */
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER, Roles.KEYUSER, Roles.WERKVERDELER, Roles.PLANNER,
+        Roles.MEDEWERKER})
 public abstract class AdministrationBasePage extends WebPage {
 
     private static final CssReferenceHeaderItem BOOTSTRAP_GRID_HEADER_ITEM =
@@ -64,13 +75,13 @@ public abstract class AdministrationBasePage extends WebPage {
                 .add(new WebMarkupContainer("logOutIcon")
                         .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT))));
 
-        pageLayout.add(new RdSideNavPanel("sideNav", List.of(
+        pageLayout.add(new RdSideNavPanel("sideNav", Stream.of(
                 new RdSideNavRecord(null, "BABS ", BabsAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Trouwlocaties", LocationAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Huwelijkstypen", MarriageTypeAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Dossiers", DossierAdministrationPage.class, null, null, null),
                 new RdSideNavRecord(null, "Trouwboekjes", TrouwboekjeAdministrationPage.class, null, null, null)
-        )));
+        ).filter(record -> magOpenen(record.page())).toList()));
 
         pageBody = new RdPageBodyBorder("pageBody");
         pageLayout.add(pageBody);
@@ -78,6 +89,14 @@ public abstract class AdministrationBasePage extends WebPage {
         RdPageFooterBorder pageFooter = new RdPageFooterBorder("pageFooter");
         pageFooter.add(new RotterdamLogoImage("footerLogoImage"));
         pageLayout.add(pageFooter);
+    }
+
+    /**
+     * Of de ingelogde gebruiker deze pagina mag openen (volgens zijn {@link AuthorizeInstantiation}). Gebruik dit om
+     * links en acties te verbergen die alleen zijn voor wie de bijbehorende pagina mag openen.
+     */
+    protected static boolean magOpenen(Class<? extends Page> pagina) {
+        return Application.get().getSecuritySettings().getAuthorizationStrategy().isInstantiationAuthorized(pagina);
     }
 
     @Override

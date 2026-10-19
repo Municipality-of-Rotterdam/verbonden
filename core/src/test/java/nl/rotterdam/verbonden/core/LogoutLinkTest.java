@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core;
 
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.MarriageIntakePage;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -21,7 +22,7 @@ class LogoutLinkTest extends BaseWicketTest {
     }
 
     @Test
-    @WithMockUser(roles = "BEHEER")
+    @WithMockUser(roles = Roles.BEHEER)
     void beheerPageLinksToConfiguredLogoutUrl() {
         tester.startPage(BabsAdministrationPage.class);
 

@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.burger_common;
 
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import nl.rotterdam.verbonden.core.integration_test.TestPersonLookupService;
 import org.apache.wicket.Component;
@@ -53,7 +54,7 @@ class BurgerBasePageTest extends BaseWicketTest {
      * Een medewerker heeft geen BSN; de header mag de gebruikersnaam dan niet als BSN opvatten.
      */
     @Test
-    @WithMockUser(username = "medewerker", roles = "BEHEER")
+    @WithMockUser(username = "medewerker", roles = Roles.BEHEER)
     void headerHidesUserBarForNonBurger() {
         tester.startPage(BurgerInternalErrorPage.class);
 

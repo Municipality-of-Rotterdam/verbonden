@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.administration_common;
 
 import nl.rotterdam.verbonden.core.error_common.ServletErrorAttributes;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.request.http.WebResponse;
 import org.slf4j.Logger;
@@ -10,7 +11,11 @@ import org.slf4j.LoggerFactory;
  * Foutpagina voor medewerkers. Niet gemount: {@code BurgerErrorPage} (op {@code /error}) en
  * {@code VerbondenExceptionMapper} sturen fouten in een {@code /beheer}-request hierheen.
  * Subklassen geven voor Wicket-fouten zelf een statuscode en melding mee.
+ *
+ * <p>Zonder rollen in {@link AuthorizeInstantiation} mag iedereen deze pagina zien, ook zonder toegang tot de
+ * opgevraagde pagina (anders kan {@link AdministrationAccessDeniedPage} zelf niet getoond worden).
  */
+@AuthorizeInstantiation
 public class AdministrationErrorPage extends AdministrationBasePage {
 
     private static final Logger log = LoggerFactory.getLogger(AdministrationErrorPage.class);

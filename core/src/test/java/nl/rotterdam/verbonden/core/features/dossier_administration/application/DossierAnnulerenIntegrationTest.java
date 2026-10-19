@@ -10,6 +10,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccess
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @VerbondenIntegrationTest
 @Transactional
-@WithMockUser(username = "medewerker", roles = "BEHEER")
+@WithMockUser(username = "medewerker", roles = Roles.BEHEER)
 class DossierAnnulerenIntegrationTest {
 
     private static final BurgerServiceNummer ANDERE_PARTNER = new BurgerServiceNummer("999990056");
