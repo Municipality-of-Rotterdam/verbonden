@@ -675,6 +675,11 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
     margin-bottom: 1.25rem;
 }
 
+/* Ruimte tussen de afspraakkaart van de datepicker en de bevestigknop */
+.datum-kiezen__form > .utrecht-button {
+    margin-top: 1.5rem;
+}
+
 
 /* =============================================================
    JullieGegevensPage – partner cards
