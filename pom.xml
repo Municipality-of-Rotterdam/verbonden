@@ -87,6 +87,12 @@
 
             <dependency>
                 <groupId>org.apache.wicket</groupId>
+                <artifactId>wicket-auth-roles</artifactId>
+                <version>${wicket.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-tester</artifactId>
                 <version>${wicket.version}</version>
             </dependency>
@@ -113,15 +119,6 @@
             <dependency>
                 <groupId>org.apache.wicket</groupId>
                 <artifactId>wicket-spring</artifactId>
-                <version>${wicket.version}</version>
-            </dependency>
-            <!-- Pulled in transitively by wicket-spring-boot-starter; without pinning it here it
-                 resolves to that starter's own bundled version, which trips its own startup
-                 WicketDependencyVersionChecker (fails hard on any org.apache.wicket artifact
-                 whose version differs from wicket-core's). -->
-            <dependency>
-                <groupId>org.apache.wicket</groupId>
-                <artifactId>wicket-auth-roles</artifactId>
                 <version>${wicket.version}</version>
             </dependency>
 

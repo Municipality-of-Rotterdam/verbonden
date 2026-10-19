@@ -25,6 +25,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
 import nl.rotterdam.verbonden.core.persistence.DossierInzageEntity;
@@ -44,7 +45,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @VerbondenIntegrationTest
 @Transactional
-@WithMockUser(username = "medewerker", roles = "BEHEERDER")
+@WithMockUser(username = "medewerker", roles = Roles.BEHEER)
 class DossierBeheerIntegrationTest {
 
     private static final BurgerServiceNummer BSN_PARTNER_1 = new BurgerServiceNummer("999990007");

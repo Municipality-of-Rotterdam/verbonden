@@ -5,9 +5,11 @@ import nl.rotterdam.verbonden.core.features.babs_administration.application.Babs
 import nl.rotterdam.verbonden.core.features.babs_administration.application.BabsImportService;
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.BabsImportResult;
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.ListBabsDto;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -32,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/** Startpagina van beheer ({@code /beheer}), daarom ook toegankelijk voor een BABS. */
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER, Roles.KEYUSER, Roles.WERKVERDELER, Roles.PLANNER,
+        Roles.MEDEWERKER, Roles.BABS})
 public class BabsAdministrationPage extends AdministrationBasePage {
 
     @SpringBean
@@ -45,9 +50,12 @@ public class BabsAdministrationPage extends AdministrationBasePage {
         feedback.setOutputMarkupId(true);
         pageBody.add(feedback);
 
-        pageBody.add(new BookmarkablePageLink<>("nieuwBabsLink", BabsCreatePage.class));
+        pageBody.add(new BookmarkablePageLink<>("nieuwBabsLink", BabsCreatePage.class)
+                .setVisible(magOpenen(BabsCreatePage.class)));
 
+        // Importeren en (in)actief maken is beheer van BABS, net als BabsUpdatePage; niet voor een BABS zelf
         Form<?> importForm = new Form<>("importForm");
+        importForm.setVisible(magOpenen(BabsUpdatePage.class));
         importForm.add(new RdAjaxButton("importeerButton") {
             @Override
             protected void onSubmit(AjaxRequestTarget target) {
@@ -115,14 +123,16 @@ public class BabsAdministrationPage extends AdministrationBasePage {
             }
         });
 
-        columns.add(new AbstractColumn<>(Model.of("Acties")) {
-            @Override
-            public void populateItem(Item<ICellPopulator<ListBabsDto>> cellItem,
-                                     String componentId,
-                                     IModel<ListBabsDto> rowModel) {
-                cellItem.add(new ActiesFragment(componentId, rowModel));
-            }
-        });
+        if (magOpenen(BabsUpdatePage.class)) {
+            columns.add(new AbstractColumn<>(Model.of("Acties")) {
+                @Override
+                public void populateItem(Item<ICellPopulator<ListBabsDto>> cellItem,
+                                         String componentId,
+                                         IModel<ListBabsDto> rowModel) {
+                    cellItem.add(new ActiesFragment(componentId, rowModel));
+                }
+            });
+        }
 
         SortableDataProvider<ListBabsDto, String> provider = new SortableDataProvider<>() {
             @Override

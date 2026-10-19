@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.features.babs_administration.application.Babs
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.ChangeBabsDto;
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.CreateBabsDto;
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.ListBabsDto;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
@@ -24,7 +25,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
-@WithMockUser(username = "medewerker", roles = "BEHEERDER")
+@WithMockUser(username = "medewerker", roles = Roles.BEHEER)
 class BabsBeheerPaginaTest extends BaseWicketTest {
 
     private static final PersonFullName NAAM = new PersonFullName("Jan de Testambtenaar");

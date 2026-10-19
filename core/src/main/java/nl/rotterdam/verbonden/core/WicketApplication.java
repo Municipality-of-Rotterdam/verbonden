@@ -50,11 +50,13 @@ import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.Marr
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeCreatePage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeUpdatePage;
 import nl.rotterdam.verbonden.core.identity.BurgerLoginPageMount;
+import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
 import com.giffing.wicket.spring.boot.starter.app.WicketBootStandardWebApplication;
 import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
 import org.apache.wicket.Session;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AnnotationsRoleAuthorizationStrategy;
 import org.apache.wicket.markup.html.SecurePackageResourceGuard;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
@@ -79,17 +81,20 @@ public class WicketApplication extends WicketBootStandardWebApplication {
     private final String burgerLogoutUrl;
     private final String mijnLoketUrl;
     private final ObjectProvider<WicketSessionFactory> sessionFactoryProvider;
+    private final CurrentUserProvider currentUserProvider;
 
     public WicketApplication(List<BurgerLoginPageMount> burgerLoginPageMounts,
                              @Value("${verbonden.logout.beheer-url}") String beheerLogoutUrl,
                              @Value("${verbonden.logout.burger-url}") String burgerLogoutUrl,
                              @Value("${verbonden.mijn-loket-url:/mijnloket}") String mijnLoketUrl,
-                             ObjectProvider<WicketSessionFactory> sessionFactoryProvider) {
+                             ObjectProvider<WicketSessionFactory> sessionFactoryProvider,
+                             CurrentUserProvider currentUserProvider) {
         this.burgerLoginPageMounts = burgerLoginPageMounts;
         this.beheerLogoutUrl = beheerLogoutUrl;
         this.burgerLogoutUrl = burgerLogoutUrl;
         this.mijnLoketUrl = mijnLoketUrl;
         this.sessionFactoryProvider = sessionFactoryProvider;
+        this.currentUserProvider = currentUserProvider;
     }
 
     public static WicketApplication get() {
@@ -150,6 +155,9 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         getApplicationSettings().setInternalErrorPage(BurgerInternalErrorPage.class);
         getApplicationSettings().setPageExpiredErrorPage(BurgerPageExpiredPage.class);
         getApplicationSettings().setAccessDeniedPage(BurgerAccessDeniedPage.class);
+        // @AuthorizeInstantiation/@AuthorizeResource controleren tegen de rollen van de ingelogde gebruiker
+        getSecuritySettings().setAuthorizationStrategy(new AnnotationsRoleAuthorizationStrategy(
+                roles -> roles.stream().anyMatch(currentUserProvider.getCurrentUser()::hasRole)));
         // Kiest bij een /beheer-request de beheervariant van bovenstaande foutpagina's
         setExceptionMapperProvider(VerbondenExceptionMapper::new);
 

@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import org.apache.wicket.Component;
@@ -17,7 +18,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
-@WithMockUser(username = "medewerker", roles = "BEHEERDER")
+@WithMockUser(username = "medewerker", roles = Roles.BEHEER)
 class DossierAdministrationPageTest extends BaseWicketTest {
 
     @Autowired
