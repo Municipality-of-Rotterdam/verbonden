@@ -34,7 +34,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
-@WithMockUser(username = "medewerker", roles = "BEHEERDER")
+@WithMockUser(username = "medewerker", roles = "BEHEER")
 class DossierBeheerPaginaTest extends BaseWicketTest {
 
     private static final BurgerServiceNummer BSN_PARTNER_1 = new BurgerServiceNummer("999990007");

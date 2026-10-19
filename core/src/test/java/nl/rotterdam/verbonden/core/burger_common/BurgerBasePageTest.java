@@ -53,7 +53,7 @@ class BurgerBasePageTest extends BaseWicketTest {
      * Een medewerker heeft geen BSN; de header mag de gebruikersnaam dan niet als BSN opvatten.
      */
     @Test
-    @WithMockUser(username = "medewerker", roles = "BEHEERDER")
+    @WithMockUser(username = "medewerker", roles = "BEHEER")
     void headerHidesUserBarForNonBurger() {
         tester.startPage(BurgerInternalErrorPage.class);
 

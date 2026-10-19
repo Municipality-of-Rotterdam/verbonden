@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @VerbondenIntegrationTest
 @Transactional
-@WithMockUser(username = "medewerker", roles = "BEHEERDER")
+@WithMockUser(username = "medewerker", roles = "BEHEER")
 class DossierAnnulerenIntegrationTest {
 
     private static final BurgerServiceNummer ANDERE_PARTNER = new BurgerServiceNummer("999990056");

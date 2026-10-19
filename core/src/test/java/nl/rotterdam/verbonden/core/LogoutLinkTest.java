@@ -21,7 +21,7 @@ class LogoutLinkTest extends BaseWicketTest {
     }
 
     @Test
-    @WithMockUser(roles = "BEHEERDER")
+    @WithMockUser(roles = "BEHEER")
     void beheerPageLinksToConfiguredLogoutUrl() {
         tester.startPage(BabsAdministrationPage.class);
 

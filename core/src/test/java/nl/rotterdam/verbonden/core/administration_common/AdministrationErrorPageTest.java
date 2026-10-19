@@ -15,7 +15,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@WithMockUser(username = "medewerker", roles = "BEHEERDER")
+@WithMockUser(username = "medewerker", roles = "BEHEER")
 class AdministrationErrorPageTest extends BaseWicketTest {
 
     @Test
