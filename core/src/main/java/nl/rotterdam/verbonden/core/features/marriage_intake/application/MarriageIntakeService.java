@@ -100,7 +100,15 @@ public interface MarriageIntakeService {
 
     List<LocalDateTime> findBeschikbareSlots(UUID dossierId, YearMonth maand);
 
+    /**
+     * Alle vrije tijdsloten voor het dossier, inclusief het tijdslot dat het dossier zelf al heeft geboekt.
+     */
     Collection<LocalDateTime> findAllBeschikbareSlots(UUID dossierId);
+
+    /**
+     * Het geboekte tijdslot van het dossier, of {@code null} als er nog geen afspraak is.
+     */
+    LocalDateTime findDatumTijdHuwelijk(UUID dossierId);
 
     List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum);
 

@@ -336,13 +336,14 @@ class BeschikbareSlotsIntegrationTest {
                 LocalTime.of(9, 0), LocalTime.of(9, 30), 10);
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        UUID anderDossierId = maakDossier(CeremonieSoort.KLEIN);
 
-        List<LocalTime> tijdenVoor = marriageIntakeService.findBeschikbareTijden(dossierId, volgendeMaandag);
+        List<LocalTime> tijdenVoor = marriageIntakeService.findBeschikbareTijden(anderDossierId, volgendeMaandag);
         assertThat(tijdenVoor).containsExactly(LocalTime.of(9, 0), LocalTime.of(9, 10), LocalTime.of(9, 20));
 
         marriageIntakeService.slaAfspraakOp(dossierId, volgendeMaandag, LocalTime.of(9, 0));
 
-        List<LocalTime> tijdenNa = marriageIntakeService.findBeschikbareTijden(dossierId, volgendeMaandag);
+        List<LocalTime> tijdenNa = marriageIntakeService.findBeschikbareTijden(anderDossierId, volgendeMaandag);
         assertThat(tijdenNa).containsExactly(LocalTime.of(9, 10), LocalTime.of(9, 20));
         assertThat(tijdenNa).doesNotContain(LocalTime.of(9, 0));
     }
@@ -377,14 +378,38 @@ class BeschikbareSlotsIntegrationTest {
                 LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        UUID anderDossierId = maakDossier(CeremonieSoort.KLEIN);
         marriageIntakeService.slaAfspraakOp(dossierId, volgendeMaandag, LocalTime.of(9, 0));
 
-        List<LocalTime> tijden = marriageIntakeService.findBeschikbareTijden(dossierId, volgendeMaandag);
+        List<LocalTime> tijden = marriageIntakeService.findBeschikbareTijden(anderDossierId, volgendeMaandag);
         assertThat(tijden).doesNotContain(LocalTime.of(9, 0));
         assertThat(tijden).contains(LocalTime.of(9, 10), LocalTime.of(9, 20));
 
-        Set<LocalDate> datums = marriageIntakeService.findBeschikbareDatums(dossierId, maand);
+        Set<LocalDate> datums = marriageIntakeService.findBeschikbareDatums(anderDossierId, maand);
         assertThat(datums).contains(volgendeMaandag);
+    }
+
+    @Test
+    void eigenAfspraak_blijftVoorEigenDossierBeschikbaar() {
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
+        LocalDate volgendeMaandag = volgendeWeekdag(DayOfWeek.MONDAY);
+        YearMonth maand = YearMonth.from(volgendeMaandag);
+
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(9, 10), 10);
+
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        marriageIntakeService.slaAfspraakOp(dossierId, volgendeMaandag, LocalTime.of(9, 0));
+
+        assertThat(marriageIntakeService.findBeschikbareTijden(dossierId, volgendeMaandag))
+                .containsExactly(LocalTime.of(9, 0));
+        assertThat(marriageIntakeService.findBeschikbareDatums(dossierId, maand)).contains(volgendeMaandag);
+        assertThat(marriageIntakeService.findAllBeschikbareSlots(dossierId))
+                .contains(volgendeMaandag.atTime(9, 0));
+
+        // Hetzelfde tijdslot opnieuw boeken lukt en houdt de afspraak gelijk
+        marriageIntakeService.slaAfspraakOp(dossierId, volgendeMaandag, LocalTime.of(9, 0));
+        assertThat(marriageIntakeService.findDatumTijdHuwelijk(dossierId)).isEqualTo(volgendeMaandag.atTime(9, 0));
     }
 
     @Test

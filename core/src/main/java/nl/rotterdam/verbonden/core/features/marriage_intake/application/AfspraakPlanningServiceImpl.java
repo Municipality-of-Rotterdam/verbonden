@@ -64,7 +64,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
         LocalDate limiet = datum.plusYears(1);
         while (!datum.isAfter(limiet)) {
             for (TrouwlocatieEntity locatie : locaties) {
-                if (heeftVrijSlot(locatie.getId(), huwelijksType, datum)) {
+                if (heeftVrijSlot(locatie.getId(), huwelijksType, datum, null)) {
                     return datum;
                 }
             }
@@ -75,9 +75,10 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<LocalDate> findBeschikbareDatums(CeremonieSoort ceremonieSoort, YearMonth maand) {
-        HuwelijksType huwelijksType = toHuwelijksType(ceremonieSoort);
-        List<TrouwlocatieEntity> locaties = resolveLocaties(ceremonieSoort);
+    public Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
+        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
 
         Set<LocalDate> beschikbaar = new HashSet<>();
         LocalDate vandaag = LocalDate.now();
@@ -88,7 +89,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
 
         for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
             for (TrouwlocatieEntity locatie : locaties) {
-                if (heeftVrijSlot(locatie.getId(), huwelijksType, datum)) {
+                if (heeftVrijSlot(locatie.getId(), huwelijksType, datum, dossier)) {
                     beschikbaar.add(datum);
                     break;
                 }
@@ -99,33 +100,33 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LocalDateTime> findBeschikbareSlots(CeremonieSoort ceremonieSoort, YearMonth maand) {
+    public List<LocalDateTime> findBeschikbareSlots(UUID dossierId, YearMonth maand) {
         LocalDate vandaag = LocalDate.now();
         LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
         LocalDate laatste = vandaag.plusDays(planningConfig.getTotDagen());
         LocalDate start = maand.atDay(1).isBefore(vroegste) ? vroegste : maand.atDay(1);
         LocalDate einde = maand.atEndOfMonth().isAfter(laatste) ? laatste : maand.atEndOfMonth();
-        return vrijeSlotsTussen(ceremonieSoort, start, einde);
+        return vrijeSlotsTussen(getDossier(dossierId), start, einde);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<LocalDateTime> findAllBeschikbareSlots(CeremonieSoort ceremonieSoort) {
+    public List<LocalDateTime> findAllBeschikbareSlots(UUID dossierId) {
         LocalDate vandaag = LocalDate.now();
-        return vrijeSlotsTussen(ceremonieSoort,
+        return vrijeSlotsTussen(getDossier(dossierId),
                 vandaag.plusDays(planningConfig.getVanafDagen()),
                 vandaag.plusDays(planningConfig.getTotDagen()));
     }
 
-    private List<LocalDateTime> vrijeSlotsTussen(CeremonieSoort ceremonieSoort, LocalDate start, LocalDate einde) {
-        HuwelijksType huwelijksType = toHuwelijksType(ceremonieSoort);
-        List<TrouwlocatieEntity> locaties = resolveLocaties(ceremonieSoort);
+    private List<LocalDateTime> vrijeSlotsTussen(HuwelijksDossierEntity dossier, LocalDate start, LocalDate einde) {
+        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
+        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
 
         List<LocalDateTime> slots = new ArrayList<>();
         for (LocalDate datum = start; !datum.isAfter(einde); datum = datum.plusDays(1)) {
             Set<LocalTime> tijdenVoorDatum = new TreeSet<>();
             for (TrouwlocatieEntity locatie : locaties) {
-                tijdenVoorDatum.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
+                tijdenVoorDatum.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum, dossier));
             }
             LocalDate finalDatum = datum;
             tijdenVoorDatum.forEach(tijd -> slots.add(LocalDateTime.of(finalDatum, tijd)));
@@ -135,13 +136,14 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LocalTime> findBeschikbareTijden(CeremonieSoort ceremonieSoort, LocalDate datum) {
-        HuwelijksType huwelijksType = toHuwelijksType(ceremonieSoort);
-        List<TrouwlocatieEntity> locaties = resolveLocaties(ceremonieSoort);
+    public List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
+        List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
 
         Set<LocalTime> tijden = new TreeSet<>();
         for (TrouwlocatieEntity locatie : locaties) {
-            tijden.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum));
+            tijden.addAll(vrijeTijdslotenVoor(locatie.getId(), huwelijksType, datum, dossier));
         }
         return new ArrayList<>(tijden);
     }
@@ -149,8 +151,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
     @Override
     @Transactional
     public void boekAfspraak(UUID dossierId, LocalDate datum, LocalTime startTijd) {
-        HuwelijksDossierEntity dossier = dossierRepository.findByUuid(dossierId)
-                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
         HuwelijksType huwelijksType = toHuwelijksType(dossier.getCeremonieSoort());
         List<TrouwlocatieEntity> locaties = resolveLocaties(dossier.getCeremonieSoort());
 
@@ -159,7 +160,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                     locatie.getId(), huwelijksType, datum.getDayOfWeek(), datum);
 
             for (LocatieBeschikbaarheidEntity slot : slots) {
-                if (isSlotVrij(slot, datum, startTijd)) {
+                if (isSlotVrij(slot, datum, startTijd, dossier)) {
                     LocalTime eindTijd = startTijd.plusMinutes(slot.getDuurInMinuten());
 
                     afspraakRepository.deleteByDossier_Id(dossier.getId());
@@ -177,13 +178,19 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
         throw new IllegalStateException("Geen beschikbaar tijdslot gevonden voor " + datum + " " + startTijd);
     }
 
+    private HuwelijksDossierEntity getDossier(UUID dossierId) {
+        return dossierRepository.findByUuid(dossierId)
+                .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
+    }
+
     private List<TrouwlocatieEntity> resolveLocaties(CeremonieSoort ceremonieSoort) {
         return marriageTypeLocationRepository.findByMarriageType_Soort(ceremonieSoort)
                 .map(mapping -> List.of(mapping.getLocatie()))
                 .orElseGet(locatieRepository::findAll);
     }
 
-    private boolean heeftVrijSlot(long locatieId, HuwelijksType huwelijksType, LocalDate datum) {
+    private boolean heeftVrijSlot(long locatieId, HuwelijksType huwelijksType, LocalDate datum,
+                                  HuwelijksDossierEntity eigenDossier) {
         if (nietBeschikbareDagRepository.existsByLocatie_IdAndDatum(locatieId, datum)) {
             return false;
         }
@@ -194,7 +201,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
         }
         for (LocatieBeschikbaarheidEntity b : beschikbaarheden) {
             List<LocalTime> slots = genereerSlots(b);
-            Set<LocalTime> bezet = bezetteTijden(locatieId, datum);
+            Set<LocalTime> bezet = bezetteTijden(locatieId, datum, eigenDossier);
             for (LocalTime slot : slots) {
                 if (!bezet.contains(slot)) {
                     return true;
@@ -204,13 +211,14 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
         return false;
     }
 
-    private List<LocalTime> vrijeTijdslotenVoor(long locatieId, HuwelijksType huwelijksType, LocalDate datum) {
+    private List<LocalTime> vrijeTijdslotenVoor(long locatieId, HuwelijksType huwelijksType, LocalDate datum,
+                                                HuwelijksDossierEntity eigenDossier) {
         if (nietBeschikbareDagRepository.existsByLocatie_IdAndDatum(locatieId, datum)) {
             return List.of();
         }
         List<LocatieBeschikbaarheidEntity> beschikbaarheden = beschikbaarheidRepository
                 .findBeschikbareSlots(locatieId, huwelijksType, datum.getDayOfWeek(), datum);
-        Set<LocalTime> bezet = bezetteTijden(locatieId, datum);
+        Set<LocalTime> bezet = bezetteTijden(locatieId, datum, eigenDossier);
         List<LocalTime> vrij = new ArrayList<>();
         for (LocatieBeschikbaarheidEntity b : beschikbaarheden) {
             for (LocalTime slot : genereerSlots(b)) {
@@ -222,12 +230,13 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
         return vrij;
     }
 
-    private boolean isSlotVrij(LocatieBeschikbaarheidEntity beschikbaarheid, LocalDate datum, LocalTime startTijd) {
+    private boolean isSlotVrij(LocatieBeschikbaarheidEntity beschikbaarheid, LocalDate datum, LocalTime startTijd,
+                               HuwelijksDossierEntity eigenDossier) {
         List<LocalTime> slots = genereerSlots(beschikbaarheid);
         if (!slots.contains(startTijd)) {
             return false;
         }
-        return !bezetteTijden(beschikbaarheid.getLocatie().getId(), datum).contains(startTijd);
+        return !bezetteTijden(beschikbaarheid.getLocatie().getId(), datum, eigenDossier).contains(startTijd);
     }
 
     private List<LocalTime> genereerSlots(LocatieBeschikbaarheidEntity beschikbaarheid) {
@@ -241,12 +250,18 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
         return slots;
     }
 
-    private Set<LocalTime> bezetteTijden(long locatieId, LocalDate datum) {
+    /**
+     * De tijden waarop de locatie op {@code datum} al een afspraak heeft. De afspraak van {@code eigenDossier}
+     * (indien niet {@code null}) telt niet mee: dat dossier mag zijn eigen tijdslot opnieuw kiezen.
+     */
+    private Set<LocalTime> bezetteTijden(long locatieId, LocalDate datum, HuwelijksDossierEntity eigenDossier) {
         Set<LocalTime> bezet = new HashSet<>();
         // De afspraak van een geannuleerd dossier blijft bewaard, maar houdt het tijdslot niet bezet
         for (AfspraakEntity a : afspraakRepository.findByLocatie_IdAndDatumAndDossier_StatusIn(
                 locatieId, datum, DossierStatus.ACTIEF)) {
-            bezet.add(a.getStartTijd());
+            if (eigenDossier == null || !eigenDossier.getId().equals(a.getDossier().getId())) {
+                bezet.add(a.getStartTijd());
+            }
         }
         return bezet;
     }

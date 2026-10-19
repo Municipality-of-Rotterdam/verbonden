@@ -356,25 +356,31 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional(readOnly = true)
     public Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand) {
-        return afspraakPlanningService.findBeschikbareDatums(getDossier(dossierId).getCeremonieSoort(), maand);
+        return afspraakPlanningService.findBeschikbareDatums(dossierId, maand);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<LocalDateTime> findBeschikbareSlots(UUID dossierId, YearMonth maand) {
-        return afspraakPlanningService.findBeschikbareSlots(getDossier(dossierId).getCeremonieSoort(), maand);
+        return afspraakPlanningService.findBeschikbareSlots(dossierId, maand);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Collection<LocalDateTime> findAllBeschikbareSlots(UUID dossierId) {
-        return afspraakPlanningService.findAllBeschikbareSlots(getDossier(dossierId).getCeremonieSoort());
+        return afspraakPlanningService.findAllBeschikbareSlots(dossierId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public LocalDateTime findDatumTijdHuwelijk(UUID dossierId) {
+        return findDatumTijdHuwelijk(getDossier(dossierId));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum) {
-        return afspraakPlanningService.findBeschikbareTijden(getDossier(dossierId).getCeremonieSoort(), datum);
+        return afspraakPlanningService.findBeschikbareTijden(dossierId, datum);
     }
 
     @Override

@@ -14,6 +14,9 @@ import java.util.UUID;
  * Vrije tijdsloten voor een ceremonie, en het boeken van een afspraak daarop. Kijkt niet naar de status van het
  * dossier: of het dossier gewijzigd mag worden, bepaalt de aanroeper (de burger alleen bij een concept, een
  * medewerker altijd).
+ *
+ * <p>Voor een dossier telt het tijdslot dat het zelf al heeft geboekt als vrij, zodat het opnieuw gekozen en
+ * bevestigd kan worden.</p>
  */
 public interface AfspraakPlanningService {
 
@@ -22,16 +25,16 @@ public interface AfspraakPlanningService {
      */
     LocalDate findEersteGelegenheid(CeremonieSoort ceremonieSoort);
 
-    Set<LocalDate> findBeschikbareDatums(CeremonieSoort ceremonieSoort, YearMonth maand);
+    Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand);
 
-    List<LocalDateTime> findBeschikbareSlots(CeremonieSoort ceremonieSoort, YearMonth maand);
+    List<LocalDateTime> findBeschikbareSlots(UUID dossierId, YearMonth maand);
 
     /**
      * Alle vrije tijdsloten binnen de planningsperiode.
      */
-    List<LocalDateTime> findAllBeschikbareSlots(CeremonieSoort ceremonieSoort);
+    List<LocalDateTime> findAllBeschikbareSlots(UUID dossierId);
 
-    List<LocalTime> findBeschikbareTijden(CeremonieSoort ceremonieSoort, LocalDate datum);
+    List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum);
 
     /**
      * Boekt een afspraak voor het dossier op een vrij tijdslot, en vervangt daarmee een eerdere afspraak.

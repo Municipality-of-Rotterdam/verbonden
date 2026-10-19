@@ -22,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,6 +153,44 @@ class DatumKiezenPageTest extends BaseWicketTest {
         String response = tester.getLastResponseAsString();
         assertThat(response).contains("rods-date-picker");
         assertThat(response).contains("el.options");
+    }
+
+    @Test
+    @WithMockUser(username = "999990007", roles = "BURGER")
+    void geboektTijdslotIsGeselecteerdEnKiesbaar() {
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        LocalDateTime geboekt = marriageIntakeService.findAllBeschikbareSlots(dossierId).iterator().next();
+        marriageIntakeService.slaAfspraakOp(dossierId, geboekt.toLocalDate(), geboekt.toLocalTime());
+
+        tester.startPage(DatumKiezenPage.class, dossierParams(dossierId));
+
+        tester.assertRenderedPage(DatumKiezenPage.class);
+        String geboektAlsTekst = geboekt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        assertThat(tester.getLastResponseAsString())
+                .contains("value=\"" + geboektAlsTekst + "\"")
+                .contains("{ \"value\": \"" + geboektAlsTekst + "\" }");
+    }
+
+    @Test
+    @WithMockUser(username = "999990007", roles = "BURGER")
+    void geboektTijdslotOpnieuwBevestigen_behoudtAfspraak() {
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        LocalDateTime geboekt = marriageIntakeService.findAllBeschikbareSlots(dossierId).iterator().next();
+        marriageIntakeService.slaAfspraakOp(dossierId, geboekt.toLocalDate(), geboekt.toLocalTime());
+
+        tester.startPage(DatumKiezenPage.class, dossierParams(dossierId));
+        // Zoals een browser: anders weigert Wicket's CSRF-bescherming de POST.
+        tester.getRequest().setHeader("Origin", "http://localhost");
+        formTester("datumKiezenForm").submit();
+
+        tester.assertRenderedPage(DeDagPage.class);
+        assertThat(marriageIntakeService.findDatumTijdHuwelijk(dossierId)).isEqualTo(geboekt);
     }
 
     // ──────────────────────────────────────────────────────────────────────────

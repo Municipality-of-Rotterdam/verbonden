@@ -158,6 +158,20 @@ class DossierBeheerIntegrationTest {
     }
 
     @Test
+    void medewerker_kanHuidigeAfspraakOpnieuwOpslaan() {
+        UUID dossierId = testData.maakCompleetDossier();
+        marriageIntakeService.dienIn(dossierId);
+        LocalDateTime huidig = dossierAdministrationService.findDetail(dossierId).datumTijdHuwelijk();
+
+        assertThat(dossierAdministrationService.findBeschikbareTijden(dossierId, huidig.toLocalDate()))
+                .contains(huidig.toLocalTime());
+
+        dossierAdministrationService.updateAfspraak(dossierId, huidig.toLocalDate(), huidig.toLocalTime());
+
+        assertThat(dossierAdministrationService.findDetail(dossierId).datumTijdHuwelijk()).isEqualTo(huidig);
+    }
+
+    @Test
     void medewerker_kanIngediendDossierWijzigen() {
         UUID dossierId = testData.maakCompleetDossier();
         marriageIntakeService.dienIn(dossierId);

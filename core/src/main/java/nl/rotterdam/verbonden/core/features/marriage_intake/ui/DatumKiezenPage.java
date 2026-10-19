@@ -15,7 +15,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -84,7 +83,8 @@ public class DatumKiezenPage extends BurgerBasePage {
 
     private class DatumKiezenForm extends Form<LocalDateTime> {
 
-        private final IModel<LocalDateTime> selectedModel = Model.of((LocalDateTime) null);
+        private final IModel<LocalDateTime> selectedModel = LoadableDetachableModel.of(
+                () -> marriageIntakeService.findDatumTijdHuwelijk(dossierId));
 
         private DatumKiezenForm() {
             super("datumKiezenForm");

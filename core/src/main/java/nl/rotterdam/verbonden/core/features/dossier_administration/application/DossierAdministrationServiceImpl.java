@@ -229,7 +229,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Override
     @Transactional(readOnly = true)
     public List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum) {
-        return afspraakPlanningService.findBeschikbareTijden(getDossier(dossierId).getCeremonieSoort(), datum);
+        return afspraakPlanningService.findBeschikbareTijden(dossierId, datum);
     }
 
     @Override

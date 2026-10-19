@@ -40,7 +40,7 @@ public class DossierAfspraakUpdatePage extends DossierBeheerBasePage {
     private class ChangeAfspraakForm extends Form<AfspraakFormDto> {
 
         ChangeAfspraakForm(String id) {
-            super(id, Model.of(new AfspraakFormDto()));
+            super(id, Model.of(AfspraakFormDto.vanDto(dossier)));
         }
 
         @Override
