@@ -21,7 +21,8 @@ import java.util.UUID;
 public interface AfspraakPlanningService {
 
     /**
-     * De eerste dag (vanaf morgen, tot een jaar vooruit) met een vrij tijdslot, of {@code null} als die er niet is.
+     * De eerste dag binnen de planningsperiode met een vrij tijdslot, of {@code null} als die er niet is. Dat is
+     * dezelfde periode waarin de burger een datum kan kiezen.
      */
     LocalDate findEersteGelegenheid(CeremonieSoort ceremonieSoort);
 

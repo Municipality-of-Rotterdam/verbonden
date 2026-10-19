@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
+import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateNietBeschikbareDagDto;
@@ -10,9 +11,19 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossier
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.config.PlanningConfig;
+import nl.rotterdam.verbonden.core.integration_test.InstelbareKlok;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceContext;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +34,36 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Draait elke test op een reeks vaste datums: alle zeven weekdagen rond een maandovergang, en een jaarovergang.
+ * Zo hangt de uitkomst niet af van de dag waarop de test toevallig draait.
+ */
 @VerbondenIntegrationTest
 @Transactional
+@ParameterizedClass(name = "vandaag = {0}")
+@MethodSource("testdatums")
 class BeschikbareSlotsIntegrationTest {
+
+    static Stream<LocalDate> testdatums() {
+        LocalDate maandagVoorMaandovergang = LocalDate.of(2026, 10, 26);
+        return Stream.concat(
+                Stream.iterate(maandagVoorMaandovergang, d -> d.plusDays(1)).limit(7),
+                Stream.of(LocalDate.of(2026, 12, 31)));
+    }
+
+    @Parameter
+    private LocalDate vandaag;
+
+    @Autowired
+    private InstelbareKlok klok;
 
     @Autowired
     private MarriageIntakeService marriageIntakeService;
@@ -42,14 +74,29 @@ class BeschikbareSlotsIntegrationTest {
     @Autowired
     private PlanningConfig planningConfig;
 
+    @Autowired
+    private DossierAdministrationService dossierAdministrationService;
+
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @BeforeEach
     void setUp() {
+        klok.zetOp(vandaag);
         for (ListLocatieDto locatie : locationAdministrationService.findAllLocaties()) {
             locationAdministrationService.findBeschikbaarheden(locatie.id())
                     .forEach(b -> locationAdministrationService.deleteBeschikbaarheid(b.id()));
             locationAdministrationService.findNietBeschikbareDagen(locatie.id())
                     .forEach(d -> locationAdministrationService.deleteNietBeschikbareDag(d.id()));
         }
+    }
+
+    @AfterEach
+    void zetKlokTerug() {
+        klok.zetTerug();
     }
 
     private long vindGekoppeldeLocatieId(CeremonieSoort soort) {
@@ -119,7 +166,7 @@ class BeschikbareSlotsIntegrationTest {
         maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
                 LocalTime.of(9, 0), LocalTime.of(9, 20), 10);
 
-        LocalDate dag1 = volgendeMaandag;
+        @SuppressWarnings("UnnecessaryLocalVariable") LocalDate dag1 = volgendeMaandag;
         LocalDate dag2 = volgendeMaandag.plusWeeks(1);
         vulAlleSlotsOp(dag1, LocalTime.of(9, 0), LocalTime.of(9, 20));
         vulAlleSlotsOp(dag2, LocalTime.of(9, 0), LocalTime.of(9, 20));
@@ -129,10 +176,9 @@ class BeschikbareSlotsIntegrationTest {
         Set<LocalDate> datums = marriageIntakeService.findBeschikbareDatums(dossierId, maand);
         assertThat(datums).doesNotContain(dag1, dag2);
 
-        long resterendeMaandagen = aantalToekomstigeWeekdagen(maand) - 2;
-        if (resterendeMaandagen > 0) {
-            assertThat(datums).hasSize((int) resterendeMaandagen);
-        }
+        // dag2 kan al in de volgende maand vallen
+        long volgeplandInMaand = Stream.of(dag1, dag2).filter(d -> YearMonth.from(d).equals(maand)).count();
+        assertThat(datums).hasSize((int) (aantalToekomstigeWeekdagen(maand) - volgeplandInMaand));
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -173,11 +219,10 @@ class BeschikbareSlotsIntegrationTest {
 
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
 
-        Set<LocalDate> datums = marriageIntakeService.findBeschikbareDatums(dossierId, maand);
-        assertThat(datums).doesNotContain(volgendeMaandag);
-        if (maand.equals(YearMonth.from(maandagDaarnaast))) {
-            assertThat(datums).contains(maandagDaarnaast);
-        }
+        assertThat(marriageIntakeService.findBeschikbareDatums(dossierId, maand)).doesNotContain(volgendeMaandag);
+        // Vraag de maand van de volgende maandag apart op: die kan al in de volgende maand vallen
+        assertThat(marriageIntakeService.findBeschikbareDatums(dossierId, YearMonth.from(maandagDaarnaast)))
+                .contains(maandagDaarnaast);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -198,7 +243,7 @@ class BeschikbareSlotsIntegrationTest {
         Set<LocalDate> datums = marriageIntakeService.findBeschikbareDatums(dossierId, maand);
         assertThat(datums).isNotEmpty();
         assertThat(datums).allMatch(d -> d.getDayOfWeek() == DayOfWeek.TUESDAY);
-        assertThat(datums).allMatch(d -> d.isAfter(LocalDate.now()));
+        assertThat(datums).allMatch(d -> d.isAfter(vandaag));
     }
 
     @Test
@@ -390,6 +435,105 @@ class BeschikbareSlotsIntegrationTest {
     }
 
     @Test
+    void aantalQueries_isOnafhankelijkVanDeLengteVanDePlanningsperiode() {
+        LocalDate volgendeMaandag = maakPlanningMetAfspraakEnNietBeschikbareDag();
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        List<LocalDateTime> slots = new ArrayList<>();
+
+        long aantalQueries = aantalQueries(
+                () -> slots.addAll(marriageIntakeService.findAllBeschikbareSlots(dossierId)));
+
+        assertThat(slots).contains(volgendeMaandag.atTime(9, 10))
+                .doesNotContain(volgendeMaandag.atTime(9, 0), volgendeMaandag.plusWeeks(1).atTime(9, 10));
+        // Dossier, locatie bij de ceremoniesoort, en per soort gegeven één query voor de hele periode
+        assertThat(aantalQueries).isLessThanOrEqualTo(6);
+    }
+
+    @Test
+    void aantalQueries_beheer_beschikbareTijdenOpEenDatum() {
+        LocalDate volgendeMaandag = maakPlanningMetAfspraakEnNietBeschikbareDag();
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        List<LocalTime> tijden = new ArrayList<>();
+
+        long aantalQueries = aantalQueries(
+                () -> tijden.addAll(dossierAdministrationService.findBeschikbareTijden(dossierId, volgendeMaandag)));
+
+        assertThat(tijden).contains(LocalTime.of(9, 10)).doesNotContain(LocalTime.of(9, 0));
+        assertThat(aantalQueries).isLessThanOrEqualTo(6);
+    }
+
+    @Test
+    void aantalQueries_beheer_afspraakWijzigen() {
+        LocalDate volgendeMaandag = maakPlanningMetAfspraakEnNietBeschikbareDag();
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        marriageIntakeService.slaAfspraakOp(dossierId, volgendeMaandag, LocalTime.of(9, 10));
+
+        long aantalQueries = aantalQueries(
+                () -> dossierAdministrationService.updateAfspraak(dossierId, volgendeMaandag, LocalTime.of(9, 20)));
+
+        assertThat(marriageIntakeService.findDatumTijdHuwelijk(dossierId)).isEqualTo(volgendeMaandag.atTime(9, 20));
+        // Planning (zoals hierboven), plus de oude afspraak ophalen en verwijderen en de nieuwe opslaan
+        assertThat(aantalQueries).isLessThanOrEqualTo(9);
+    }
+
+    /**
+     * Beschikbaarheid op maandag 9:00-10:00, een afspraak van een ander dossier op de eerstvolgende maandag om
+     * 9:00 en een niet-beschikbare dag een week later, zodat alle drie de planningsqueries iets opleveren.
+     *
+     * @return de eerstvolgende maandag in de planningsperiode
+     */
+    private LocalDate maakPlanningMetAfspraakEnNietBeschikbareDag() {
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
+        LocalDate volgendeMaandag = volgendeWeekdag(DayOfWeek.MONDAY);
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
+        maakNietBeschikbareDag(locatieId, volgendeMaandag.plusWeeks(1), "Feestdag");
+        marriageIntakeService.slaAfspraakOp(maakDossier(CeremonieSoort.KLEIN), volgendeMaandag, LocalTime.of(9, 0));
+        return volgendeMaandag;
+    }
+
+    /**
+     * Het aantal SQL-statements dat {@code actie} uitvoert, inclusief het wegschrijven van wijzigingen. Wat al
+     * in de persistence context zit, wordt eerst weggeschreven en vergeten, zodat het niet meetelt of uit de
+     * cache komt.
+     */
+    private long aantalQueries(Runnable actie) {
+        entityManager.flush();
+        entityManager.clear();
+        Statistics statistics = entityManagerFactory.unwrap(SessionFactory.class).getStatistics();
+        statistics.setStatisticsEnabled(true);
+        try {
+            statistics.clear();
+            actie.run();
+            entityManager.flush();
+            return statistics.getPrepareStatementCount();
+        } finally {
+            statistics.setStatisticsEnabled(false);
+        }
+    }
+
+    @Test
+    void eersteGelegenheid_valtBinnenDePlanningsperiode() {
+        long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
+        maakBeschikbaarheid(locatieId, HuwelijksType.GRATIS, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 10);
+        // Ruim meer dan een week, zodat er vóór de planningsperiode zeker een maandag ligt
+        int origineleVanafDagen = planningConfig.getVanafDagen();
+        planningConfig.setVanafDagen(14);
+        try {
+            LocalDate eersteGelegenheid = marriageIntakeService.findAllMarriageTypes().stream()
+                    .filter(mt -> mt.soort() == CeremonieSoort.KLEIN)
+                    .findFirst().orElseThrow()
+                    .eersteGelegenheid();
+
+            // Dezelfde dag als de eerste die de burger in de date picker kan kiezen
+            assertThat(eersteGelegenheid).isEqualTo(volgendeWeekdag(DayOfWeek.MONDAY));
+        } finally {
+            planningConfig.setVanafDagen(origineleVanafDagen);
+        }
+    }
+
+    @Test
     void eigenAfspraak_blijftVoorEigenDossierBeschikbaar() {
         long locatieId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
         LocalDate volgendeMaandag = volgendeWeekdag(DayOfWeek.MONDAY);
@@ -424,7 +568,6 @@ class BeschikbareSlotsIntegrationTest {
         var allSlots = marriageIntakeService.findAllBeschikbareSlots(dossierId);
         assertThat(allSlots).isNotEmpty();
 
-        LocalDate vandaag = LocalDate.now();
         LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
         LocalDate laatste = vandaag.plusDays(planningConfig.getTotDagen());
 
@@ -455,7 +598,7 @@ class BeschikbareSlotsIntegrationTest {
                                      DayOfWeek dag, LocalTime start, LocalTime eind, int duur) {
         locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
                 locatieId, type, dag, start, eind, duur, BigDecimal.ZERO,
-                LocalDate.now().minusMonths(1), LocalDate.now().plusYears(2)));
+                vandaag.minusMonths(1), vandaag.plusYears(2)));
     }
 
     private void maakNietBeschikbareDag(long locatieId, LocalDate datum, String reden) {
@@ -473,12 +616,12 @@ class BeschikbareSlotsIntegrationTest {
     }
 
     private LocalDate volgendeWeekdag(DayOfWeek dag) {
-        LocalDate vroegste = LocalDate.now().plusDays(planningConfig.getVanafDagen());
+        LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
         return vroegste.with(TemporalAdjusters.nextOrSame(dag));
     }
 
     private long aantalToekomstigeWeekdagen(YearMonth maand) {
-        LocalDate vroegste = LocalDate.now().plusDays(planningConfig.getVanafDagen());
+        LocalDate vroegste = vandaag.plusDays(planningConfig.getVanafDagen());
         return maand.atDay(1).datesUntil(maand.atEndOfMonth().plusDays(1))
                 .filter(d -> d.getDayOfWeek() == DayOfWeek.MONDAY)
                 .filter(d -> !d.isBefore(vroegste))

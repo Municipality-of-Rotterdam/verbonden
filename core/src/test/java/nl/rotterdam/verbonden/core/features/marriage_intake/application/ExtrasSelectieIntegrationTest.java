@@ -3,15 +3,18 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.CreateTrouwboekjeDto;
+import nl.rotterdam.verbonden.core.integration_test.InstelbareKlok;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,14 +35,28 @@ class ExtrasSelectieIntegrationTest {
     @Autowired
     private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
 
-    @Test
-    void huwelijk_slaatInternationaleAkteOp() {
+    @Autowired
+    private InstelbareKlok klok;
+
+    @AfterEach
+    void zetKlokTerug() {
+        klok.zetTerug();
+    }
+
+    /** Het tarief gaat op 1 januari 2027 omhoog; een nog niet ingediend dossier toont het tarief van vandaag. */
+    @ParameterizedTest(name = "vandaag = {0}")
+    @CsvSource({
+            "2026-10-26, 17.80",
+            "2026-12-31, 17.80",
+            "2027-01-01, 18.30",
+            "2027-06-15, 18.30"})
+    void huwelijk_slaatInternationaleAkteOp(LocalDate vandaag, BigDecimal tariefVandaag) {
+        klok.zetOp(vandaag);
         UUID dossierId = maakDossier(RegistratieType.HUWELIJK, "999990007");
 
         marriageIntakeService.slaExtrasOp(dossierId, new SaveExtrasDto(false, false, null, true));
 
         assertThat(marriageIntakeService.findExtrasSelecties(dossierId).internationaleAkte()).isTrue();
-        BigDecimal tariefVandaag = InternationaleAkteTarief.prijsOp(LocalDate.now());
         assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
                 .extracting(SidebarExtraItemDto::naam, SidebarExtraItemDto::prijs)
                 .containsExactly(tuple("Internationale huwelijksakte", tariefVandaag));
@@ -70,6 +87,24 @@ class ExtrasSelectieIntegrationTest {
         assertThat(marriageIntakeService.findExtrasSelecties(dossierId).trouwboekjeId()).isEqualTo(trouwboekjeId);
         assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
                 .containsExactly(new SidebarExtraItemDto("Linnen trouwboekje", new BigDecimal("42.50")));
+    }
+
+    /** Een trouwboekje is te kiezen vanaf de startdatum, tot (niet tot en met) de einddatum. */
+    @ParameterizedTest(name = "vandaag = {0}: kiesbaar = {1}")
+    @CsvSource({
+            "2026-10-31, false",
+            "2026-11-01, true",
+            "2026-11-30, true",
+            "2026-12-01, false"})
+    void trouwboekje_isAlleenTussenStartEnEinddatumTeKiezen(LocalDate vandaag, boolean kiesbaar) {
+        klok.zetOp(vandaag);
+        long trouwboekjeId = trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
+                "Seizoensboekje", null, "/trouwboekjes/seizoen.webp", new BigDecimal("30.00"),
+                LocalDate.of(2026, 11, 1), LocalDate.of(2026, 12, 1)));
+
+        assertThat(marriageIntakeService.findActieveTrouwboekjes())
+                .extracting(TrouwboekjeKeuzeDto::id)
+                .satisfies(ids -> assertThat(ids.contains(trouwboekjeId)).isEqualTo(kiesbaar));
     }
 
     private UUID maakDossier(RegistratieType registratieType, String bsn) {

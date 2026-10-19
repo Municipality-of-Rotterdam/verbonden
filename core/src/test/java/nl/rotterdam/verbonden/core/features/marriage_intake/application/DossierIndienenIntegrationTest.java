@@ -4,22 +4,23 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCo
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
+import nl.rotterdam.verbonden.core.integration_test.InstelbareKlok;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData.BSN_PARTNER_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
@@ -33,6 +34,14 @@ class DossierIndienenIntegrationTest {
 
     @Autowired
     private CompleetDossierTestData testData;
+
+    @Autowired
+    private InstelbareKlok klok;
+
+    @AfterEach
+    void zetKlokTerug() {
+        klok.zetTerug();
+    }
 
     @Test
     void nieuwDossier_isConceptEnNietCompleet() {
@@ -69,23 +78,26 @@ class DossierIndienenIntegrationTest {
         UUID dossierId = testData.maakCompleetDossier();
         assertThat(marriageIntakeService.findByDossierId(dossierId).compleet()).isTrue();
 
-        LocalDateTime voorIndienen = LocalDateTime.now();
+        klok.zetOp(LocalDate.of(2026, 10, 26));
         marriageIntakeService.dienIn(dossierId);
 
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
         assertThat(dossier.status()).isEqualTo(DossierStatus.INGEDIEND);
-        assertThat(dossier.ingediendOp()).isAfterOrEqualTo(voorIndienen);
+        assertThat(dossier.ingediendOp()).isEqualTo(LocalDateTime.of(2026, 10, 26, 12, 0));
     }
 
     @Test
     void dienIn_metInternationaleAkte_legtPrijsVanDatumVanIndienenVast() {
+        klok.zetOp(LocalDate.of(2026, 12, 31));
         UUID dossierId = testData.maakCompleetDossier();
         marriageIntakeService.slaExtrasOp(dossierId, new SaveExtrasDto(false, false, null, true));
 
         marriageIntakeService.dienIn(dossierId);
+        // Na de tariefverhoging van 1 januari 2027 blijft de vastgelegde prijs gelden
+        klok.zetOp(LocalDate.of(2027, 1, 1));
 
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
-        BigDecimal tarief = InternationaleAkteTarief.prijsOp(dossier.ingediendOp().toLocalDate());
+        BigDecimal tarief = new BigDecimal("17.80");
         assertThat(marriageIntakeService.findInternationaleAktePrijs(dossierId)).isEqualByComparingTo(tarief);
         assertThat(dossier.extras())
                 .extracting(SidebarExtraItemDto::naam, SidebarExtraItemDto::prijs)

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,11 +32,14 @@ public class CompleetDossierTestData {
 
     private final MarriageIntakeService marriageIntakeService;
     private final LocationAdministrationService locationAdministrationService;
+    private final Clock clock;
 
     CompleetDossierTestData(MarriageIntakeService marriageIntakeService,
-                            LocationAdministrationService locationAdministrationService) {
+                            LocationAdministrationService locationAdministrationService,
+                            Clock clock) {
         this.marriageIntakeService = marriageIntakeService;
         this.locationAdministrationService = locationAdministrationService;
+        this.clock = clock;
     }
 
     /**
@@ -82,7 +86,7 @@ public class CompleetDossierTestData {
         for (DayOfWeek dag : DayOfWeek.values()) {
             locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
                     locatieId, HuwelijksType.GRATIS, dag, LocalTime.of(9, 0), LocalTime.of(10, 0), 10,
-                    BigDecimal.ZERO, LocalDate.now().minusMonths(1), LocalDate.now().plusYears(2)));
+                    BigDecimal.ZERO, LocalDate.now(clock).minusMonths(1), LocalDate.now(clock).plusYears(2)));
         }
     }
 }

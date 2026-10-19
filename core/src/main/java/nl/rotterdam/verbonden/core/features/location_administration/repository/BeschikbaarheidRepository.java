@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -27,15 +27,15 @@ public interface BeschikbaarheidRepository extends JpaRepository<LocatieBeschikb
 
     @Query("""
             SELECT b FROM LocatieBeschikbaarheidEntity b
-            WHERE b.locatie.id = :locatieId
+            WHERE b.locatie.id IN :locatieIds
               AND b.huwelijkstype = :huwelijkstype
-              AND b.dagVanDeWeek = :dag
-              AND b.ingangsdatum <= :datum
-              AND b.einddatum >= :datum
+              AND b.ingangsdatum <= :tot
+              AND b.einddatum >= :van
+            ORDER BY b.id
             """)
-    List<LocatieBeschikbaarheidEntity> findBeschikbareSlots(
-            @Param("locatieId") long locatieId,
+    List<LocatieBeschikbaarheidEntity> findGeldigTussen(
+            @Param("locatieIds") Collection<Long> locatieIds,
             @Param("huwelijkstype") HuwelijksType huwelijkstype,
-            @Param("dag") DayOfWeek dag,
-            @Param("datum") LocalDate datum);
+            @Param("van") LocalDate van,
+            @Param("tot") LocalDate tot);
 }

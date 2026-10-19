@@ -65,6 +65,12 @@ Elke feature-package bevat de volgende sub-packages:
 - **Let op bij nested transacties:** wanneer een service-methode `@Transactional(propagation = REQUIRES_NEW)` gebruikt, commit die inner-transactie onafhankelijk en wordt **niet** teruggedraaid door de `@Transactional` op de testklasse. In dat geval moet je de data handmatig opschonen in een `@BeforeEach`-methode via service-methoden (bijv. `delete()`/`deleteAll()`), zodat de database vóór elke test weer in de oorspronkelijke staat is.
 - Wanneer seed-data (Flyway) interfereert met de test, verwijder die data via service-methoden in een `@BeforeEach`-methode. Door `@Transactional` wordt ook deze cleanup na de test teruggedraaid.
 
+### Datum en tijd
+- Logica die afhangt van de huidige datum of tijd vraagt die op via de geïnjecteerde `java.time.Clock` (bean in `ClockConfig`): `LocalDate.now(clock)`, nooit `LocalDate.now()` zonder klok.
+- Tests van datum- en tijdafhankelijke logica moeten reproduceerbaar zijn: ze mogen niet afhangen van de dag waarop ze draaien. Zet in integratietests de klok vast met `InstelbareKlok.zetOp(datum)` en zet hem terug met `zetTerug()` in een `@AfterEach` (de Spring-context wordt gedeeld tussen testklassen). Reken verwachte waarden uit vanaf die vaste datum, nooit vanaf de systeemklok.
+- Test zulke logica op meerdere vaste datums met `@ParameterizedClass` of `@ParameterizedTest`: in elk geval alle zeven weekdagen, een maandovergang en een jaarovergang (zie `BeschikbareSlotsIntegrationTest`).
+- Gebruik geen `if` in een test die een controle op sommige datums overslaat. Reken de verwachting zo uit dat de controle op elke datum iets test.
+
 ### Value types
 - Gebruik **value types** voor domeinwaarden die validatie, type-veiligheid of semantiek toevoegen (bijv. `PersonFullName` voor een volledige naam).
 - Value types implementeren de `ValueHolder<T>` interface met een `T getValue()` methode.

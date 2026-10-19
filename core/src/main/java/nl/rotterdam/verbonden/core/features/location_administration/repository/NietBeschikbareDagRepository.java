@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -26,5 +27,6 @@ public interface NietBeschikbareDagRepository extends JpaRepository<LocatieNietB
     @Query("SELECT d.datum FROM LocatieNietBeschikbareDagEntity d WHERE d.locatie.id = :locatieId")
     Set<LocalDate> findDatumsByLocatieId(@Param("locatieId") long locatieId);
 
-    boolean existsByLocatie_IdAndDatum(long locatieId, LocalDate datum);
+    List<LocatieNietBeschikbareDagEntity> findByLocatie_IdInAndDatumBetween(Collection<Long> locatieIds,
+                                                                            LocalDate van, LocalDate tot);
 }

@@ -202,7 +202,7 @@
                 <!-- Drop the Docker/Testcontainers-backed providers entirely: on macOS starting a
                      container triggers a TCC "access data from other apps" (Apple Events) prompt,
                      and it requires Docker Desktop to be installed and running. We use the native
-                     Zonky provider instead (see embedded-postgres dependency below), which runs a
+                     EMBEDDED provider instead (see embedded-postgres dependency below), which runs a
                      real postgres binary as a plain subprocess. -->
                 <exclusion>
                     <groupId>org.testcontainers</groupId>
@@ -223,7 +223,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Zonky provider: runs a real, natively-executed PostgreSQL binary for tests, no Docker required -->
+        <!-- EMBEDDED provider: runs a real, natively-executed PostgreSQL binary for tests, no Docker required -->
         <dependency>
             <groupId>io.zonky.test</groupId>
             <artifactId>embedded-postgres</artifactId>

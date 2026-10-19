@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -60,6 +61,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final GetuigenRepository getuigenRepository;
     private final TrouwboekjeRepository trouwboekjeRepository;
     private final PersonLookupService personLookupService;
+    private final Clock clock;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
                               LocatieRepository locatieRepository,
@@ -69,7 +71,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               AfspraakPlanningService afspraakPlanningService,
                               GetuigenRepository getuigenRepository,
                               TrouwboekjeRepository trouwboekjeRepository,
-                              PersonLookupService personLookupService) {
+                              PersonLookupService personLookupService,
+                              Clock clock) {
         this.dossierRepository = dossierRepository;
         this.locatieRepository = locatieRepository;
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
@@ -79,6 +82,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         this.getuigenRepository = getuigenRepository;
         this.trouwboekjeRepository = trouwboekjeRepository;
         this.personLookupService = personLookupService;
+        this.clock = clock;
     }
 
     @Override
@@ -290,7 +294,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         if (!ontbrekendeOnderdelen(dossier).isEmpty()) {
             throw new DossierNietCompleetException(dossierId);
         }
-        LocalDateTime ingediendOp = LocalDateTime.now();
+        LocalDateTime ingediendOp = LocalDateTime.now(clock);
         dossier.setStatus(DossierStatus.INGEDIEND);
         dossier.setIngediendOp(ingediendOp);
         dossier.setInternationaleAktePrijs(dossier.isInternationaleAkte()
@@ -310,7 +314,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private BigDecimal internationaleAktePrijs(HuwelijksDossierEntity dossier) {
         return dossier.getInternationaleAktePrijs() != null
                 ? dossier.getInternationaleAktePrijs()
-                : InternationaleAkteTarief.prijsOp(LocalDate.now());
+                : InternationaleAkteTarief.prijsOp(LocalDate.now(clock));
     }
 
     /**
@@ -493,7 +497,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional(readOnly = true)
     public List<TrouwboekjeKeuzeDto> findActieveTrouwboekjes() {
-        return trouwboekjeRepository.findActief(LocalDate.now()).stream()
+        return trouwboekjeRepository.findActief(LocalDate.now(clock)).stream()
                 .map(e -> new TrouwboekjeKeuzeDto(e.getId(), e.getNaam(), e.getOmschrijving(), e.getAfbeelding(), e.getPrijs()))
                 .toList();
     }
