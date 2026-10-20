@@ -4,6 +4,7 @@ import jakarta.servlet.RequestDispatcher;
 import nl.rotterdam.verbonden.core.burger_common.BurgerErrorPage;
 import nl.rotterdam.verbonden.core.burger_common.BurgerPageExpiredPage;
 import nl.rotterdam.verbonden.core.error_common.VerbondenExceptionMapper;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.authorization.UnauthorizedActionException;
 import org.apache.wicket.core.request.handler.RenderPageRequestHandler;
@@ -15,7 +16,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@WithMockUser(username = "medewerker", roles = "BEHEERDER")
+@WithMockUser(username = "medewerker", roles = Roles.BEHEER)
 class AdministrationErrorPageTest extends BaseWicketTest {
 
     @Test

@@ -6,6 +6,7 @@ import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministr
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
@@ -16,6 +17,11 @@ import nl.rotterdam.nl_design_system.wicket.components.page_body.RdPageBodyBorde
 import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Page;
+import nl.rotterdam.nl_design_system.wicket.components.side_nav.RdSideNavPanel;
+import nl.rotterdam.nl_design_system.wicket.components.side_nav.RdSideNavRecord;
+import org.apache.wicket.Application;
+import org.apache.wicket.Page;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
@@ -30,9 +36,17 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.PackageResourceReference;
 
+import java.util.stream.Stream;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Basis voor alle beheerpagina's. Standaard mogen alle medewerkersrollen behalve {@code BABS} een beheerpagina
+ * openen; een pagina die ook (of juist alleen) voor andere rollen is, overschrijft dit met een eigen
+ * {@link AuthorizeInstantiation}. De rolnamen staan in {@link Roles}.
+ */
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER, Roles.KEYUSER, Roles.WERKVERDELER, Roles.PLANNER,
+        Roles.MEDEWERKER})
 public abstract class AdministrationBasePage extends WebPage {
 
     private static final CssReferenceHeaderItem BOOTSTRAP_GRID_HEADER_ITEM =
@@ -79,6 +93,14 @@ public abstract class AdministrationBasePage extends WebPage {
 
         pageBody = new RdPageBodyBorder("pageBody");
         add(pageBody);
+    }
+
+    /**
+     * Of de ingelogde gebruiker deze pagina mag openen (volgens zijn {@link AuthorizeInstantiation}). Gebruik dit om
+     * links en acties te verbergen die alleen zijn voor wie de bijbehorende pagina mag openen.
+     */
+    protected static boolean magOpenen(Class<? extends Page> pagina) {
+        return Application.get().getSecuritySettings().getAuthorizationStrategy().isInstantiationAuthorized(pagina);
     }
 
     @Override

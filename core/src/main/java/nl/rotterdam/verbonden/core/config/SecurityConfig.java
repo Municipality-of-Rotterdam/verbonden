@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.config;
 
+import nl.rotterdam.verbonden.core.identity.Roles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -71,7 +72,7 @@ public class SecurityConfig {
      * which is also included in this chain's matcher so it is handled correctly.
      *
      * <p>An {@link AdminSecurityCustomizer} bean, if present, is applied last, so an
-     * adapter module can grant {@code ROLE_BEHEERDER} through another route (e.g. an
+     * adapter module can grant roles such as {@code ROLE_BEHEER} or {@code ROLE_BABS} through another route (e.g. an
      * upstream gateway header identifying internal users) alongside form login.
      */
     @Bean
@@ -93,7 +94,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/login/**").permitAll()
-                        .requestMatchers("/beheer/**").hasRole("BEHEERDER")
+                        // Welke rol welke pagina mag openen, bepaalt Wicket via @AuthorizeInstantiation
+                        .requestMatchers("/beheer/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
@@ -199,7 +201,7 @@ public class SecurityConfig {
                     users.add(User.builder()
                             .username(parts[0].trim())
                             .password(encodedPassword)
-                            .roles("BEHEERDER")
+                            .roles(Roles.BEHEER)
                             .build());
                 }
             }
@@ -212,7 +214,7 @@ public class SecurityConfig {
             users.add(User.builder()
                     .username("beheerder")
                     .password("{noop}rotterdam")
-                    .roles("BEHEERDER")
+                    .roles(Roles.BEHEER)
                     .build());
         }
 

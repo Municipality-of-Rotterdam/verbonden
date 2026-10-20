@@ -12,6 +12,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.application.Marriage
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.tester.FormTester;
@@ -34,7 +35,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
-@WithMockUser(username = "medewerker", roles = "BEHEERDER")
+@WithMockUser(username = "medewerker", roles = Roles.BEHEER)
 class DossierBeheerPaginaTest extends BaseWicketTest {
 
     private static final BurgerServiceNummer BSN_PARTNER_1 = new BurgerServiceNummer("999990007");

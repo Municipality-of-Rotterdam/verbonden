@@ -2,6 +2,8 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 
 import nl.rotterdam.verbonden.core.domain.ValueHolder;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
+import nl.rotterdam.verbonden.core.identity.Roles;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeResource;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
@@ -20,7 +22,8 @@ import java.util.UUID;
 
 /**
  * Alle gegevens van één dossier als JSON, gemount op {@code /beheer/dossiers/${dossierId}/json} en daarmee
- * net als de beheerpagina's alleen bereikbaar voor medewerkers. Elke opvraging komt in het inzagelog.
+ * net als de beheerpagina's alleen bereikbaar voor medewerkers (zie {@link AuthorizeResource} hieronder). Elke
+ * opvraging komt in het inzagelog.
  */
 public class DossierJsonResourceReference extends ResourceReference {
 
@@ -33,6 +36,12 @@ public class DossierJsonResourceReference extends ResourceReference {
         return new DossierJsonResource();
     }
 
+    /**
+     * Een resource valt niet onder de {@code @AuthorizeInstantiation} van de beheerpagina's; dezelfde rollen dus
+     * hier.
+     */
+    @AuthorizeResource({Roles.BEHEER, Roles.SUPERUSER, Roles.KEYUSER, Roles.WERKVERDELER, Roles.PLANNER,
+            Roles.MEDEWERKER})
     private static class DossierJsonResource extends AbstractResource {
 
         /** Value types (BSN, e-mailadres, ...) als hun waarde, niet als {@code {"value": ...}}. */
