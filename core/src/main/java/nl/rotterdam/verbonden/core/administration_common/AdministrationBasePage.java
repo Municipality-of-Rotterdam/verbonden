@@ -36,7 +36,6 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.PackageResourceReference;
 
-import java.util.stream.Stream;
 import java.io.Serializable;
 import java.util.List;
 
@@ -56,14 +55,13 @@ public abstract class AdministrationBasePage extends WebPage {
     private static final CssReferenceHeaderItem ADMINISTRATION_BASE_PAGE_HEADER_ITEM =
             CssHeaderItem.forReference(new PackageResourceReference(AdministrationBasePage.class, "AdministrationBasePage.css"));
 
-    private static final List<NavigationItem> NAVIGATION_ITEMS = Stream.of(
+    private static final List<NavigationItem> NAVIGATION_ITEMS = List.of(
             new NavigationItem("BABS", RotterdamIconType.USER, BabsAdministrationPage.class),
             new NavigationItem("Trouwlocaties", RotterdamIconType.LOCATION, LocationAdministrationPage.class),
             new NavigationItem("Huwelijkstypen", RotterdamIconType.RING, MarriageTypeAdministrationPage.class),
             new NavigationItem("Dossiers", RotterdamIconType.DOCUMENT, DossierAdministrationPage.class),
             new NavigationItem("Trouwboekjes", RotterdamIconType.FILE, TrouwboekjeAdministrationPage.class)
-    ).filter(record -> magOpenen(record.page())).toList();
-
+    );
 
     protected final RdPageBodyBorder pageBody;
 
@@ -73,7 +71,9 @@ public abstract class AdministrationBasePage extends WebPage {
         add(new RdBodyTransparentContainer("body"));
 
         add(new RotterdamLogoImage("rotterdamLogoImage"));
-        add(new ListView<>("navigationItems", NAVIGATION_ITEMS) {
+        add(new ListView<>("navigationItems", NAVIGATION_ITEMS.stream()
+                .filter(item -> magOpenen(item.page()))
+                .toList()) {
             @Override
             protected void populateItem(ListItem<NavigationItem> item) {
                 NavigationItem navigationItem = item.getModelObject();

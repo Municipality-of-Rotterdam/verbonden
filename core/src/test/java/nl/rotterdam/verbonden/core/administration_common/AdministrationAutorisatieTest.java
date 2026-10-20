@@ -7,9 +7,14 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
+import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsUpdatePage;
+import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
+import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -74,13 +79,13 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
         assertThat(BEHEER_PAGINAS).contains(BabsAdministrationPage.class, DossierAdministrationPage.class);
     }
 
-    /** De startpagina is voor iedere rol; alle andere beheerpagina's voor iedere rol behalve BABS. */
+    /** Verwacht dezelfde rolbeperkingen als de effectieve {@code @AuthorizeInstantiation} op de pagina. */
     @ParameterizedTest(name = "{0} met rol {1}")
     @MethodSource("paginaEnRol")
     void elkeRolMagBijDeVoorHaarBedoeldePaginas(Class<?> pagina, String rol) {
         alsGebruikerMetRol(rol);
 
-        boolean verwacht = pagina == BabsAdministrationPage.class || !rol.equals(Roles.BABS);
+        boolean verwacht = rolMagPaginaOpenen(pagina, rol);
         assertThat(magOpenen(pagina)).isEqualTo(verwacht);
     }
 
@@ -137,10 +142,23 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
 
         tester.startPage(BabsAdministrationPage.class);
 
-        tester.assertVisible(pad("nieuwBabsLink"));
-        tester.assertVisible(pad("importForm"));
-        assertThat(tester.getLastResponseAsString())
-                .contains("Acties", "Trouwlocaties", "Huwelijkstypen", "Dossiers", "Trouwboekjes");
+        boolean magBabsWijzigen = rolMagPaginaOpenen(BabsUpdatePage.class, rol);
+        if (magBabsWijzigen) {
+            tester.assertVisible(pad("nieuwBabsLink"));
+            tester.assertVisible(pad("importForm"));
+            assertThat(tester.getLastResponseAsString()).contains("Acties");
+        } else {
+            tester.assertInvisible(pad("nieuwBabsLink"));
+            tester.assertInvisible(pad("importForm"));
+            assertThat(tester.getLastResponseAsString()).doesNotContain("Acties");
+        }
+
+        String response = tester.getLastResponseAsString();
+        assertNavigationItem(response, rol, "BABS", BabsAdministrationPage.class);
+        assertNavigationItem(response, rol, "Trouwlocaties", LocationAdministrationPage.class);
+        assertNavigationItem(response, rol, "Huwelijkstypen", MarriageTypeAdministrationPage.class);
+        assertNavigationItem(response, rol, "Dossiers", DossierAdministrationPage.class);
+        assertNavigationItem(response, rol, "Trouwboekjes", TrouwboekjeAdministrationPage.class);
     }
 
     @Test
@@ -200,6 +218,22 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
     private boolean magOpenen(Class<?> pagina) {
         IAuthorizationStrategy strategy = application.getSecuritySettings().getAuthorizationStrategy();
         return strategy.isInstantiationAuthorized(pagina.asSubclass(org.apache.wicket.Page.class));
+    }
+
+    private void assertNavigationItem(String response, String rol, String label, Class<?> page) {
+        if (rolMagPaginaOpenen(page, rol)) {
+            assertThat(response).contains(label);
+        } else {
+            assertThat(response).doesNotContain(label);
+        }
+    }
+
+    private static boolean rolMagPaginaOpenen(Class<?> pagina, String rol) {
+        AuthorizeInstantiation autorisatie = pagina.getAnnotation(AuthorizeInstantiation.class);
+        if (autorisatie == null) {
+            autorisatie = pagina.getPackage().getAnnotation(AuthorizeInstantiation.class);
+        }
+        return autorisatie == null || autorisatie.value().length == 0 || List.of(autorisatie.value()).contains(rol);
     }
 
     private static void alsGebruikerMetRol(String rol) {
