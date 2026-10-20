@@ -56,13 +56,14 @@ public abstract class AdministrationBasePage extends WebPage {
     private static final CssReferenceHeaderItem ADMINISTRATION_BASE_PAGE_HEADER_ITEM =
             CssHeaderItem.forReference(new PackageResourceReference(AdministrationBasePage.class, "AdministrationBasePage.css"));
 
-    private static final List<NavigationItem> NAVIGATION_ITEMS = List.of(
+    private static final List<NavigationItem> NAVIGATION_ITEMS = Stream.of(
             new NavigationItem("BABS", RotterdamIconType.USER, BabsAdministrationPage.class),
             new NavigationItem("Trouwlocaties", RotterdamIconType.LOCATION, LocationAdministrationPage.class),
             new NavigationItem("Huwelijkstypen", RotterdamIconType.RING, MarriageTypeAdministrationPage.class),
             new NavigationItem("Dossiers", RotterdamIconType.DOCUMENT, DossierAdministrationPage.class),
             new NavigationItem("Trouwboekjes", RotterdamIconType.FILE, TrouwboekjeAdministrationPage.class)
-    );
+    ).filter(record -> magOpenen(record.page())).toList();
+
 
     protected final RdPageBodyBorder pageBody;
 
