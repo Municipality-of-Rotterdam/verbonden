@@ -30,6 +30,8 @@ class TrouwboekjeAdministrationPageTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString())
                 .contains("aria-label=\"Bewerken\"")
                 .contains("aria-label=\"Verwijderen\"")
+                .contains("title=\"Bewerken\"")
+                .contains("title=\"Verwijderen\"")
                 .contains("rods-icon-edit")
                 .contains("rods-icon-trash")
                 .doesNotContain(">Bewerken</a>", ">Verwijderen</a>");

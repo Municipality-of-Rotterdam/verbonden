@@ -191,7 +191,8 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
                             PageParameters updateParams = new PageParameters().add("id", model.getObject().id());
                             setResponsePage(TrouwboekjeUpdatePage.class, updateParams);
                         }
-                    }.add(AttributeModifier.replace("aria-label", Model.of(BEWERKEN_LABEL))),
+                    }.add(AttributeModifier.replace("title", Model.of(BEWERKEN_LABEL)))
+                            .add(AttributeModifier.replace("aria-label", Model.of(BEWERKEN_LABEL))),
 
                     new RdIconAjaxButtonBorder("verwijderLink", Model.of(VERWIJDEREN_LABEL)) {
                         @Override
@@ -212,7 +213,8 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
                             }
                             setResponsePage(TrouwboekjeAdministrationPage.class);
                         }
-                    }.add(AttributeModifier.replace("aria-label", Model.of(VERWIJDEREN_LABEL)))
+                    }.add(AttributeModifier.replace("title", Model.of(VERWIJDEREN_LABEL)))
+                            .add(AttributeModifier.replace("aria-label", Model.of(VERWIJDEREN_LABEL)))
             );
         }
     }

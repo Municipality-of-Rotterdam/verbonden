@@ -19,11 +19,13 @@
         </form>
     </div>
 
-    <table wicket:id="babsTable"></table>
+    <form wicket:id="actionsForm">
+        <table wicket:id="babsTable"></table>
+    </form>
 
     <wicket:fragment wicket:id="actiesFragment">
-        <a wicket:id="bewerkLink" class="utrecht-button utrecht-button--secondary-action">Bewerken</a>
-        <a wicket:id="toggleActiefLink" class="utrecht-button utrecht-button--secondary-action"></a>
+        <button wicket:id="bewerkLink"><span wicket:id="icon"></span></button>
+        <button wicket:id="toggleActiefLink"><span wicket:id="icon"></span></button>
     </wicket:fragment>
 </wicket:extend>
 </body>

@@ -174,7 +174,7 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
                             PageParameters p = new PageParameters().add("id", d.id());
                             setResponsePage(MarriageTypeUpdatePage.class, p);
                         }
-                    },
+                    }.add(AttributeModifier.replace("title", Model.of("Wijzigen"))),
 
                     new RdIconAjaxButtonBorder("verwijderLink", Model.of("Verwijderen")) {
                         @Override
@@ -189,7 +189,8 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
                             marriageTypeAdministrationService.delete(dtoModel.getObject().id());
                             setResponsePage(MarriageTypeAdministrationPage.class);
                         }
-                    }.add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
+                    }.add(AttributeModifier.replace("title", Model.of("Verwijderen")))
+                            .add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
             );
         }
     }

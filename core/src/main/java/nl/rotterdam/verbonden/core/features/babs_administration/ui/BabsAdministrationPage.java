@@ -6,18 +6,22 @@ import nl.rotterdam.verbonden.core.features.babs_administration.application.Babs
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.BabsImportResult;
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.ListBabsDto;
 import nl.rotterdam.verbonden.core.identity.Roles;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
+import nl.rotterdam.nl_design_system.wicket.components.icon_button.RdIconAjaxButtonBorder;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
@@ -28,7 +32,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -79,7 +82,7 @@ public class BabsAdministrationPage extends AdministrationBasePage {
         pageBody.add(buildBabsTable());
     }
 
-    private RdDataTable<ListBabsDto, String> buildBabsTable() {
+    private Form<Void> buildBabsTable() {
         List<IColumn<ListBabsDto, String>> columns = new ArrayList<>();
 
         columns.add(new AbstractColumn<>(Model.of("Naam"), "naam") {
@@ -160,7 +163,9 @@ public class BabsAdministrationPage extends AdministrationBasePage {
         };
         provider.setSort("naam", SortOrder.ASCENDING);
 
-        return new RdDataTable<>("babsTable", columns, provider, 20);
+        Form<Void> form = new Form<>("actionsForm");
+        form.add(new RdDataTable<>("babsTable", columns, provider, 20));
+        return form;
     }
 
     // ---------------------------------------------------------------------------
@@ -176,20 +181,35 @@ public class BabsAdministrationPage extends AdministrationBasePage {
             PageParameters params = new PageParameters();
             params.add("id", dto.id());
 
-            add(new BookmarkablePageLink<>("bewerkLink", BabsUpdatePage.class, params));
-
-            add(new Link<>("toggleActiefLink", model) {
+            add(new RdIconAjaxButtonBorder("bewerkLink", Model.of("Bewerken")) {
                 @Override
-                public void onClick() {
-                    babsAdministrationService.toggleActief(getModelObject().id());
+                protected void onInitialize() {
+                    super.onInitialize();
+                    add(new WebMarkupContainer("icon").add(RotterdamIconBehavior.EDIT));
+                }
+
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    setResponsePage(BabsUpdatePage.class, params);
+                }
+            }.add(AttributeModifier.replace("title", Model.of("Bewerken"))));
+
+            String toggleActiefLabel = dto.actief() ? "Inactief maken" : "Actief maken";
+            RotterdamIconBehavior toggleActiefIcon =
+                    dto.actief() ? RotterdamIconBehavior.BADGE_ALERT : RotterdamIconBehavior.BADGE_CHECK;
+            add(new RdIconAjaxButtonBorder("toggleActiefLink", Model.of(toggleActiefLabel)) {
+                @Override
+                protected void onInitialize() {
+                    super.onInitialize();
+                    add(new WebMarkupContainer("icon").add(toggleActiefIcon));
+                }
+
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    babsAdministrationService.toggleActief(model.getObject().id());
                     setResponsePage(BabsAdministrationPage.class);
                 }
-
-                @Override
-                public IModel<String> getBody() {
-                    return Model.of(getModelObject().actief() ? "Inactief maken" : "Actief maken");
-                }
-            });
+            }.add(AttributeModifier.replace("title", Model.of(toggleActiefLabel))));
         }
     }
 }

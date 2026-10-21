@@ -161,10 +161,12 @@ body {
 }
 
 .administration-content rods-icon-edit,
-.administration-content rods-icon-trash {
-    width: 2rem;
-    height: 2rem;
-    font-size: 2rem;
+.administration-content rods-icon-trash,
+.administration-content rods-icon-badge-alert,
+.administration-content rods-icon-badge-check {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 1.5rem;
 }
 
 /* Voorbeeld van de afbeelding van een trouwboekje in beheer */

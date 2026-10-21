@@ -123,7 +123,7 @@ public class LocationAdministrationPage extends AdministrationBasePage {
 
                             setResponsePage(LocationUpdatePage.class, params);
                         }
-                    },
+                    }.add(AttributeModifier.replace("title", Model.of("Wijzigen"))),
 
                     new RdIconAjaxButtonBorder("verwijderLink", Model.of("Verwijderen")) {
                         @Override
@@ -139,7 +139,8 @@ public class LocationAdministrationPage extends AdministrationBasePage {
                             add(new WebMarkupContainer("icon")
                                     .add(RotterdamIconBehavior.TRASH));
                         }
-                    }.add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
+                    }.add(AttributeModifier.replace("title", Model.of("Verwijderen")))
+                            .add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
             );
         }
     }
