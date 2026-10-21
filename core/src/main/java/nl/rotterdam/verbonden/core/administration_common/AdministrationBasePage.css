@@ -160,6 +160,10 @@ body {
     background: transparent;
 }
 
+.administration-content table {
+    background-color: #fff;
+}
+
 .administration-content rods-icon-edit,
 .administration-content rods-icon-trash,
 .administration-content rods-icon-badge-alert,
