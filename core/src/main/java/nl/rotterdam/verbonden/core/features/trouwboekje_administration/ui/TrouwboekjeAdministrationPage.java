@@ -6,6 +6,8 @@ import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.Li
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.wicket.components.icon_button.RdIconAjaxButtonBorder;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
+import nl.rotterdam.verbonden.core.identity.Roles;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -31,6 +33,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
 public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
 
     private static final String BEWERKEN_LABEL = "Bewerken";

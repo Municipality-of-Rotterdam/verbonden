@@ -6,9 +6,11 @@ import nl.rotterdam.verbonden.core.features.marriage_type_administration.domain.
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.wicket.components.icon_button.RdIconAjaxButtonBorder;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -30,6 +32,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
 public class MarriageTypeAdministrationPage extends AdministrationBasePage {
 
     @SpringBean
