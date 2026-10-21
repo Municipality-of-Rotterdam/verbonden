@@ -3,18 +3,20 @@ package nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui;
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ListTrouwboekjeDto;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
+import nl.rotterdam.nl_design_system.wicket.components.icon_button.RdIconAjaxButtonBorder;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
@@ -34,8 +36,10 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
     @SpringBean
     private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
 
+    private final FeedbackPanel feedback;
+
     public TrouwboekjeAdministrationPage() {
-        FeedbackPanel feedback = new FeedbackPanel("feedback");
+        feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
         pageBody.add(feedback);
         pageBody.add(new BookmarkablePageLink<>("nieuwExtraLink", TrouwboekjeCreatePage.class));
@@ -167,23 +171,43 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
         ActiesFragment(String id, IModel<ListTrouwboekjeDto> model) {
             super(id, "actiesFragment", TrouwboekjeAdministrationPage.this, model);
 
-            ListTrouwboekjeDto dto = model.getObject();
-            PageParameters params = new PageParameters().add("id", dto.id());
+            add(
+                    new RdIconAjaxButtonBorder("bewerkLink", Model.of("Bewerken")) {
+                        @Override
+                        protected void onInitialize() {
+                            super.onInitialize();
+                            add(new WebMarkupContainer("icon")
+                                    .add(RotterdamIconBehavior.EDIT));
+                        }
 
-            add(new BookmarkablePageLink<>("bewerkLink", TrouwboekjeUpdatePage.class, params));
+                        @Override
+                        protected void onSubmit(AjaxRequestTarget target) {
+                            PageParameters updateParams = new PageParameters().add("id", model.getObject().id());
+                            setResponsePage(TrouwboekjeUpdatePage.class, updateParams);
+                        }
+                    }.add(AttributeModifier.replace("aria-label", Model.of("Bewerken"))),
 
-            add(new Link<>("verwijderLink", model) {
-                @Override
-                public void onClick() {
-                    try {
-                        trouwboekjeAdministrationService.delete(getModelObject().id());
-                    } catch (DataIntegrityViolationException e) {
-                        getPage().error(getString("extra.verwijder.fout.ingebruik"));
-                        return;
-                    }
-                    setResponsePage(TrouwboekjeAdministrationPage.class);
-                }
-            });
+                    new RdIconAjaxButtonBorder("verwijderLink", Model.of("Verwijderen")) {
+                        @Override
+                        protected void onInitialize() {
+                            super.onInitialize();
+                            add(new WebMarkupContainer("icon")
+                                    .add(RotterdamIconBehavior.TRASH));
+                        }
+
+                        @Override
+                        protected void onSubmit(AjaxRequestTarget target) {
+                            try {
+                                trouwboekjeAdministrationService.delete(model.getObject().id());
+                            } catch (DataIntegrityViolationException e) {
+                                getPage().error(getString("extra.verwijder.fout.ingebruik"));
+                                target.add(feedback);
+                                return;
+                            }
+                            setResponsePage(TrouwboekjeAdministrationPage.class);
+                        }
+                    }.add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
+            );
         }
     }
 }

@@ -160,6 +160,13 @@ body {
     background: transparent;
 }
 
+.administration-content rods-icon-edit,
+.administration-content rods-icon-trash {
+    width: 2rem;
+    height: 2rem;
+    font-size: 2rem;
+}
+
 /* Voorbeeld van de afbeelding van een trouwboekje in beheer */
 .rd-trouwboekje-beheer__afbeelding {
     display: block;
