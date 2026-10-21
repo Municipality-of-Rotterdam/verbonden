@@ -33,6 +33,9 @@ import java.util.List;
 
 public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
 
+    private static final String BEWERKEN_LABEL = "Bewerken";
+    private static final String VERWIJDEREN_LABEL = "Verwijderen";
+
     @SpringBean
     private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
 
@@ -172,7 +175,7 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
             super(id, "actiesFragment", TrouwboekjeAdministrationPage.this, model);
 
             add(
-                    new RdIconAjaxButtonBorder("bewerkLink", Model.of("Bewerken")) {
+                    new RdIconAjaxButtonBorder("bewerkLink", Model.of(BEWERKEN_LABEL)) {
                         @Override
                         protected void onInitialize() {
                             super.onInitialize();
@@ -185,9 +188,9 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
                             PageParameters updateParams = new PageParameters().add("id", model.getObject().id());
                             setResponsePage(TrouwboekjeUpdatePage.class, updateParams);
                         }
-                    }.add(AttributeModifier.replace("aria-label", Model.of("Bewerken"))),
+                    }.add(AttributeModifier.replace("aria-label", Model.of(BEWERKEN_LABEL))),
 
-                    new RdIconAjaxButtonBorder("verwijderLink", Model.of("Verwijderen")) {
+                    new RdIconAjaxButtonBorder("verwijderLink", Model.of(VERWIJDEREN_LABEL)) {
                         @Override
                         protected void onInitialize() {
                             super.onInitialize();
@@ -206,7 +209,7 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
                             }
                             setResponsePage(TrouwboekjeAdministrationPage.class);
                         }
-                    }.add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
+                    }.add(AttributeModifier.replace("aria-label", Model.of(VERWIJDEREN_LABEL)))
             );
         }
     }
