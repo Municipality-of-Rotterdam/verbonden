@@ -24,7 +24,7 @@ class AdministrationBasePageTest extends BaseWicketTest {
                 .contains("Dossiers")
                 .contains("Trouwboekjes")
                 .contains("Uitloggen")
-                .contains(">user<")
+                .contains("Beheerder")
                 .contains("href=\"/logout\"")
                 .doesNotContain("rd-top-bar")
                 .doesNotContain("rd-footer-links")

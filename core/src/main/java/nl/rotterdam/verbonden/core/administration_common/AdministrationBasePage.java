@@ -7,7 +7,6 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdm
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.verbonden.core.identity.Roles;
-import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
@@ -36,7 +35,6 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.PackageResourceReference;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.io.Serializable;
 import java.util.List;
@@ -65,9 +63,6 @@ public abstract class AdministrationBasePage extends WebPage {
             new NavigationItem("Trouwboekjes", RotterdamIconType.FILE, TrouwboekjeAdministrationPage.class)
     );
 
-    @SpringBean
-    private CurrentUserProvider currentUserProvider;
-
     protected final RdPageBodyBorder pageBody;
 
     public AdministrationBasePage() {
@@ -93,7 +88,6 @@ public abstract class AdministrationBasePage extends WebPage {
         });
         add(new WebMarkupContainer("userIcon")
                 .add(new RotterdamIconBehavior(RotterdamIconType.USER)));
-        add(new Label("userName", currentUserProvider.getCurrentUser().getUserId()));
         add(new ExternalLink("logOutLink", WicketApplication.get().getBeheerLogoutUrl())
                 .add(new WebMarkupContainer("logOutIcon")
                         .add(new RotterdamIconBehavior(RotterdamIconType.LOG_OUT))));
