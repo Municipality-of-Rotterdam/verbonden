@@ -124,6 +124,29 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
     }
 
     @Test
+    void babsGroepKanBeheerStartpaginaOpenenEnZietAlleenBeschikbareBeheerpagina() {
+        alsGebruikerMetAuthority("ROLE_vbr_babs");
+
+        tester.startPage(BabsAdministrationPage.class);
+
+        tester.assertRenderedPage(BabsAdministrationPage.class);
+        assertThat(tester.getLastResponseAsString())
+                .contains("BABS")
+                .doesNotContain("Trouwlocaties", "Huwelijkstypen", "Dossiers", "Trouwboekjes");
+    }
+
+    @Test
+    void beheerGroepKanBeheerStartpaginaOpenenEnZietAlleBeheerpaginaas() {
+        alsGebruikerMetAuthority("vbr_beheer");
+
+        tester.startPage(BabsAdministrationPage.class);
+
+        tester.assertRenderedPage(BabsAdministrationPage.class);
+        assertThat(tester.getLastResponseAsString())
+                .contains("BABS", "Trouwlocaties", "Huwelijkstypen", "Dossiers", "Trouwboekjes");
+    }
+
+    @Test
     void babsZietGeenLinksEnActiesVoorBeheer() {
         alsGebruikerMetRol(Roles.BABS);
 
@@ -237,7 +260,11 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
     }
 
     private static void alsGebruikerMetRol(String rol) {
+        alsGebruikerMetAuthority("ROLE_" + rol);
+    }
+
+    private static void alsGebruikerMetAuthority(String authority) {
         SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken.authenticated(
-                "medewerker", null, List.of(new SimpleGrantedAuthority("ROLE_" + rol))));
+                "medewerker", null, List.of(new SimpleGrantedAuthority(authority))));
     }
 }

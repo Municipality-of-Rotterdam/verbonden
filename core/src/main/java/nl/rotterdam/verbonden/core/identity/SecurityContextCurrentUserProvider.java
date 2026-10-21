@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 class SecurityContextCurrentUserProvider implements CurrentUserProvider {
 
     private static final String ROLE_PREFIX = "ROLE_";
+    private static final String GROUP_PREFIX = "vbr_";
     private static final String ONBEKEND = "onbekend";
 
     @Override
@@ -26,11 +28,19 @@ class SecurityContextCurrentUserProvider implements CurrentUserProvider {
                 ? Set.of()
                 : auth.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
-                        .map(authority -> authority.startsWith(ROLE_PREFIX)
-                                ? authority.substring(ROLE_PREFIX.length())
-                                : authority)
+                        .map(SecurityContextCurrentUserProvider::normaliseerRol)
                         .collect(Collectors.toUnmodifiableSet());
         return new AuthenticatedUserImpl(userId, roles);
+    }
+
+    private static String normaliseerRol(String authority) {
+        String role = authority.startsWith(ROLE_PREFIX)
+                ? authority.substring(ROLE_PREFIX.length())
+                : authority;
+        if (role.regionMatches(true, 0, GROUP_PREFIX, 0, GROUP_PREFIX.length())) {
+            return role.substring(GROUP_PREFIX.length()).toUpperCase(Locale.ROOT);
+        }
+        return role;
     }
 
     private record AuthenticatedUserImpl(String userId, Set<String> roles) implements AuthenticatedUser {
