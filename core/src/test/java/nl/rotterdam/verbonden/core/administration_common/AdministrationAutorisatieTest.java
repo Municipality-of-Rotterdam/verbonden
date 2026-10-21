@@ -14,7 +14,6 @@ import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.Trouwb
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
-import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,6 +29,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -41,6 +42,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Transactional
 class AdministrationAutorisatieTest extends BaseWicketTest {
+
+    private static final Set<String> STANDAARD_BEHEER_ROLLEN =
+            Set.of(Roles.BEHEER, Roles.SUPERUSER, Roles.KEYUSER, Roles.WERKVERDELER, Roles.PLANNER, Roles.MEDEWERKER);
+    private static final Map<Class<?>, Set<String>> PAGINA_ROLLEN = Map.of(
+            BabsAdministrationPage.class, Set.copyOf(Roles.ALLE),
+            LocationAdministrationPage.class, Set.of(Roles.BEHEER, Roles.SUPERUSER)
+    );
 
     private static final List<Class<?>> BEHEER_PAGINAS = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
@@ -136,7 +144,7 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
     }
 
     @Test
-    void beheerGroepKanBeheerStartpaginaOpenenEnZietAlleBeheerpaginaas() {
+    void beheerGroepKanBeheerStartpaginaOpenenEnZietAlleBeheerpaginas() {
         alsGebruikerMetAuthority("vbr_beheer");
 
         tester.startPage(BabsAdministrationPage.class);
@@ -252,11 +260,7 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
     }
 
     private static boolean rolMagPaginaOpenen(Class<?> pagina, String rol) {
-        AuthorizeInstantiation autorisatie = pagina.getAnnotation(AuthorizeInstantiation.class);
-        if (autorisatie == null) {
-            autorisatie = pagina.getPackage().getAnnotation(AuthorizeInstantiation.class);
-        }
-        return autorisatie == null || autorisatie.value().length == 0 || List.of(autorisatie.value()).contains(rol);
+        return PAGINA_ROLLEN.getOrDefault(pagina, STANDAARD_BEHEER_ROLLEN).contains(rol);
     }
 
     private static void alsGebruikerMetRol(String rol) {

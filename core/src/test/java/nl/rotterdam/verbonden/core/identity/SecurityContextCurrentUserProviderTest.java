@@ -29,6 +29,15 @@ class SecurityContextCurrentUserProviderTest {
     }
 
     @Test
+    void normalizesGroupPrefixWithoutCaseSensitivityAndPreservesUnknownGroups() {
+        setAuthorities("VBR_BABS", "vbr_other");
+
+        AuthenticatedUser currentUser = provider.getCurrentUser();
+
+        assertThat(currentUser.getRoles()).containsExactlyInAnyOrder(Roles.BABS, "OTHER");
+    }
+
+    @Test
     void keepsStandardSpringRoleAuthorities() {
         setAuthorities("ROLE_BABS", "ROLE_BEHEER");
 
