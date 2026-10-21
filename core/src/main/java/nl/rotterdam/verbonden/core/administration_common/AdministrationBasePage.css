@@ -164,6 +164,33 @@ body {
     background-color: #fff;
 }
 
+.administration-content .utrecht-table {
+    --utrecht-table-header-background-color: #fff;
+    --utrecht-table-row-alternate-odd-background-color: #fff;
+    --utrecht-table-row-alternate-even-background-color: #fff;
+    --utrecht-table-row-border-block-end-color: #bdcbd0;
+    --utrecht-table-row-border-block-end-width: 1px;
+    border: 1px solid #bdcbd0;
+}
+
+.administration-content .utrecht-table__header {
+    background-color: #fff;
+}
+
+.administration-content .utrecht-table__header-cell {
+    border-block-end: 2px solid #20272a;
+}
+
+.administration-content .utrecht-table__header-cell-button:has(.utrecht-icon) {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.administration-content .utrecht-table .utrecht-table__body .utrecht-table__row:hover .utrecht-table__cell {
+    background-color: #e4eff2;
+    color: inherit;
+}
+
 .administration-content rods-icon-edit,
 .administration-content rods-icon-trash,
 .administration-content rods-icon-badge-alert,
