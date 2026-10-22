@@ -118,7 +118,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
         String response = tester.getLastResponseAsString();
         // DatumKiezenPage hangt onder /mijn-dag/{dossierId}/de-dag/datum-kiezen
         assertThat(response).contains("href=\"../../" + dossierId + "\"><span>Mijn dag</span>");
-        assertThat(response).contains("href=\"../de-dag\"><span>Ceremonie</span>");
+        assertThat(response).contains("href=\"../de-dag\"><span>Dé dag</span>");
         assertThat(response).doesNotContain("bookmarkable");
     }
 
