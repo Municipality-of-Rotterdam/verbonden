@@ -59,7 +59,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.startPage(JullieGegevensPage.class, params);
 
         String html = tester.getLastResponseAsString();
-        assertThat(html).containsPattern("id=\"partner-uitnodiging-url\"[^>]*value=\"[^\"]*/huwelijk/" + createdDossierId + "\"");
+        assertThat(html).containsPattern("id=\"partner-uitnodiging-url\"[^>]*value=\"[^\"]*/mijn-dag/" + createdDossierId + "\"");
         assertThat(html).contains("data-kopieer-doel=\"partner-uitnodiging-url\"");
         assertThat(html).contains("link-kopieren");
 

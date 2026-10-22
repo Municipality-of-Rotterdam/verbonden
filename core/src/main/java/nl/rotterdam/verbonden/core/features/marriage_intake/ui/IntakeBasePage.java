@@ -16,6 +16,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.List;
@@ -94,7 +95,8 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         }
 
         pageBody.add(new MijnLoketBreadcrumbPanel("breadcrumb", List.of(
-                new Kruimel(getString("intake.breadcrumb.mijndag"), MarriageIntakePage.class))));
+                new Kruimel(getString("intake.breadcrumb.mijndag"), MarriageIntakePage.class,
+                        dossierId != null ? makeDossierPageParameters(dossierId) : new PageParameters()))));
 
         RdAlert wrongDossierAlert = new RdAlert("wrongDossierAlert",
                 new ResourceModel("intake.alert.wrong.dossier"), RdAlertType.WARNING);

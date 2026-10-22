@@ -71,8 +71,9 @@ public class DatumKiezenPage extends BurgerBasePage {
         }
 
         pageBody.add(new MijnLoketBreadcrumbPanel("breadcrumb", List.of(
-                new Kruimel(getString("intake.tab.dedag"), DeDagPage.class),
-                new Kruimel(getString("datum.kiezen.breadcrumb"), DatumKiezenPage.class))));
+                new Kruimel(getString("intake.breadcrumb.mijndag"), MarriageIntakePage.class, makeDossierPageParameters(dossierId)),
+                new Kruimel(getString("intake.tab.dedag"), DeDagPage.class, makeDossierPageParameters(dossierId)),
+                new Kruimel(getString("datum.kiezen.breadcrumb"), DatumKiezenPage.class, makeDossierPageParameters(dossierId)))));
 
         pageBody.add(new BookmarkablePageLink<>("terugLink", DeDagPage.class,  makeDossierPageParameters(dossierId)));
 

@@ -12,6 +12,7 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import java.io.Serializable;
 import java.util.List;
@@ -28,7 +29,7 @@ import static nl.rotterdam.nl_design_system.wicket.components.breadcrumb_nav.RdB
  */
 public class MijnLoketBreadcrumbPanel extends Panel {
 
-    public record Kruimel(String label, Class<? extends Page> pagina) implements Serializable {
+    public record Kruimel(String label, Class<? extends Page> pagina, PageParameters parameters) implements Serializable {
     }
 
     private final List<Kruimel> kruimels;
@@ -51,7 +52,7 @@ public class MijnLoketBreadcrumbPanel extends Panel {
                     @Override
                     protected void populateItem(ListItem<Kruimel> item) {
                         Kruimel kruimel = item.getModelObject();
-                        BookmarkablePageLink<Void> link = new BookmarkablePageLink<>("link", kruimel.pagina()) {
+                        BookmarkablePageLink<Void> link = new BookmarkablePageLink<>("link", kruimel.pagina(), kruimel.parameters()) {
                             @Override
                             protected void onComponentTag(ComponentTag tag) {
                                 super.onComponentTag(tag);

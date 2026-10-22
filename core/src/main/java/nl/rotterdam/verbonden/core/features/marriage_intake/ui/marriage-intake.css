@@ -30,12 +30,16 @@
     font-size: 1rem;
 }
 
-.utrecht-breadcrumb-nav__link {
+/* Altijd groen, ook als de link al bezocht is */
+.utrecht-breadcrumb-nav__link,
+.utrecht-breadcrumb-nav__link:visited,
+.utrecht-breadcrumb-nav__link:hover,
+.utrecht-breadcrumb-nav__link:active {
     font-size: 0.9375rem;
+    color: var(--rd-color-green-500, #007a3e);
 }
 
 .utrecht-breadcrumb-nav__link[aria-current="page"] {
-    color: #333;
     text-decoration: none;
     cursor: default;
 }
