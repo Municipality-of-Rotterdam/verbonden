@@ -27,6 +27,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
@@ -105,6 +106,20 @@ class DatumKiezenPageTest extends BaseWicketTest {
         String response = tester.getLastResponseAsString();
         assertThat(response).contains("rods-date-picker");
         assertThat(response).doesNotContain("el.options");
+    }
+
+    @Test
+    @WithMockUser(username = "999990019", roles = "BURGER")
+    void breadcrumbLinktNaarGemounteMijnDagEnDeDagPagina() {
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+
+        tester.startPage(DatumKiezenPage.class, dossierParams(dossierId));
+
+        String response = tester.getLastResponseAsString();
+        // DatumKiezenPage hangt onder /mijn-dag/{dossierId}/de-dag/datum-kiezen
+        assertThat(response).contains("href=\"../../" + dossierId + "\"><span>Mijn dag</span>");
+        assertThat(response).contains("href=\"../de-dag\"><span>Dé dag</span>");
+        assertThat(response).doesNotContain("bookmarkable");
     }
 
     @Test
@@ -279,7 +294,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
     /** Dossier van de ingelogde burger (zie {@code @WithMockUser}), zoals de intake het aanmaakt. */
     private UUID maakDossier(CeremonieSoort soort) {
         BurgerServiceNummer ingelogd = new BurgerServiceNummer(
-                SecurityContextHolder.getContext().getAuthentication().getName());
+                requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
         return marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, soort, null, ingelogd));
     }

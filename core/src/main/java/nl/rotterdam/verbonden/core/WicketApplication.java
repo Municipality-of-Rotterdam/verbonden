@@ -193,12 +193,14 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/nieuw", BeschikbaarheidCreatePage.class);
         mountPage("/beheer/locaties/${locatieId}/beschikbaarheden/${id}", BeschikbaarheidUpdatePage.class);
 
-        mountPage("/huwelijk/${dossierId}", MarriageIntakePage.class);
-        mountPage("/huwelijk/${dossierId}/uitnodiging", DossierUitnodigingPage.class);
-        mountPage("/mijn-dag/${dossierId}", DeDagPage.class);
+        mountPage("/mijn-dag/${dossierId}", MarriageIntakePage.class);
+        mountPage("/mijn-dag/${dossierId}/uitnodiging", DossierUitnodigingPage.class);
+        mountPage("/mijn-dag/${dossierId}/de-dag", DeDagPage.class);
+        mountPage("/mijn-dag/${dossierId}/de-dag/datum-kiezen", DatumKiezenPage.class);
         mountPage("/mijn-dag/${dossierId}/jullie-gegevens", JullieGegevensPage.class);
         mountPage("/mijn-dag/${dossierId}/de-getuigen", DeGetuigenPage.class);
-        mountPage("/mijn-dag/${dossierId}/datum-kiezen", DatumKiezenPage.class);
+        mountPage("/mijn-dag/${dossierId}/extras", ExtrasPage.class);
+        mountPage("/mijn-dag/${dossierId}/aanvraag", AanvraagStatusPage.class);
         mountPage("/beheer/dossiers", DossierAdministrationPage.class);
         mountPage("/beheer/dossiers/nieuw", DossierCreatePage.class);
         mountPage("/beheer/dossiers/${dossierId}", DossierDetailPage.class);
@@ -211,8 +213,6 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/beheer/extras", TrouwboekjeAdministrationPage.class);
         mountPage("/beheer/extras/nieuw", TrouwboekjeCreatePage.class);
         mountPage("/beheer/extras/${id}", TrouwboekjeUpdatePage.class);
-        mountPage("/mijn-dag/${dossierId}/extras", ExtrasPage.class);
-        mountPage("/mijn-dag/${dossierId}/aanvraag", AanvraagStatusPage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/nieuw", NietBeschikbareDagCreatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/${id}", NietBeschikbareDagUpdatePage.class);
         mountPage("/beheer/locaties/${locatieId}/niet-beschikbare-dagen/importeren", NietBeschikbareDagImportPage.class);
