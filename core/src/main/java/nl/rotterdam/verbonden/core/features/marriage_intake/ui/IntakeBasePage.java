@@ -9,11 +9,11 @@ import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.verbonden.core.burger_common.MijnLoketBreadcrumbPanel;
 import nl.rotterdam.verbonden.core.burger_common.MijnLoketBreadcrumbPanel.Kruimel;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -41,6 +41,10 @@ public abstract class IntakeBasePage extends BurgerBasePage {
     protected abstract IModel<DossierSamenvattingDto> getSidebarDossierModel();
 
     protected abstract IntakeStep getActiveStep();
+
+    protected boolean hasStepNavigation() {
+        return true;
+    }
 
     /**
      * Returns {@code true} when the page requires a valid (non-null) dossier ID to render.
@@ -114,41 +118,77 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         pageBody.add(notAuthorizedAlert);
 
         // The steps are only useful while the dossier can still be changed
-        WebMarkupContainer stappen = new WebMarkupContainer("stappen");
-        stappen.setVisible(!ingediend);
-        stappen.add(
-                createTabLink("tabDeDag", IntakeStep.DE_DAG, DeDagPage.class),
-                createTabLink("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS, JullieGegevensPage.class),
-                createTabLink("tabGetuigen", IntakeStep.DE_GETUIGEN, DeGetuigenPage.class),
-                createTabLink("tabExtras", IntakeStep.EXTRAS, ExtrasPage.class)
-        );
-        pageBody.add(stappen);
+        if (hasStepNavigation()) {
+            pageBody.add(
+                    createNavigationContainer("vorigeStapContainer", "vorigeStap", vorigeStap(), "intake.button.vorige"),
+                    createNavigationContainer("volgendeStapContainer", "volgendeStap", volgendeStap(), "intake.button.volgende")
+            );
+        }
 
-        keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel());
+        keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel(), getActiveStep());
         pageBody.add(keuzesSidebar);
     }
 
-    private Link<Void> createTabLink(String id, IntakeStep step, Class<? extends IntakeBasePage> pageClass) {
-        Link<Void> tab = new Link<>(id) {
+    private WebMarkupContainer createNavigationContainer(String id, String linkId, IntakeStep targetStep, String labelKey) {
+        WebMarkupContainer container = new WebMarkupContainer(id);
+        container.setVisible(targetStep != null);
+        container.add(createNavigationLink(linkId, targetStep, labelKey));
+        return container;
+    }
+
+    private Link<Void> createNavigationLink(String id, IntakeStep targetStep, String labelKey) {
+        Link<Void> link = new Link<>(id) {
             @Override
             public void onClick() {
                 if (dossierId != null) {
-                    setResponsePage(pageClass, makeDossierPageParameters(dossierId));
+                    setResponsePage(pageFor(targetStep), makeDossierPageParameters(dossierId));
                 }
             }
 
             @Override
-            public boolean isEnabled() {
-                return dossierId != null;
+            protected void onConfigure() {
+                super.onConfigure();
+                setEnabled(dossierId != null);
             }
         };
-        boolean isActive = getActiveStep() == step;
-        tab.add(AttributeModifier.replace("aria-selected", String.valueOf(isActive)));
-        if (isActive) {
-            tab.add(AttributeModifier.append("class", " rd-tab--active"));
-            tab.add(AttributeModifier.replace("aria-current", "step"));
+        link.add(new Label("label", new ResourceModel(labelKey)));
+        return link;
+    }
+
+    private IntakeStep vorigeStap() {
+        if (getActiveStep() == null) {
+            return null;
         }
-        return tab;
+        return switch (getActiveStep()) {
+            case DE_DAG -> null;
+            case JULLIE_GEGEVENS -> IntakeStep.DE_DAG;
+            case DE_GETUIGEN -> IntakeStep.JULLIE_GEGEVENS;
+            case EXTRAS -> IntakeStep.DE_GETUIGEN;
+            case CONTROLEREN -> IntakeStep.EXTRAS;
+        };
+    }
+
+    private IntakeStep volgendeStap() {
+        if (getActiveStep() == null) {
+            return null;
+        }
+        return switch (getActiveStep()) {
+            case DE_DAG -> IntakeStep.JULLIE_GEGEVENS;
+            case JULLIE_GEGEVENS -> IntakeStep.DE_GETUIGEN;
+            case DE_GETUIGEN -> IntakeStep.EXTRAS;
+            case EXTRAS -> IntakeStep.CONTROLEREN;
+            case CONTROLEREN -> null;
+        };
+    }
+
+    private Class<? extends IntakeBasePage> pageFor(IntakeStep step) {
+        return switch (step) {
+            case DE_DAG -> DeDagPage.class;
+            case JULLIE_GEGEVENS -> JullieGegevensPage.class;
+            case DE_GETUIGEN -> DeGetuigenPage.class;
+            case EXTRAS -> ExtrasPage.class;
+            case CONTROLEREN -> ControlerenPage.class;
+        };
     }
 
     @Override

@@ -1,0 +1,117 @@
+<wicket:extend>
+
+    <h1 wicket:id="heading">Controleren</h1>
+    <p class="rd-intro-text" wicket:id="intro"></p>
+
+    <div wicket:id="vorigeStapContainer" class="rd-vorige-nav">
+        <a wicket:id="vorigeStap" class="rd-secondary-button">
+            <span aria-hidden="true">&#8592;</span>
+            <span wicket:id="label">Vorige stap</span>
+        </a>
+    </div>
+    <div wicket:id="volgendeStapContainer" class="rd-verder-nav">
+        <a wicket:id="volgendeStap" class="rd-secondary-button">
+            <span wicket:id="label">Volgende stap</span>
+        </a>
+    </div>
+
+    <div class="rd-controleer-kaart">
+        <h2><wicket:message key="controleren.samenvatting">Samenvatting</wicket:message></h2>
+        <p><wicket:message key="controleren.samenvatting.intro">Je kan alles nog aanpassen voordat je bevestigt.</wicket:message></p>
+
+        <section class="rd-controleer-sectie">
+            <div class="rd-controleer-sectie__kop">
+                <h3><wicket:message key="controleren.dag">Dé dag</wicket:message></h3>
+                <a wicket:id="wijzigDag"><wicket:message key="controleren.aanpassen">Aanpassen</wicket:message></a>
+            </div>
+            <div class="rd-controleer-rij">
+                <span><wicket:message key="controleren.registratie">Registratie</wicket:message></span>
+                <strong wicket:id="registratieType">Huwelijk</strong>
+            </div>
+            <div class="rd-controleer-rij">
+                <span><wicket:message key="controleren.ceremonie">Ceremonie</wicket:message></span>
+                <strong>&#x20AC;&nbsp;<span wicket:id="ceremoniePrijs"></span>&nbsp;<span wicket:id="ceremonieSoort">Klein</span></strong>
+            </div>
+            <div class="rd-controleer-rij">
+                <span><wicket:message key="controleren.datum">Datum</wicket:message></span>
+                <strong wicket:id="datum"></strong>
+            </div>
+            <div class="rd-controleer-rij">
+                <span><wicket:message key="controleren.locatie">Locatie</wicket:message></span>
+                <strong wicket:id="locatie"></strong>
+            </div>
+        </section>
+
+        <section class="rd-controleer-sectie">
+            <div class="rd-controleer-sectie__kop">
+                <h3><wicket:message key="controleren.jullie.gegevens">Jullie gegevens</wicket:message></h3>
+                <a wicket:id="wijzigGegevens"><wicket:message key="controleren.aanpassen">Aanpassen</wicket:message></a>
+            </div>
+            <div wicket:id="partners" class="rd-controleer-rij">
+                <span><wicket:message key="controleren.naamkeuze">Naamkeuze</wicket:message></span>
+                <strong wicket:id="naamkeuze"></strong>
+            </div>
+        </section>
+
+        <section class="rd-controleer-sectie">
+            <div class="rd-controleer-sectie__kop">
+                <h3><wicket:message key="controleren.getuigen">De getuigen</wicket:message></h3>
+                <a wicket:id="wijzigGetuigen"><wicket:message key="controleren.aanpassen">Aanpassen</wicket:message></a>
+            </div>
+            <div wicket:id="getuigen" class="rd-controleer-rij">
+                <span><wicket:message key="controleren.getuige">Getuige</wicket:message></span>
+                <strong wicket:id="getuigeNaam"></strong>
+            </div>
+        </section>
+
+        <section class="rd-controleer-sectie">
+            <div class="rd-controleer-sectie__kop">
+                <h3><wicket:message key="controleren.extras">Extra opties</wicket:message></h3>
+                <a wicket:id="wijzigExtras"><wicket:message key="controleren.aanpassen">Aanpassen</wicket:message></a>
+            </div>
+            <p wicket:id="geenExtras" class="rd-keuzes-empty">
+                <wicket:message key="intake.sidebar.extras.nogniet">Nog geen extra's gekozen</wicket:message>
+            </p>
+            <div wicket:id="extras" class="rd-controleer-rij">
+                <span wicket:id="extraNaam"></span>
+                <strong wicket:id="extraPrijs"></strong>
+            </div>
+        </section>
+
+        <div class="rd-controleer-totaal">
+            <strong><wicket:message key="controleren.totaal">Totaal bedrag</wicket:message></strong>
+            <strong>€&nbsp;<span wicket:id="totaalPrijs"></span></strong>
+        </div>
+    </div>
+
+    <form wicket:id="bevestigForm" class="rd-controleer-bevestigen">
+        <button wicket:id="bevestigButton" type="submit"></button>
+        <div wicket:id="nogNietCompleetHint" class="rd-keuzes-hint">
+            <p wicket:id="algemeen" class="rd-keuzes-hint__tekst">
+                <wicket:message key="intake.sidebar.bevestig.nognietcompleet">Vul eerst alle onderdelen in. Daarna kunnen jullie je keuzes bevestigen.</wicket:message>
+            </p>
+            <wicket:container wicket:id="specifiek">
+                <p class="rd-keuzes-hint__tekst">
+                    <wicket:message key="intake.sidebar.bevestig.nogintevullen">Dit moet nog gebeuren voordat jullie je keuzes kunnen bevestigen:</wicket:message>
+                </p>
+                <ul class="rd-keuzes-hint__lijst">
+                    <li wicket:id="onderdelen"><a href="#" wicket:id="link"><span wicket:id="label">onderdeel</span></a></li>
+                </ul>
+            </wicket:container>
+        </div>
+        <dialog wicket:id="bevestigDialog" class="rd-bevestig-dialog">
+            <p class="rd-bevestig-dialog__factuur">
+                <span class="rd-bevestig-dialog__factuur-icoon" aria-hidden="true">&#x20AC;</span>
+                <wicket:message key="intake.bevestig.dialog.factuur">Rotterdam stuurt je een factuur voor de kosten.</wicket:message>
+            </p>
+        </dialog>
+    </form>
+
+    <wicket:fragment wicket:id="bevestigDialogActies">
+        <div wicket:id="acties">
+            <button wicket:id="indienenButton" type="submit"></button>
+            <button wicket:id="annulerenButton" type="submit" class="rd-bevestig-dialog__annuleren"></button>
+        </div>
+    </wicket:fragment>
+
+</wicket:extend>

@@ -61,6 +61,11 @@ public class MarriageIntakePage extends IntakeBasePage {
     }
 
     @Override
+    protected boolean hasStepNavigation() {
+        return false;
+    }
+
+    @Override
     protected IModel<String> getTitleModel() {
         return new ResourceModel("intake.page.title.marriageintake");
     }

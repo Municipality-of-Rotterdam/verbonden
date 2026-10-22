@@ -8,7 +8,6 @@ import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -82,7 +81,6 @@ public class DeDagPage extends IntakeBasePage {
                 new NietBeschikbaarLink("babsLink", "intake.card.babs.niet.beschikbaar")
         );
 
-        pageBody.add(new BookmarkablePageLink<>("jullieGegevensLink", JullieGegevensPage.class, makeDossierPageParameters(dossierId)));
     }
 
     private class NietBeschikbaarLink extends Link<Void> {
@@ -103,4 +101,3 @@ public class DeDagPage extends IntakeBasePage {
         }
     }
 }
-

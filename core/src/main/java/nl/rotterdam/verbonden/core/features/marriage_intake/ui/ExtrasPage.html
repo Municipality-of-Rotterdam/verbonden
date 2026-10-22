@@ -2,6 +2,13 @@
 
     <h1 wicket:id="heading">Extra's</h1>
 
+    <div wicket:id="vorigeStapContainer" class="rd-vorige-nav">
+        <a wicket:id="vorigeStap" class="rd-secondary-button">
+            <span aria-hidden="true">&#8592;</span>
+            <span wicket:id="label">Vorige stap</span>
+        </a>
+    </div>
+
     <form wicket:id="extrasForm">
 
         <!-- Ringen uitwisselen -->
@@ -90,5 +97,12 @@
         </div>
 
     </form>
+
+    <div wicket:id="volgendeStapContainer" class="rd-verder-nav">
+        <a wicket:id="volgendeStap" class="rd-secondary-button">
+            <span wicket:id="label">Volgende stap</span>
+            <span aria-hidden="true">&#8594;</span>
+        </a>
+    </div>
 
 </wicket:extend>
