@@ -7,9 +7,13 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
+import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
+import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
+import org.apache.wicket.util.tester.TagTester;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,7 +29,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +53,14 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
             .filter(c -> !c.getModifiers().contains(JavaModifier.ABSTRACT))
             .map(JavaClass::reflect)
             .toList();
+
+    /** Packages van het beheer van stamgegevens: alleen voor {@code BEHEER} en {@code SUPERUSER}. */
+    private static final Set<String> STAMGEGEVENS_PACKAGES = Set.of(
+            LocationAdministrationPage.class.getPackageName(),
+            MarriageTypeAdministrationPage.class.getPackageName(),
+            TrouwboekjeAdministrationPage.class.getPackageName());
+
+    private static final Pattern MENU_ITEM_TITLE = Pattern.compile("<a [^>]*title=\"([^\"]+)\"");
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -74,13 +89,16 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
         assertThat(BEHEER_PAGINAS).contains(BabsAdministrationPage.class, DossierAdministrationPage.class);
     }
 
-    /** De startpagina is voor iedere rol; alle andere beheerpagina's voor iedere rol behalve BABS. */
+    /**
+     * De startpagina is voor iedere rol; het beheer van stamgegevens alleen voor BEHEER en SUPERUSER; alle andere
+     * beheerpagina's voor iedere rol behalve BABS.
+     */
     @ParameterizedTest(name = "{0} met rol {1}")
     @MethodSource("paginaEnRol")
     void elkeRolMagBijDeVoorHaarBedoeldePaginas(Class<?> pagina, String rol) {
         alsGebruikerMetRol(rol);
 
-        boolean verwacht = pagina == BabsAdministrationPage.class || !rol.equals(Roles.BABS);
+        boolean verwacht = verwachtToegang(pagina, rol);
         assertThat(magOpenen(pagina)).isEqualTo(verwacht);
     }
 
@@ -126,8 +144,8 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
 
         tester.assertInvisible(pad("nieuwBabsLink"));
         tester.assertInvisible(pad("importForm"));
-        assertThat(tester.getLastResponseAsString())
-                .doesNotContain("Acties", "Trouwlocaties", "Huwelijkstypen", "Dossiers", "Trouwboekjes");
+        assertThat(tester.getLastResponseAsString()).doesNotContain("Acties");
+        assertThat(menuItems()).containsExactly("BABS");
     }
 
     @ParameterizedTest(name = "{0}")
@@ -139,8 +157,18 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
 
         tester.assertVisible(pad("nieuwBabsLink"));
         tester.assertVisible(pad("importForm"));
-        assertThat(tester.getLastResponseAsString())
-                .contains("Acties", "Trouwlocaties", "Huwelijkstypen", "Dossiers", "Trouwboekjes");
+        assertThat(tester.getLastResponseAsString()).contains("Acties");
+
+        List<String> verwachteMenuItems = Stream.of(
+                        Map.entry("BABS", BabsAdministrationPage.class),
+                        Map.entry("Trouwlocaties", LocationAdministrationPage.class),
+                        Map.entry("Huwelijkstypen", MarriageTypeAdministrationPage.class),
+                        Map.entry("Dossiers", DossierAdministrationPage.class),
+                        Map.entry("Trouwboekjes", TrouwboekjeAdministrationPage.class))
+                .filter(item -> verwachtToegang(item.getValue(), rol))
+                .map(Map.Entry::getKey)
+                .toList();
+        assertThat(menuItems()).containsExactlyElementsOf(verwachteMenuItems);
     }
 
     @Test
@@ -200,6 +228,25 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
     private boolean magOpenen(Class<?> pagina) {
         IAuthorizationStrategy strategy = application.getSecuritySettings().getAuthorizationStrategy();
         return strategy.isInstantiationAuthorized(pagina.asSubclass(org.apache.wicket.Page.class));
+    }
+
+    /** De labels van de menu-items in de zijbalk, in volgorde; tekst elders op de pagina telt niet mee. */
+    private List<String> menuItems() {
+        TagTester navigatie = TagTester.createTagByAttribute(
+                tester.getLastResponseAsString(), "aria-label", "Beheernavigatie");
+        return MENU_ITEM_TITLE.matcher(navigatie.getValue()).results()
+                .map(match -> match.group(1))
+                .toList();
+    }
+
+    private static boolean verwachtToegang(Class<?> pagina, String rol) {
+        if (pagina == BabsAdministrationPage.class) {
+            return true;
+        }
+        if (STAMGEGEVENS_PACKAGES.contains(pagina.getPackageName())) {
+            return rol.equals(Roles.BEHEER) || rol.equals(Roles.SUPERUSER);
+        }
+        return !rol.equals(Roles.BABS);
     }
 
     private static void alsGebruikerMetRol(String rol) {

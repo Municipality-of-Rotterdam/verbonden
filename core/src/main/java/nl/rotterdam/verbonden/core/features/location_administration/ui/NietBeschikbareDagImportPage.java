@@ -4,7 +4,9 @@ import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
 import nl.rotterdam.verbonden.core.administration_common.RdFormFieldFileUpload;
 import nl.rotterdam.verbonden.core.features.location_administration.application.NietBeschikbareDagImportService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.NietBeschikbareDagImportResult;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -17,9 +19,9 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
 public class NietBeschikbareDagImportPage extends AdministrationBasePage {
 
     @SpringBean

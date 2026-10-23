@@ -6,9 +6,11 @@ import nl.rotterdam.verbonden.core.features.location_administration.domain.ListL
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.wicket.components.icon_button.RdIconAjaxButtonBorder;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
@@ -32,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
 public class LocationAdministrationPage extends AdministrationBasePage {
 
     @SpringBean
@@ -120,7 +123,7 @@ public class LocationAdministrationPage extends AdministrationBasePage {
 
                             setResponsePage(LocationUpdatePage.class, params);
                         }
-                    },
+                    }.add(AttributeModifier.replace("title", Model.of("Wijzigen"))),
 
                     new RdIconAjaxButtonBorder("verwijderLink", Model.of("Verwijderen")) {
                         @Override
@@ -136,7 +139,8 @@ public class LocationAdministrationPage extends AdministrationBasePage {
                             add(new WebMarkupContainer("icon")
                                     .add(RotterdamIconBehavior.TRASH));
                         }
-                    }.add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
+                    }.add(AttributeModifier.replace("title", Model.of("Verwijderen")))
+                            .add(AttributeModifier.replace("aria-label", Model.of("Verwijderen")))
             );
         }
     }

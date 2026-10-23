@@ -52,6 +52,26 @@ class BabsBeheerPaginaTest extends BaseWicketTest {
     }
 
     @Test
+    void overzichtToontIconActiesMetTooltips() {
+        babsAdministrationService.create(new CreateBabsDto(
+                NAAM, null, null, true, null, null, List.of(DayOfWeek.MONDAY)));
+        babsAdministrationService.create(new CreateBabsDto(
+                new PersonFullName("Piet de Testambtenaar"), null, null, false, null, null,
+                List.of(DayOfWeek.MONDAY)));
+
+        tester.startPage(BabsAdministrationPage.class);
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("title=\"Bewerken\"")
+                .contains("title=\"Inactief maken\"")
+                .contains("title=\"Actief maken\"")
+                .contains("rods-icon-edit")
+                .contains("rods-icon-badge-alert")
+                .contains("rods-icon-badge-check")
+                .doesNotContain(">Bewerken</a>", ">Actief maken</a>", ">Inactief maken</a>");
+    }
+
+    @Test
     void aanmaakPagina_teKorteNaam_toontMeldingEnMaaktGeenBabsAan() {
         long aantalVoor = babsAdministrationService.count();
         tester.startPage(BabsCreatePage.class);

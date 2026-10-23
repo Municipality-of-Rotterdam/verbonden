@@ -3,9 +3,11 @@ package nl.rotterdam.verbonden.core.features.location_administration.ui;
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateLocatieDto;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -14,6 +16,7 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
 public class LocationCreatePage extends AdministrationBasePage {
 
     @SpringBean
