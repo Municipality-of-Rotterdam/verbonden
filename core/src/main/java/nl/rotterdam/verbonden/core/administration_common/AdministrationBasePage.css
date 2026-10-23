@@ -111,6 +111,12 @@ body {
     color: #fff;
 }
 
+.administration-sidebar__navigation a[aria-current] {
+    background: #263238;
+    box-shadow: inset 4px 0 0 #00a03c;
+    font-weight: bold;
+}
+
 .administration-sidebar__navigation a > span:first-child,
 .administration-sidebar__logout > span:first-child,
 .administration-sidebar__user > span:first-child {

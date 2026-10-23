@@ -15,12 +15,12 @@ import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rott
 import nl.rotterdam.nl_design_system.wicket.components.body.RdBodyTransparentContainer;
 import nl.rotterdam.nl_design_system.wicket.components.page_body.RdPageBodyBorder;
 import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
+import org.apache.wicket.Application;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Page;
-import nl.rotterdam.nl_design_system.wicket.components.side_nav.RdSideNavPanel;
-import nl.rotterdam.nl_design_system.wicket.components.side_nav.RdSideNavRecord;
-import org.apache.wicket.Application;
-import org.apache.wicket.Page;
+import org.apache.wicket.Session;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
@@ -29,10 +29,12 @@ import org.apache.wicket.markup.head.MetaDataHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.resource.PackageResourceReference;
 
@@ -55,6 +57,8 @@ public abstract class AdministrationBasePage extends WebPage {
     private static final CssReferenceHeaderItem ADMINISTRATION_BASE_PAGE_HEADER_ITEM =
             CssHeaderItem.forReference(new PackageResourceReference(AdministrationBasePage.class, "AdministrationBasePage.css"));
 
+    private static final String SIDEBAR_UITGEKLAPT_SESSION_KEY = "administrationSidebarUitgeklapt";
+
     private static final List<NavigationItem> NAVIGATION_ITEMS = List.of(
             new NavigationItem("BABS", RotterdamIconType.USER, BabsAdministrationPage.class),
             new NavigationItem("Trouwlocaties", RotterdamIconType.LOCATION, LocationAdministrationPage.class),
@@ -70,6 +74,7 @@ public abstract class AdministrationBasePage extends WebPage {
         add(new RdRootTransparentContainer("root"));
         add(new RdBodyTransparentContainer("body"));
 
+        add(new SidebarToggle("sidebarToggle"));
         add(new RotterdamLogoImage("rotterdamLogoImage"));
         add(new ListView<>("navigationItems", NAVIGATION_ITEMS.stream()
                 .filter(item -> magOpenen(item.page()))
@@ -80,6 +85,13 @@ public abstract class AdministrationBasePage extends WebPage {
                 BookmarkablePageLink<Void> pageLink =
                         new BookmarkablePageLink<>("pageLink", navigationItem.page());
                 pageLink.add(AttributeModifier.replace("title", navigationItem.label()));
+                // Een vervolgpagina (bijv. wijzigen) hoort bij het menu-item van het overzicht in dezelfde package
+                Class<? extends Page> huidigePagina = getPage().getClass();
+                if (huidigePagina == navigationItem.page()) {
+                    pageLink.add(AttributeModifier.replace("aria-current", "page"));
+                } else if (huidigePagina.getPackageName().equals(navigationItem.page().getPackageName())) {
+                    pageLink.add(AttributeModifier.replace("aria-current", "true"));
+                }
                 pageLink.add(new WebMarkupContainer("navIcon")
                         .add(new RotterdamIconBehavior(navigationItem.icon())));
                 pageLink.add(new Label("navLabel", navigationItem.label()));
@@ -114,6 +126,32 @@ public abstract class AdministrationBasePage extends WebPage {
         // die de CSP-nonce mee, anders blokkeert de style-src-directive ze.
         response.render(MetaDataHeaderItem.forMetaTag("csp-nonce",
                 WebApplication.get().getCspSettings().getNonce(getRequestCycle())));
+    }
+
+    /** Onthoudt in de sessie of de gebruiker de zijbalk heeft uitgeklapt, zodat die zo blijft op elke pagina. */
+    private static class SidebarToggle extends CheckBox {
+
+        SidebarToggle(String id) {
+            super(id, LambdaModel.of(
+                    () -> Boolean.TRUE.equals(Session.get().getAttribute(SIDEBAR_UITGEKLAPT_SESSION_KEY)),
+                    uitgeklapt -> {
+                        Session.get().bind();
+                        Session.get().setAttribute(SIDEBAR_UITGEKLAPT_SESSION_KEY, uitgeklapt);
+                    }));
+            // De <label for> in de markup verwijst naar dit id
+            setMarkupId("administration-sidebar-toggle");
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            add(new AjaxFormComponentUpdatingBehavior("change") {
+                @Override
+                protected void onUpdate(AjaxRequestTarget target) {
+                    // Het model heeft de nieuwe stand al in de sessie gezet
+                }
+            });
+        }
     }
 
     private record NavigationItem(String label, RotterdamIconType icon, Class<? extends Page> page)

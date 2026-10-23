@@ -8,10 +8,12 @@ import nl.rotterdam.verbonden.core.features.location_administration.domain.ListL
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.application.MarriageTypeAdministrationService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.domain.CreateMarriageTypeDto;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.form.*;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -23,6 +25,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import java.math.BigDecimal;
 import java.util.List;
 
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
 public class MarriageTypeCreatePage extends AdministrationBasePage {
 
     @SpringBean

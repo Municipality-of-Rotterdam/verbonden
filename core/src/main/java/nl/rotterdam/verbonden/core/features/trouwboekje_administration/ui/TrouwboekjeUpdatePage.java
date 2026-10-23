@@ -3,10 +3,12 @@ package nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui;
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ChangeTrouwboekjeDto;
+import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -20,6 +22,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
 public class TrouwboekjeUpdatePage extends AdministrationBasePage {
 
     @SpringBean

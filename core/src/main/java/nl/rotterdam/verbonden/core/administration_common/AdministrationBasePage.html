@@ -9,7 +9,7 @@
 
 <div class="administration-shell">
     <aside class="administration-sidebar">
-        <input id="administration-sidebar-toggle" class="administration-sidebar__toggle" type="checkbox"
+        <input wicket:id="sidebarToggle" class="administration-sidebar__toggle" type="checkbox"
                aria-label="Navigatiemenu in- of uitklappen"/>
         <label class="administration-sidebar__toggle-button" for="administration-sidebar-toggle"
                title="Navigatiemenu in- of uitklappen">
@@ -21,8 +21,8 @@
         </div>
 
         <nav aria-label="Beheernavigatie">
-            <ul class="administration-sidebar__navigation" wicket:id="navigationItems">
-                <li>
+            <ul class="administration-sidebar__navigation">
+                <li wicket:id="navigationItems">
                     <a wicket:id="pageLink">
                         <span wicket:id="navIcon"></span>
                         <span class="administration-sidebar__label" wicket:id="navLabel"></span>
