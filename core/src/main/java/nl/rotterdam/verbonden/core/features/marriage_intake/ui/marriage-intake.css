@@ -198,6 +198,77 @@
     text-align: end;
 }
 
+.rd-vorige-nav {
+    margin: 1rem 0;
+}
+
+.rd-controleer-kaart {
+    border: 1px solid #b9c9ce;
+    padding: 2rem 2.4rem;
+    margin-top: 1.5rem;
+}
+
+.rd-controleer-kaart h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.75rem;
+}
+
+.rd-controleer-sectie {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #b9c9ce;
+}
+
+.rd-controleer-sectie__kop,
+.rd-controleer-rij,
+.rd-controleer-totaal {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.rd-controleer-sectie__kop {
+    margin-bottom: 0.75rem;
+}
+
+.rd-controleer-sectie__kop h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.rd-controleer-rij {
+    padding: 0.45rem 0;
+}
+
+.rd-controleer-rij > :first-child {
+    color: #60747b;
+}
+
+.rd-controleer-rij strong {
+    text-align: end;
+}
+
+.rd-controleer-totaal {
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    background: #eef3f5;
+    color: var(--rd-color-green-500, #007a3e);
+}
+
+.rd-controleer-bevestigen {
+    margin-top: 2rem;
+}
+
+.rd-controleer-bevestigen .rd-keuzes-hint {
+    margin-top: 1rem;
+}
+
+@media (max-width: 575.98px) {
+    .rd-controleer-kaart {
+        padding: 1.25rem;
+    }
+}
+
 
 /* =============================================================
    DeDagPage – secondary button ("Naar Jullie gegevens")
@@ -316,29 +387,56 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
    ============================================================= */
 
 .rd-keuzes-panel {
-    border: 1px solid #d0d0d0;
-    border-radius: 4px;
-    background: #fff;
-    padding: 1.25rem;
+    padding: 1.25rem 0;
 }
 
 .rd-keuzes-panel__heading {
-    font-size: 1.125rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin: 0 0 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e0e0e0;
+    margin: 0 0 1.5rem;
 }
 
 .rd-keuzes-section {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
 }
 
 .rd-keuzes-section__heading {
-    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
     font-weight: 700;
-    margin: 0 0 0.5rem;
-    color: #222;
+    margin: 0 0 0.375rem;
+    color: #404b4f;
+}
+
+.rd-keuzes-section__heading a,
+.rd-keuzes-section__heading a:visited {
+    color: inherit;
+    text-decoration: none;
+}
+
+.rd-keuzes-section__heading a:hover {
+    text-decoration: underline;
+}
+
+.rd-keuzes-subheading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0 0.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #404b4f;
+}
+
+.rd-progress-step--active {
+    color: var(--rd-color-green-500, #007a3e) !important;
+    font-weight: 700;
+}
+
+.rd-progress-review {
+    margin-top: 1.5rem;
 }
 
 .rd-keuzes-item {
@@ -446,6 +544,21 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
     background: var(--rd-color-green-500, #007a3e);
     border-radius: 50%;
     flex-shrink: 0;
+}
+
+.rd-status-icon--current {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: var(--rd-color-green-500, #007a3e);
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
 }
 
 .rd-keuzes-divider {

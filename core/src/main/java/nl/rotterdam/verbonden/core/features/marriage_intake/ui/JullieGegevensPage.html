@@ -10,6 +10,13 @@
         </wicket:message>
     </p>
 
+    <div wicket:id="vorigeStapContainer" class="rd-vorige-nav">
+        <a wicket:id="vorigeStap" class="rd-secondary-button">
+            <span aria-hidden="true">&#8592;</span>
+            <span wicket:id="label">Vorige stap</span>
+        </a>
+    </div>
+
     <!-- Partner cards -->
     <div class="row g-4">
         <div wicket:id="partnerCards" class="col-12 col-md-6">
@@ -147,10 +154,9 @@
         </div>
     </div>
 
-    <!-- Navigation to next step -->
-    <div class="rd-verder-nav">
-        <a wicket:id="deGetuigenLink" class="rd-secondary-button">
-            <wicket:message key="intake.button.naar.de.getuigen">Naar De getuigen</wicket:message>
+    <div wicket:id="volgendeStapContainer" class="rd-verder-nav">
+        <a wicket:id="volgendeStap" class="rd-secondary-button">
+            <span wicket:id="label">Volgende stap</span>
             <span aria-hidden="true">&#8594;</span>
         </a>
     </div>

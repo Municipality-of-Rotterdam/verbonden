@@ -9,6 +9,13 @@
         de gegevens te verifi&#235;ren door een identiteitscontrole.
     </p>
 
+    <div wicket:id="vorigeStapContainer" class="rd-vorige-nav">
+        <a wicket:id="vorigeStap" class="rd-secondary-button">
+            <span aria-hidden="true">&#8592;</span>
+            <span wicket:id="label">Vorige stap</span>
+        </a>
+    </div>
+
     <div wicket:id="getuigen">
         <form wicket:id="getuigeForm" class="rd-getuige-form">
             <wicket:border wicket:id="getuigeFieldset">
@@ -18,5 +25,11 @@
         </form>
     </div>
 
-</wicket:extend>
+    <div wicket:id="volgendeStapContainer" class="rd-verder-nav">
+        <a wicket:id="volgendeStap" class="rd-secondary-button">
+            <span wicket:id="label">Volgende stap</span>
+            <span aria-hidden="true">&#8594;</span>
+        </a>
+    </div>
 
+</wicket:extend>

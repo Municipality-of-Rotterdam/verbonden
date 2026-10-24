@@ -4,5 +4,6 @@ public enum IntakeStep {
     DE_DAG,
     JULLIE_GEGEVENS,
     DE_GETUIGEN,
-    EXTRAS
+    EXTRAS,
+    CONTROLEREN
 }
