@@ -101,8 +101,32 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.addRequestHeader("sec-fetch-mode", "navigate");
         tester.startPage(DeGetuigenPage.class, params);
         tester.assertVisible(SIDEBAR + "partnerHerinnering");
-        assertThat(tester.getLastResponseAsString()).contains("Uw partner heeft het dossier nog niet gekoppeld.")
+        String html = tester.getLastResponseAsString();
+        assertThat(html).contains("Uw partner heeft het dossier nog niet gekoppeld.")
                 .doesNotContain("partnerUitnodigenLink");
+        int sidebarStart = html.indexOf("rd-keuzes-panel");
+        assertThat(html.indexOf("Uw partner heeft het dossier nog niet gekoppeld.", sidebarStart))
+                .isLessThan(html.indexOf("De getuigen", sidebarStart));
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void sidebarToontGroeneNummersVoorOnvolledigeStappenEnVinkjeVoorVolledigeStap() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
+
+        PageParameters params = new PageParameters();
+        params.add("dossierId", createdDossierId.toString());
+        tester.startPage(DeGetuigenPage.class, params);
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("rd-status-icon--check")
+                .contains("rd-status-icon--current\">2</span>")
+                .contains("rd-status-icon--current\">3</span>")
+                .contains("rd-status-icon--current\">4</span>")
+                .contains("rd-status-icon--current\">5</span>")
+                .contains("rd-status-icon--current\">6</span>");
     }
 
     @Test

@@ -81,11 +81,11 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
     protected void onInitialize() {
         super.onInitialize();
         add(
-                progressIcon("algemeenStatusIcon", 1, IntakeStep.DE_DAG),
-                progressIcon("gegevensProgressIcon", 3, IntakeStep.JULLIE_GEGEVENS),
-                progressIcon("getuigenProgressIcon", 4, IntakeStep.DE_GETUIGEN),
-                progressIcon("extrasProgressIcon", 5, IntakeStep.EXTRAS),
-                progressIcon("controlerenProgressIcon", 6, IntakeStep.CONTROLEREN)
+                progressIcon("algemeenStatusIcon", 1, IntakeStep.DE_DAG, null),
+                progressIcon("gegevensProgressIcon", 3, IntakeStep.JULLIE_GEGEVENS, null),
+                progressIcon("getuigenProgressIcon", 4, IntakeStep.DE_GETUIGEN, null),
+                progressIcon("extrasProgressIcon", 5, IntakeStep.EXTRAS, null),
+                progressIcon("controlerenProgressIcon", 6, IntakeStep.CONTROLEREN, null)
         );
 
         // Dé dag — registratie type row (visible when dossier is present)
@@ -129,7 +129,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         ceremonieDossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
         dossierGegevens.add(ceremonieDossierGegevens);
         dossierGegevens.add(progressIcon("datumStatusIcon", 2, IntakeStep.DE_DAG,
-                OntbrekendOnderdeel.DATUM, false));
+                OntbrekendOnderdeel.DATUM));
 
         // Datum row — shown when datumTijdHuwelijk is set, otherwise "nog kiezen" placeholder
         WebMarkupContainer datumGekozen = new WebMarkupContainer("datumGekozen") {
@@ -230,7 +230,6 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                     }
                 }
         );
-
         add(new PartnerHerinnering());
 
         // Extra's list
@@ -321,29 +320,20 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         }
     }
 
-    private Label progressIcon(String id, int number, IntakeStep step) {
-        return progressIcon(id, number, step, null, true);
-    }
-
     private Label progressIcon(String id, int number, IntakeStep step, OntbrekendOnderdeel missing) {
-        return progressIcon(id, number, step, missing, true);
-    }
-
-    private Label progressIcon(String id, int number, IntakeStep step, OntbrekendOnderdeel missing,
-                               boolean showAsCurrentStep) {
         return new Label(id, Model.of("")) {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                setDefaultModelObject(showAsCurrentStep && activeStep == step ? number : "");
+                setDefaultModelObject(isStepComplete(step, missing) ? "" : number);
             }
 
             @Override
             protected void onComponentTag(ComponentTag tag) {
                 super.onComponentTag(tag);
-                String state = showAsCurrentStep && activeStep == step
-                        ? "rd-status-icon--current"
-                        : isStepComplete(step, missing) ? "rd-status-icon--check" : "rd-status-icon--empty";
+                String state = isStepComplete(step, missing)
+                        ? "rd-status-icon--check"
+                        : "rd-status-icon--current";
                 tag.put("class", "rd-status-icon " + state);
             }
         };

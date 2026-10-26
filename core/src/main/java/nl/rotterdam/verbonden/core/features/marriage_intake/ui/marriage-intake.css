@@ -481,6 +481,7 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
     font-size: 0.9375rem;
     font-weight: 600;
     white-space: nowrap;
+    color: var(--rd-color-green-500, #007a3e);
 }
 
 .rd-keuzes-item--status {
@@ -562,12 +563,6 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
     font-size: 0.65rem;
     font-weight: 700;
     line-height: 1;
-}
-
-.rd-keuzes-divider {
-    border: none;
-    border-top: 1px solid #e0e0e0;
-    margin: 0.75rem 0;
 }
 
 .rd-keuzes-empty {
