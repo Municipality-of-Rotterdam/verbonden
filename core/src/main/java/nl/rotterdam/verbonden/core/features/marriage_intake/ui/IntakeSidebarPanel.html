@@ -32,31 +32,29 @@
 
             <h4 class="rd-keuzes-subheading">
                 <span wicket:id="datumStatusIcon" aria-hidden="true"></span>
-                <wicket:message key="intake.sidebar.section.datum">Datum &amp; Tijd</wicket:message>
+                <a wicket:id="datumLink"><wicket:message key="intake.sidebar.section.datum">Datum &amp; Tijd</wicket:message></a>
             </h4>
             <!-- Datum: shown when a date has been chosen -->
-            <a href="#" wicket:id="datumGekozen" class="rd-keuzes-item rd-keuzes-item--link">
+                <div wicket:id="datumGekozen" class="rd-keuzes-item">
                 <span wicket:id="datumLabel">datum</span>
                 <span wicket:id="tijdGekozen">&nbsp;<span wicket:id="tijdLabel">tijd</span></span>
-            </a>
+                </div>
             <!-- Datum: placeholder when no date chosen yet -->
-            <a href="#" wicket:id="datumNogKiezen" class="rd-keuzes-item rd-keuzes-item--link rd-keuzes-item--muted">
+                <div wicket:id="datumNogKiezen" class="rd-keuzes-item rd-keuzes-item--muted">
                 <wicket:message key="intake.sidebar.datum.nogniet">Datum nog kiezen</wicket:message>
-            </a>
+                </div>
 
             <!-- Locatie: shown when a location has been chosen -->
             <div wicket:id="locatieGekozen"
                  class="rd-keuzes-item d-flex justify-content-between align-items-center">
-                <a href="#" class="rd-keuzes-item__label">
-                    <span wicket:id="locatieLabel">locatie</span>
-                </a>
+                <span class="rd-keuzes-item__label" wicket:id="locatieLabel">locatie</span>
             </div>
             <!-- Locatie: placeholder when no location chosen yet -->
             <div wicket:id="locatieNogKiezen"
                  class="rd-keuzes-item d-flex justify-content-between align-items-center">
-                <a href="#" class="rd-keuzes-item__label rd-keuzes-item--muted">
+                <span class="rd-keuzes-item__label rd-keuzes-item--muted">
                     <wicket:message key="intake.sidebar.locatie.nogniet">Locatie nog kiezen</wicket:message>
-                </a>
+                </span>
             </div>
         </div>
     </div>
@@ -67,24 +65,24 @@
     <div class="rd-keuzes-section">
         <h3 class="rd-keuzes-section__heading">
             <span wicket:id="gegevensProgressIcon" aria-hidden="true"></span>
-            <wicket:message key="intake.sidebar.section.gegevens">Gegevens &amp; Getuigen</wicket:message>
+            <a wicket:id="gegevensLink"><wicket:message key="intake.sidebar.section.gegevens">Jullie gegevens</wicket:message></a>
         </h3>
 
-        <div wicket:id="gegevensStatusIcon" class="rd-keuzes-item rd-keuzes-item--status">
-            <span wicket:id="gegevensStatusCheckGreen" class="rd-status-icon rd-status-icon--check" aria-hidden="true"></span>
-            <span wicket:id="gegevensStatusCheckGrey" class="rd-status-icon rd-status-icon--check-partial" aria-hidden="true"></span>
-            <span wicket:id="gegevensStatusEmpty" class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
-            <a href="#" wicket:id="jullieGegevensLink"><wicket:message key="intake.sidebar.gegevens.link">Jullie gegevens</wicket:message></a>
+        <p wicket:id="geenGegevens" class="rd-keuzes-empty">
+            <wicket:message key="intake.sidebar.gegevens.nogniet">Nog geen gegevens ingevuld</wicket:message>
+        </div>
+        <div wicket:id="gekozenNamen" class="rd-keuzes-item">
+            <span wicket:id="gekozenNaam">Naam</span>
         </div>
         <h4 class="rd-keuzes-subheading">
             <span wicket:id="getuigenProgressIcon" aria-hidden="true"></span>
-            <wicket:message key="intake.sidebar.section.getuigen">De getuigen</wicket:message>
+            <a wicket:id="getuigenLink"><wicket:message key="intake.sidebar.section.getuigen">De getuigen</wicket:message></a>
         </h4>
-        <div wicket:id="getuigenRegel" class="rd-keuzes-item rd-keuzes-item--status">
-            <span wicket:id="getuigenStatusCheck" class="rd-status-icon rd-status-icon--check" aria-hidden="true"></span>
-            <span wicket:id="getuigenStatusPartial" class="rd-status-icon rd-status-icon--check-partial" aria-hidden="true"></span>
-            <span wicket:id="getuigenStatusEmpty" class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
-            <a href="#" wicket:id="getuigenLink"><wicket:message key="intake.sidebar.getuigen.link">Getuigen</wicket:message></a>
+        <p wicket:id="geenGetuigen" class="rd-keuzes-empty">
+            <wicket:message key="intake.sidebar.getuigen.nogniet">Nog geen getuigen ingevuld</wicket:message>
+        </p>
+        <div wicket:id="getuigenNamen" class="rd-keuzes-item">
+            <span wicket:id="getuigeNaam">Naam getuige</span>
         </div>
 
         <!-- Herinnering zolang de tweede partner het dossier nog niet heeft gekoppeld -->
@@ -92,7 +90,6 @@
             <span class="rd-keuzes-info__icon" aria-hidden="true">&#9432;</span>
             <span>
                 <wicket:message key="intake.sidebar.partner.nietgekoppeld">Uw partner heeft het dossier nog niet gekoppeld.</wicket:message>
-                <a href="#" wicket:id="partnerUitnodigenLink"><wicket:message key="intake.sidebar.partner.uitnodigen">Partner uitnodigen</wicket:message></a>
             </span>
         </div>
     </div>
