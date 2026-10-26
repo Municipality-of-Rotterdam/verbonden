@@ -15,16 +15,16 @@
 
         <div wicket:id="dossierGegevens">
             <!-- Registratie type (live updating on MarriageIntakePage via AJAX) -->
-            <a href="#" class="rd-keuzes-item rd-keuzes-item--link">
+            <div class="rd-keuzes-item">
                 <span wicket:id="registratieTypeLabel">type</span>
-            </a>
+            </div>
 
             <!-- Ceremony soort + prijs (only shown when a real dossier exists) -->
             <div wicket:id="ceremonieDossierGegevens"
                  class="rd-keuzes-item d-flex justify-content-between align-items-center">
-                <a href="#" class="rd-keuzes-item__label">
+                <span class="rd-keuzes-item__label">
                     <span wicket:id="ceremonieSoortLabel">soort</span>
-                </a>
+                </span>
                 <span class="rd-keuzes-item__prijs">
                     &#x20AC;&nbsp;<span wicket:id="ceremoniePrijs">prijs</span>
                 </span>
@@ -70,7 +70,7 @@
 
         <p wicket:id="geenGegevens" class="rd-keuzes-empty">
             <wicket:message key="intake.sidebar.gegevens.nogniet">Nog geen gegevens ingevuld</wicket:message>
-        </div>
+        </p>
         <div wicket:id="gekozenNamen" class="rd-keuzes-item">
             <span wicket:id="gekozenNaam">Naam</span>
         </div>

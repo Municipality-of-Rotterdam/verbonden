@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.application.Marriage
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.PackageResourceReference;
@@ -81,14 +82,14 @@ class JullieGegevensPageTest extends BaseWicketTest {
 
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         tester.addRequestHeader("sec-fetch-mode", "navigate");
-        tester.clickLink("pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar:gegevensStatusIcon:jullieGegevensLink");
+        tester.clickLink(SIDEBAR + "gegevensLink");
 
         tester.assertRenderedPage(JullieGegevensPage.class);
     }
 
     @Test
     @WithMockUser(username = "999990007")
-    void zijbalkHerinnertAanPartnerUitnodigenEnLinktNaarJullieGegevens() {
+    void zijbalkHerinnertAanPartnerZonderLink() {
         createdDossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
 
@@ -98,12 +99,47 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.addRequestHeader("sec-fetch-mode", "navigate");
         tester.startPage(DeGetuigenPage.class, params);
         tester.assertVisible(SIDEBAR + "partnerHerinnering");
+        assertThat(tester.getLastResponseAsString()).contains("Uw partner heeft het dossier nog niet gekoppeld.")
+                .doesNotContain("partnerUitnodigenLink");
+    }
 
-        tester.addRequestHeader("sec-fetch-site", "same-origin");
-        tester.addRequestHeader("sec-fetch-mode", "navigate");
-        tester.clickLink(SIDEBAR + "partnerHerinnering:partnerUitnodigenLink");
+    @Test
+    @WithMockUser(username = "999990007")
+    void sidebarToontLegeTekstenTotNamenZijnIngevuld() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
 
-        tester.assertRenderedPage(JullieGegevensPage.class);
+        PageParameters params = new PageParameters();
+        params.add("dossierId", createdDossierId.toString());
+        tester.startPage(DeGetuigenPage.class, params);
+
+        tester.assertVisible(SIDEBAR + "geenGegevens");
+        tester.assertVisible(SIDEBAR + "geenGetuigen");
+        assertThat(tester.getLastResponseAsString())
+                .contains("Nog geen gegevens ingevuld")
+                .contains("Nog geen getuigen ingevuld");
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void sidebarToontGekozenAchternaamEnGetuigenAlsGewoneTekst() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
+        marriageIntakeService.slaPartnerGegevensOp(createdDossierId, 1, "Buitelaar");
+        marriageIntakeService.slaGetuigeOp(createdDossierId, new SaveGetuigenDto(1, "Anna van Bergen"));
+
+        PageParameters params = new PageParameters();
+        params.add("dossierId", createdDossierId.toString());
+        tester.startPage(DeGetuigenPage.class, params);
+
+        tester.assertInvisible(SIDEBAR + "geenGegevens");
+        tester.assertInvisible(SIDEBAR + "geenGetuigen");
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("Buitelaar")
+                .contains("Anna van Bergen")
+                .doesNotContain("<a href=\"Buitelaar")
+                .doesNotContain("<a href=\"Anna van Bergen");
     }
 
     @Test

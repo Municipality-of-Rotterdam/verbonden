@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
@@ -8,7 +9,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnd
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
-import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import org.apache.wicket.Page;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -22,7 +23,6 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.Page;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.Nullable;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
@@ -383,18 +383,6 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
         public PartnerHerinnering() {
             super("partnerHerinnering");
-        }
-
-        @Override
-        protected void onInitialize() {
-            super.onInitialize();
-            add(new Link<Void>("partnerUitnodigenLink") {
-                @Override
-                public void onClick() {
-                    setResponsePage(JullieGegevensPage.class,
-                            makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
-                }
-            });
         }
 
         @Override
