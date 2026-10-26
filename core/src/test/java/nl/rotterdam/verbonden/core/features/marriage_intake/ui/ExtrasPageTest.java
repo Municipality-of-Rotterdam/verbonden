@@ -98,6 +98,22 @@ class ExtrasPageTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString()).doesNotContain(INTERNATIONALE_AKTE_INTRO);
     }
 
+    @Test
+    @WithMockUser(username = "999990020")
+    void extraOptiesHebbenConsistenteKaartenEnPrijsStaatRechtsUitgelijnd() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null,
+                        new BurgerServiceNummer("999990020")));
+
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html.split("rd-extra-sectie card mb-4 p-4", -1)).hasSize(5);
+        assertThat(html)
+                .contains("rd-trouwboekje-keuzes")
+                .contains("rd-extra-keuze-item d-flex align-items-center justify-content-between flex-wrap gap-2");
+    }
+
     private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, BurgerServiceNummer bsn) {
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, ceremonieSoort, null, bsn));

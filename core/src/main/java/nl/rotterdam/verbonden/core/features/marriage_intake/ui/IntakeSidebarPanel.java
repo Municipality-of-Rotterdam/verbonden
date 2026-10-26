@@ -278,10 +278,6 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         add(stepLink("extrasLink", IntakeStep.EXTRAS, ExtrasPage.class));
         add(stepLink("controlerenLink", IntakeStep.CONTROLEREN, ControlerenPage.class));
 
-        // Reservation info — only relevant while the dossier can still be changed
-        add(new WebMarkupContainer("reserveringInfo")
-                .add(new VisibleModelBehavior(LambdaModel.of(this::isWijzigbaar))));
-
         // Status — shown once the dossier has been submitted
         WebMarkupContainer statusContainer = new WebMarkupContainer("statusContainer");
         statusContainer.add(new VisibleModelBehavior(LambdaModel.of(() -> !isWijzigbaar())));

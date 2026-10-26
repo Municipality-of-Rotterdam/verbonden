@@ -46,6 +46,25 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990020")
+    void controlerenToontCorrecteDagnaamEnBevestigingsinformatieVoorDeKnop() {
+        UUID dossierId = testData.maakCompleetDossier();
+
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("Dé dag")
+                .contains("Jullie keuze blijft 3 dagen gereserveerd.")
+                .contains("Na bevestiging kunnen jullie de keuzes niet meer wijzigen.")
+                .contains("Rotterdam stuurt je een factuur voor de kosten.")
+                .doesNotContain("intake.sidebar.reservering.info");
+        String confirmButtonMarkupId = tester.getComponentFromLastRenderedPage(BEVESTIG_BUTTON).getMarkupId();
+        assertThat(html.indexOf("Jullie keuze blijft 3 dagen gereserveerd."))
+                .isLessThan(html.indexOf("id=\"" + confirmButtonMarkupId + "\""));
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
     void compleetDossier_bevestigButtonOpentBevestigingsdialoog() {
         UUID dossierId = testData.maakCompleetDossier();
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
@@ -56,8 +75,8 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
         tester.assertVisible(DIALOG_CONTENT);
         tester.assertComponentOnAjaxResponse(DIALOG_CONTENT);
-        tester.assertContains("Wil je je keuzes definitief vastleggen\\?");
-        tester.assertContains("Rotterdam stuurt je een factuur voor de kosten.");
+        tester.assertContains("Bevestig jullie keuzes");
+        assertThat(tester.getLastResponseAsString()).doesNotContain("Rotterdam stuurt je een factuur");
         assertThat(tester.getLastResponseAsString()).contains(".showModal()");
     }
 

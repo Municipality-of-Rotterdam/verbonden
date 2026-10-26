@@ -85,6 +85,11 @@
     </div>
 
     <form wicket:id="bevestigForm" class="rd-controleer-bevestigen">
+        <div class="rd-controleer-bevestig-informatie" role="note">
+            <p><wicket:message key="controleren.bevestig.reservering">Jullie keuze blijft 3 dagen gereserveerd.</wicket:message></p>
+            <p><wicket:message key="controleren.bevestig.wijzigen">Na bevestiging kunnen jullie de keuzes niet meer wijzigen.</wicket:message></p>
+            <p><wicket:message key="controleren.bevestig.factuur">Rotterdam stuurt je een factuur voor de kosten.</wicket:message></p>
+        </div>
         <button wicket:id="bevestigButton" type="submit"></button>
         <div wicket:id="nogNietCompleetHint" class="rd-keuzes-hint">
             <p wicket:id="algemeen" class="rd-keuzes-hint__tekst">
@@ -100,10 +105,6 @@
             </wicket:container>
         </div>
         <dialog wicket:id="bevestigDialog" class="rd-bevestig-dialog">
-            <p class="rd-bevestig-dialog__factuur">
-                <span class="rd-bevestig-dialog__factuur-icoon" aria-hidden="true">&#x20AC;</span>
-                <wicket:message key="intake.bevestig.dialog.factuur">Rotterdam stuurt je een factuur voor de kosten.</wicket:message>
-            </p>
         </dialog>
     </form>
 
