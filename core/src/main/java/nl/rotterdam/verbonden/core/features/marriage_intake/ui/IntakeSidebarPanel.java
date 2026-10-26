@@ -81,7 +81,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
     protected void onInitialize() {
         super.onInitialize();
         add(
-                progressIcon("algemeenStatusIcon", 1, IntakeStep.DE_DAG, null),
+                progressIcon("algemeenStatusIcon", 1, IntakeStep.MIJN_DAG, null),
                 progressIcon("gegevensProgressIcon", 3, IntakeStep.JULLIE_GEGEVENS, null),
                 progressIcon("getuigenProgressIcon", 4, IntakeStep.DE_GETUIGEN, null),
                 progressIcon("extrasProgressIcon", 5, IntakeStep.EXTRAS, null),
@@ -100,8 +100,8 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         IModel<String> registratieModel = LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::registratieType, RegistratieType::getLabel));
         dossierGegevens.add(new Label("registratieTypeLabel", registratieModel));
-        add(stepLink("dedagLink", IntakeStep.DE_DAG, DeDagPage.class));
-        dossierGegevens.add(stepLink("datumLink", IntakeStep.DE_DAG, DatumKiezenPage.class));
+        add(stepLink("dedagLink", IntakeStep.MIJN_DAG, MarriageIntakePage.class));
+        dossierGegevens.add(stepLink("datumLink", IntakeStep.DE_DAG, DeDagPage.class));
 
         // Ceremony row — only shown when a persisted dossier exists (id > 0)
         WebMarkupContainer ceremonieDossierGegevens = new WebMarkupContainer("ceremonieDossierGegevens") {
@@ -344,7 +344,9 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             return !d.ontbrekendeOnderdelen().contains(missing);
         }
         return switch (step) {
-            case DE_DAG -> d.registratieType() != null && d.ceremonieSoort() != null;
+            case MIJN_DAG -> d.registratieType() != null && d.ceremonieSoort() != null;
+            case DE_DAG -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.DATUM)
+                    && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.LOCATIE);
             case JULLIE_GEGEVENS -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.PARTNER_GEKOPPELD)
                     && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.ACHTERNAMEN);
             case DE_GETUIGEN -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.GETUIGEN);

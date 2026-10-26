@@ -91,6 +91,38 @@ class JullieGegevensPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990007")
+    void sidebarLinkAlgemeenNavigeertNaarMijnDag() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null,
+                        new BurgerServiceNummer("999990007")));
+        PageParameters params = new PageParameters().add("dossierId", createdDossierId.toString());
+        tester.startPage(DeGetuigenPage.class, params);
+
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(SIDEBAR + "dedagLink");
+
+        tester.assertRenderedPage(MarriageIntakePage.class);
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void sidebarLinkDatumEnTijdNavigeertNaarDeDag() {
+        createdDossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null,
+                        new BurgerServiceNummer("999990007")));
+        PageParameters params = new PageParameters().add("dossierId", createdDossierId.toString());
+        tester.startPage(DeGetuigenPage.class, params);
+
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(SIDEBAR + "dossierGegevens:datumLink");
+
+        tester.assertRenderedPage(DeDagPage.class);
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
     void zijbalkHerinnertAanPartnerZonderLink() {
         createdDossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));

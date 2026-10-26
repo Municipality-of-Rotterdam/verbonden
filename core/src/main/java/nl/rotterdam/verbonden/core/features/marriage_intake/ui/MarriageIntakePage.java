@@ -57,7 +57,7 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     @Override
     protected IntakeStep getActiveStep() {
-        return IntakeStep.DE_DAG;
+        return IntakeStep.MIJN_DAG;
     }
 
     @Override

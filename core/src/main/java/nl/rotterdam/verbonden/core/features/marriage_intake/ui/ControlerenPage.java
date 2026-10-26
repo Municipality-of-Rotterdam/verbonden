@@ -1,38 +1,27 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
-import nl.rotterdam.nl_design_system.wicket.components.action_group.RdActionGroup;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
-import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogBorder;
-import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogHeadingLevel;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
-import org.apache.wicket.Component;
-import org.apache.wicket.Page;
-import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.Page;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.jspecify.annotations.NonNull;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
 import java.math.BigDecimal;
@@ -41,9 +30,6 @@ import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
-
-import static java.util.Objects.requireNonNull;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class ControlerenPage extends IntakeBasePage {
@@ -147,21 +133,6 @@ public class ControlerenPage extends IntakeBasePage {
 
     private class BevestigForm extends Form<Void> {
 
-        private final RdDialogBorder bevestigDialog = new RdDialogBorder("bevestigDialog",
-                new ResourceModel("intake.bevestig.dialog.titel"),
-                RotterdamIconBehavior.supplyOf(RotterdamIconBehavior.CLOSE),
-                RdDialogHeadingLevel.LEVEL_2) {
-            @Override
-            protected @NonNull Component newFooterContent(@NonNull String id) {
-                return new BevestigDialogActies(id, this);
-            }
-
-            @Override
-            protected void onClose(@NonNull AjaxRequestTarget target) {
-                close(target);
-            }
-        };
-
         BevestigForm(String id) {
             super(id);
         }
@@ -170,10 +141,10 @@ public class ControlerenPage extends IntakeBasePage {
         protected void onInitialize() {
             super.onInitialize();
             add(
-                    new RdAjaxButton("bevestigButton", new ResourceModel("controleren.bevestig")) {
+                    new RdButton("bevestigButton", new ResourceModel("controleren.bevestig")) {
                         @Override
-                        protected void onSubmit(AjaxRequestTarget target) {
-                            bevestigDialog.showModal(target);
+                        public void onSubmit() {
+                            setResponsePage(BetalingPage.class, parameters());
                         }
 
                         @Override
@@ -181,9 +152,8 @@ public class ControlerenPage extends IntakeBasePage {
                             super.onConfigure();
                             setEnabled(isCompleet());
                         }
-                    }.setDefaultFormProcessing(false),
-                    new NogNietCompleetHint(),
-                    bevestigDialog
+                    },
+                    new NogNietCompleetHint()
             );
         }
     }
@@ -242,42 +212,4 @@ public class ControlerenPage extends IntakeBasePage {
         }
     }
 
-    private class BevestigDialogActies extends Fragment {
-
-        private final RdDialogBorder dialog;
-
-        BevestigDialogActies(String id, RdDialogBorder dialog) {
-            super(id, "bevestigDialogActies", ControlerenPage.this);
-            this.dialog = dialog;
-        }
-
-        @Override
-        protected void onInitialize() {
-            super.onInitialize();
-            RdButton indienenButton = new RdButton("indienenButton",
-                    new ResourceModel("intake.bevestig.dialog.bevestigen")) {
-                @Override
-                public void onSubmit() {
-                    UUID id = requireNonNull(dossierModel.getObject()).id();
-                    try {
-                        marriageIntakeService.dienIn(id);
-                    } catch (DossierNietWijzigbaarException ignored) {
-                        // Already submitted by the partner; show the current status.
-                    }
-                    AanvraagStatusPage.respond(id);
-                }
-            };
-            indienenButton.setDefaultFormProcessing(false);
-            indienenButton.setAppearance(RdButtonAppearance.PRIMARY_ACTION);
-            RdAjaxButton annulerenButton = new RdAjaxButton("annulerenButton",
-                    new ResourceModel("intake.bevestig.dialog.annuleren")) {
-                @Override
-                protected void onSubmit(AjaxRequestTarget target) {
-                    dialog.close(target);
-                }
-            };
-            annulerenButton.setDefaultFormProcessing(false);
-            add(new RdActionGroup("acties").add(indienenButton, annulerenButton));
-        }
-    }
 }

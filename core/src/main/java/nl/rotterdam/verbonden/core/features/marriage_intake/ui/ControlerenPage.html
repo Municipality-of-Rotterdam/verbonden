@@ -86,9 +86,11 @@
 
     <form wicket:id="bevestigForm" class="rd-controleer-bevestigen">
         <div class="rd-controleer-bevestig-informatie" role="note">
-            <p><wicket:message key="controleren.bevestig.reservering">Jullie keuze blijft 3 dagen gereserveerd.</wicket:message></p>
-            <p><wicket:message key="controleren.bevestig.wijzigen">Na bevestiging kunnen jullie de keuzes niet meer wijzigen.</wicket:message></p>
-            <p><wicket:message key="controleren.bevestig.factuur">Rotterdam stuurt je een factuur voor de kosten.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.voorbereiding">Je staat op het punt om alles naar de gemeente Rotterdam te sturen en te betalen.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.pagina">Bij het bevestigen word je naar de betalingspagina geleid.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.email">Je krijgt daarna ook een bevestiging per e-mail.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.reservering">De reservering blijft 3 dagen geldig. In deze periode kun je alles gratis aanpassen. Na deze 3 dagen is wijzigen niet meer mogelijk.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.annuleren">Let op: Annuleer je na de 3 dagen bedenktijd? Dan rekenen we € 50,- administratiekosten per keer.</wicket:message></p>
         </div>
         <button wicket:id="bevestigButton" type="submit"></button>
         <div wicket:id="nogNietCompleetHint" class="rd-keuzes-hint">
@@ -104,15 +106,6 @@
                 </ul>
             </wicket:container>
         </div>
-        <dialog wicket:id="bevestigDialog" class="rd-bevestig-dialog">
-        </dialog>
     </form>
-
-    <wicket:fragment wicket:id="bevestigDialogActies">
-        <div wicket:id="acties">
-            <button wicket:id="indienenButton" type="submit"></button>
-            <button wicket:id="annulerenButton" type="submit" class="rd-bevestig-dialog__annuleren"></button>
-        </div>
-    </wicket:fragment>
 
 </wicket:extend>

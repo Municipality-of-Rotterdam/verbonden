@@ -160,7 +160,8 @@ public abstract class IntakeBasePage extends BurgerBasePage {
             return null;
         }
         return switch (getActiveStep()) {
-            case DE_DAG -> null;
+            case MIJN_DAG -> null;
+            case DE_DAG -> IntakeStep.MIJN_DAG;
             case JULLIE_GEGEVENS -> IntakeStep.DE_DAG;
             case DE_GETUIGEN -> IntakeStep.JULLIE_GEGEVENS;
             case EXTRAS -> IntakeStep.DE_GETUIGEN;
@@ -173,6 +174,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
             return null;
         }
         return switch (getActiveStep()) {
+            case MIJN_DAG -> IntakeStep.JULLIE_GEGEVENS;
             case DE_DAG -> IntakeStep.JULLIE_GEGEVENS;
             case JULLIE_GEGEVENS -> IntakeStep.DE_GETUIGEN;
             case DE_GETUIGEN -> IntakeStep.EXTRAS;
@@ -183,6 +185,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
 
     private Class<? extends IntakeBasePage> pageFor(IntakeStep step) {
         return switch (step) {
+            case MIJN_DAG -> MarriageIntakePage.class;
             case DE_DAG -> DeDagPage.class;
             case JULLIE_GEGEVENS -> JullieGegevensPage.class;
             case DE_GETUIGEN -> DeGetuigenPage.class;
