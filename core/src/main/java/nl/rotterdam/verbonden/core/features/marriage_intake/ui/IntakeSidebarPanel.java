@@ -9,8 +9,8 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnd
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
-import org.apache.wicket.Page;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Page;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -22,7 +22,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.Nullable;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
@@ -43,12 +42,10 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
 
-    private final IModel<DossierSamenvattingDto> dossierModel;
     private final IntakeStep activeStep;
 
     public IntakeSidebarPanel(String id, IModel<DossierSamenvattingDto> dossierModel, IntakeStep activeStep) {
         super(id, dossierModel);
-        this.dossierModel = dossierModel;
         this.activeStep = activeStep;
         setOutputMarkupId(true);
     }
@@ -104,7 +101,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                 () -> dossierValue(DossierSamenvattingDto::registratieType, RegistratieType::getLabel));
         dossierGegevens.add(new Label("registratieTypeLabel", registratieModel));
         add(stepLink("dedagLink", IntakeStep.DE_DAG, DeDagPage.class));
-        add(stepLink("datumLink", IntakeStep.DE_DAG, DatumKiezenPage.class));
+        dossierGegevens.add(stepLink("datumLink", IntakeStep.DE_DAG, DatumKiezenPage.class));
 
         // Ceremony row — only shown when a persisted dossier exists (id > 0)
         WebMarkupContainer ceremonieDossierGegevens = new WebMarkupContainer("ceremonieDossierGegevens") {

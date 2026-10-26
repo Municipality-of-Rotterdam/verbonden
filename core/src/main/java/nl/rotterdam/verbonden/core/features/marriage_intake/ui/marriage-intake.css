@@ -411,12 +411,15 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
 }
 
 .rd-keuzes-section__heading a,
-.rd-keuzes-section__heading a:visited {
+.rd-keuzes-section__heading a:visited,
+.rd-keuzes-subheading a,
+.rd-keuzes-subheading a:visited {
     color: inherit;
     text-decoration: none;
 }
 
-.rd-keuzes-section__heading a:hover {
+.rd-keuzes-section__heading a:hover,
+.rd-keuzes-subheading a:hover {
     text-decoration: underline;
 }
 

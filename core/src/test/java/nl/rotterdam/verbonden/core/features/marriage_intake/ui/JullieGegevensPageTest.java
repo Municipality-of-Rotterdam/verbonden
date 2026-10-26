@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.UUID;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,6 +33,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
     @AfterEach
     void cleanup() {
         if (createdDossierId != null) {
+            marriageIntakeService.slaGetuigenOp(createdDossierId, List.of());
             marriageIntakeService.delete(createdDossierId);
             createdDossierId = null;
         }
@@ -121,10 +123,10 @@ class JullieGegevensPageTest extends BaseWicketTest {
     }
 
     @Test
-    @WithMockUser(username = "999990007")
+    @WithMockUser(username = "999990093")
     void sidebarToontGekozenAchternaamEnGetuigenAlsGewoneTekst() {
         createdDossierId = marriageIntakeService.create(
-                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990093")));
         marriageIntakeService.slaPartnerGegevensOp(createdDossierId, 1, "Buitelaar");
         marriageIntakeService.slaGetuigeOp(createdDossierId, new SaveGetuigenDto(1, "Anna van Bergen"));
 
@@ -137,9 +139,16 @@ class JullieGegevensPageTest extends BaseWicketTest {
         String html = tester.getLastResponseAsString();
         assertThat(html)
                 .contains("Buitelaar")
-                .contains("Anna van Bergen")
-                .doesNotContain("<a href=\"Buitelaar")
-                .doesNotContain("<a href=\"Anna van Bergen");
+                .contains("Anna van Bergen");
+        assertNotInsideLink(html, "Buitelaar");
+        assertNotInsideLink(html, "Anna van Bergen");
+    }
+
+    private void assertNotInsideLink(String html, String text) {
+        int textIndex = html.indexOf(text);
+        assertThat(textIndex).isGreaterThanOrEqualTo(0);
+        assertThat(html.lastIndexOf("</a>", textIndex))
+                .isGreaterThan(html.lastIndexOf("<a", textIndex));
     }
 
     @Test
