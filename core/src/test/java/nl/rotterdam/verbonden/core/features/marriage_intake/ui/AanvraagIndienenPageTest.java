@@ -116,6 +116,37 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990020")
+    void betalingNietGeluktKeertTerugNaarControlerenMetMelding() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(BetalingPage.class, makeDossierPageParameters(dossierId));
+
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(PAGE_BODY + ":betalingMislukt");
+
+        tester.assertRenderedPage(ControlerenPage.class);
+        tester.assertVisible(PAGE_BODY + ":betalingMislukt");
+        tester.assertContains("De betaling is niet gelukt of afgebroken.");
+        assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void betaalknopBlijftActiefAlsDossierNietCompleetIs() {
+        UUID dossierId = testData.maakConceptDossier();
+        tester.startPage(BetalingPage.class, makeDossierPageParameters(dossierId));
+        String betalingForm = PAGE_BODY + ":betalingForm";
+
+        tester.assertEnabled(betalingForm + ":betalingButton");
+        tester.getRequest().setHeader("Origin", "http://localhost");
+        tester.newFormTester(betalingForm).submit("betalingButton");
+
+        tester.assertRenderedPage(ControlerenPage.class);
+        assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
     void extraStapNavigeertNaarControlerenEnTerug() {
         UUID dossierId = testData.maakCompleetDossier();
         tester.startPage(ExtrasPage.class, makeDossierPageParameters(dossierId));
@@ -139,6 +170,15 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.clickLink(PAGE_BODY + ":vorigeStapContainer:vorigeStap");
 
         tester.assertRenderedPage(ExtrasPage.class);
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(PAGE_BODY + ":vorigeStapContainer:vorigeStap");
+        tester.assertRenderedPage(DeGetuigenPage.class);
+        String extrasIconMarkupId =
+                tester.getComponentFromLastRenderedPage(PAGE_BODY + ":keuzesSidebar:extrasProgressIcon").getMarkupId();
+        int extrasIconPosition = tester.getLastResponseAsString().indexOf("id=\"" + extrasIconMarkupId + "\"");
+        assertThat(tester.getLastResponseAsString().substring(extrasIconPosition, extrasIconPosition + 120))
+                .contains("rd-status-icon--complete");
     }
 
     @Test

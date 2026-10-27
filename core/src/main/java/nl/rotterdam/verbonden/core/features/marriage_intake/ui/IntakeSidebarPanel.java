@@ -1,6 +1,5 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
-import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
@@ -22,7 +21,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.Nullable;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
@@ -39,37 +37,20 @@ import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPag
 
 public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
-    @SpringBean
-    private MarriageIntakeService marriageIntakeService;
-
     private final IntakeStep activeStep;
+    private final IModel<List<PartnerGegevensDto>> partnerGegevensModel;
+    private final IModel<List<GetuigeDto>> getuigenModel;
+    private final boolean extrasDoorlopen;
 
-    public IntakeSidebarPanel(String id, IModel<DossierSamenvattingDto> dossierModel, IntakeStep activeStep) {
+    public IntakeSidebarPanel(String id, IModel<DossierSamenvattingDto> dossierModel,
+                              IModel<List<PartnerGegevensDto>> partnerGegevensModel,
+                              IModel<List<GetuigeDto>> getuigenModel, IntakeStep activeStep, boolean extrasDoorlopen) {
         super(id, dossierModel);
         this.activeStep = activeStep;
+        this.partnerGegevensModel = partnerGegevensModel;
+        this.getuigenModel = getuigenModel;
+        this.extrasDoorlopen = extrasDoorlopen;
         setOutputMarkupId(true);
-    }
-
-    private List<String> findGekozenNamen() {
-        DossierSamenvattingDto dossier = getDossierModelObject();
-        if (dossier == null || dossier.id() == null) {
-            return List.of();
-        }
-        return marriageIntakeService.findPartnerGegevens(dossier.id()).stream()
-                .map(PartnerGegevensDto::gekozenAchternaam)
-                .filter(naam -> naam != null && !naam.isBlank())
-                .toList();
-    }
-
-    private List<String> findGetuigenNamen() {
-        DossierSamenvattingDto dossier = getDossierModelObject();
-        if (dossier == null || dossier.id() == null) {
-            return List.of();
-        }
-        return marriageIntakeService.findGetuigen(dossier.id()).stream()
-                .map(GetuigeDto::naam)
-                .filter(naam -> naam != null && !naam.isBlank())
-                .toList();
     }
 
     @Nullable
@@ -205,7 +186,10 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
         // Gegevens & Getuigen status icons
         add(stepLink("gegevensLink", IntakeStep.JULLIE_GEGEVENS, JullieGegevensPage.class));
-        IModel<List<String>> gekozenNamenModel = LoadableDetachableModel.of(this::findGekozenNamen);
+        IModel<List<String>> gekozenNamenModel = LambdaModel.of(() -> partnerGegevensModel.getObject().stream()
+                .map(PartnerGegevensDto::gekozenAchternaam)
+                .filter(naam -> naam != null && !naam.isBlank())
+                .toList());
         add(
                 new WebMarkupContainer("geenGegevens")
                         .add(new VisibleModelBehavior(gekozenNamenModel.map(List::isEmpty))),
@@ -217,7 +201,10 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                 }
         );
         add(stepLink("getuigenLink", IntakeStep.DE_GETUIGEN, DeGetuigenPage.class));
-        IModel<List<String>> getuigenNamenModel = LoadableDetachableModel.of(this::findGetuigenNamen);
+        IModel<List<String>> getuigenNamenModel = LambdaModel.of(() -> getuigenModel.getObject().stream()
+                .map(GetuigeDto::naam)
+                .filter(naam -> naam != null && !naam.isBlank())
+                .toList());
         add(
                 new WebMarkupContainer("geenGetuigen")
                         .add(new VisibleModelBehavior(getuigenNamenModel.map(List::isEmpty))),
@@ -296,7 +283,8 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         Link<Void> link = new Link<>(id) {
             @Override
             public void onClick() {
-                setResponsePage(pageClass, makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
+                setResponsePage(pageClass, makeDossierPageParameters(
+                        requireNonNull(getDossierModelObject()).id(), extrasDoorlopen));
             }
 
             @Override
@@ -319,6 +307,10 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
     private Label progressIcon(String id, int number, IntakeStep step) {
         return new Label(id, Model.of("")) {
+            {
+                setOutputMarkupId(true);
+            }
+
             @Override
             protected void onConfigure() {
                 super.onConfigure();
@@ -351,7 +343,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                     && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.ACHTERNAMEN);
             case DE_GETUIGEN -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.GETUIGEN);
             case EXTRAS -> d.status() != DossierStatus.CONCEPT
-                    || activeStep != null && activeStep.ordinal() > IntakeStep.EXTRAS.ordinal();
+                    || extrasDoorlopen;
             case CONTROLEREN -> d.compleet();
         };
     }

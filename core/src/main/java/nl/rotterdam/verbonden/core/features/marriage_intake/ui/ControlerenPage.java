@@ -6,6 +6,8 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -30,7 +32,6 @@ import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class ControlerenPage extends IntakeBasePage {
 
@@ -41,6 +42,8 @@ public class ControlerenPage extends IntakeBasePage {
     private MarriageIntakeService marriageIntakeService;
 
     private IModel<DossierSamenvattingDto> dossierModel;
+    private IModel<List<PartnerGegevensDto>> partnerGegevensModel;
+    private IModel<List<GetuigeDto>> getuigenModel;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -54,41 +57,63 @@ public class ControlerenPage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
+        return dossierModel();
+    }
+
+    @Override
+    protected IModel<List<PartnerGegevensDto>> getSidebarPartnerGegevensModel() {
+        return partnerGegevensModel();
+    }
+
+    @Override
+    protected IModel<List<GetuigeDto>> getSidebarGetuigenModel() {
+        return getuigenModel();
     }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
 
-        dossierModel = LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
-        DossierSamenvattingDto dossier = dossierModel.getObject();
+        IModel<List<SidebarExtraItemDto>> extrasModel =
+                LambdaModel.of(() -> dossierModel().getObject().extras() == null
+                        ? List.of() : dossierModel().getObject().extras());
 
         pageBody.add(
                 new RdHeading("heading", getString("controleren.heading"), 1),
                 new Label("intro", new ResourceModel("controleren.intro")),
+                new RdAlert("betalingMislukt", new ResourceModel("controleren.betaling.mislukt"), RdAlertType.WARNING)
+                        .add(new VisibleModelBehavior(LambdaModel.of(
+                                () -> getPageParameters().get("betalingMislukt").toBoolean(false)))),
                 new BookmarkablePageLink<>("wijzigDag", DeDagPage.class, parameters()),
                 new BookmarkablePageLink<>("wijzigGegevens", JullieGegevensPage.class, parameters()),
                 new BookmarkablePageLink<>("wijzigGetuigen", DeGetuigenPage.class, parameters()),
                 new BookmarkablePageLink<>("wijzigExtras", ExtrasPage.class, parameters()),
-                new Label("registratieType", dossier.registratieType().getLabel()),
-                new Label("ceremonieSoort", dossier.ceremonieSoort().getLabel()),
-                new Label("ceremoniePrijs", formatPrijs(dossier.prijs())),
-                new Label("datum", dossier.datumTijdHuwelijk() == null ? "" : dossier.datumTijdHuwelijk().format(DATUM_FORMAT)),
-                new Label("locatie", dossier.huwelijksLocatie() == null ? "" : dossier.huwelijksLocatie()),
-                new ListView<>("partners", marriageIntakeService.findPartnerGegevens(dossierId)) {
+                new Label("registratieType", LambdaModel.of(() ->
+                        dossierModel().getObject().registratieType().getLabel())),
+                new Label("ceremonieSoort", LambdaModel.of(() ->
+                        dossierModel().getObject().ceremonieSoort().getLabel())),
+                new Label("ceremoniePrijs", LambdaModel.of(() -> formatPrijs(dossierModel().getObject().prijs()))),
+                new Label("datum", LambdaModel.of(() -> {
+                    var datum = dossierModel().getObject().datumTijdHuwelijk();
+                    return datum == null ? "" : datum.format(DATUM_FORMAT);
+                })),
+                new Label("locatie", LambdaModel.of(() -> {
+                    String locatie = dossierModel().getObject().huwelijksLocatie();
+                    return locatie == null ? "" : locatie;
+                })),
+                new ListView<>("partners", partnerGegevensModel()) {
                     @Override
                     protected void populateItem(ListItem<PartnerGegevensDto> item) {
                         item.add(new Label("naamkeuze", naamkeuze(item.getModelObject())));
                     }
                 },
-                new ListView<>("getuigen", marriageIntakeService.findGetuigen(dossierId)) {
+                new ListView<>("getuigen", getuigenModel()) {
                     @Override
                     protected void populateItem(ListItem<GetuigeDto> item) {
                         item.add(new Label("getuigeNaam", item.getModelObject().naam()));
                     }
                 },
-                new ListView<>("extras", dossier.extras() == null ? List.of() : dossier.extras()) {
+                new ListView<>("extras", extrasModel) {
                     @Override
                     protected void populateItem(ListItem<SidebarExtraItemDto> item) {
                         SidebarExtraItemDto extra = item.getModelObject();
@@ -96,20 +121,36 @@ public class ControlerenPage extends IntakeBasePage {
                         item.add(new Label("extraPrijs", extra.prijs() == null ? "" : "€ " + formatPrijs(extra.prijs())));
                     }
                 },
-                new WebMarkupContainer("geenExtras") {
-                    @Override
-                    protected void onConfigure() {
-                        super.onConfigure();
-                        setVisible(dossier.extras() == null || dossier.extras().isEmpty());
-                    }
-                },
-                new Label("totaalPrijs", formatPrijs(dossier.totalPrijs())),
+                new WebMarkupContainer("geenExtras")
+                        .add(new VisibleModelBehavior(extrasModel.map(List::isEmpty))),
+                new Label("totaalPrijs", LambdaModel.of(() -> formatPrijs(dossierModel().getObject().totalPrijs()))),
                 new BevestigForm("bevestigForm")
         );
     }
 
+    private IModel<DossierSamenvattingDto> dossierModel() {
+        if (dossierModel == null) {
+            dossierModel = LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
+        }
+        return dossierModel;
+    }
+
+    private IModel<List<PartnerGegevensDto>> partnerGegevensModel() {
+        if (partnerGegevensModel == null) {
+            partnerGegevensModel = LoadableDetachableModel.of(() -> marriageIntakeService.findPartnerGegevens(dossierId));
+        }
+        return partnerGegevensModel;
+    }
+
+    private IModel<List<GetuigeDto>> getuigenModel() {
+        if (getuigenModel == null) {
+            getuigenModel = LoadableDetachableModel.of(() -> marriageIntakeService.findGetuigen(dossierId));
+        }
+        return getuigenModel;
+    }
+
     private PageParameters parameters() {
-        return makeDossierPageParameters(dossierId);
+        return pageParametersForDossier(dossierId);
     }
 
     private String naamkeuze(PartnerGegevensDto partner) {
