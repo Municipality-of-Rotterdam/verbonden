@@ -30,6 +30,8 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 @AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
 public class LocationUpdatePage extends AdministrationBasePage {
@@ -139,7 +142,7 @@ public class LocationUpdatePage extends AdministrationBasePage {
             public void populateItem(Item<ICellPopulator<ListBeschikbaarheidDto>> cellItem,
                                      String componentId, IModel<ListBeschikbaarheidDto> rowModel) {
                 var prijs = rowModel.getObject().prijs();
-                cellItem.add(new Label(componentId, Model.of(prijs != null ? "€ " + prijs : "")));
+                cellItem.add(new Label(componentId, Model.of(formatPrijs(prijs))));
             }
         });
 
@@ -201,6 +204,12 @@ public class LocationUpdatePage extends AdministrationBasePage {
         provider.setSort("dagVanDeWeek", SortOrder.ASCENDING);
 
         return new RdDataTable<>("beschikbaarheidTable", columns, provider, 100);
+    }
+
+    private static String formatPrijs(BigDecimal prijs) {
+        return prijs != null
+                ? NumberFormat.getCurrencyInstance(Locale.forLanguageTag("nl-NL")).format(prijs)
+                : "";
     }
 
     private static Comparator<ListBeschikbaarheidDto> comparatorFor(String property, boolean ascending) {
