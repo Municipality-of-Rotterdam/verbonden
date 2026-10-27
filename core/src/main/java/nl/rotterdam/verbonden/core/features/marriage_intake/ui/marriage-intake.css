@@ -504,24 +504,14 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
     gap: 0.5rem;
 }
 
-/* Empty circle status icon */
-.rd-status-icon--empty {
-    display: inline-block;
-    width: 1.1rem;
-    height: 1.1rem;
-    border: 2px solid #aaa;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-/* Green checkmark status icon (all complete) */
-.rd-status-icon--check {
+.rd-status-icon--complete,
+.rd-status-icon--current,
+.rd-status-icon--current-check {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 1.1rem;
     height: 1.1rem;
-    background: var(--rd-color-green-500, #007a3e);
     border-radius: 50%;
     flex-shrink: 0;
     color: #fff;
@@ -530,52 +520,32 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
     line-height: 1;
 }
 
-.rd-status-icon--check::before {
+.rd-status-icon--complete {
+    background: #4a5559;
+}
+
+.rd-status-icon--current,
+.rd-status-icon--current-check {
+    background: var(--rd-color-green-500, #007a3e);
+}
+
+.rd-status-icon--complete::before,
+.rd-status-icon--current-check::before {
     content: "✓";
 }
 
-/* Partial check: grey circle with grey checkmark (one person selected name) */
-.rd-status-icon--check-partial {
+.rd-status-icon--upcoming {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 1.1rem;
     height: 1.1rem;
-    border: 2px solid #aaa;
+    border: 2px solid #9aa5a9;
     border-radius: 50%;
     flex-shrink: 0;
-    color: #aaa;
+    color: #66777d;
     font-size: 0.65rem;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.rd-status-icon--check-partial::before {
-    content: "✓";
-}
-
-/* Filled (done) status icon */
-.rd-status-icon--done {
-    display: inline-block;
-    width: 1.1rem;
-    height: 1.1rem;
-    background: var(--rd-color-green-500, #007a3e);
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-
-.rd-status-icon--current {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.1rem;
-    height: 1.1rem;
-    background: var(--rd-color-green-500, #007a3e);
-    border-radius: 50%;
-    flex-shrink: 0;
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
 }
 

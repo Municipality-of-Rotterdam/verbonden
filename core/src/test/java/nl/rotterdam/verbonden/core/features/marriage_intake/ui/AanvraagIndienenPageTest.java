@@ -52,17 +52,33 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         String html = tester.getLastResponseAsString();
         assertThat(html)
                 .contains("Dé dag")
-                .contains("Je staat op het punt om alles naar de gemeente Rotterdam te sturen en te betalen.")
-                .contains("Bij het bevestigen word je naar de betalingspagina geleid.")
-                .contains("Je krijgt daarna ook een bevestiging per e-mail.")
-                .contains("De reservering blijft 3 dagen geldig.")
-                .contains("In deze periode kun je alles gratis aanpassen.")
-                .contains("Na deze 3 dagen is wijzigen niet meer mogelijk.")
-                .contains("€ 50,- administratiekosten per keer.")
+                .contains("Controleer jullie keuzes goed.")
+                .contains("Na bevestiging gaan jullie verder naar de betalingspagina.")
+                .contains("Na betaling ontvangen jullie een bevestiging per e-mail.")
+                .contains("Jullie reservering blijft 3 dagen geldig.")
+                .contains("Binnen die periode kunnen jullie de aanvraag gratis aanpassen.")
+                .contains("Daarna is wijzigen niet meer mogelijk.")
+                .contains("Dan betalen jullie € 50 administratiekosten.")
+                .contains("rd-status-icon rd-status-icon--current-check")
                 .doesNotContain("<dialog");
         String confirmButtonMarkupId = tester.getComponentFromLastRenderedPage(BEVESTIG_BUTTON).getMarkupId();
-        assertThat(html.indexOf("Je staat op het punt"))
+        assertThat(html.indexOf("Controleer jullie keuzes goed."))
                 .isLessThan(html.indexOf("id=\"" + confirmButtonMarkupId + "\""));
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void statusWordtOnderControlerenInDeSidebarGetoond() {
+        UUID dossierId = testData.maakCompleetDossier();
+        marriageIntakeService.dienIn(dossierId);
+
+        tester.startPage(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));
+
+        String html = tester.getLastResponseAsString();
+        int controlerenSection = html.indexOf("rd-keuzes-section rd-progress-review");
+        assertThat(html.indexOf("Controleren", controlerenSection))
+                .isLessThan(html.indexOf("rd-keuzes-status", controlerenSection));
+        tester.assertVisible(PAGE_BODY + ":keuzesSidebar:controlerenSection:statusContainer");
     }
 
     @Test

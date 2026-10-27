@@ -111,19 +111,17 @@
         </div>
     </div>
 
-    <!-- Status (shown once the dossier has been submitted) -->
-    <div wicket:id="statusContainer" class="rd-keuzes-status" role="status">
-        <span class="rd-keuzes-status__label">
-            <wicket:message key="intake.sidebar.status">Status</wicket:message>
-        </span>
-        <span wicket:id="statusLabel" class="rd-keuzes-status__badge">Ingediend</span>
-    </div>
-
-    <div class="rd-keuzes-section rd-progress-review">
+    <div wicket:id="controlerenSection" class="rd-keuzes-section rd-progress-review">
         <h3 class="rd-keuzes-section__heading">
             <span wicket:id="controlerenProgressIcon" aria-hidden="true"></span>
             <a wicket:id="controlerenLink"><wicket:message key="intake.sidebar.controleren">Controleren</wicket:message></a>
         </h3>
+        <div wicket:id="statusContainer" class="rd-keuzes-status" role="status">
+            <span class="rd-keuzes-status__label">
+                <wicket:message key="intake.sidebar.status">Status</wicket:message>
+            </span>
+            <span wicket:id="statusLabel" class="rd-keuzes-status__badge">Ingediend</span>
+        </div>
     </div>
 
 </div>

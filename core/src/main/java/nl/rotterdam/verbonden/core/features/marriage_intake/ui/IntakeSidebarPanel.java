@@ -81,11 +81,10 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
     protected void onInitialize() {
         super.onInitialize();
         add(
-                progressIcon("algemeenStatusIcon", 1, IntakeStep.MIJN_DAG, null),
-                progressIcon("gegevensProgressIcon", 3, IntakeStep.JULLIE_GEGEVENS, null),
-                progressIcon("getuigenProgressIcon", 4, IntakeStep.DE_GETUIGEN, null),
-                progressIcon("extrasProgressIcon", 5, IntakeStep.EXTRAS, null),
-                progressIcon("controlerenProgressIcon", 6, IntakeStep.CONTROLEREN, null)
+                progressIcon("algemeenStatusIcon", 1, IntakeStep.MIJN_DAG),
+                progressIcon("gegevensProgressIcon", 3, IntakeStep.JULLIE_GEGEVENS),
+                progressIcon("getuigenProgressIcon", 4, IntakeStep.DE_GETUIGEN),
+                progressIcon("extrasProgressIcon", 5, IntakeStep.EXTRAS)
         );
 
         // Dé dag — registratie type row (visible when dossier is present)
@@ -128,8 +127,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         ceremonieDossierGegevens.add(new Label("ceremonieSoortLabel", ceremonieSoortModel));
         ceremonieDossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
         dossierGegevens.add(ceremonieDossierGegevens);
-        dossierGegevens.add(progressIcon("datumStatusIcon", 2, IntakeStep.DE_DAG,
-                OntbrekendOnderdeel.DATUM));
+        dossierGegevens.add(progressIcon("datumStatusIcon", 2, IntakeStep.DE_DAG));
 
         // Datum row — shown when datumTijdHuwelijk is set, otherwise "nog kiezen" placeholder
         WebMarkupContainer datumGekozen = new WebMarkupContainer("datumGekozen") {
@@ -276,14 +274,17 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         add(extrasListView);
 
         add(stepLink("extrasLink", IntakeStep.EXTRAS, ExtrasPage.class));
-        add(stepLink("controlerenLink", IntakeStep.CONTROLEREN, ControlerenPage.class));
-
-        // Status — shown once the dossier has been submitted
+        WebMarkupContainer controlerenSection = new WebMarkupContainer("controlerenSection");
         WebMarkupContainer statusContainer = new WebMarkupContainer("statusContainer");
         statusContainer.add(new VisibleModelBehavior(LambdaModel.of(() -> !isWijzigbaar())));
         statusContainer.add(new Label("statusLabel", LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::status, DossierStatus::getLabel))));
-        add(statusContainer);
+        controlerenSection.add(
+                progressIcon("controlerenProgressIcon", 6, IntakeStep.CONTROLEREN),
+                stepLink("controlerenLink", IntakeStep.CONTROLEREN, ControlerenPage.class),
+                statusContainer
+        );
+        add(controlerenSection);
     }
 
     private boolean isWijzigbaar() {
@@ -316,32 +317,31 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         }
     }
 
-    private Label progressIcon(String id, int number, IntakeStep step, OntbrekendOnderdeel missing) {
+    private Label progressIcon(String id, int number, IntakeStep step) {
         return new Label(id, Model.of("")) {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                setDefaultModelObject(isStepComplete(step, missing) ? "" : number);
+                setDefaultModelObject(isStepComplete(step) ? "" : number);
             }
 
             @Override
             protected void onComponentTag(ComponentTag tag) {
                 super.onComponentTag(tag);
-                String state = isStepComplete(step, missing)
-                        ? "rd-status-icon--check"
-                        : "rd-status-icon--current";
+                boolean complete = isStepComplete(step);
+                boolean current = activeStep == step;
+                String state = complete
+                        ? current ? "rd-status-icon--current-check" : "rd-status-icon--complete"
+                        : current ? "rd-status-icon--current" : "rd-status-icon--upcoming";
                 tag.put("class", "rd-status-icon " + state);
             }
         };
     }
 
-    private boolean isStepComplete(IntakeStep step, OntbrekendOnderdeel missing) {
+    private boolean isStepComplete(IntakeStep step) {
         DossierSamenvattingDto d = getDossierModelObject();
         if (d == null || d.id() == null) {
             return false;
-        }
-        if (missing != null) {
-            return !d.ontbrekendeOnderdelen().contains(missing);
         }
         return switch (step) {
             case MIJN_DAG -> d.registratieType() != null && d.ceremonieSoort() != null;
@@ -352,7 +352,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             case DE_GETUIGEN -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.GETUIGEN);
             case EXTRAS -> d.status() != DossierStatus.CONCEPT
                     || activeStep != null && activeStep.ordinal() > IntakeStep.EXTRAS.ordinal();
-            case CONTROLEREN -> d.status() != DossierStatus.CONCEPT;
+            case CONTROLEREN -> d.compleet();
         };
     }
 

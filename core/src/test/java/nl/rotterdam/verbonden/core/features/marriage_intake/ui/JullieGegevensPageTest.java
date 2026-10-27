@@ -143,7 +143,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990007")
-    void sidebarToontGroeneNummersVoorOnvolledigeStappenEnVinkjeVoorVolledigeStap() {
+    void sidebarToontStatusPerStapMetAndereMarkeringVoorHuidigeStap() {
         createdDossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
 
@@ -153,12 +153,12 @@ class JullieGegevensPageTest extends BaseWicketTest {
 
         String html = tester.getLastResponseAsString();
         assertThat(html)
-                .contains("rd-status-icon--check")
-                .contains("rd-status-icon--current\">2</span>")
-                .contains("rd-status-icon--current\">3</span>")
+                .contains("rd-status-icon--complete")
+                .contains("rd-status-icon--upcoming\">2</span>")
+                .contains("rd-status-icon--upcoming\">3</span>")
                 .contains("rd-status-icon--current\">4</span>")
-                .contains("rd-status-icon--current\">5</span>")
-                .contains("rd-status-icon--current\">6</span>");
+                .contains("rd-status-icon--upcoming\">5</span>")
+                .contains("rd-status-icon--upcoming\">6</span>");
     }
 
     @Test
