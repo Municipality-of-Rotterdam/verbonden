@@ -25,11 +25,7 @@ import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -154,7 +150,7 @@ public class ExtrasPage extends IntakeBasePage {
                 }
             });
             internationaleAkteSection.add(internationaleAkteCheckbox, new Label("internationaleAktePrijs",
-                    formatPrijs(marriageIntakeService.findInternationaleAktePrijs(dossierId))));
+                    IntakePriceFormatter.format(marriageIntakeService.findInternationaleAktePrijs(dossierId))));
             add(internationaleAkteSection);
         }
 
@@ -180,7 +176,7 @@ public class ExtrasPage extends IntakeBasePage {
                     WebMarkupContainer prijsContainer = new WebMarkupContainer("prijsContainer");
                     prijsContainer.setVisible(trouwboekje.prijs() != null);
                     if (trouwboekje.prijs() != null) {
-                        prijsContainer.add(new Label("prijs", Model.of(formatPrijs(trouwboekje.prijs()))));
+                        prijsContainer.add(new Label("prijs", Model.of(IntakePriceFormatter.format(trouwboekje.prijs()))));
                     } else {
                         prijsContainer.add(new Label("prijs", Model.of("")));
                     }
@@ -215,9 +211,6 @@ public class ExtrasPage extends IntakeBasePage {
             };
         }
 
-        private String formatPrijs(BigDecimal prijs) {
-            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(prijs);
-        }
 
         @Override
         protected void onSubmit() {

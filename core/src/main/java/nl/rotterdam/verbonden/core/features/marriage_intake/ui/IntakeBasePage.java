@@ -161,7 +161,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
                     if (getActiveStep() == IntakeStep.EXTRAS && targetStep == IntakeStep.CONTROLEREN) {
                         extrasDoorlopen = true;
                     }
-                    setResponsePage(pageFor(targetStep), pageParametersForDossier(dossierId));
+                    setResponsePage(targetStep.pageClass(), pageParametersForDossier(dossierId));
                 }
             }
 
@@ -176,42 +176,19 @@ public abstract class IntakeBasePage extends BurgerBasePage {
     }
 
     private IntakeStep vorigeStap() {
-        if (getActiveStep() == null) {
+        IntakeStep current = getActiveStep();
+        if (current == null || current.ordinal() == 0) {
             return null;
         }
-        return switch (getActiveStep()) {
-            case MIJN_DAG -> null;
-            case DE_DAG -> IntakeStep.MIJN_DAG;
-            case JULLIE_GEGEVENS -> IntakeStep.DE_DAG;
-            case DE_GETUIGEN -> IntakeStep.JULLIE_GEGEVENS;
-            case EXTRAS -> IntakeStep.DE_GETUIGEN;
-            case CONTROLEREN -> IntakeStep.EXTRAS;
-        };
+        return IntakeStep.values()[current.ordinal() - 1];
     }
 
     private IntakeStep volgendeStap() {
-        if (getActiveStep() == null) {
+        IntakeStep current = getActiveStep();
+        if (current == null || current.ordinal() == IntakeStep.values().length - 1) {
             return null;
         }
-        return switch (getActiveStep()) {
-            case MIJN_DAG -> IntakeStep.DE_DAG;
-            case DE_DAG -> IntakeStep.JULLIE_GEGEVENS;
-            case JULLIE_GEGEVENS -> IntakeStep.DE_GETUIGEN;
-            case DE_GETUIGEN -> IntakeStep.EXTRAS;
-            case EXTRAS -> IntakeStep.CONTROLEREN;
-            case CONTROLEREN -> null;
-        };
-    }
-
-    private Class<? extends IntakeBasePage> pageFor(IntakeStep step) {
-        return switch (step) {
-            case MIJN_DAG -> MarriageIntakePage.class;
-            case DE_DAG -> DeDagPage.class;
-            case JULLIE_GEGEVENS -> JullieGegevensPage.class;
-            case DE_GETUIGEN -> DeGetuigenPage.class;
-            case EXTRAS -> ExtrasPage.class;
-            case CONTROLEREN -> ControlerenPage.class;
-        };
+        return IntakeStep.values()[current.ordinal() + 1];
     }
 
     protected final PageParameters pageParametersForDossier(UUID id) {

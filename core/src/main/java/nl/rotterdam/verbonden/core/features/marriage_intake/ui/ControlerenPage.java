@@ -13,7 +13,6 @@ import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.Page;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -26,12 +25,11 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ControlerenPage extends IntakeBasePage {
 
@@ -92,15 +90,24 @@ public class ControlerenPage extends IntakeBasePage {
                         dossierModel().getObject().registratieType().getLabel())),
                 new Label("ceremonieSoort", LambdaModel.of(() ->
                         dossierModel().getObject().ceremonieSoort().getLabel())),
-                new Label("ceremoniePrijs", LambdaModel.of(() -> formatPrijs(dossierModel().getObject().prijs()))),
-                new Label("datum", LambdaModel.of(() -> {
+                new WebMarkupContainer("ceremoniePrijsContainer")
+                        .add(new VisibleModelBehavior(LambdaModel.of(() -> dossierModel().getObject().prijs() != null)))
+                        .add(new Label("ceremoniePrijs", LambdaModel.of(() ->
+                                IntakePriceFormatter.format(Objects.requireNonNull(dossierModel().getObject().prijs()))))),
+                new WebMarkupContainer("datumRij")
+                        .add(new VisibleModelBehavior(LambdaModel.of(() ->
+                                dossierModel().getObject().datumTijdHuwelijk() != null)))
+                        .add(new Label("datum", LambdaModel.of(() -> {
                     var datum = dossierModel().getObject().datumTijdHuwelijk();
-                    return datum == null ? "" : datum.format(DATUM_FORMAT);
-                })),
-                new Label("locatie", LambdaModel.of(() -> {
-                    String locatie = dossierModel().getObject().huwelijksLocatie();
-                    return locatie == null ? "" : locatie;
-                })),
+                    return Objects.requireNonNull(datum).format(DATUM_FORMAT);
+                }))),
+                new WebMarkupContainer("locatieRij")
+                        .add(new VisibleModelBehavior(LambdaModel.of(() -> {
+                            String locatie = dossierModel().getObject().huwelijksLocatie();
+                            return locatie != null && !locatie.isBlank();
+                        })))
+                        .add(new Label("locatie", LambdaModel.of(() ->
+                                Objects.requireNonNull(dossierModel().getObject().huwelijksLocatie())))),
                 new ListView<>("partners", partnerGegevensModel()) {
                     @Override
                     protected void populateItem(ListItem<PartnerGegevensDto> item) {
@@ -118,12 +125,19 @@ public class ControlerenPage extends IntakeBasePage {
                     protected void populateItem(ListItem<SidebarExtraItemDto> item) {
                         SidebarExtraItemDto extra = item.getModelObject();
                         item.add(new Label("extraNaam", extra.naam()));
-                        item.add(new Label("extraPrijs", extra.prijs() == null ? "" : "€ " + formatPrijs(extra.prijs())));
+                        item.add(new WebMarkupContainer("extraPrijsContainer")
+                                .add(new VisibleModelBehavior(LambdaModel.of(() -> extra.prijs() != null)))
+                                .add(new Label("extraPrijs", LambdaModel.of(() ->
+                                        IntakePriceFormatter.format(Objects.requireNonNull(extra.prijs()))))));
                     }
                 },
                 new WebMarkupContainer("geenExtras")
                         .add(new VisibleModelBehavior(extrasModel.map(List::isEmpty))),
-                new Label("totaalPrijs", LambdaModel.of(() -> formatPrijs(dossierModel().getObject().totalPrijs()))),
+                new WebMarkupContainer("totaalPrijsRij")
+                        .add(new VisibleModelBehavior(LambdaModel.of(() ->
+                                dossierModel().getObject().totalPrijs() != null)))
+                        .add(new Label("totaalPrijs", LambdaModel.of(() ->
+                                IntakePriceFormatter.format(Objects.requireNonNull(dossierModel().getObject().totalPrijs()))))),
                 new BevestigForm("bevestigForm")
         );
     }
@@ -154,17 +168,14 @@ public class ControlerenPage extends IntakeBasePage {
     }
 
     private String naamkeuze(PartnerGegevensDto partner) {
-        String naam = String.join(" ", List.of(
-                partner.voornamen() == null ? "" : partner.voornamen(),
-                partner.achternaam() == null ? "" : partner.achternaam())).trim();
-        return partner.gekozenAchternaam() == null || partner.gekozenAchternaam().isBlank()
-                ? naam
-                : naam + " - " + partner.gekozenAchternaam();
-    }
-
-    private String formatPrijs(BigDecimal prijs) {
-        return prijs == null ? "" : new DecimalFormat(
-                "#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(prijs);
+        String naam = java.util.stream.Stream.of(partner.voornamen(), partner.achternaam())
+                .filter(Objects::nonNull)
+                .filter(waarde -> !waarde.isBlank())
+                .collect(Collectors.joining(" "));
+        return java.util.Optional.ofNullable(partner.gekozenAchternaam())
+                .filter(gekozen -> !gekozen.isBlank())
+                .map(gekozen -> naam + " - " + gekozen)
+                .orElse(naam);
     }
 
     private boolean isCompleet() {
@@ -238,19 +249,11 @@ public class ControlerenPage extends IntakeBasePage {
             item.add(new Link<Void>("link") {
                 @Override
                 public void onClick() {
-                    setResponsePage(pageVoor(onderdeel), parameters());
+                    setResponsePage(IntakeStep.pageVoor(onderdeel), parameters());
                 }
             }.add(new Label("label", new ResourceModel("intake.sidebar.ontbrekend." + onderdeel.name()))));
         }
 
-        private Class<? extends Page> pageVoor(OntbrekendOnderdeel onderdeel) {
-            return switch (onderdeel) {
-                case DATUM -> DatumKiezenPage.class;
-                case LOCATIE -> DeDagPage.class;
-                case PARTNER_GEKOPPELD, ACHTERNAMEN -> JullieGegevensPage.class;
-                case GETUIGEN -> DeGetuigenPage.class;
-            };
-        }
     }
 
 }

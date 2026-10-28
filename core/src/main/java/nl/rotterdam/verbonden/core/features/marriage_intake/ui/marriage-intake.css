@@ -194,6 +194,11 @@
     text-align: end;
 }
 
+.rd-controleer-prijs {
+    color: var(--rd-color-green-500, #007a3e);
+    white-space: nowrap;
+}
+
 .rd-controleer-totaal {
     margin-top: 1.5rem;
     padding: 1.25rem;

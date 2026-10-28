@@ -27,17 +27,10 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 public class MarriageIntakePage extends IntakeBasePage {
-
-    private static final DecimalFormat PRIJS_FORMAT =
-            new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL")));
 
     private static final DateTimeFormatter DATUM_FORMAT =
             DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -126,7 +119,7 @@ public class MarriageIntakePage extends IntakeBasePage {
                 item.add(prijsPrefix);
 
                 // Price badge (text only; CSS class utrecht-status-badge applied in HTML)
-                item.add(new Label("prijs", "€\u00a0" + formatPrijs(dto.prijs())));
+                item.add(new Label("prijs", "€\u00a0" + IntakePriceFormatter.format(dto.prijs())));
 
                 // Bullet points
                 item.add(new ListView<>("bullets", dto.bulletPoints()) {
@@ -184,13 +177,6 @@ public class MarriageIntakePage extends IntakeBasePage {
                 target.add(keuzesSidebar);
             }
         });
-    }
-
-    private static String formatPrijs(BigDecimal prijs) {
-        if (prijs == null) {
-            return "";
-        }
-        return PRIJS_FORMAT.format(prijs);
     }
 
 }

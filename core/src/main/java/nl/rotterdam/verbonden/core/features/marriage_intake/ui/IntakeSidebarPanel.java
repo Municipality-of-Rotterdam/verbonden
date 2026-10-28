@@ -25,11 +25,8 @@ import org.jspecify.annotations.Nullable;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -62,10 +59,10 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
     protected void onInitialize() {
         super.onInitialize();
         add(
-                progressIcon("algemeenStatusIcon", 1, IntakeStep.MIJN_DAG),
-                progressIcon("gegevensProgressIcon", 3, IntakeStep.JULLIE_GEGEVENS),
-                progressIcon("getuigenProgressIcon", 4, IntakeStep.DE_GETUIGEN),
-                progressIcon("extrasProgressIcon", 5, IntakeStep.EXTRAS)
+                progressIcon("algemeenStatusIcon", IntakeStep.MIJN_DAG),
+                progressIcon("gegevensProgressIcon", IntakeStep.JULLIE_GEGEVENS),
+                progressIcon("getuigenProgressIcon", IntakeStep.DE_GETUIGEN),
+                progressIcon("extrasProgressIcon", IntakeStep.EXTRAS)
         );
 
         // Dé dag — registratie type row (visible when dossier is present)
@@ -80,8 +77,8 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         IModel<String> registratieModel = LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::registratieType, RegistratieType::getLabel));
         dossierGegevens.add(new Label("registratieTypeLabel", registratieModel));
-        add(stepLink("dedagLink", IntakeStep.MIJN_DAG, MarriageIntakePage.class));
-        dossierGegevens.add(stepLink("datumLink", IntakeStep.DE_DAG, DeDagPage.class));
+        add(stepLink("dedagLink", IntakeStep.MIJN_DAG));
+        dossierGegevens.add(stepLink("datumLink", IntakeStep.DE_DAG));
 
         // Ceremony row — only shown when a persisted dossier exists (id > 0)
         WebMarkupContainer ceremonieDossierGegevens = new WebMarkupContainer("ceremonieDossierGegevens") {
@@ -103,12 +100,12 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             if (prijs == null) {
                 return "";
             }
-            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(prijs);
+            return IntakePriceFormatter.format(prijs);
         });
         ceremonieDossierGegevens.add(new Label("ceremonieSoortLabel", ceremonieSoortModel));
         ceremonieDossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
         dossierGegevens.add(ceremonieDossierGegevens);
-        dossierGegevens.add(progressIcon("datumStatusIcon", 2, IntakeStep.DE_DAG));
+        dossierGegevens.add(progressIcon("datumStatusIcon", IntakeStep.DE_DAG));
 
         // Datum row — shown when datumTijdHuwelijk is set, otherwise "nog kiezen" placeholder
         WebMarkupContainer datumGekozen = new WebMarkupContainer("datumGekozen") {
@@ -185,7 +182,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         add(dossierGegevens);
 
         // Gegevens & Getuigen status icons
-        add(stepLink("gegevensLink", IntakeStep.JULLIE_GEGEVENS, JullieGegevensPage.class));
+        add(stepLink("gegevensLink", IntakeStep.JULLIE_GEGEVENS));
         IModel<List<String>> gekozenNamenModel = LambdaModel.of(() -> partnerGegevensModel.getObject().stream()
                 .map(PartnerGegevensDto::gekozenAchternaam)
                 .filter(naam -> naam != null && !naam.isBlank())
@@ -200,7 +197,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                     }
                 }
         );
-        add(stepLink("getuigenLink", IntakeStep.DE_GETUIGEN, DeGetuigenPage.class));
+        add(stepLink("getuigenLink", IntakeStep.DE_GETUIGEN));
         IModel<List<String>> getuigenNamenModel = LambdaModel.of(() -> getuigenModel.getObject().stream()
                 .map(GetuigeDto::naam)
                 .filter(naam -> naam != null && !naam.isBlank())
@@ -248,8 +245,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                 WebMarkupContainer prijsContainer = new WebMarkupContainer("extraPrijsContainer");
                 prijsContainer.setVisible(extra.prijs() != null);
                 if (extra.prijs() != null) {
-                    String prijsText = new DecimalFormat("#,##0.00",
-                            new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(extra.prijs());
+                    String prijsText = IntakePriceFormatter.format(extra.prijs());
                     prijsContainer.add(new Label("extraPrijs", Model.of(prijsText)));
                 } else {
                     prijsContainer.add(new Label("extraPrijs", Model.of("")));
@@ -260,15 +256,15 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         extrasListView.setReuseItems(false);
         add(extrasListView);
 
-        add(stepLink("extrasLink", IntakeStep.EXTRAS, ExtrasPage.class));
+        add(stepLink("extrasLink", IntakeStep.EXTRAS));
         WebMarkupContainer controlerenSection = new WebMarkupContainer("controlerenSection");
         WebMarkupContainer statusContainer = new WebMarkupContainer("statusContainer");
         statusContainer.add(new VisibleModelBehavior(LambdaModel.of(() -> !isWijzigbaar())));
         statusContainer.add(new Label("statusLabel", LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::status, DossierStatus::getLabel))));
         controlerenSection.add(
-                progressIcon("controlerenProgressIcon", 6, IntakeStep.CONTROLEREN),
-                stepLink("controlerenLink", IntakeStep.CONTROLEREN, ControlerenPage.class),
+                progressIcon("controlerenProgressIcon", IntakeStep.CONTROLEREN),
+                stepLink("controlerenLink", IntakeStep.CONTROLEREN),
                 statusContainer
         );
         add(controlerenSection);
@@ -279,11 +275,11 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         return d == null || d.status() == DossierStatus.CONCEPT;
     }
 
-    private Link<Void> stepLink(String id, IntakeStep step, Class<? extends Page> pageClass) {
+    private Link<Void> stepLink(String id, IntakeStep step) {
         Link<Void> link = new Link<>(id) {
             @Override
             public void onClick() {
-                setResponsePage(pageClass, makeDossierPageParameters(
+                setResponsePage(step.pageClass(), makeDossierPageParameters(
                         requireNonNull(getDossierModelObject()).id(), extrasDoorlopen));
             }
 
@@ -305,7 +301,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         }
     }
 
-    private Label progressIcon(String id, int number, IntakeStep step) {
+    private Label progressIcon(String id, IntakeStep step) {
         return new Label(id, Model.of("")) {
             {
                 setOutputMarkupId(true);
@@ -314,7 +310,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             @Override
             protected void onConfigure() {
                 super.onConfigure();
-                setDefaultModelObject(isStepComplete(step) ? "" : number);
+                setDefaultModelObject(isStepComplete(step) ? "" : step.ordinal() + 1);
             }
 
             @Override
