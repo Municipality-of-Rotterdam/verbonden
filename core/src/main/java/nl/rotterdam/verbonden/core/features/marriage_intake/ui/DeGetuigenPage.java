@@ -7,7 +7,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.nl_design_system.wicket.components.fieldset.RdFieldset;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.basic.Label;
@@ -44,6 +43,16 @@ public class DeGetuigenPage extends IntakeBasePage {
     }
 
     @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("intake.step.getuigen");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("de.getuigen.intro");
+    }
+
+    @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
         return Model.of(marriageIntakeService.findByDossierId(dossierId));
     }
@@ -58,9 +67,6 @@ public class DeGetuigenPage extends IntakeBasePage {
     @Override
     protected void onInitialize() {
         super.onInitialize();
-
-        pageBody.add(new RdHeading("heading", getString("de.getuigen.heading"), 1));
-        pageBody.add(new Label("intro", new ResourceModel("de.getuigen.intro")));
 
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
         int maxGetuigen = dossier.ceremonieSoort().getAantalGetuigen();
@@ -122,4 +128,3 @@ public class DeGetuigenPage extends IntakeBasePage {
         }
     }
 }
-

@@ -1,22 +1,5 @@
 <wicket:extend>
 
-    <!-- Page heading -->
-    <h1 wicket:id="heading">Jullie gegevens &amp; verklaring naamgebruik</h1>
-
-    <!-- Intro text -->
-    <p class="rd-intro-text">
-        <wicket:message key="jullie.gegevens.intro">
-            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi.
-        </wicket:message>
-    </p>
-
-    <div wicket:id="vorigeStapContainer" class="rd-vorige-nav">
-        <a wicket:id="vorigeStap" class="rd-secondary-button">
-            <span aria-hidden="true">&#8592;</span>
-            <span wicket:id="label">Vorige stap</span>
-        </a>
-    </div>
-
     <!-- Partner cards -->
     <div class="row g-4">
         <div wicket:id="partnerCards" class="col-12 col-md-6">
@@ -152,13 +135,6 @@
                 <p id="partner-uitnodiging-melding" class="rd-partner-uitnodigen__melding" aria-live="polite"></p>
             </div>
         </div>
-    </div>
-
-    <div wicket:id="volgendeStapContainer" class="rd-verder-nav">
-        <a wicket:id="volgendeStap" class="rd-secondary-button">
-            <span wicket:id="label">Volgende stap</span>
-            <span aria-hidden="true">&#8594;</span>
-        </a>
     </div>
 
 </wicket:extend>

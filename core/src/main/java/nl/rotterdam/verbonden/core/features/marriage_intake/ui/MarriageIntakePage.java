@@ -9,7 +9,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -59,6 +58,21 @@ public class MarriageIntakePage extends IntakeBasePage {
     }
 
     @Override
+    protected boolean hasIntakeStepLayout() {
+        return true;
+    }
+
+    @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("intake.step.mijndag");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("intake.intro.marriageintake");
+    }
+
+    @Override
     protected IModel<String> getTitleModel() {
         return new ResourceModel("intake.page.title.marriageintake");
     }
@@ -90,8 +104,6 @@ public class MarriageIntakePage extends IntakeBasePage {
         if (dossierId != null) {
             registratieType = marriageIntakeService.findByDossierId(dossierId).registratieType();
         }
-
-        pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
         Form<Void> form = new Form<>("form");
         pageBody.add(form);

@@ -50,6 +50,82 @@
     font-size: 1rem;
 }
 
+.rd-intake-step-layout .rd-intake-step__header h1 {
+    margin-bottom: 0.75rem;
+}
+
+.rd-read-aloud {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2rem;
+    padding: 0 0.4rem;
+    border: 1px solid #718087;
+    border-radius: 0;
+    background: #fff;
+    color: #273238;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.rd-read-aloud__menu,
+.rd-read-aloud__speaker,
+.rd-read-aloud__play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.85rem;
+    padding: 0 0.25rem;
+    border-right: 1px solid #718087;
+}
+
+.rd-read-aloud__speaker {
+    color: #c43b72;
+}
+
+.rd-read-aloud__play {
+    padding-right: 0;
+    border-right: 0;
+    color: #008a3b;
+}
+
+.rd-read-aloud:focus-visible,
+.rd-read-aloud:hover {
+    outline: 2px solid #007a3e;
+    outline-offset: 2px;
+}
+
+.rd-intake-step-layout .rd-vorige-nav {
+    margin: 2rem 0 1rem;
+}
+
+.rd-intake-step-layout .rd-intake-step__title h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.75rem;
+}
+
+.rd-intake-step-layout .rd-intake-step__title .rd-intro-text {
+    margin-bottom: 2rem;
+}
+
+.rd-intake-step-layout .rd-intake-content {
+    border: 1px solid #b9c9ce;
+    padding: 1.5rem;
+}
+
+.rd-intake-step-layout .rd-controleer-kaart {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+.rd-intake-step-layout .rd-verder-nav {
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
 /* Section card (wrapping fieldset) */
 .rd-card {
     border: 1px solid #d0d0d0;
@@ -141,7 +217,7 @@
 
 .rd-verder-nav {
     margin-top: 1rem;
-    text-align: end;
+    text-align: left;
 }
 
 .rd-vorige-nav {

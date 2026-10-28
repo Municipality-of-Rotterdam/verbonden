@@ -8,7 +8,6 @@ import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -58,6 +57,16 @@ public class JullieGegevensPage extends IntakeBasePage {
     }
 
     @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("intake.step.jullie.gegevens");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("jullie.gegevens.intro");
+    }
+
+    @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
         return Model.of(marriageIntakeService.findByDossierId(dossierId));
     }
@@ -66,8 +75,6 @@ public class JullieGegevensPage extends IntakeBasePage {
     @Override
     protected void onInitialize() {
         super.onInitialize();
-
-        pageBody.add(new RdHeading("heading", getString("jullie.gegevens.heading"), 1));
 
         List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
         // Zodra beide partners gekoppeld zijn, mag elke partner ook de gegevens van de ander invullen

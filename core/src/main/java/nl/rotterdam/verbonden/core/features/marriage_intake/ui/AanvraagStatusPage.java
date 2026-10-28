@@ -51,6 +51,11 @@ public class AanvraagStatusPage extends IntakeBasePage {
     }
 
     @Override
+    protected boolean hasIntakeStepLayout() {
+        return false;
+    }
+
+    @Override
     protected IModel<String> getTitleModel() {
         return new ResourceModel("aanvraag.status.page.title");
     }

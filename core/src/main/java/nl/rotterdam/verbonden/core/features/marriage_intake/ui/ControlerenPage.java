@@ -9,7 +9,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraI
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -57,6 +56,16 @@ public class ControlerenPage extends IntakeBasePage {
     }
 
     @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("controleren.heading");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("controleren.intro");
+    }
+
+    @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
         return dossierModel;
     }
@@ -81,8 +90,6 @@ public class ControlerenPage extends IntakeBasePage {
                 dossier.id() != null && dossier.compleet());
 
         pageBody.add(
-                new RdHeading("heading", getString("controleren.heading"), 1),
-                new Label("intro", new ResourceModel("controleren.intro")),
                 new RdAlert("betalingMislukt", new ResourceModel("controleren.betaling.mislukt"), RdAlertType.WARNING)
                         .add(new VisibleModelBehavior(LambdaModel.of(
                                 () -> getPageParameters().get("betalingMislukt").toBoolean(false)))),

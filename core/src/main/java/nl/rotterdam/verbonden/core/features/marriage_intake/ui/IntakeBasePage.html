@@ -19,7 +19,40 @@
 
         <!-- Main content (filled by sub-pages) -->
         <div class="col-12 col-lg-9">
-            <wicket:child/>
+            <div class="rd-intake-step">
+                <div wicket:id="intakeHeader" class="rd-intake-step__header">
+                    <h1 wicket:id="intakeHeading">Maak jullie dag om nooit te vergeten</h1>
+                    <button class="rd-read-aloud" type="button" data-intake-read-aloud
+                            aria-pressed="false"
+                            wicket:message="aria-label:intake.read.aloud.label">
+                        <span class="rd-read-aloud__menu" aria-hidden="true">&#9776;</span>
+                        <span class="rd-read-aloud__speaker" aria-hidden="true">&#128266;</span>
+                        <span class="rd-read-aloud__label"><wicket:message key="intake.read.aloud">Lees voor</wicket:message></span>
+                        <span class="rd-read-aloud__play" aria-hidden="true">&#9654;</span>
+                    </button>
+                </div>
+
+                <div wicket:id="vorigeStapContainer" class="rd-vorige-nav">
+                    <a wicket:id="vorigeStap" class="rd-secondary-button">
+                        <span aria-hidden="true">&#8592;</span>
+                        <span wicket:id="label">Vorige stap</span>
+                    </a>
+                </div>
+
+                <div wicket:id="stepDetails" class="rd-intake-step__title">
+                    <h2 wicket:id="stepHeading">Mijn dag</h2>
+                    <p class="rd-intro-text" wicket:id="stepIntro"></p>
+                </div>
+
+                <div class="rd-intake-content"><wicket:child/></div>
+
+                <div wicket:id="volgendeStapContainer" class="rd-verder-nav">
+                    <a wicket:id="volgendeStap" class="rd-secondary-button">
+                        <span wicket:id="label">Volgende stap</span>
+                        <span aria-hidden="true">&#8594;</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar -->

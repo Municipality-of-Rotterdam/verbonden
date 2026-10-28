@@ -5,11 +5,11 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.cycle.RequestCycle;
@@ -45,6 +45,20 @@ public class DeDagPage extends IntakeBasePage {
     }
 
     @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("intake.step.dedag");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return LoadableDetachableModel.of(() -> {
+            CeremonieSoort soort = marriageIntakeService.findByDossierId(dossierId).ceremonieSoort();
+            return getString(soort == CeremonieSoort.KLEIN
+                    ? "intake.intro.dedag.klein" : "intake.intro.dedag");
+        });
+    }
+
+    @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
         return Model.of(marriageIntakeService.findByDossierId(dossierId));
     }
@@ -59,13 +73,6 @@ public class DeDagPage extends IntakeBasePage {
     @Override
     protected void onInitialize() {
         super.onInitialize();
-
-        pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
-
-        // With a small ceremony only the date can be chosen, so the generic "start with what matters most" text does not apply
-        CeremonieSoort soort = marriageIntakeService.findByDossierId(dossierId).ceremonieSoort();
-        pageBody.add(new Label("intro", new ResourceModel(
-                soort == CeremonieSoort.KLEIN ? "intake.intro.dedag.klein" : "intake.intro.dedag")));
 
         pageBody.add(new Link<Void>("datumLink") {
             @Override

@@ -6,7 +6,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenv
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -47,6 +46,16 @@ public class ExtrasPage extends IntakeBasePage {
     }
 
     @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("extras.heading");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("extras.intro");
+    }
+
+    @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
         return LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
     }
@@ -61,8 +70,6 @@ public class ExtrasPage extends IntakeBasePage {
     @Override
     protected void onInitialize() {
         super.onInitialize();
-
-        pageBody.add(new RdHeading("heading", getString("extras.heading"), 1));
 
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
         SaveExtrasDto selecties = marriageIntakeService.findExtrasSelecties(dossierId);
