@@ -98,7 +98,7 @@
 }
 
 .rd-intake-step-layout .rd-vorige-nav {
-    margin: 2rem 0 1rem;
+    margin: 2rem 0 1.5rem;
 }
 
 .rd-intake-step-layout .rd-intake-step__title h2 {
@@ -110,9 +110,18 @@
     margin-bottom: 2rem;
 }
 
-.rd-intake-step-layout .rd-intake-content {
+.rd-intake-step-layout:not(.rd-intake-content--unbordered) .rd-intake-content {
     border: 1px solid #b9c9ce;
     padding: 1.5rem;
+}
+
+.rd-intake-step-layout.rd-intake-content--unbordered .rd-intake-content {
+    border: 0;
+    padding: 0;
+}
+
+.rd-ceremonie-kaart .rd-ceremony-heading {
+    margin-top: 0;
 }
 
 .rd-intake-step-layout .rd-controleer-kaart {

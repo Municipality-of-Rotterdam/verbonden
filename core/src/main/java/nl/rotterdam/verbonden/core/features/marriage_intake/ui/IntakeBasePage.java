@@ -70,6 +70,10 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         return hasStepNavigation();
     }
 
+    protected boolean hasIntakeContentBorder() {
+        return true;
+    }
+
     protected IModel<String> getStepHeadingModel() {
         return Model.of("");
     }
@@ -153,6 +157,9 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         boolean intakeStepLayout = hasIntakeStepLayout();
         if (intakeStepLayout) {
             pageBody.add(AttributeModifier.append("class", "rd-intake-step-layout"));
+        }
+        if (!hasIntakeContentBorder()) {
+            pageBody.add(AttributeModifier.append("class", "rd-intake-content--unbordered"));
         }
         WebMarkupContainer intakeHeader = new WebMarkupContainer("intakeHeader");
         intakeHeader.setVisible(intakeStepLayout);

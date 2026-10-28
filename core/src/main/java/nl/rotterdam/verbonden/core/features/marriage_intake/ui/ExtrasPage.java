@@ -68,6 +68,11 @@ public class ExtrasPage extends IntakeBasePage {
     }
 
     @Override
+    protected boolean hasIntakeContentBorder() {
+        return false;
+    }
+
+    @Override
     protected void onInitialize() {
         super.onInitialize();
 
@@ -109,7 +114,6 @@ public class ExtrasPage extends IntakeBasePage {
                 }
             });
             ringenSection.add(ringenCheckbox);
-            add(ringenSection);
 
             // --- Muziek ---
             WebMarkupContainer muziekSection = new WebMarkupContainer("muziekSection") {
@@ -129,7 +133,9 @@ public class ExtrasPage extends IntakeBasePage {
                 }
             });
             muziekSection.add(muziekCheckbox);
-            add(muziekSection);
+            WebMarkupContainer ceremonieExtrasSection = new WebMarkupContainer("ceremonieExtrasSection");
+            ceremonieExtrasSection.add(ringenSection, muziekSection);
+            add(ceremonieExtrasSection);
 
             // --- Trouwboekje ---
             List<TrouwboekjeKeuzeDto> trouwboekjes = marriageIntakeService.findActieveTrouwboekjes();

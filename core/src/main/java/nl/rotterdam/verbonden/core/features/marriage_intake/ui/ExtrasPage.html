@@ -2,43 +2,45 @@
 
     <form wicket:id="extrasForm">
 
-        <!-- Ringen uitwisselen -->
-        <div wicket:id="ringenSection" class="rd-extra-sectie card mb-4 p-4">
-            <h2 class="rd-extra-sectie__heading">
-                <wicket:message key="extras.ringen.heading">Ringen uitwisselen tijdens ceremonie</wicket:message>
-            </h2>
-            <p>
-                <wicket:message key="extras.ringen.intro">Wil u een moment om ringen bij elkaar om te doen?</wicket:message>
-            </p>
-            <div class="rd-extra-keuze-item d-flex align-items-center gap-2">
-                <label>
-                    <input type="checkbox" wicket:id="ringenUitwisselenCheckbox"/>
-                    <wicket:message key="extras.ringen.label">Ringen uitwisselen</wicket:message>
-                </label>
+        <div wicket:id="ceremonieExtrasSection" class="rd-extra-sectie card mb-4 p-4">
+            <!-- Ringen uitwisselen -->
+            <div wicket:id="ringenSection">
+                <h2 class="rd-extra-sectie__heading">
+                    <wicket:message key="extras.ringen.heading">Ringen uitwisselen tijdens ceremonie</wicket:message>
+                </h2>
+                <p>
+                    <wicket:message key="extras.ringen.intro">Wil u een moment om ringen bij elkaar om te doen?</wicket:message>
+                </p>
+                <div class="rd-extra-keuze-item d-flex align-items-center gap-2">
+                    <label>
+                        <input type="checkbox" wicket:id="ringenUitwisselenCheckbox"/>
+                        <wicket:message key="extras.ringen.label">Ringen uitwisselen</wicket:message>
+                    </label>
+                </div>
             </div>
-        </div>
 
-        <!-- Muziek (alleen zichtbaar bij groot huwelijk) -->
-        <div wicket:id="muziekSection" class="rd-extra-sectie card mb-4 p-4">
-            <h2 class="rd-extra-sectie__heading">
-                <wicket:message key="extras.muziek.heading">Muziek</wicket:message>
-            </h2>
-            <p>
-                <wicket:message key="extras.muziek.intro">Wij hebben een vaste lijst van muziek waar jullie een keuze uit kunnen maken. Deze kunnen jullie na bevestiging door een lijst te downloaden uit MijnLoket. Er zijn een 5-tal momenten dat er muziek gespeeld kan worden tijdens de ceremonie.</wicket:message>
-            </p>
-            <ul>
-                <li><wicket:message key="extras.muziek.moment1">Opkomst bruid</wicket:message></li>
-                <li><wicket:message key="extras.muziek.moment2">Reden 2</wicket:message></li>
-                <li><wicket:message key="extras.muziek.moment3">Reden 3</wicket:message></li>
-                <li><wicket:message key="extras.muziek.moment4">Reden 4</wicket:message></li>
-                <li><wicket:message key="extras.muziek.moment5">Reden 5</wicket:message></li>
-                <li><wicket:message key="extras.muziek.moment6">Verlaten zaal door bruidspaar</wicket:message></li>
-            </ul>
-            <div class="rd-extra-keuze-item d-flex align-items-center gap-2">
-                <label>
-                    <input type="checkbox" wicket:id="muziekCheckbox"/>
-                    <wicket:message key="extras.muziek.label">Muziek</wicket:message>
-                </label>
+            <!-- Muziek (alleen zichtbaar bij groot huwelijk) -->
+            <div wicket:id="muziekSection">
+                <h2 class="rd-extra-sectie__heading">
+                    <wicket:message key="extras.muziek.heading">Muziek</wicket:message>
+                </h2>
+                <p>
+                    <wicket:message key="extras.muziek.intro">Wij hebben een vaste lijst van muziek waar jullie een keuze uit kunnen maken. Deze kunnen jullie na bevestiging door een lijst te downloaden uit MijnLoket. Er zijn een 5-tal momenten dat er muziek gespeeld kan worden tijdens de ceremonie.</wicket:message>
+                </p>
+                <ul>
+                    <li><wicket:message key="extras.muziek.moment1">Opkomst bruid</wicket:message></li>
+                    <li><wicket:message key="extras.muziek.moment2">Reden 2</wicket:message></li>
+                    <li><wicket:message key="extras.muziek.moment3">Reden 3</wicket:message></li>
+                    <li><wicket:message key="extras.muziek.moment4">Reden 4</wicket:message></li>
+                    <li><wicket:message key="extras.muziek.moment5">Reden 5</wicket:message></li>
+                    <li><wicket:message key="extras.muziek.moment6">Verlaten zaal door bruidspaar</wicket:message></li>
+                </ul>
+                <div class="rd-extra-keuze-item d-flex align-items-center gap-2">
+                    <label>
+                        <input type="checkbox" wicket:id="muziekCheckbox"/>
+                        <wicket:message key="extras.muziek.label">Muziek</wicket:message>
+                    </label>
+                </div>
             </div>
         </div>
 

@@ -63,6 +63,11 @@ public class MarriageIntakePage extends IntakeBasePage {
     }
 
     @Override
+    protected boolean hasIntakeContentBorder() {
+        return false;
+    }
+
+    @Override
     protected IModel<String> getStepHeadingModel() {
         return new ResourceModel("intake.step.mijndag");
     }

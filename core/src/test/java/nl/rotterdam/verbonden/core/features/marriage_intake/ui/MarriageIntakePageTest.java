@@ -28,6 +28,18 @@ class MarriageIntakePageTest extends BaseWicketTest {
         tester.assertRenderedPage(MarriageIntakePage.class);
     }
 
+    @Test
+    @WithMockUser(username = "999990007")
+    void registratieEnCeremoniekeuzeHebbenEigenKaartZonderOmvattendeRand() {
+        tester.startPage(MarriageIntakePage.class);
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("rd-intake-content--unbordered")
+                .contains("rd-ceremonie-kaart");
+        assertThat(html.split("class=\"rd-card", -1)).hasSize(3);
+    }
+
     /**
      * De Stencil-iconen lezen de CSP-nonce uit {@code <meta name="csp-nonce">} voor hun eigen
      * {@code <style>}-blokken; zonder die tag blokkeert de browser ze.
