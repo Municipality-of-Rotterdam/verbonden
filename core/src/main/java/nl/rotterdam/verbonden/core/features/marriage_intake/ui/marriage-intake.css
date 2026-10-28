@@ -46,7 +46,7 @@
 
 /* Intro paragraph */
 .rd-intro-text {
-    margin: 0 0 1.5rem;
+    margin: 2rem 0 1.5rem;
     font-size: 1rem;
 }
 
@@ -68,6 +68,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     cursor: pointer;
+    margin-bottom: 0.75rem;
 }
 
 .rd-read-aloud__menu,
