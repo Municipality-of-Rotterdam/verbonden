@@ -133,7 +133,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         notAuthorizedAlert.setVisible(showNotAuthorizedWarning);
         pageBody.add(notAuthorizedAlert);
 
-        // The steps are only useful while the dossier can still be changed
+        // Only pages in the sequential flow show previous/next step navigation.
         if (hasStepNavigation()) {
             pageBody.add(
                     createNavigationContainer("vorigeStapContainer", "vorigeStap", vorigeStap(), "intake.button.vorige"),
@@ -194,7 +194,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
             return null;
         }
         return switch (getActiveStep()) {
-            case MIJN_DAG -> IntakeStep.JULLIE_GEGEVENS;
+            case MIJN_DAG -> IntakeStep.DE_DAG;
             case DE_DAG -> IntakeStep.JULLIE_GEGEVENS;
             case JULLIE_GEGEVENS -> IntakeStep.DE_GETUIGEN;
             case DE_GETUIGEN -> IntakeStep.EXTRAS;
