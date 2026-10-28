@@ -150,7 +150,7 @@ public class ExtrasPage extends IntakeBasePage {
                 }
             });
             internationaleAkteSection.add(internationaleAkteCheckbox, new Label("internationaleAktePrijs",
-                    IntakePriceFormatter.format(marriageIntakeService.findInternationaleAktePrijs(dossierId))));
+                    marriageIntakeService.findInternationaleAktePrijs(dossierId).format()));
             add(internationaleAkteSection);
         }
 
@@ -176,7 +176,7 @@ public class ExtrasPage extends IntakeBasePage {
                     WebMarkupContainer prijsContainer = new WebMarkupContainer("prijsContainer");
                     prijsContainer.setVisible(trouwboekje.prijs() != null);
                     if (trouwboekje.prijs() != null) {
-                        prijsContainer.add(new Label("prijs", Model.of(IntakePriceFormatter.format(trouwboekje.prijs()))));
+                        prijsContainer.add(new Label("prijs", Model.of(trouwboekje.prijs().format())));
                     } else {
                         prijsContainer.add(new Label("prijs", Model.of("")));
                     }

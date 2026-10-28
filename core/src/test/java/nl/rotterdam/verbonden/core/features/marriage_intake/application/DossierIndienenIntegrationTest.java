@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -97,12 +97,12 @@ class DossierIndienenIntegrationTest {
         klok.zetOp(LocalDate.of(2027, 1, 1));
 
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
-        BigDecimal tarief = new BigDecimal("17.80");
+        Bedrag tarief = Bedrag.of("17.80");
         assertThat(marriageIntakeService.findInternationaleAktePrijs(dossierId)).isEqualByComparingTo(tarief);
         assertThat(dossier.extras())
                 .extracting(SidebarExtraItemDto::naam, SidebarExtraItemDto::prijs)
                 .containsExactly(tuple("Internationale huwelijksakte", tarief));
-        assertThat(dossier.totalPrijs()).isEqualByComparingTo(dossier.prijs().add(tarief));
+        assertThat(dossier.totalPrijs()).isEqualTo(dossier.prijs().plus(tarief));
     }
 
     @Test

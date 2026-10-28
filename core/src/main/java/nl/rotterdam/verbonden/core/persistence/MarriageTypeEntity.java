@@ -1,9 +1,9 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,7 +21,8 @@ public class MarriageTypeEntity {
     private String tekst;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal prijs;
+    @Convert(converter = BedragAttributeConverter.class)
+    private Bedrag prijs;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String url;
@@ -60,11 +61,11 @@ public class MarriageTypeEntity {
         this.tekst = tekst;
     }
 
-    public BigDecimal getPrijs() {
+    public Bedrag getPrijs() {
         return prijs;
     }
 
-    public void setPrijs(BigDecimal prijs) {
+    public void setPrijs(Bedrag prijs) {
         this.prijs = prijs;
     }
 

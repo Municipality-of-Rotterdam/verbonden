@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.features.location_administration.repository.LocatieRepository;
@@ -40,7 +41,6 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -232,7 +232,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
 
-        BigDecimal prijs = marriageTypeRepository.findBySoort(e.getCeremonieSoort())
+        Bedrag prijs = marriageTypeRepository.findBySoort(e.getCeremonieSoort())
                 .map(MarriageTypeEntity::getPrijs)
                 .orElse(null);
 
@@ -256,11 +256,12 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             extraItems.add(new SidebarExtraItemDto("Internationale huwelijksakte", internationaleAktePrijs(e)));
         }
 
-        BigDecimal extrasTotaal = extraItems.stream()
+        Bedrag extrasTotaal = extraItems.stream()
                 .map(SidebarExtraItemDto::prijs)
                 .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalPrijs = prijs != null ? prijs.add(extrasTotaal) : (extrasTotaal.compareTo(BigDecimal.ZERO) > 0 ? extrasTotaal : null);
+                .reduce(Bedrag.ZERO, Bedrag::plus);
+        Bedrag totalPrijs = prijs != null ? prijs.plus(extrasTotaal)
+                : (extrasTotaal.isPositive() ? extrasTotaal : null);
 
         return new DossierSamenvattingDto(
                 e.getUuid(),
@@ -304,14 +305,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional(readOnly = true)
-    public BigDecimal findInternationaleAktePrijs(UUID dossierId) {
+    public Bedrag findInternationaleAktePrijs(UUID dossierId) {
         return internationaleAktePrijs(getDossier(dossierId));
     }
 
     /**
      * De bij het indienen vastgelegde prijs; zolang het dossier nog niet is ingediend het tarief van vandaag.
      */
-    private BigDecimal internationaleAktePrijs(HuwelijksDossierEntity dossier) {
+    private Bedrag internationaleAktePrijs(HuwelijksDossierEntity dossier) {
         return dossier.getInternationaleAktePrijs() != null
                 ? dossier.getInternationaleAktePrijs()
                 : InternationaleAkteTarief.prijsOp(LocalDate.now(clock));

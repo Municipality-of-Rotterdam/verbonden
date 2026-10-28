@@ -136,7 +136,7 @@ public class LocationUpdatePage extends AdministrationBasePage {
             public void populateItem(Item<ICellPopulator<ListBeschikbaarheidDto>> cellItem,
                                      String componentId, IModel<ListBeschikbaarheidDto> rowModel) {
                 var prijs = rowModel.getObject().prijs();
-                cellItem.add(new Label(componentId, Model.of(prijs != null ? "€ " + prijs : "")));
+                cellItem.add(new Label(componentId, Model.of(prijs != null ? "€ " + prijs.format() : "")));
             }
         });
 

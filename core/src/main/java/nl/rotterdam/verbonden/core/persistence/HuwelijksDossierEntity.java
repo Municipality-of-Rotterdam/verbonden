@@ -8,7 +8,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 
-import java.math.BigDecimal;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +62,8 @@ public class HuwelijksDossierEntity {
     private boolean internationaleAkte = false;
 
     @Column(name = "internationale_akte_prijs")
-    private BigDecimal internationaleAktePrijs;
+    @Convert(converter = BedragAttributeConverter.class)
+    private Bedrag internationaleAktePrijs;
 
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
@@ -202,11 +203,11 @@ public class HuwelijksDossierEntity {
         return internationaleAkte;
     }
 
-    public BigDecimal getInternationaleAktePrijs() {
+    public Bedrag getInternationaleAktePrijs() {
         return internationaleAktePrijs;
     }
 
-    public void setInternationaleAktePrijs(BigDecimal internationaleAktePrijs) {
+    public void setInternationaleAktePrijs(Bedrag internationaleAktePrijs) {
         this.internationaleAktePrijs = internationaleAktePrijs;
     }
 

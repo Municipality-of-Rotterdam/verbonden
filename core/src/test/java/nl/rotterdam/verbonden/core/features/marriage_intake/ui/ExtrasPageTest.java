@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
@@ -19,11 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +41,7 @@ class ExtrasPageTest extends BaseWicketTest {
     @WithMockUser(username = "999990007")
     void trouwboekjeKiezen_slaatOpEnVerverstAlleenKeuzesEnSidebar() {
         long trouwboekjeId = trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
-                "Linnen trouwboekje", "Linnen", "/trouwboekjes/linnen.webp", new BigDecimal("42.50"), null, null));
+                "Linnen trouwboekje", "Linnen", "/trouwboekjes/linnen.webp", Bedrag.of("42.50"), null, null));
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990007")));
         ExtrasPage page = tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
@@ -124,7 +121,6 @@ class ExtrasPageTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString()).contains(INTERNATIONALE_AKTE_INTRO);
         assertThat(tester.getLastResponseAsString()).contains("Internationale huwelijksakte");
         tester.assertLabel("pageLayout:pageLayout_body:pageBody:pageBody_body:extrasForm:internationaleAkteSection:internationaleAktePrijs",
-                new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL")))
-                        .format(InternationaleAkteTarief.prijsOp(LocalDate.now())));
+                InternationaleAkteTarief.prijsOp(LocalDate.now()).format());
     }
 }

@@ -17,6 +17,8 @@ import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsUpdatePag
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
+import nl.rotterdam.verbonden.core.ui.BedragWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BuitenlandsPersoonsnummerWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BurgerServiceNummerWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
@@ -125,6 +127,7 @@ public class WicketApplication extends WicketBootStandardWebApplication {
     @Override
     protected IConverterLocator newConverterLocator() {
         ConverterLocator locator = (ConverterLocator) super.newConverterLocator();
+        locator.set(Bedrag.class, new BedragWicketConverter());
         locator.set(LocalDate.class, new LocalDateWicketConverter());
         locator.set(LocalTime.class, new LocalTimeWicketConverter());
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());

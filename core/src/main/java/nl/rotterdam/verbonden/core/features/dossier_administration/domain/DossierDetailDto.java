@@ -6,9 +6,9 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -32,12 +32,12 @@ public record DossierDetailDto(
         CeremonieSoort ceremonieSoort,
         String locatieNaam,
         LocalDateTime datumTijdHuwelijk,
-        BigDecimal ceremoniePrijs,
+        Bedrag ceremoniePrijs,
         List<DetailPartnerDto> partners,
         List<GetuigeDto> getuigen,
         List<SidebarExtraItemDto> extras,
         ChangeExtrasDto extraKeuzes,
-        BigDecimal totaalPrijs,
+        Bedrag totaalPrijs,
         boolean compleet,
         List<ListDossierBestandDto> bestanden
 ) implements Serializable {

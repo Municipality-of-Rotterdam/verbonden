@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.integration_test;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
@@ -12,7 +13,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieTy
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -86,7 +86,7 @@ public class CompleetDossierTestData {
         for (DayOfWeek dag : DayOfWeek.values()) {
             locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
                     locatieId, HuwelijksType.GRATIS, dag, LocalTime.of(9, 0), LocalTime.of(10, 0), 10,
-                    BigDecimal.ZERO, LocalDate.now(clock).minusMonths(1), LocalDate.now(clock).plusYears(2)));
+                    Bedrag.ZERO, LocalDate.now(clock).minusMonths(1), LocalDate.now(clock).plusYears(2)));
         }
     }
 }

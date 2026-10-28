@@ -94,7 +94,7 @@ public class ControlerenPage extends IntakeBasePage {
                 new Label("ceremonieSoort", dossierModel.map(dossier -> dossier.ceremonieSoort().getLabel())),
                 visibleWhen("ceremoniePrijsContainer", dossierModel.map(dossier -> dossier.prijs() != null),
                         new Label("ceremoniePrijs", dossierModel.map(dossier ->
-                                IntakePriceFormatter.format(Objects.requireNonNull(dossier.prijs()))))),
+                                Objects.requireNonNull(dossier.prijs()).format()))),
                 visibleWhen("datumRij", dossierModel.map(dossier -> dossier.datumTijdHuwelijk() != null),
                         new Label("datum", dossierModel.map(dossier ->
                                 Objects.requireNonNull(dossier.datumTijdHuwelijk()).format(DATUM_FORMAT)))),
@@ -122,14 +122,14 @@ public class ControlerenPage extends IntakeBasePage {
                         item.add(visibleWhen("extraPrijsContainer",
                                 item.getModel().map(waarde -> waarde.prijs() != null),
                                 new Label("extraPrijs", item.getModel().map(waarde ->
-                                        IntakePriceFormatter.format(Objects.requireNonNull(waarde.prijs()))))));
+                                        Objects.requireNonNull(waarde.prijs()).format()))));
                     }
                 },
                 new WebMarkupContainer("geenExtras")
                         .add(new VisibleModelBehavior(extrasModel.map(List::isEmpty))),
                 visibleWhen("totaalPrijsRij", dossierModel.map(dossier -> dossier.totalPrijs() != null),
                         new Label("totaalPrijs", dossierModel.map(dossier ->
-                                IntakePriceFormatter.format(Objects.requireNonNull(dossier.totalPrijs()))))),
+                                Objects.requireNonNull(dossier.totalPrijs()).format()))),
                 new BevestigForm("bevestigForm", compleetModel)
         );
     }

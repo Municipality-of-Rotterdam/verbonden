@@ -68,7 +68,7 @@ public class MarriageTypeAdministrationPage extends AdministrationBasePage {
                                      String componentId,
                                      IModel<ListMarriageTypeDto> rowModel) {
                 cellItem.add(new Label(componentId,
-                        rowModel.map(dto -> dto.prijs() != null ? dto.prijs().toPlainString() : "")));
+                        rowModel.map(dto -> dto.prijs() != null ? dto.prijs().format() : "")));
             }
         });
 

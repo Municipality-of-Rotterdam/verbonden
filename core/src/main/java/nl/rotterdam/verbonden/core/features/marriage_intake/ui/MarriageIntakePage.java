@@ -119,7 +119,7 @@ public class MarriageIntakePage extends IntakeBasePage {
                 item.add(prijsPrefix);
 
                 // Price badge (text only; CSS class utrecht-status-badge applied in HTML)
-                item.add(new Label("prijs", "€\u00a0" + IntakePriceFormatter.format(dto.prijs())));
+                item.add(new Label("prijs", "€\u00a0" + dto.prijs().format()));
 
                 // Bullet points
                 item.add(new ListView<>("bullets", dto.bulletPoints()) {

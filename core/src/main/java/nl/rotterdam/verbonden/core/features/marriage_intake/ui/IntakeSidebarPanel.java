@@ -8,6 +8,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnd
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -23,7 +24,6 @@ import org.apache.wicket.model.Model;
 import org.jspecify.annotations.Nullable;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
-import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Function;
@@ -95,11 +95,11 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             if (d == null) {
                 return "";
             }
-            BigDecimal prijs = d.prijs();
+            Bedrag prijs = d.prijs();
             if (prijs == null) {
                 return "";
             }
-            return IntakePriceFormatter.format(prijs);
+            return prijs.format();
         });
         ceremonieDossierGegevens.add(new Label("ceremonieSoortLabel", ceremonieSoortModel));
         ceremonieDossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
@@ -244,7 +244,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                 WebMarkupContainer prijsContainer = new WebMarkupContainer("extraPrijsContainer");
                 prijsContainer.setVisible(extra.prijs() != null);
                 if (extra.prijs() != null) {
-                    String prijsText = IntakePriceFormatter.format(extra.prijs());
+                    String prijsText = extra.prijs().format();
                     prijsContainer.add(new Label("extraPrijs", Model.of(prijsText)));
                 } else {
                     prijsContainer.add(new Label("extraPrijs", Model.of("")));

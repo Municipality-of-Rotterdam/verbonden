@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
@@ -15,7 +16,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegeve
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -94,7 +94,7 @@ public interface MarriageIntakeService {
      * Geeft de prijs van de internationale huwelijksakte: de bij het indienen vastgelegde prijs, of — zolang
      * het dossier nog niet is ingediend — het tarief van vandaag.
      */
-    BigDecimal findInternationaleAktePrijs(UUID dossierId);
+    Bedrag findInternationaleAktePrijs(UUID dossierId);
 
     Set<LocalDate> findBeschikbareDatums(UUID dossierId, YearMonth maand);
 
