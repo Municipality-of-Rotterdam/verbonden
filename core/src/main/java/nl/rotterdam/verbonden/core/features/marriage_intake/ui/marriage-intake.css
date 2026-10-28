@@ -106,6 +106,10 @@
     font-size: 1.75rem;
 }
 
+.rd-intake-step-layout--first-step .rd-intake-step__title {
+    margin-top: 2rem;
+}
+
 .rd-intake-step-layout .rd-intake-step__title .rd-intro-text {
     margin-bottom: 2rem;
 }

@@ -158,6 +158,9 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         if (intakeStepLayout) {
             pageBody.add(AttributeModifier.append("class", "rd-intake-step-layout"));
         }
+        if (intakeStepLayout && !hasStepNavigation()) {
+            pageBody.add(AttributeModifier.append("class", "rd-intake-step-layout--first-step"));
+        }
         if (!hasIntakeContentBorder()) {
             pageBody.add(AttributeModifier.append("class", "rd-intake-content--unbordered"));
         }

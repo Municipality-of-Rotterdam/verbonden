@@ -36,6 +36,7 @@ class MarriageIntakePageTest extends BaseWicketTest {
         String html = tester.getLastResponseAsString();
         assertThat(html)
                 .contains("rd-intake-content--unbordered")
+                .contains("rd-intake-step-layout--first-step")
                 .contains("rd-ceremonie-kaart");
         assertThat(html.split("class=\"rd-card", -1)).hasSize(3);
     }
