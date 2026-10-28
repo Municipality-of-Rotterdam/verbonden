@@ -44,6 +44,30 @@ class DeGetuigenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990202")
+    void paginaToontGedeeldeStapindeling() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990202")));
+        tester.startPage(DeGetuigenPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        String html = tester.getLastResponseAsString();
+        int readAloud = html.indexOf("data-intake-read-aloud");
+        int previous = html.indexOf("Vorige stap");
+        int stepHeading = html.indexOf("De getuigen", previous);
+        int intro = html.indexOf("Geef hieronder de namen", stepHeading);
+        int content = html.indexOf("rd-intake-content", intro);
+        int next = html.indexOf("Volgende stap", content);
+
+        assertThat(html).contains("Maak jullie dag om nooit te vergeten", "rd-intake-step-layout");
+        assertThat(readAloud).isGreaterThanOrEqualTo(0);
+        assertThat(previous).isGreaterThan(readAloud);
+        assertThat(stepHeading).isGreaterThan(previous);
+        assertThat(intro).isGreaterThan(stepHeading);
+        assertThat(content).isGreaterThan(intro);
+        assertThat(next).isGreaterThan(content);
+    }
+
+    @Test
+    @WithMockUser(username = "999990202")
     void renderKleinHuwelijk_toontTweeGetuigenBlokken() {
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990202")));
@@ -197,4 +221,3 @@ class DeGetuigenPageTest extends BaseWicketTest {
         assertThat(samenvatting.getuigenGedeeltelijkIngevuld()).isFalse();
     }
 }
-

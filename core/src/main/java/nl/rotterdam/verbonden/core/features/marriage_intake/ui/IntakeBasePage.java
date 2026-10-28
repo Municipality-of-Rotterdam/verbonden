@@ -154,14 +154,18 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         if (intakeStepLayout) {
             pageBody.add(AttributeModifier.append("class", "rd-intake-step-layout"));
         }
+        WebMarkupContainer intakeHeader = new WebMarkupContainer("intakeHeader");
+        intakeHeader.setVisible(intakeStepLayout);
+        intakeHeader.add(new RdHeading("intakeHeading", new ResourceModel("intake.heading"), 1));
+
+        WebMarkupContainer stepDetails = new WebMarkupContainer("stepDetails");
+        stepDetails.setVisible(intakeStepLayout);
+        stepDetails.add(new Label("stepHeading", getStepHeadingModel()),
+                new Label("stepIntro", getStepIntroModel()));
+
         pageBody.add(
-                new WebMarkupContainer("intakeHeader")
-                        .setVisible(intakeStepLayout)
-                        .add(new RdHeading("intakeHeading", new ResourceModel("intake.heading"), 1)),
-                new WebMarkupContainer("stepDetails")
-                        .setVisible(intakeStepLayout)
-                        .add(new Label("stepHeading", getStepHeadingModel()),
-                                new Label("stepIntro", getStepIntroModel())),
+                intakeHeader,
+                stepDetails,
                 createNavigationContainer("vorigeStapContainer", "vorigeStap", vorigeStap(), "intake.button.vorige"),
                 createNavigationContainer("volgendeStapContainer", "volgendeStap", volgendeStap(), "intake.button.volgende")
         );
