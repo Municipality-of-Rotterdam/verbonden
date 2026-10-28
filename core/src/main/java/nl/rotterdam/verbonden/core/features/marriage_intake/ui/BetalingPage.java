@@ -19,7 +19,8 @@ public class BetalingPage extends IntakeBasePage {
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
 
-    private IModel<DossierSamenvattingDto> dossierModel;
+    private final IModel<DossierSamenvattingDto> dossierModel =
+            LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -38,7 +39,7 @@ public class BetalingPage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return dossierModel();
+        return dossierModel;
     }
 
     @Override
@@ -56,13 +57,6 @@ public class BetalingPage extends IntakeBasePage {
                 }.add(new Label("label", new ResourceModel("betaling.mislukt.button"))),
                 new BetalingForm("betalingForm")
         );
-    }
-
-    private IModel<DossierSamenvattingDto> dossierModel() {
-        if (dossierModel == null) {
-            dossierModel = LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
-        }
-        return dossierModel;
     }
 
     private class BetalingForm extends Form<Void> {

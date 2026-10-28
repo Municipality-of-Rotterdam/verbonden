@@ -33,6 +33,7 @@ Elke feature-package bevat de volgende sub-packages:
     - **Gebruik altijd primitieven** (`long`, `int`, `boolean`, …) in plaats van wrapper-typen (`Long`, `Integer`, `Boolean`, …) waar dat mogelijk is — dit geldt voor methode-parameters én retourtypen in services én repositories.
 
 ### Wicket
+- Roep in `onInitialize()` nooit `getObject()` aan op een `LoadableDetachableModel` of een model dat daarvan afhankelijk is. Gebruik afgeleide modellen via `model.map(...)` voor componenten en zichtbaarheid, zodat data pas tijdens renderen wordt geladen en na detach bij een volgende request wordt vernieuwd.
 - Injecteer altijd een service **interface** (niet de implementatie) via `@SpringBean`, zodat Wicket een JDK dynamic proxy kan aanmaken (voorkomt CGLIB-/Objenesis-problemen zonder no-arg constructor).
 - Activeer het Rotterdam NLDS-thema via `PatchingNldsRotterdamDesignSystemThemeBehavior.INSTANCE` direct op de page (niet via een `TransparentWebMarkupContainer` op `<html>`), zodat `<wicket:fragment>`-tags vindbaar blijven.
 - **`RdFormFieldTextInput` met een niet-`String` modeltype:** wanneer het HTML-inputtype een custom Java-type vereist (bijv. `setHtmlInputType("time")` → `LocalTime`, `setHtmlInputType("date")` → `LocalDate`, `setHtmlInputType("number")` → `Integer`/`BigDecimal`), roep dan altijd `setModelType(Xxx.class)` aan zodat Wicket het type correct kan converteren bij formulier-submit. Voorbeeld: `.setHtmlInputType("time").setModelType(LocalTime.class)`.

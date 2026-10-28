@@ -10,6 +10,7 @@ import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -23,6 +24,7 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.wicketstuff.minis.behavior.EnabledModelBehavior;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
 import java.time.format.DateTimeFormatter;
@@ -39,7 +41,8 @@ public class ControlerenPage extends IntakeBasePage {
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
 
-    private IModel<DossierSamenvattingDto> dossierModel;
+    private final IModel<DossierSamenvattingDto> dossierModel =
+            LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
     private IModel<List<PartnerGegevensDto>> partnerGegevensModel;
     private IModel<List<GetuigeDto>> getuigenModel;
 
@@ -55,7 +58,7 @@ public class ControlerenPage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return dossierModel();
+        return dossierModel;
     }
 
     @Override
@@ -72,9 +75,10 @@ public class ControlerenPage extends IntakeBasePage {
     protected void onInitialize() {
         super.onInitialize();
 
-        IModel<List<SidebarExtraItemDto>> extrasModel =
-                LambdaModel.of(() -> dossierModel().getObject().extras() == null
-                        ? List.of() : dossierModel().getObject().extras());
+        IModel<List<SidebarExtraItemDto>> extrasModel = dossierModel.map(dossier ->
+                dossier.extras() == null ? List.of() : dossier.extras());
+        IModel<Boolean> compleetModel = dossierModel.map(dossier ->
+                dossier.id() != null && dossier.compleet());
 
         pageBody.add(
                 new RdHeading("heading", getString("controleren.heading"), 1),
@@ -86,37 +90,18 @@ public class ControlerenPage extends IntakeBasePage {
                 new BookmarkablePageLink<>("wijzigGegevens", JullieGegevensPage.class, parameters()),
                 new BookmarkablePageLink<>("wijzigGetuigen", DeGetuigenPage.class, parameters()),
                 new BookmarkablePageLink<>("wijzigExtras", ExtrasPage.class, parameters()),
-                new Label("registratieType", LambdaModel.of(() ->
-                        dossierModel().getObject().registratieType().getLabel())),
-                new Label("ceremonieSoort", LambdaModel.of(() ->
-                        dossierModel().getObject().ceremonieSoort().getLabel())),
-                new WebMarkupContainer("ceremoniePrijsContainer") {
-                    @Override
-                    protected void onConfigure() {
-                        super.onConfigure();
-                        setVisible(dossierModel().getObject().prijs() != null);
-                    }
-                }.add(new Label("ceremoniePrijs", LambdaModel.of(() ->
-                        IntakePriceFormatter.format(Objects.requireNonNull(dossierModel().getObject().prijs()))))),
-                new WebMarkupContainer("datumRij") {
-                    @Override
-                    protected void onConfigure() {
-                        super.onConfigure();
-                        setVisible(dossierModel().getObject().datumTijdHuwelijk() != null);
-                    }
-                }.add(new Label("datum", LambdaModel.of(() -> {
-                    var datum = dossierModel().getObject().datumTijdHuwelijk();
-                    return Objects.requireNonNull(datum).format(DATUM_FORMAT);
-                }))),
-                new WebMarkupContainer("locatieRij") {
-                    @Override
-                    protected void onConfigure() {
-                        super.onConfigure();
-                        String locatie = dossierModel().getObject().huwelijksLocatie();
-                        setVisible(locatie != null && !locatie.isBlank());
-                    }
-                }.add(new Label("locatie", LambdaModel.of(() ->
-                        Objects.requireNonNull(dossierModel().getObject().huwelijksLocatie())))),
+                new Label("registratieType", dossierModel.map(dossier -> dossier.registratieType().getLabel())),
+                new Label("ceremonieSoort", dossierModel.map(dossier -> dossier.ceremonieSoort().getLabel())),
+                visibleWhen("ceremoniePrijsContainer", dossierModel.map(dossier -> dossier.prijs() != null),
+                        new Label("ceremoniePrijs", dossierModel.map(dossier ->
+                                IntakePriceFormatter.format(Objects.requireNonNull(dossier.prijs()))))),
+                visibleWhen("datumRij", dossierModel.map(dossier -> dossier.datumTijdHuwelijk() != null),
+                        new Label("datum", dossierModel.map(dossier ->
+                                Objects.requireNonNull(dossier.datumTijdHuwelijk()).format(DATUM_FORMAT)))),
+                visibleWhen("locatieRij", dossierModel.map(dossier ->
+                                dossier.huwelijksLocatie() != null && !dossier.huwelijksLocatie().isBlank()),
+                        new Label("locatie", dossierModel.map(dossier ->
+                                Objects.requireNonNull(dossier.huwelijksLocatie())))),
                 new ListView<>("partners", partnerGegevensModel()) {
                     @Override
                     protected void populateItem(ListItem<PartnerGegevensDto> item) {
@@ -134,37 +119,26 @@ public class ControlerenPage extends IntakeBasePage {
                     protected void populateItem(ListItem<SidebarExtraItemDto> item) {
                         SidebarExtraItemDto extra = item.getModelObject();
                         item.add(new Label("extraNaam", extra.naam()));
-                        WebMarkupContainer extraPrijs = new WebMarkupContainer("extraPrijsContainer") {
-                            @Override
-                            protected void onConfigure() {
-                                super.onConfigure();
-                                setVisible(extra.prijs() != null);
-                            }
-                        };
-                        extraPrijs.add(new Label("extraPrijs", LambdaModel.of(() ->
-                                IntakePriceFormatter.format(Objects.requireNonNull(extra.prijs())))));
-                        item.add(extraPrijs);
+                        item.add(visibleWhen("extraPrijsContainer",
+                                item.getModel().map(waarde -> waarde.prijs() != null),
+                                new Label("extraPrijs", item.getModel().map(waarde ->
+                                        IntakePriceFormatter.format(Objects.requireNonNull(waarde.prijs()))))));
                     }
                 },
                 new WebMarkupContainer("geenExtras")
                         .add(new VisibleModelBehavior(extrasModel.map(List::isEmpty))),
-                new WebMarkupContainer("totaalPrijsRij") {
-                    @Override
-                    protected void onConfigure() {
-                        super.onConfigure();
-                        setVisible(dossierModel().getObject().totalPrijs() != null);
-                    }
-                }.add(new Label("totaalPrijs", LambdaModel.of(() ->
-                        IntakePriceFormatter.format(Objects.requireNonNull(dossierModel().getObject().totalPrijs()))))),
-                new BevestigForm("bevestigForm")
+                visibleWhen("totaalPrijsRij", dossierModel.map(dossier -> dossier.totalPrijs() != null),
+                        new Label("totaalPrijs", dossierModel.map(dossier ->
+                                IntakePriceFormatter.format(Objects.requireNonNull(dossier.totalPrijs()))))),
+                new BevestigForm("bevestigForm", compleetModel)
         );
     }
 
-    private IModel<DossierSamenvattingDto> dossierModel() {
-        if (dossierModel == null) {
-            dossierModel = LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
-        }
-        return dossierModel;
+    private WebMarkupContainer visibleWhen(String id, IModel<Boolean> visible, Component child) {
+        WebMarkupContainer container = new WebMarkupContainer(id);
+        container.add(new VisibleModelBehavior(visible));
+        container.add(child);
+        return container;
     }
 
     private IModel<List<PartnerGegevensDto>> partnerGegevensModel() {
@@ -196,15 +170,13 @@ public class ControlerenPage extends IntakeBasePage {
                 .orElse(naam);
     }
 
-    private boolean isCompleet() {
-        DossierSamenvattingDto dossier = dossierModel.getObject();
-        return dossier != null && dossier.id() != null && dossier.compleet();
-    }
-
     private class BevestigForm extends Form<Void> {
 
-        BevestigForm(String id) {
+        private final IModel<Boolean> compleetModel;
+
+        BevestigForm(String id, IModel<Boolean> compleetModel) {
             super(id);
+            this.compleetModel = compleetModel;
         }
 
         @Override
@@ -217,28 +189,26 @@ public class ControlerenPage extends IntakeBasePage {
                             setResponsePage(BetalingPage.class, parameters());
                         }
 
-                        @Override
-                        protected void onConfigure() {
-                            super.onConfigure();
-                            setEnabled(isCompleet());
-                        }
-                    },
-                    new NogNietCompleetHint()
+                    }.add(new EnabledModelBehavior(compleetModel)),
+                    new NogNietCompleetHint(compleetModel)
             );
         }
     }
 
     private class NogNietCompleetHint extends WebMarkupContainer {
 
-        NogNietCompleetHint() {
+        private final IModel<Boolean> compleetModel;
+
+        NogNietCompleetHint(IModel<Boolean> compleetModel) {
             super("nogNietCompleetHint");
+            this.compleetModel = compleetModel;
         }
 
         @Override
         protected void onInitialize() {
             super.onInitialize();
             IModel<List<OntbrekendOnderdeel>> ontbrekendModel =
-                    LambdaModel.of(() -> dossierModel.getObject().ontbrekendeOnderdelen());
+                    dossierModel.map(DossierSamenvattingDto::ontbrekendeOnderdelen);
             add(
                     new WebMarkupContainer("algemeen")
                             .add(new VisibleModelBehavior(ontbrekendModel.map(List::isEmpty))),
@@ -251,7 +221,7 @@ public class ControlerenPage extends IntakeBasePage {
         @Override
         protected void onConfigure() {
             super.onConfigure();
-            setVisible(!isCompleet());
+            setVisible(!compleetModel.getObject());
         }
     }
 
