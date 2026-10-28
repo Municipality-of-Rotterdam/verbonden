@@ -1,6 +1,209 @@
-/* Zonder Bootstrap reboot is box-sizing content-box: width 100% + padding valt dan buiten de balk */
-.rd-top-bar > .container-fluid {
+body {
+    margin: 0;
+}
+
+.administration-shell {
+    --administration-sidebar-width: 5rem;
+    display: flex;
+    min-height: 100vh;
+    background: #eff4f6;
+}
+
+.administration-sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex: 0 0 var(--administration-sidebar-width);
+    flex-direction: column;
+    width: var(--administration-sidebar-width);
+    height: 100vh;
     box-sizing: border-box;
+    padding: 1rem 0.75rem;
+    background: #000;
+    color: #fff;
+    transition: flex-basis 160ms ease, width 160ms ease;
+}
+
+.administration-sidebar:has(.administration-sidebar__toggle:checked) {
+    --administration-sidebar-width: 16rem;
+}
+
+.administration-sidebar__toggle {
+    position: absolute;
+    top: 2rem;
+    right: -0.5rem;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.administration-sidebar__toggle-button {
+    position: absolute;
+    z-index: 1;
+    top: 2rem;
+    right: -0.75rem;
+    display: grid;
+    width: 1.5rem;
+    height: 1.5rem;
+    place-items: center;
+    border: 1px solid #bac8ce;
+    background: #fff;
+    color: #263238;
+    cursor: pointer;
+}
+
+.administration-sidebar__toggle-button span::before {
+    content: "›";
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.administration-sidebar__toggle:checked + .administration-sidebar__toggle-button span::before {
+    content: "‹";
+}
+
+.administration-sidebar__toggle:focus-visible + .administration-sidebar__toggle-button {
+    outline: 2px solid #00a03c;
+    outline-offset: 2px;
+}
+
+.administration-sidebar__brand {
+    display: flex;
+    min-height: 4rem;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.administration-sidebar__brand img,
+.administration-sidebar__brand svg {
+    width: 2.5rem;
+    max-height: 2.5rem;
+    filter: brightness(0) invert(1);
+}
+
+.administration-sidebar__navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.administration-sidebar__navigation a,
+.administration-sidebar__logout,
+.administration-sidebar__user {
+    display: flex;
+    min-height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-sizing: border-box;
+    padding: 0.5rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.administration-sidebar__navigation a:hover,
+.administration-sidebar__logout:hover {
+    background: #263238;
+    color: #fff;
+}
+
+.administration-sidebar__navigation a[aria-current] {
+    background: #263238;
+    box-shadow: inset 4px 0 0 #00a03c;
+    font-weight: bold;
+}
+
+.administration-sidebar__navigation a > span:first-child,
+.administration-sidebar__logout > span:first-child,
+.administration-sidebar__user > span:first-child {
+    display: inline-flex;
+    flex: 0 0 1.5rem;
+    justify-content: center;
+}
+
+.administration-sidebar__label {
+    display: inline;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    transition: max-width 160ms ease, opacity 160ms ease;
+}
+
+.administration-sidebar:has(.administration-sidebar__toggle:checked) .administration-sidebar__navigation a,
+.administration-sidebar:has(.administration-sidebar__toggle:checked) .administration-sidebar__logout,
+.administration-sidebar:has(.administration-sidebar__toggle:checked) .administration-sidebar__user {
+    justify-content: flex-start;
+    padding-inline: 0.75rem;
+}
+
+.administration-sidebar:has(.administration-sidebar__toggle:checked) .administration-sidebar__label {
+    max-width: 14rem;
+    opacity: 1;
+}
+
+.administration-sidebar__footer {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    padding-bottom: 0.5rem;
+}
+
+.administration-content {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    background: #eff4f6;
+}
+
+.administration-content__body {
+    min-width: 0;
+    background: transparent;
+}
+
+.administration-content table {
+    background-color: #fff;
+}
+
+.administration-content .utrecht-table {
+    --utrecht-table-header-background-color: #fff;
+    --utrecht-table-row-alternate-odd-background-color: #fff;
+    --utrecht-table-row-alternate-even-background-color: #fff;
+    --utrecht-table-row-border-block-end-color: #bdcbd0;
+    --utrecht-table-row-border-block-end-width: 1px;
+    border: 1px solid #bdcbd0;
+}
+
+.administration-content .utrecht-table__header {
+    background-color: #fff;
+}
+
+.administration-content .utrecht-table__header-cell {
+    border-block-end: 2px solid #20272a;
+}
+
+.administration-content .utrecht-table__header-cell-button:has(.utrecht-icon) {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.administration-content .utrecht-table .utrecht-table__body .utrecht-table__row:hover .utrecht-table__cell {
+    background-color: #e4eff2;
+    color: inherit;
+}
+
+.administration-content rods-icon-edit,
+.administration-content rods-icon-trash,
+.administration-content rods-icon-badge-alert,
+.administration-content rods-icon-badge-check {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 1.5rem;
 }
 
 /* Voorbeeld van de afbeelding van een trouwboekje in beheer */
