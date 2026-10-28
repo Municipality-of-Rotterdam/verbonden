@@ -53,6 +53,27 @@ class ControlerenPageTest extends BaseWicketTest {
                 + ":keuzesSidebar:getuigenProgressIcon").getDefaultModelObject()).isEqualTo(4);
     }
 
+    @Test
+    @WithMockUser(username = "999990020")
+    void samenvattingsrandEindigtNaTotaalEnLaatBevestigingBuitenDeRand() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        String html = tester.getLastResponseAsString();
+        int content = html.indexOf("rd-intake-content--unbordered");
+        int kaart = html.indexOf("rd-controleer-kaart");
+        int totaal = html.indexOf("rd-controleer-totaal");
+        int kaartEinde = html.indexOf("</div>", totaal);
+        kaartEinde = html.indexOf("</div>", kaartEinde + "</div>".length());
+        int bevestigen = html.indexOf("bevestigForm");
+
+        assertThat(content).isGreaterThanOrEqualTo(0);
+        assertThat(kaart).isGreaterThan(content);
+        assertThat(totaal).isGreaterThan(kaart);
+        assertThat(kaartEinde).isGreaterThan(totaal);
+        assertThat(bevestigen).isGreaterThan(kaartEinde);
+    }
+
     private void click(String linkId) {
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         tester.addRequestHeader("sec-fetch-mode", "navigate");

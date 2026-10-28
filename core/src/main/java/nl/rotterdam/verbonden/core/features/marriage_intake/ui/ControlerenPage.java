@@ -51,6 +51,11 @@ public class ControlerenPage extends IntakeBasePage {
     }
 
     @Override
+    protected boolean hasIntakeContentBorder() {
+        return false;
+    }
+
+    @Override
     protected IModel<String> getTitleModel() {
         return new ResourceModel("intake.page.title.controleren");
     }

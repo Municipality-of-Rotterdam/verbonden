@@ -124,10 +124,8 @@
     margin-top: 0;
 }
 
-.rd-intake-step-layout .rd-controleer-kaart {
-    border: 0;
-    padding: 0;
-    margin: 0;
+.rd-intake-step-layout .rd-extra-sectie {
+    border: 1px solid #b9c9ce;
 }
 
 .rd-intake-step-layout .rd-verder-nav {
