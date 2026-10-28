@@ -90,24 +90,33 @@ public class ControlerenPage extends IntakeBasePage {
                         dossierModel().getObject().registratieType().getLabel())),
                 new Label("ceremonieSoort", LambdaModel.of(() ->
                         dossierModel().getObject().ceremonieSoort().getLabel())),
-                new WebMarkupContainer("ceremoniePrijsContainer")
-                        .add(new VisibleModelBehavior(LambdaModel.of(() -> dossierModel().getObject().prijs() != null)))
-                        .add(new Label("ceremoniePrijs", LambdaModel.of(() ->
-                                IntakePriceFormatter.format(Objects.requireNonNull(dossierModel().getObject().prijs()))))),
-                new WebMarkupContainer("datumRij")
-                        .add(new VisibleModelBehavior(LambdaModel.of(() ->
-                                dossierModel().getObject().datumTijdHuwelijk() != null)))
-                        .add(new Label("datum", LambdaModel.of(() -> {
+                new WebMarkupContainer("ceremoniePrijsContainer") {
+                    @Override
+                    protected void onConfigure() {
+                        super.onConfigure();
+                        setVisible(dossierModel().getObject().prijs() != null);
+                    }
+                }.add(new Label("ceremoniePrijs", LambdaModel.of(() ->
+                        IntakePriceFormatter.format(Objects.requireNonNull(dossierModel().getObject().prijs()))))),
+                new WebMarkupContainer("datumRij") {
+                    @Override
+                    protected void onConfigure() {
+                        super.onConfigure();
+                        setVisible(dossierModel().getObject().datumTijdHuwelijk() != null);
+                    }
+                }.add(new Label("datum", LambdaModel.of(() -> {
                     var datum = dossierModel().getObject().datumTijdHuwelijk();
                     return Objects.requireNonNull(datum).format(DATUM_FORMAT);
                 }))),
-                new WebMarkupContainer("locatieRij")
-                        .add(new VisibleModelBehavior(LambdaModel.of(() -> {
-                            String locatie = dossierModel().getObject().huwelijksLocatie();
-                            return locatie != null && !locatie.isBlank();
-                        })))
-                        .add(new Label("locatie", LambdaModel.of(() ->
-                                Objects.requireNonNull(dossierModel().getObject().huwelijksLocatie())))),
+                new WebMarkupContainer("locatieRij") {
+                    @Override
+                    protected void onConfigure() {
+                        super.onConfigure();
+                        String locatie = dossierModel().getObject().huwelijksLocatie();
+                        setVisible(locatie != null && !locatie.isBlank());
+                    }
+                }.add(new Label("locatie", LambdaModel.of(() ->
+                        Objects.requireNonNull(dossierModel().getObject().huwelijksLocatie())))),
                 new ListView<>("partners", partnerGegevensModel()) {
                     @Override
                     protected void populateItem(ListItem<PartnerGegevensDto> item) {
@@ -125,19 +134,28 @@ public class ControlerenPage extends IntakeBasePage {
                     protected void populateItem(ListItem<SidebarExtraItemDto> item) {
                         SidebarExtraItemDto extra = item.getModelObject();
                         item.add(new Label("extraNaam", extra.naam()));
-                        item.add(new WebMarkupContainer("extraPrijsContainer")
-                                .add(new VisibleModelBehavior(LambdaModel.of(() -> extra.prijs() != null)))
-                                .add(new Label("extraPrijs", LambdaModel.of(() ->
-                                        IntakePriceFormatter.format(Objects.requireNonNull(extra.prijs()))))));
+                        WebMarkupContainer extraPrijs = new WebMarkupContainer("extraPrijsContainer") {
+                            @Override
+                            protected void onConfigure() {
+                                super.onConfigure();
+                                setVisible(extra.prijs() != null);
+                            }
+                        };
+                        extraPrijs.add(new Label("extraPrijs", LambdaModel.of(() ->
+                                IntakePriceFormatter.format(Objects.requireNonNull(extra.prijs())))));
+                        item.add(extraPrijs);
                     }
                 },
                 new WebMarkupContainer("geenExtras")
                         .add(new VisibleModelBehavior(extrasModel.map(List::isEmpty))),
-                new WebMarkupContainer("totaalPrijsRij")
-                        .add(new VisibleModelBehavior(LambdaModel.of(() ->
-                                dossierModel().getObject().totalPrijs() != null)))
-                        .add(new Label("totaalPrijs", LambdaModel.of(() ->
-                                IntakePriceFormatter.format(Objects.requireNonNull(dossierModel().getObject().totalPrijs()))))),
+                new WebMarkupContainer("totaalPrijsRij") {
+                    @Override
+                    protected void onConfigure() {
+                        super.onConfigure();
+                        setVisible(dossierModel().getObject().totalPrijs() != null);
+                    }
+                }.add(new Label("totaalPrijs", LambdaModel.of(() ->
+                        IntakePriceFormatter.format(Objects.requireNonNull(dossierModel().getObject().totalPrijs()))))),
                 new BevestigForm("bevestigForm")
         );
     }

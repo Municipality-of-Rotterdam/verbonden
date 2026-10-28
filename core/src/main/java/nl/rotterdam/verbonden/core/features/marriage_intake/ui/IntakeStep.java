@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
+import org.apache.wicket.Page;
 
 public enum IntakeStep {
     MIJN_DAG(MarriageIntakePage.class),
@@ -10,17 +11,17 @@ public enum IntakeStep {
     EXTRAS(ExtrasPage.class),
     CONTROLEREN(ControlerenPage.class);
 
-    private final Class<? extends IntakeBasePage> pageClass;
+    private final Class<? extends Page> pageClass;
 
-    IntakeStep(Class<? extends IntakeBasePage> pageClass) {
+    IntakeStep(Class<? extends Page> pageClass) {
         this.pageClass = pageClass;
     }
 
-    public Class<? extends IntakeBasePage> pageClass() {
+    public Class<? extends Page> pageClass() {
         return pageClass;
     }
 
-    public static Class<? extends IntakeBasePage> pageVoor(OntbrekendOnderdeel onderdeel) {
+    public static Class<? extends Page> pageVoor(OntbrekendOnderdeel onderdeel) {
         return switch (onderdeel) {
             case DATUM -> DatumKiezenPage.class;
             case LOCATIE -> DE_DAG.pageClass;
