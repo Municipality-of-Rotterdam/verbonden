@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ExtrasPageTest extends BaseWicketTest {
 
     private static final String INTERNATIONALE_AKTE_INTRO =
-            "Gaan jullie de huwelijksakte in het buitenland gebruiken? Kies dan voor een internationaal uittreksel. Dat is een samenvatting van jullie huwelijksakte met uitleg in 10 talen: Nederlands, Engels, Frans, Duits, Spaans, Grieks, Italiaans, Portugees, Turks en Servo-Kroatisch.";
+            "Gaat u de huwelijksakte in het buitenland gebruiken? Kies dan voor een internationaal uittreksel. Dat is een samenvatting van uw huwelijksakte met uitleg in 10 talen: Nederlands, Engels, Frans, Duits, Spaans, Grieks, Italiaans, Portugees, Turks en Servo-Kroatisch.";
 
     @Autowired
     private MarriageIntakeService marriageIntakeService;

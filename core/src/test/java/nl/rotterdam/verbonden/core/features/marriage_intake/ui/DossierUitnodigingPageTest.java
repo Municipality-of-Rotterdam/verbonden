@@ -60,7 +60,7 @@ class DossierUitnodigingPageTest extends BaseWicketTest {
         tester.startPage(MarriageIntakePage.class, dossierParameters(dossierId));
 
         tester.assertRenderedPage(DossierUitnodigingPage.class);
-        tester.assertContains("dan vervalt je eigen aanvraag");
+        tester.assertContains("dan vervalt uw eigen aanvraag");
     }
 
     @Test

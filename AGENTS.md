@@ -85,5 +85,6 @@ Elke feature-package bevat de volgende sub-packages:
 
 ### Teksten
 - Schrijf teksten op burgerpagina's (o.a. `marriage_intake`, `burger_common`) op **taalniveau B1**, volgens de regels in `.claude/skills/taalniveau/SKILL.md`. Dit geldt voor alle tekst die een burger ziet: koppen, uitleg, knoppen, foutmeldingen en validatiemeldingen.
+- Spreek de burger aan met **u/uw**, ook als de tekst over beide partners gaat ("Plan uw dag", "U kunt", "Uw gegevens"). Gebruik nooit je/jij/jouw of jullie.
 - Controleer nieuwe of gewijzigde burgerteksten met die skill voordat je ze oplevert.
 - Beheerpagina's zijn voor medewerkers; daar is vaktaal toegestaan (C1). Schrijf ook daar zo eenvoudig als het kan.

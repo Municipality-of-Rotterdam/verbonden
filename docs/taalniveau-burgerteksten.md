@@ -1,6 +1,6 @@
 # Taalniveau burgerteksten
 
-Analyse van de teksten op de burgerpagina's met de skill `taalniveau` (`.claude/skills/taalniveau/SKILL.md`). Streefniveau: **B1**.
+Analyse van de teksten op de burgerpagina's met de skill `taalniveau` (`.claude/skills/taalniveau/SKILL.md`). Streefniveau: **B1**. Aanspreekvorm: **u/uw** (zie `AGENTS.md`).
 
 Bijna alle teksten staan in `core/src/main/java/nl/rotterdam/verbonden/core/WicketApplication.properties`. De tekst in de HTML-bestanden is voorbeeldtekst; die wordt bij het tonen vervangen door de tekst uit het properties-bestand. Bij elk punt staat daarom de property-sleutel.
 
@@ -12,7 +12,7 @@ Beheerpagina's zijn niet beoordeeld. Die zijn voor medewerkers; daar is vaktaal 
 - Gemiddelde zinslengte: 7,7 woorden (150 zinnen). Dat past bij B1, maar het zijn vooral korte knop- en kopteksten. Drie zinnen zijn langer dan 20 woorden.
 - Vakjargon: dossier, koppelen, gemachtigd, omgeleid, URL, verifiëren, uittreksel, mits, privévenster, verklaring naamgebruik.
 - Passieve zinnen: "wordt in behandeling genomen", "kan niet meer worden gewijzigd", "wordt uw partner gevraagd".
-- De aanspreekvorm wisselt tussen u, je en jullie, soms op één scherm. Op de uitnodigingspagina staat "je", in de zijbalk "uw partner" en op de introductiepagina staan "u" en "jullie" door elkaar.
+- De aanspreekvorm is gelijkgetrokken naar u/uw. Eerder wisselden u, je en jullie elkaar af.
 
 ---
 
@@ -41,36 +41,36 @@ Beheerpagina's zijn niet beoordeeld. Die zijn voor medewerkers; daar is vaktaal 
 - **Waarom beter:** Kortere zinnen, en "ingaan op" en "laten annuleren" vervallen.
 
 #### `de.getuigen.intro`
-- **Origineel:** Geef hieronder de namen van jullie getuigen door. Na betaling en bevestiging vragen wij om de gegevens te verifiëren door een identiteitscontrole. Dit vindt plaats in MijnLoket.
-- **B1-versie:** Geef hieronder de namen van jullie getuigen door. Na betaling en bevestiging controleren we wie jullie getuigen zijn. Dat regelen jullie in MijnLoket.
+- **Origineel:** Geef hieronder de namen van uw getuigen door. Na betaling en bevestiging vragen wij om de gegevens te verifiëren door een identiteitscontrole. Dit vindt plaats in MijnLoket.
+- **B1-versie:** Geef hieronder de namen van uw getuigen door. Na betaling en bevestiging controleren we wie uw getuigen zijn. Dat regelt u in MijnLoket.
 - **Waarom beter:** Haalt "verifiëren", de naamwoordstijl ("een identiteitscontrole") en "vindt plaats" weg.
 
 #### `extras.muziek.intro`
-- **Origineel:** Wij hebben een vaste lijst van muziek waar jullie een keuze uit kunnen maken. Deze kunnen jullie na bevestiging door een lijst te downloaden uit MijnLoket. Er zijn een 5-tal momenten dat er muziek gespeeld kan worden tijdens de ceremonie.
-- **B1-versie:** Jullie kiezen muziek uit een vaste lijst. Die lijst staat na de bevestiging in MijnLoket. Tijdens de ceremonie kan op 5 momenten muziek klinken.
+- **Origineel:** Wij hebben een vaste lijst van muziek waar u een keuze uit kunt maken. Deze kunt u na bevestiging door een lijst te downloaden uit MijnLoket. Er zijn een 5-tal momenten dat er muziek gespeeld kan worden tijdens de ceremonie.
+- **B1-versie:** U kiest muziek uit een vaste lijst. Die lijst staat na de bevestiging in MijnLoket. Tijdens de ceremonie kan op 5 momenten muziek klinken.
 - **Waarom beter:** De tweede zin klopt grammaticaal niet, en "5-tal" is stijf.
 - **Let op (inhoud):** de tekst noemt 5 momenten, maar er zijn er 6 (`extras.muziek.moment1` t/m `moment6`), en drie heten nog "Reden 2", "Reden 3" en "Reden 4".
 
 ### Gemiddelde impact
 
 #### `intake.registratie.description`
-- **Origineel:** Wil je weten wat het verschil is tussen een huwelijk en geregistreerd partnerschap, kijk dan even op onze pagina op rotterdam.nl/registratie
+- **Origineel:** Wilt u weten wat het verschil is tussen een huwelijk en geregistreerd partnerschap, kijk dan even op onze pagina op rotterdam.nl/registratie
 - **B1-versie:** Wat is het verschil tussen een huwelijk en een geregistreerd partnerschap? Lees het op rotterdam.nl/registratie.
 - **Waarom beter:** De zin van 21 woorden wordt een korte vraag met een duidelijke verwijzing.
 
 #### `extras.internationale.akte.intro`
-- **Origineel:** … Kies dan voor een internationaal uittreksel. Dat is een samenvatting van jullie huwelijksakte met uitleg in 10 talen: Nederlands, Engels, …
-- **B1-versie:** … Kies dan voor een internationaal uittreksel. Dat is een korte versie van jullie huwelijksakte. Er staat uitleg bij in 10 talen: Nederlands, Engels, …
+- **Origineel:** … Kies dan voor een internationaal uittreksel. Dat is een samenvatting van uw huwelijksakte met uitleg in 10 talen: Nederlands, Engels, …
+- **B1-versie:** … Kies dan voor een internationaal uittreksel. Dat is een korte versie van uw huwelijksakte. Er staat uitleg bij in 10 talen: Nederlands, Engels, …
 - **Waarom beter:** De zin van 23 woorden wordt gesplitst, en "samenvatting" wordt "korte versie".
 
 #### `aanvraag.status.INGEDIEND.tekst`
 - **Origineel:** De huwelijksaanvraag is ontvangen en wordt in behandeling genomen.
-- **B1-versie:** We hebben jullie aanvraag ontvangen. De gemeente gaat die nu bekijken.
+- **B1-versie:** We hebben uw aanvraag ontvangen. De gemeente gaat die nu bekijken.
 - **Waarom beter:** Actieve zinnen in plaats van passieve.
 
 #### `aanvraag.status.wijzigen`
-- **Origineel:** Jullie aanvraag kan niet meer online worden gewijzigd. Klopt er iets niet? Neem dan contact op met de gemeente Rotterdam.
-- **B1-versie:** Jullie kunnen de aanvraag niet meer online wijzigen. Klopt er iets niet? Neem dan contact op met de gemeente Rotterdam.
+- **Origineel:** Uw aanvraag kan niet meer online worden gewijzigd. Klopt er iets niet? Neem dan contact op met de gemeente Rotterdam.
+- **B1-versie:** U kunt de aanvraag niet meer online wijzigen. Klopt er iets niet? Neem dan contact op met de gemeente Rotterdam.
 - **Waarom beter:** Actief in plaats van passief.
 
 #### `intake.intro.dedag`
@@ -89,43 +89,42 @@ Beheerpagina's zijn niet beoordeeld. Die zijn voor medewerkers; daar is vaktaal 
 - **Waarom beter:** "Dossier koppelen" en "browservenster" vervallen.
 
 #### `jullie.gegevens.partner.uitnodigen.link.uitleg`
-- **Origineel:** Kopieer de link en stuur deze naar uw partner. Of open de link in een privévenster of een andere browser en laat u partner daar inloggen.
+- **Origineel:** Kopieer de link en stuur deze naar uw partner. Of open de link in een privévenster of een andere browser en laat uw partner daar inloggen.
 - **B1-versie:** Kopieer de link en stuur deze naar uw partner. Of open de link in een andere browser. Laat uw partner daar inloggen.
-- **Waarom beter:** "Privévenster" vervalt, de lange zin wordt gesplitst en de tikfout "u partner" verdwijnt.
+- **Waarom beter:** "Privévenster" vervalt en de lange zin wordt gesplitst.
 
 #### `intake.uitnodiging.eigen.concept`
-- **Origineel:** Je bent al begonnen met een eigen aanvraag. Doe je mee met deze uitnodiging, dan vervalt je eigen aanvraag. Je keuzes daarin worden niet overgenomen.
-- **B1-versie:** Je bent al begonnen met een eigen aanvraag. Doe je mee met deze uitnodiging? Dan stopt je eigen aanvraag. Je keuzes daaruit nemen we niet mee.
+- **Origineel:** U bent al begonnen met een eigen aanvraag. Doet u mee met deze uitnodiging, dan vervalt uw eigen aanvraag. Uw keuzes daarin worden niet overgenomen.
+- **B1-versie:** U bent al begonnen met een eigen aanvraag. Doet u mee met deze uitnodiging? Dan stopt uw eigen aanvraag. Uw keuzes daaruit nemen we niet mee.
 - **Waarom beter:** "Vervalt" is formeel en "worden niet overgenomen" is passief.
 
 ### Lage impact
 
 #### `intake.soort.*.beschrijving.*`
-- **Origineel:** Datum kun je kiezen (mits beschikbaar) / Geen voorkeur opgeven trouwambtenaar
-- **B1-versie:** Je kiest zelf de datum (als die vrij is) / Je kunt geen trouwambtenaar kiezen
+- **Origineel:** Datum kunt u kiezen (mits beschikbaar) / Geen voorkeur opgeven trouwambtenaar
+- **B1-versie:** U kiest zelf de datum (als die vrij is) / U kunt geen trouwambtenaar kiezen
 - **Waarom beter:** "Mits" is B2-woordenschat, en de telegramstijl is lastig te lezen.
 
 #### `extras.ringen.intro`
-- **Origineel:** Wil u een moment om ringen bij elkaar om te doen?
-- **B1-versie:** Willen jullie elkaar een ring omdoen?
-- **Waarom beter:** "Wil u" is grammaticaal fout en wijkt af van de jullie-vorm.
+- **Origineel:** Wilt u een moment om ringen bij elkaar om te doen?
+- **B1-versie:** Wilt u elkaar tijdens de ceremonie een ring omdoen?
+- **Waarom beter:** Korter en directer.
 
 #### Kleine punten
 | Sleutel | Origineel | B1-versie |
 |---|---|---|
-| `de.getuigen.heading` | Benoem jullie getuigen | Kies jullie getuigen |
+| `de.getuigen.heading` | Benoem uw getuigen | Kies uw getuigen |
 | `intake.uitnodiging.accepteer` | Ja, Ik wil! | Ja, ik wil! |
-| `jullie.gegevens.heading` | Jullie gegevens & verklaring naamgebruik | Jullie gegevens en achternaam |
-| `intake.soort.description` | Al uw keuzes hebben invloed op elkaar. | Jullie keuzes hangen met elkaar samen. |
+| `jullie.gegevens.heading` | Uw gegevens & verklaring naamgebruik | Uw gegevens en achternaam |
+| `intake.soort.description` | Al uw keuzes hebben invloed op elkaar. | Uw keuzes hangen met elkaar samen. |
 
 ---
 
 ## Samenvatting
-- **Belangrijkste knelpunt:** de foutmeldingen en uitleg in systeemtaal (dossier, koppelen, gemachtigd, URL, verifiëren), plus de wisselende aanspreekvorm.
+- **Belangrijkste knelpunt:** de foutmeldingen en uitleg in systeemtaal (dossier, koppelen, gemachtigd, URL, verifiëren).
 - **Snelste winst:** de drie meldingen over toegang tot een dossier (`intake.alert.*`) en de getuigen-intro herschrijven.
 - **Geschat verbetertraject:** klein. Bijna alles staat in één properties-bestand.
 
 ## Open punten
-- **Aanspreekvorm:** kies één vorm voor de burgerpagina's, bijvoorbeeld "jullie" voor het stel en "u" voor de ingelogde persoon, of overal "je" en "jullie". Neem de keuze op in `AGENTS.md`.
 - **Inhoud muziekmomenten:** het aantal momenten (5 of 6) en de namen "Reden 2–4".
 - **Inclusiviteit:** "Opkomst bruid" en "Verlaten zaal door bruidspaar" passen niet altijd, bijvoorbeeld bij een geregistreerd partnerschap of bij twee partners van hetzelfde geslacht.
