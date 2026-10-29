@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.burger_common.BurgerPageExpiredPage;
 import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.error_common.VerbondenExceptionMapper;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
+import nl.rotterdam.verbonden.core.features.trouwlijst_administration.ui.TrouwlijstAdministrationPage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeCreatePage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeUpdatePage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.ExtrasPage;
@@ -217,6 +218,7 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/beheer/dossiers/${dossierId}/getuigen", DossierGetuigenUpdatePage.class);
         mountPage("/beheer/dossiers/${dossierId}/extras", DossierExtrasUpdatePage.class);
         mountResource("/beheer/dossiers/${dossierId}/json", new DossierJsonResourceReference());
+        mountPage("/beheer/trouwlijst", TrouwlijstAdministrationPage.class);
         mountPage("/beheer/extras", TrouwboekjeAdministrationPage.class);
         mountPage("/beheer/extras/nieuw", TrouwboekjeCreatePage.class);
         mountPage("/beheer/extras/${id}", TrouwboekjeUpdatePage.class);

@@ -10,6 +10,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdm
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
+import nl.rotterdam.verbonden.core.features.trouwlijst_administration.ui.TrouwlijstAdministrationPage;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
@@ -164,7 +165,8 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
                         Map.entry("Trouwlocaties", LocationAdministrationPage.class),
                         Map.entry("Huwelijkstypen", MarriageTypeAdministrationPage.class),
                         Map.entry("Dossiers", DossierAdministrationPage.class),
-                        Map.entry("Trouwboekjes", TrouwboekjeAdministrationPage.class))
+                        Map.entry("Trouwboekjes", TrouwboekjeAdministrationPage.class),
+                        Map.entry("Trouwlijst", TrouwlijstAdministrationPage.class))
                 .filter(item -> verwachtToegang(item.getValue(), rol))
                 .map(Map.Entry::getKey)
                 .toList();
@@ -245,6 +247,9 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
         }
         if (STAMGEGEVENS_PACKAGES.contains(pagina.getPackageName())) {
             return rol.equals(Roles.BEHEER) || rol.equals(Roles.SUPERUSER);
+        }
+        if (pagina == TrouwlijstAdministrationPage.class) {
+            return rol.equals(Roles.BEHEER) || rol.equals(Roles.SUPERUSER) || rol.equals(Roles.PLANNER);
         }
         return !rol.equals(Roles.BABS);
     }
