@@ -2,7 +2,7 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
-import org.apache.wicket.Component;
+import org.apache.wicket.util.tester.TagTester;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -23,11 +23,10 @@ class ControlerenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990020")
-    void vorigeStapNavigeertNaarExtrasEnVolgendeStapNaarGetuigen() {
+    void stapnavigatieVolgtDeVolgordeVanDeStappen() {
         UUID dossierId = testData.maakCompleetDossier();
         tester.startPage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
 
-        assertThat(tester.getComponentFromLastRenderedPage(PAGE_BODY + ":volgendeStapContainer")).isNotNull();
         click("volgendeStapContainer:volgendeStap");
         tester.assertRenderedPage(DeGetuigenPage.class);
 
@@ -35,6 +34,7 @@ class ControlerenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(JullieGegevensPage.class);
 
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+        tester.assertInvisible(PAGE_BODY + ":volgendeStapContainer");
         click("vorigeStapContainer:vorigeStap");
         tester.assertRenderedPage(ExtrasPage.class);
     }
@@ -45,33 +45,44 @@ class ControlerenPageTest extends BaseWicketTest {
         UUID dossierId = testData.maakConceptDossier();
         tester.startPage(DeGetuigenPage.class, makeDossierPageParameters(dossierId));
 
-        assertIconState("algemeenStatusIcon", "rd-status-icon--complete");
-        assertIconState("dossierGegevens:datumStatusIcon", "rd-status-icon--upcoming");
-        assertIconState("getuigenProgressIcon", "rd-status-icon--current");
-        assertIconState("extrasProgressIcon", "rd-status-icon--upcoming");
-        assertThat(tester.getComponentFromLastRenderedPage(PAGE_BODY
-                + ":keuzesSidebar:getuigenProgressIcon").getDefaultModelObject()).isEqualTo(4);
+        assertThat(statusIcoon(IntakeStep.MIJN_DAG).getAttribute("class")).contains("rd-status-icon--complete");
+        assertThat(statusIcoon(IntakeStep.DE_DAG).getAttribute("class")).contains("rd-status-icon--upcoming");
+        assertThat(statusIcoon(IntakeStep.DE_GETUIGEN).getAttribute("class")).contains("rd-status-icon--current");
+        assertThat(statusIcoon(IntakeStep.DE_GETUIGEN).getValue()).isEqualTo("4");
+        assertThat(statusIcoon(IntakeStep.EXTRAS).getAttribute("class")).contains("rd-status-icon--upcoming");
     }
 
     @Test
     @WithMockUser(username = "999990020")
-    void samenvattingsrandEindigtNaTotaalEnLaatBevestigingBuitenDeRand() {
+    void extrasBlijvenAfgerondNaDoorlopenOokInEenNieuweSessie() {
+        UUID dossierId = testData.maakConceptDossier();
+        tester.startPage(ExtrasPage.class, makeDossierPageParameters(dossierId));
+
+        // Terug naar de vorige stap telt niet als doorlopen
+        click("vorigeStapContainer:vorigeStap");
+        tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
+        assertThat(statusIcoon(IntakeStep.EXTRAS).getAttribute("class")).contains("rd-status-icon--upcoming");
+
+        tester.startPage(ExtrasPage.class, makeDossierPageParameters(dossierId));
+        click("volgendeStapContainer:volgendeStap");
+        tester.assertRenderedPage(ControlerenPage.class);
+
+        // Een nieuwe request zonder extra URL-parameters: de voortgang komt uit het dossier
+        tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
+        assertThat(statusIcoon(IntakeStep.EXTRAS).getAttribute("class")).contains("rd-status-icon--complete");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void totaalStaatInDeSamenvattingEnBevestigenDaarbuiten() {
         UUID dossierId = testData.maakCompleetDossier();
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
 
         String html = tester.getLastResponseAsString();
-        int content = html.indexOf("rd-intake-content--unbordered");
-        int kaart = html.indexOf("rd-controleer-kaart");
-        int totaal = html.indexOf("rd-controleer-totaal");
-        int kaartEinde = html.indexOf("</div>", totaal);
-        kaartEinde = html.indexOf("</div>", kaartEinde + "</div>".length());
-        int bevestigen = html.indexOf("bevestigForm");
-
-        assertThat(content).isGreaterThanOrEqualTo(0);
-        assertThat(kaart).isGreaterThan(content);
-        assertThat(totaal).isGreaterThan(kaart);
-        assertThat(kaartEinde).isGreaterThan(totaal);
-        assertThat(bevestigen).isGreaterThan(kaartEinde);
+        assertThat(html).contains("rd-intake-content--unbordered");
+        String samenvatting = TagTester.createTagByAttribute(html, "class", "rd-controleer-kaart").getValue();
+        assertThat(samenvatting).contains("rd-controleer-totaal").doesNotContain("rd-controleer-bevestigen");
+        assertThat(TagTester.createTagByAttribute(html, "class", "rd-controleer-bevestigen")).isNotNull();
     }
 
     private void click(String linkId) {
@@ -80,11 +91,7 @@ class ControlerenPageTest extends BaseWicketTest {
         tester.clickLink(PAGE_BODY + ":" + linkId);
     }
 
-    private void assertIconState(String componentPath, String stateClass) {
-        Component component = tester.getComponentFromLastRenderedPage(PAGE_BODY + ":keuzesSidebar:" + componentPath);
-        String html = tester.getLastResponseAsString();
-        int iconStart = html.indexOf("id=\"" + component.getMarkupId() + "\"");
-        assertThat(iconStart).isGreaterThanOrEqualTo(0);
-        assertThat(html.substring(iconStart, iconStart + 120)).contains(stateClass);
+    private TagTester statusIcoon(IntakeStep step) {
+        return SidebarStatusIconen.statusIcoon(tester.getLastResponseAsString(), step);
     }
 }

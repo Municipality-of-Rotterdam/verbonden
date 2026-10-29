@@ -14,6 +14,13 @@ import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
+
+/**
+ * Tijdelijke betaalpagina zolang er nog geen betaalprovider is gekoppeld.
+ * TODO: vervangen door de betaalflow van de betaalprovider. De knop "Betaling niet gelukt" verdwijnt dan; de
+ * terugkoppeling van de provider roept bij een mislukte betaling {@link ControlerenPage#naMislukteBetaling} aan.
+ */
 public class BetalingPage extends IntakeBasePage {
 
     @SpringBean
@@ -51,8 +58,7 @@ public class BetalingPage extends IntakeBasePage {
                 new Link<Void>("betalingMislukt") {
                     @Override
                     public void onClick() {
-                        setResponsePage(ControlerenPage.class, pageParametersForDossier(dossierId)
-                                .add("betalingMislukt", true));
+                        setResponsePage(ControlerenPage.naMislukteBetaling(dossierId));
                     }
                 }.add(new Label("label", new ResourceModel("betaling.mislukt.button"))),
                 new BetalingForm("betalingForm")
@@ -76,7 +82,7 @@ public class BetalingPage extends IntakeBasePage {
                     } catch (DossierNietWijzigbaarException ignored) {
                         // The other partner may already have submitted this dossier.
                     } catch (DossierNietCompleetException ignored) {
-                        setResponsePage(ControlerenPage.class, pageParametersForDossier(dossierId));
+                        setResponsePage(ControlerenPage.class, makeDossierPageParameters(dossierId));
                         return;
                     }
                     AanvraagStatusPage.respond(dossierId);

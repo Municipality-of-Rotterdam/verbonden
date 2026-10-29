@@ -18,8 +18,14 @@ class BedragTest {
     }
 
     @Test
+    void constructor_staatNullenAchterDeTweedeDecimaalToe() {
+        assertThat(Bedrag.of("1.500")).isEqualTo(Bedrag.of("1.50"));
+    }
+
+    @Test
     void constructor_weigertAfrondenVanExtraDecimalen() {
         assertThatThrownBy(() -> Bedrag.of("1.001"))
-                .isInstanceOf(ArithmeticException.class);
+                .isInstanceOf(BedragTeVeelDecimalenException.class)
+                .hasMessageContaining("1.001");
     }
 }

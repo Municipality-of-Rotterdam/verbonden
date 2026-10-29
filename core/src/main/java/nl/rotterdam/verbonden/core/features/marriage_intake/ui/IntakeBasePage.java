@@ -32,7 +32,6 @@ import java.util.UUID;
 
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.extractDossierId;
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
-import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.PARAM_EXTRAS_DOORLOPEN;
 
 public abstract class IntakeBasePage extends BurgerBasePage {
 
@@ -44,7 +43,6 @@ public abstract class IntakeBasePage extends BurgerBasePage {
     private boolean showWrongDossierWarning;
     private boolean showInvitationBlockedWarning;
     private boolean showNotAuthorizedWarning;
-    private boolean extrasDoorlopen;
 
     protected IntakeSidebarPanel keuzesSidebar;
 
@@ -124,7 +122,6 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         } else {
             marriageIntakeService.findDossierIdByBsn(getCurrentBsn()).ifPresent(id -> dossierId = id);
         }
-        extrasDoorlopen = getPageParameters().get(PARAM_EXTRAS_DOORLOPEN).toBoolean(false);
 
         if (dossierId == null && showNotAuthorizedWarning && requiresDossier()) {
             throw new RestartResponseException(MarriageIntakePage.class, makeDossierPageParameters(extractDossierId(getPageParameters())));
@@ -137,7 +134,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
 
         pageBody.add(new MijnLoketBreadcrumbPanel("breadcrumb", List.of(
                 new Kruimel(getString("intake.breadcrumb.mijndag"), MarriageIntakePage.class,
-                        dossierId != null ? pageParametersForDossier(dossierId) : new PageParameters()))));
+                        dossierId != null ? makeDossierPageParameters(dossierId) : new PageParameters()))));
 
         RdAlert wrongDossierAlert = new RdAlert("wrongDossierAlert",
                 new ResourceModel("intake.alert.wrong.dossier"), RdAlertType.WARNING);
@@ -181,7 +178,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         );
 
         keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel(),
-                getSidebarPartnerGegevensModel(), getSidebarGetuigenModel(), getActiveStep(), extrasDoorlopen);
+                getSidebarPartnerGegevensModel(), getSidebarGetuigenModel(), getActiveStep());
         pageBody.add(keuzesSidebar);
     }
 
@@ -198,9 +195,9 @@ public abstract class IntakeBasePage extends BurgerBasePage {
             public void onClick() {
                 if (dossierId != null) {
                     if (getActiveStep() == IntakeStep.EXTRAS && targetStep == IntakeStep.CONTROLEREN) {
-                        extrasDoorlopen = true;
+                        marriageIntakeService.markeerExtrasDoorlopen(dossierId);
                     }
-                    setResponsePage(targetStep.pageClass(), pageParametersForDossier(dossierId));
+                    setResponsePage(targetStep.pageClass(), makeDossierPageParameters(dossierId));
                 }
             }
 
@@ -228,10 +225,6 @@ public abstract class IntakeBasePage extends BurgerBasePage {
             return null;
         }
         return IntakeStep.values()[current.ordinal() + 1];
-    }
-
-    protected final PageParameters pageParametersForDossier(UUID id) {
-        return makeDossierPageParameters(id, extrasDoorlopen);
     }
 
     @Override

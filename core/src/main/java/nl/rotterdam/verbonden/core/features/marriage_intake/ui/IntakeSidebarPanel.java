@@ -36,16 +36,14 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
     private final IntakeStep activeStep;
     private final IModel<List<PartnerGegevensDto>> partnerGegevensModel;
     private final IModel<List<GetuigeDto>> getuigenModel;
-    private final boolean extrasDoorlopen;
 
     public IntakeSidebarPanel(String id, IModel<DossierSamenvattingDto> dossierModel,
                               IModel<List<PartnerGegevensDto>> partnerGegevensModel,
-                              IModel<List<GetuigeDto>> getuigenModel, IntakeStep activeStep, boolean extrasDoorlopen) {
+                              IModel<List<GetuigeDto>> getuigenModel, IntakeStep activeStep) {
         super(id, dossierModel);
         this.activeStep = activeStep;
         this.partnerGegevensModel = partnerGegevensModel;
         this.getuigenModel = getuigenModel;
-        this.extrasDoorlopen = extrasDoorlopen;
         setOutputMarkupId(true);
     }
 
@@ -278,8 +276,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         Link<Void> link = new Link<>(id) {
             @Override
             public void onClick() {
-                setResponsePage(step.pageClass(), makeDossierPageParameters(
-                        requireNonNull(getDossierModelObject()).id(), extrasDoorlopen));
+                setResponsePage(step.pageClass(), makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
             }
 
             @Override
@@ -302,10 +299,6 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
     private Label progressIcon(String id, IntakeStep step) {
         return new Label(id, Model.of("")) {
-            {
-                setOutputMarkupId(true);
-            }
-
             @Override
             protected void onConfigure() {
                 super.onConfigure();
@@ -337,8 +330,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             case JULLIE_GEGEVENS -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.PARTNER_GEKOPPELD)
                     && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.ACHTERNAMEN);
             case DE_GETUIGEN -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.GETUIGEN);
-            case EXTRAS -> d.status() != DossierStatus.CONCEPT
-                    || extrasDoorlopen;
+            case EXTRAS -> d.status() != DossierStatus.CONCEPT || d.extrasDoorlopen();
             case CONTROLEREN -> d.compleet();
         };
     }

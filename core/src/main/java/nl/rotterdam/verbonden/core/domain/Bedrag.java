@@ -14,6 +14,9 @@ public record Bedrag(BigDecimal value) implements ValueHolder<BigDecimal>, Compa
 
     public Bedrag {
         Objects.requireNonNull(value, "Bedrag mag niet null zijn");
+        if (value.stripTrailingZeros().scale() > 2) {
+            throw new BedragTeVeelDecimalenException(value);
+        }
         value = value.setScale(2, RoundingMode.UNNECESSARY);
     }
 

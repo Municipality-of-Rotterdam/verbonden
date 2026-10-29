@@ -274,6 +274,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 getuigenBevestigd,
                 getuigenGedeeltelijkIngevuld,
                 extraItems,
+                e.isExtrasDoorlopen(),
                 aantalGekozenAchternamen,
                 e.getPartners().size() == 2,
                 totalPrijs,
@@ -510,5 +511,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         dossier.wijzigExtras(dto.ringenUitwisselen(), dto.muziek(), dto.trouwboekjeId() != null
                 ? trouwboekjeRepository.findById(dto.trouwboekjeId()).orElse(null)
                 : null, dto.internationaleAkte());
+    }
+
+    @Override
+    @Transactional
+    public void markeerExtrasDoorlopen(UUID dossierId) {
+        getWijzigbaarDossier(dossierId).markeerExtrasDoorlopen();
     }
 }

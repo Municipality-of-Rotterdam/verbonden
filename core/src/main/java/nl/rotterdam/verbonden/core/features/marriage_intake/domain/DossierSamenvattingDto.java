@@ -18,6 +18,7 @@ public record DossierSamenvattingDto(
         boolean getuigenBevestigd,
         boolean getuigenGedeeltelijkIngevuld,
         List<SidebarExtraItemDto> extras,
+        boolean extrasDoorlopen,
         int aantalGekozenAchternamen,
         boolean partnerGekoppeld,
         Bedrag totalPrijs,

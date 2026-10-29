@@ -1,4 +1,6 @@
 (() => {
+    // De zichtbare tekst is ook de toegankelijke naam van de knop (WCAG 2.5.3). Tijdens het voorlezen wisselt die
+    // naar de stoptekst; daarom geen aria-pressed, want een toggle-knop hoort een vaste naam te houden.
     document.addEventListener("click", event => {
         const button = event.target.closest("[data-intake-read-aloud]");
         if (!button || !window.speechSynthesis || !window.SpeechSynthesisUtterance) {
@@ -8,13 +10,12 @@
         const speech = window.speechSynthesis;
         const label = button.querySelector(".rd-read-aloud__label");
         const play = button.querySelector(".rd-read-aloud__play");
-        const startLabel = label.textContent;
         const reset = () => {
-            button.setAttribute("aria-pressed", "false");
-            label.textContent = startLabel;
+            delete button.dataset.speaking;
+            label.textContent = button.dataset.startLabel;
             play.textContent = "▶";
         };
-        if (button.getAttribute("aria-pressed") === "true") {
+        if (button.dataset.speaking) {
             speech.cancel();
             reset();
             return;
@@ -34,7 +35,7 @@
         utterance.lang = "nl-NL";
         utterance.onend = reset;
         utterance.onerror = reset;
-        button.setAttribute("aria-pressed", "true");
+        button.dataset.speaking = "true";
         label.textContent = button.dataset.stopLabel;
         play.textContent = "■";
         speech.speak(utterance);

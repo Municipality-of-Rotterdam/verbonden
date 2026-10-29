@@ -8,7 +8,6 @@ import java.util.UUID;
 public class DossierPageParameterUtil {
 
     public static final String PARAM_DOSSIER_ID = "dossierId";
-    public static final String PARAM_EXTRAS_DOORLOPEN = "extrasDoorlopen";
 
     @Nullable
     public static UUID extractDossierId(PageParameters parameters) {
@@ -22,13 +21,5 @@ public class DossierPageParameterUtil {
 
     public static PageParameters makeDossierPageParameters(@Nullable UUID dossierId) {
         return new PageParameters().add(PARAM_DOSSIER_ID, dossierId);
-    }
-
-    public static PageParameters makeDossierPageParameters(@Nullable UUID dossierId, boolean extrasDoorlopen) {
-        PageParameters parameters = makeDossierPageParameters(dossierId);
-        if (extrasDoorlopen) {
-            parameters.add(PARAM_EXTRAS_DOORLOPEN, true);
-        }
-        return parameters;
     }
 }

@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.ui;
 
 import nl.rotterdam.verbonden.core.domain.Bedrag;
+import nl.rotterdam.verbonden.core.domain.BedragTeVeelDecimalenException;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 
@@ -16,7 +17,7 @@ public class BedragWicketConverter implements IConverter<Bedrag> {
         }
         try {
             return new Bedrag(new BigDecimal(value.trim().replace(',', '.')));
-        } catch (NumberFormatException | ArithmeticException e) {
+        } catch (NumberFormatException | BedragTeVeelDecimalenException e) {
             throw new ConversionException(e).setResourceKey("IConverter.Number");
         }
     }

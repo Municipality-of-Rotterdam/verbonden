@@ -61,6 +61,9 @@ public class HuwelijksDossierEntity {
     @Column(name = "internationale_akte", nullable = false)
     private boolean internationaleAkte = false;
 
+    @Column(name = "extras_doorlopen", nullable = false)
+    private boolean extrasDoorlopen = false;
+
     @Column(name = "internationale_akte_prijs")
     @Convert(converter = BedragAttributeConverter.class)
     private Bedrag internationaleAktePrijs;
@@ -119,7 +122,7 @@ public class HuwelijksDossierEntity {
     }
 
     /**
-     * Voegt een partner toe die zich online met DigiD heeft geïdentificeerd; de eerste partner krijgt
+     * Voegt een partner toe die zich online met DigiD heeft geÃ¯dentificeerd; de eerste partner krijgt
      * volgorde 1, de tweede volgorde 2.
      *
      * @throws IllegalStateException wanneer het dossier al twee partners heeft
@@ -185,6 +188,17 @@ public class HuwelijksDossierEntity {
         this.muziek = ceremonieSoort == CeremonieSoort.GROOT && muziek;
         this.trouwboekje = trouwboekje;
         this.internationaleAkte = registratieType == RegistratieType.HUWELIJK && internationaleAkte;
+    }
+
+    /**
+     * Legt vast dat de burger de (optionele) stap Extra’s heeft doorlopen.
+     */
+    public void markeerExtrasDoorlopen() {
+        this.extrasDoorlopen = true;
+    }
+
+    public boolean isExtrasDoorlopen() {
+        return extrasDoorlopen;
     }
 
     public boolean isRingenUitwisselen() {

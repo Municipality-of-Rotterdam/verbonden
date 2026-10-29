@@ -30,7 +30,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
 
 public class ControlerenPage extends IntakeBasePage {
 
@@ -44,6 +49,18 @@ public class ControlerenPage extends IntakeBasePage {
             LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
     private IModel<List<PartnerGegevensDto>> partnerGegevensModel;
     private IModel<List<GetuigeDto>> getuigenModel;
+    // Eenmalige melding: wordt na het renderen gewist, zodat hij na een refresh niet opnieuw verschijnt
+    private boolean betalingMislukt;
+
+    /**
+     * De controleerpagina met een melding dat de betaling niet is gelukt.
+     */
+    static ControlerenPage naMislukteBetaling(UUID dossierId) {
+        ControlerenPage page = new ControlerenPage();
+        page.getPageParameters().mergeWith(makeDossierPageParameters(dossierId));
+        page.betalingMislukt = true;
+        return page;
+    }
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -96,8 +113,7 @@ public class ControlerenPage extends IntakeBasePage {
 
         pageBody.add(
                 new RdAlert("betalingMislukt", new ResourceModel("controleren.betaling.mislukt"), RdAlertType.WARNING)
-                        .add(new VisibleModelBehavior(LambdaModel.of(
-                                () -> getPageParameters().get("betalingMislukt").toBoolean(false)))),
+                        .add(new VisibleModelBehavior(LambdaModel.of(() -> betalingMislukt))),
                 new BookmarkablePageLink<>("wijzigDag", DeDagPage.class, parameters()),
                 new BookmarkablePageLink<>("wijzigGegevens", JullieGegevensPage.class, parameters()),
                 new BookmarkablePageLink<>("wijzigGetuigen", DeGetuigenPage.class, parameters()),
@@ -146,6 +162,12 @@ public class ControlerenPage extends IntakeBasePage {
         );
     }
 
+    @Override
+    protected void onAfterRender() {
+        super.onAfterRender();
+        betalingMislukt = false;
+    }
+
     private WebMarkupContainer visibleWhen(String id, IModel<Boolean> visible, Component child) {
         WebMarkupContainer container = new WebMarkupContainer(id);
         container.add(new VisibleModelBehavior(visible));
@@ -168,15 +190,15 @@ public class ControlerenPage extends IntakeBasePage {
     }
 
     private PageParameters parameters() {
-        return pageParametersForDossier(dossierId);
+        return makeDossierPageParameters(dossierId);
     }
 
     private String naamkeuze(PartnerGegevensDto partner) {
-        String naam = java.util.stream.Stream.of(partner.voornamen(), partner.achternaam())
+        String naam = Stream.of(partner.voornamen(), partner.achternaam())
                 .filter(Objects::nonNull)
                 .filter(waarde -> !waarde.isBlank())
                 .collect(Collectors.joining(" "));
-        return java.util.Optional.ofNullable(partner.gekozenAchternaam())
+        return Optional.ofNullable(partner.gekozenAchternaam())
                 .filter(gekozen -> !gekozen.isBlank())
                 .map(gekozen -> naam + " - " + gekozen)
                 .orElse(naam);

@@ -128,6 +128,11 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.assertVisible(PAGE_BODY + ":betalingMislukt");
         tester.assertContains("De betaling is niet gelukt of afgebroken.");
         assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
+
+        // De melding is eenmalig: na een refresh van de pagina is hij weg
+        tester.startPage(tester.getLastRenderedPage());
+        tester.assertRenderedPage(ControlerenPage.class);
+        tester.assertInvisible(PAGE_BODY + ":betalingMislukt");
     }
 
     @Test
@@ -174,10 +179,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.addRequestHeader("sec-fetch-mode", "navigate");
         tester.clickLink(PAGE_BODY + ":vorigeStapContainer:vorigeStap");
         tester.assertRenderedPage(DeGetuigenPage.class);
-        String extrasIconMarkupId =
-                tester.getComponentFromLastRenderedPage(PAGE_BODY + ":keuzesSidebar:extrasProgressIcon").getMarkupId();
-        int extrasIconPosition = tester.getLastResponseAsString().indexOf("id=\"" + extrasIconMarkupId + "\"");
-        assertThat(tester.getLastResponseAsString().substring(extrasIconPosition, extrasIconPosition + 120))
+        assertThat(SidebarStatusIconen.statusIcoon(tester.getLastResponseAsString(), IntakeStep.EXTRAS).getAttribute("class"))
                 .contains("rd-status-icon--complete");
     }
 

@@ -146,4 +146,13 @@ public interface MarriageIntakeService {
     SaveExtrasDto findExtrasSelecties(UUID dossierId);
 
     void slaExtrasOp(UUID dossierId, SaveExtrasDto dto);
+
+    /**
+     * Legt vast dat de burger de stap Extra's heeft doorlopen. De stap telt daarna als afgerond, ook als er geen
+     * extra's gekozen zijn.
+     *
+     * @throws nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException
+     *         wanneer het dossier geen {@link DossierStatus#CONCEPT} meer is
+     */
+    void markeerExtrasDoorlopen(UUID dossierId);
 }
