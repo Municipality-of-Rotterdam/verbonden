@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Trouwlijst beheer</title>
+</head>
+<body>
+<wicket:extend>
+    <h1>Trouwlijst</h1>
+
+    <form wicket:id="filterForm" class="mb-3">
+        <div wicket:id="week">
+            <select wicket:id="input"></select>
+        </div>
+    </form>
+
+    <div wicket:id="resultaat">
+        <div class="mb-3">
+            <a wicket:id="exporteerLink" class="utrecht-button utrecht-button--primary-action">Export lijst</a>
+        </div>
+
+        <table wicket:id="dossierTable"></table>
+    </div>
+</wicket:extend>
+</body>
+</html>
