@@ -42,6 +42,18 @@ class MarriageIntakePageTest extends BaseWicketTest {
     }
 
     /**
+     * De inleidende tekst staat in één property en gebruikt {@code <br/>} voor regelafbrekingen.
+     */
+    @Test
+    @WithMockUser(username = "999990007")
+    void rendertIntroInDrieRegels() {
+        tester.startPage(MarriageIntakePage.class);
+        assertThat(tester.getLastResponseAsString())
+                .containsPattern("Gefeliciteerd!\\s*<br/>\\s*Hier doen jullie")
+                .containsPattern("ceremonie\\.\\s*<br/>\\s*Zoiets doet u");
+    }
+
+    /**
      * De Stencil-iconen lezen de CSP-nonce uit {@code <meta name="csp-nonce">} voor hun eigen
      * {@code <style>}-blokken; zonder die tag blokkeert de browser ze.
      */
