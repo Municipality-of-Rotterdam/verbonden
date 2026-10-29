@@ -267,6 +267,14 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         add(controlerenSection);
     }
 
+    @Override
+    protected void onDetach() {
+        // Alleen het default model wordt automatisch gedetacht; zonder dit toont de sidebar na een Ajax-update oude data
+        partnerGegevensModel.detach();
+        getuigenModel.detach();
+        super.onDetach();
+    }
+
     private boolean isWijzigbaar() {
         DossierSamenvattingDto d = getDossierModelObject();
         return d == null || d.status() == DossierStatus.CONCEPT;
