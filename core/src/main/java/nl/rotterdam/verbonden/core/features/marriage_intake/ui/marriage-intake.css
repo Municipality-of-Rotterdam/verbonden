@@ -503,8 +503,7 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
     font-size: 0.9375rem;
 }
 
-.rd-keuzes-item a,
-.rd-keuzes-item--link {
+.rd-keuzes-item a {
     color: var(--rd-color-green-500, #007a3e);
     text-decoration: none;
     font-size: 0.9375rem;
@@ -535,12 +534,6 @@ a.rd-keuze-card--niet-beschikbaar:hover .rd-keuze-card__overlay {
     font-weight: 600;
     white-space: nowrap;
     color: var(--rd-color-green-500, #007a3e);
-}
-
-.rd-keuzes-item--status {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
 }
 
 .rd-status-icon--complete,
@@ -1317,10 +1310,6 @@ form.rd-getuige-form {
     font-weight: 700;
 }
 
-/* Confirmation dialog */
-.rd-bevestig-dialog {
-    width: min(32rem, calc(100vw - 2rem));
-}
 
 .rd-bevestig-dialog .ams-dialog__header h2 {
     font-size: 1.5rem;
