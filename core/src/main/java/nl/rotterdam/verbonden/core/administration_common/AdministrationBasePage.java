@@ -12,7 +12,6 @@ import nl.rotterdam.verbonden.core.features.trouwlijst_administration.ui.Trouwli
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_logo.RotterdamLogoImage;
 import nl.rotterdam.nl_design_system.wicket.components.body.RdBodyTransparentContainer;
 import nl.rotterdam.nl_design_system.wicket.components.page_body.RdPageBodyBorder;
 import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
@@ -30,6 +29,7 @@ import org.apache.wicket.markup.head.MetaDataHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
@@ -77,7 +77,7 @@ public abstract class AdministrationBasePage extends WebPage {
         add(new RdBodyTransparentContainer("body"));
 
         add(new SidebarToggle("sidebarToggle"));
-        add(new RotterdamLogoImage("rotterdamLogoImage"));
+        add(new Image("logo", new PackageResourceReference(AdministrationBasePage.class, "verbonden-logo.svg")));
         add(new ListView<>("navigationItems", NAVIGATION_ITEMS.stream()
                 .filter(item -> magOpenen(item.page()))
                 .toList()) {

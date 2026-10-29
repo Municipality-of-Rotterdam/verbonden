@@ -242,6 +242,7 @@
                     <include>**/*.xml</include>
                     <include>**/*.css</include>
                     <include>**/*.webp</include>
+                    <include>**/*.svg</include>
                     <include>**/*.js</include>
                 </includes>
             </resource>
