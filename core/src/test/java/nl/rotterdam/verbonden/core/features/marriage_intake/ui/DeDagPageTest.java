@@ -90,7 +90,7 @@ class DeDagPageTest extends BaseWicketTest {
 
         tester.assertContains("Kies een datum");
         tester.assertContains("Kies een trouwlocatie");
-        tester.assertContains("Laat uw partner het dossier koppelen");
+        tester.assertContains("Uw partner moet nog inloggen en meedoen");
         tester.assertContains("Kies allebei de achternaam die u wilt gebruiken");
         tester.assertContains("Vul de gegevens van alle getuigen in");
 

@@ -2,6 +2,8 @@
 
 Analyse van de teksten op de burgerpagina's met de skill `taalniveau` (`.claude/skills/taalniveau/SKILL.md`). Streefniveau: **B1**. Aanspreekvorm: **u/uw** (zie `AGENTS.md`).
 
+> **Status:** alle B1-versies hieronder zijn doorgevoerd. De kenmerken van de huwelijkstypen (`intake.soort.*.beschrijving.*`) staan voor de burger in de database (`huwelijkstypen.tekst`) en zijn aangepast met migratie `V40__huwelijkstype_teksten_b1.sql`. De open punten onderaan staan nog open.
+
 Bijna alle teksten staan in `core/src/main/java/nl/rotterdam/verbonden/core/WicketApplication.properties`. De tekst in de HTML-bestanden is voorbeeldtekst; die wordt bij het tonen vervangen door de tekst uit het properties-bestand. Bij elk punt staat daarom de property-sleutel.
 
 Beheerpagina's zijn niet beoordeeld. Die zijn voor medewerkers; daar is vaktaal toegestaan (C1).

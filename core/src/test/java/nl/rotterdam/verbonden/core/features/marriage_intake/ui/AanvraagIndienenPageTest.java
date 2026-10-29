@@ -109,7 +109,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
         assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.INGEDIEND);
         tester.assertRenderedPage(AanvraagStatusPage.class);
-        tester.assertContains("De huwelijksaanvraag is ontvangen en wordt in behandeling genomen.");
+        tester.assertContains("We hebben uw aanvraag ontvangen. De gemeente gaat die nu bekijken.");
         tester.assertContains("Wat gebeurt er nu\\?");
         assertThat(tester.getLastResponseAsString()).doesNotContain("bevestigButton");
     }
