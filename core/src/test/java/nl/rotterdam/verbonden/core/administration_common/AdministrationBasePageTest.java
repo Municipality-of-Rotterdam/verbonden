@@ -41,15 +41,11 @@ class AdministrationBasePageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(roles = Roles.BEHEER)
-    void toontHetVerbondenLogoDatWordtUitgeleverd() {
+    void toontHetVerbondenLogo() {
         tester.startPage(BabsAdministrationPage.class);
 
-        String src = org.apache.wicket.util.tester.TagTester.createTagByAttribute(
-                tester.getLastResponseAsString(), "alt", "Verbonden").getAttribute("src");
-        tester.executeUrl(src);
-
-        assertThat(tester.getLastResponse().getStatus()).isEqualTo(200);
-        assertThat(tester.getLastResponse().getContentType()).contains("svg");
+        assertThat(tester.getLastResponseAsString()).contains("src=\"/images/verbonden-logo.svg\"");
+        assertThat(getClass().getResource("/static/images/verbonden-logo.svg")).isNotNull();
     }
 
     @Test

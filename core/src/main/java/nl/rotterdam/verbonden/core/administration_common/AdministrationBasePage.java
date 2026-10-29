@@ -29,7 +29,6 @@ import org.apache.wicket.markup.head.MetaDataHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
@@ -77,7 +76,6 @@ public abstract class AdministrationBasePage extends WebPage {
         add(new RdBodyTransparentContainer("body"));
 
         add(new SidebarToggle("sidebarToggle"));
-        add(new Image("logo", new PackageResourceReference(AdministrationBasePage.class, "verbonden-logo.svg")));
         add(new ListView<>("navigationItems", NAVIGATION_ITEMS.stream()
                 .filter(item -> magOpenen(item.page()))
                 .toList()) {
