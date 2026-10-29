@@ -26,7 +26,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
 
     private static final String SIDEBAR = "pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar:";
 
-    private static final String PARTNER_CARDS = "pageLayout:pageLayout_body:pageBody:pageBody_body:partnerCards:";
+    private static final String PARTNER_CARDS = "pageLayout:pageLayout_body:pageBody:pageBody_body:partnerKaarten:partnerCards:";
 
     private UUID createdDossierId;
 
@@ -239,7 +239,14 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.assertVisible(PARTNER_CARDS + "1:kiesAchternaamSection");
 
         tester.addRequestHeader("sec-fetch-site", "same-origin");
-        tester.newFormTester(PARTNER_CARDS + "0:naamKiezenDialog:naamKiezenForm").submit();
+        tester.executeAjaxEvent(PARTNER_CARDS + "0:naamKiezenDialog:naamKiezenForm:bevestigButton", "click");
+
+        // Geen nieuwe page-request (die springt naar boven): alleen de kaarten en de sidebar worden ververst
+        tester.assertRenderedPage(JullieGegevensPage.class);
+        tester.assertComponentOnAjaxResponse("pageLayout:pageLayout_body:pageBody:pageBody_body:partnerKaarten");
+        tester.assertComponentOnAjaxResponse("pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar");
+        tester.assertVisible(PARTNER_CARDS + "0:gekozenAchternaamSection");
+        assertThat(tester.getLastResponseAsString()).contains("achternaamWijzigen1");
 
         assertThat(marriageIntakeService.findPartnerGegevens(createdDossierId))
                 .filteredOn(p -> p.bsn().equals(partner1))

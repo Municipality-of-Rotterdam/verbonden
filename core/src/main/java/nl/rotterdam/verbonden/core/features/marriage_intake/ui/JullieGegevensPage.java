@@ -9,6 +9,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegeve
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.markup.ComponentTag;
@@ -23,6 +24,7 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.Url;
@@ -31,6 +33,7 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jspecify.annotations.NonNull;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -45,6 +48,13 @@ public class JullieGegevensPage extends IntakeBasePage {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
+
+    private final IModel<DossierSamenvattingDto> dossierModel =
+            LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
+    private final IModel<List<PartnerGegevensDto>> partnersModel =
+            LoadableDetachableModel.of(() -> marriageIntakeService.findPartnerGegevens(dossierId));
+
+    private WebMarkupContainer partnerKaarten;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -68,23 +78,30 @@ public class JullieGegevensPage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return Model.of(marriageIntakeService.findByDossierId(dossierId));
+        return dossierModel;
     }
 
+    @Override
+    protected IModel<List<PartnerGegevensDto>> getSidebarPartnerGegevensModel() {
+        return partnersModel;
+    }
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
 
-        List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
-        // Zodra beide partners gekoppeld zijn, mag elke partner ook de gegevens van de ander invullen
-        boolean beidePartnersGekoppeld = partners.size() == 2;
+        // Wordt na het kiezen van een achternaam via Ajax ververst, zodat de scrollpositie behouden blijft
+        partnerKaarten = new WebMarkupContainer("partnerKaarten");
+        partnerKaarten.setOutputMarkupId(true);
+        pageBody.add(partnerKaarten);
 
-        pageBody.add(new ListView<>("partnerCards", partners) {
+        partnerKaarten.add(new ListView<>("partnerCards", partnersModel) {
             @Override
             protected void populateItem(ListItem<PartnerGegevensDto> item) {
                 PartnerGegevensDto partner = item.getModelObject();
-                boolean kanKiezen = beidePartnersGekoppeld;
+                List<PartnerGegevensDto> partners = getList();
+                // Zodra beide partners gekoppeld zijn, mag elke partner ook de gegevens van de ander invullen
+                boolean kanKiezen = partners.size() == 2;
 
                 item.add(
                         new Label("achternaam", partner.achternaam()),
@@ -146,7 +163,7 @@ public class JullieGegevensPage extends IntakeBasePage {
                             dialogTonen.setObject(true);
                             target.add(dialogContainer);
                         }
-                    });
+                    }.setMarkupId(editButtonMarkupId(partner.volgorde())));
 
                     dialogContainer.add(new Label("dialogVoornamen", partner.voornamen()));
                     dialogContainer.add(new NaamKiezenForm("naamKiezenForm", partner, naamOpties, dialogContainer, dialogTonen));
@@ -164,31 +181,26 @@ public class JullieGegevensPage extends IntakeBasePage {
                         }
                     });
                     stubForm.add(stubGroup);
-                    stubForm.add(new WebMarkupContainer("sluitenButton"));
+                    stubForm.add(new WebMarkupContainer("sluitenButton"), new WebMarkupContainer("bevestigButton"));
                     dialogContainer.add(stubForm);
                 }
             }
         });
 
         WebMarkupContainer partnerNogBevestigenCard = new WebMarkupContainer("partnerNogBevestigenCard");
-        partnerNogBevestigenCard.setVisible(partners.size() < 2);
+        partnerNogBevestigenCard.add(new VisibleModelBehavior(partnersModel.map(partners -> partners.size() < 2)));
 
         String loginUrl = RequestCycle.get().getUrlRenderer().renderFullUrl(
                     Url.parse(urlFor(MarriageIntakePage.class, makeDossierPageParameters(requireNonNull(dossierId))).toString()));
 
-        String qrDataUri = !loginUrl.isEmpty() && partners.size() < 2
-                ? QrCodeUtil.generateQrCodeDataUri(loginUrl, QR_CODE_SIZE, QR_CODE_SIZE)
-                : "";
-
-        WebMarkupContainer qrCodeImg = new WebMarkupContainer("partnerQrCode") {
+        // De QR-code wordt alleen gegenereerd wanneer de uitnodigingskaart zichtbaar is
+        partnerNogBevestigenCard.add(new WebMarkupContainer("partnerQrCode") {
             @Override
             protected void onComponentTag(ComponentTag tag) {
                 super.onComponentTag(tag);
-                tag.put("src", qrDataUri);
+                tag.put("src", QrCodeUtil.generateQrCodeDataUri(loginUrl, QR_CODE_SIZE, QR_CODE_SIZE));
             }
-        };
-        qrCodeImg.setVisible(!qrDataUri.isEmpty());
-        partnerNogBevestigenCard.add(qrCodeImg);
+        });
 
         partnerNogBevestigenCard.add(new WebMarkupContainer("partnerUitnodigingUrl") {
             @Override
@@ -198,8 +210,12 @@ public class JullieGegevensPage extends IntakeBasePage {
             }
         });
 
-        pageBody.add(partnerNogBevestigenCard);
+        partnerKaarten.add(partnerNogBevestigenCard);
 
+    }
+
+    private static String editButtonMarkupId(int volgorde) {
+        return "achternaamWijzigen" + volgorde;
     }
 
     @Override
@@ -247,13 +263,22 @@ public class JullieGegevensPage extends IntakeBasePage {
                     target.add(dialogContainer);
                 }
             });
-        }
 
-        @Override
-        protected void onSubmit() {
-            String gekozenNaam = naamRadioGroup.getModelObject();
-            marriageIntakeService.slaPartnerGegevensOp(dossierId, volgorde, gekozenNaam);
-            setResponsePage(JullieGegevensPage.class, makeDossierPageParameters(dossierId));
+            // Ajax in plaats van een volledige page-request, zodat de pagina niet naar boven springt
+            AjaxButton bevestigButton = new AjaxButton("bevestigButton") {
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    marriageIntakeService.slaPartnerGegevensOp(dossierId, volgorde, naamRadioGroup.getModelObject());
+                    partnersModel.detach();
+                    dossierModel.detach();
+                    target.add(partnerKaarten, keuzesSidebar);
+                    // Het dialoog verdwijnt; geef de focus aan de wijzigknop op dezelfde kaart zonder te scrollen
+                    target.appendJavaScript("document.getElementById('" + editButtonMarkupId(volgorde)
+                            + "')?.focus({preventScroll: true});");
+                }
+            };
+            add(bevestigButton);
+            setDefaultButton(bevestigButton);
         }
     }
 

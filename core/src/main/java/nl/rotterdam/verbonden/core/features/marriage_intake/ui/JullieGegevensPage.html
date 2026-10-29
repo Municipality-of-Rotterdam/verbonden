@@ -1,7 +1,7 @@
 <wicket:extend>
 
     <!-- Partner cards -->
-    <div class="row g-4">
+    <div wicket:id="partnerKaarten" class="row g-4">
         <div wicket:id="partnerCards" class="col-12 col-md-6">
             <div class="rd-partner-card">
 
@@ -76,7 +76,7 @@
                                 <a wicket:id="sluitenButton" class="rd-naam-kiezen-dialog__cancel-btn">
                                     <wicket:message key="jullie.gegevens.annuleren">Annuleren</wicket:message>
                                 </a>
-                                <button type="submit" class="rd-naam-kiezen-dialog__bevestig-btn">
+                                <button wicket:id="bevestigButton" type="submit" class="rd-naam-kiezen-dialog__bevestig-btn">
                                     <span aria-hidden="true">&#x1F517;</span>
                                     <wicket:message key="jullie.gegevens.bevestig.achternaam">Bevestig achternaam</wicket:message>
                                 </button>
