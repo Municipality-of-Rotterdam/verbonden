@@ -1,22 +1,30 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.burger_common.BurgerBasePage;
+import nl.rotterdam.verbonden.core.burger_common.MijnLoketBreadcrumbPanel;
+import nl.rotterdam.verbonden.core.burger_common.MijnLoketBreadcrumbPanel.Kruimel;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
-import nl.rotterdam.verbonden.core.burger_common.MijnLoketBreadcrumbPanel;
-import nl.rotterdam.verbonden.core.burger_common.MijnLoketBreadcrumbPanel.Kruimel;
+import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.util.List;
@@ -40,7 +48,37 @@ public abstract class IntakeBasePage extends BurgerBasePage {
 
     protected abstract IModel<DossierSamenvattingDto> getSidebarDossierModel();
 
+    protected IModel<List<PartnerGegevensDto>> getSidebarPartnerGegevensModel() {
+        return LoadableDetachableModel.of(() ->
+                dossierId == null ? List.of() : marriageIntakeService.findPartnerGegevens(dossierId));
+    }
+
+    protected IModel<List<GetuigeDto>> getSidebarGetuigenModel() {
+        return LoadableDetachableModel.of(() ->
+                dossierId == null ? List.of() : marriageIntakeService.findGetuigen(dossierId));
+    }
+
     protected abstract IntakeStep getActiveStep();
+
+    protected boolean hasStepNavigation() {
+        return true;
+    }
+
+    protected boolean hasIntakeStepLayout() {
+        return hasStepNavigation();
+    }
+
+    protected boolean hasIntakeContentBorder() {
+        return true;
+    }
+
+    protected IModel<String> getStepHeadingModel() {
+        return Model.of("");
+    }
+
+    protected IModel<String> getStepIntroModel() {
+        return Model.of("");
+    }
 
     /**
      * Returns {@code true} when the page requires a valid (non-null) dossier ID to render.
@@ -113,47 +151,87 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         notAuthorizedAlert.setVisible(showNotAuthorizedWarning);
         pageBody.add(notAuthorizedAlert);
 
-        // The steps are only useful while the dossier can still be changed
-        WebMarkupContainer stappen = new WebMarkupContainer("stappen");
-        stappen.setVisible(!ingediend);
-        stappen.add(
-                createTabLink("tabDeDag", IntakeStep.DE_DAG, DeDagPage.class),
-                createTabLink("tabJullieGegevens", IntakeStep.JULLIE_GEGEVENS, JullieGegevensPage.class),
-                createTabLink("tabGetuigen", IntakeStep.DE_GETUIGEN, DeGetuigenPage.class),
-                createTabLink("tabExtras", IntakeStep.EXTRAS, ExtrasPage.class)
-        );
-        pageBody.add(stappen);
+        boolean intakeStepLayout = hasIntakeStepLayout();
+        if (intakeStepLayout) {
+            pageBody.add(AttributeModifier.append("class", "rd-intake-step-layout"));
+        }
+        if (intakeStepLayout && !hasStepNavigation()) {
+            pageBody.add(AttributeModifier.append("class", "rd-intake-step-layout--first-step"));
+        }
+        if (!hasIntakeContentBorder()) {
+            pageBody.add(AttributeModifier.append("class", "rd-intake-content--unbordered"));
+        }
+        WebMarkupContainer intakeHeader = new WebMarkupContainer("intakeHeader");
+        intakeHeader.setVisible(intakeStepLayout);
+        intakeHeader.add(new RdHeading("intakeHeading", new ResourceModel("intake.heading"), 1));
 
-        keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel());
+        WebMarkupContainer stepDetails = new WebMarkupContainer("stepDetails");
+        stepDetails.setVisible(intakeStepLayout);
+        stepDetails.add(new Label("stepHeading", getStepHeadingModel()),
+                new Label("stepIntro", getStepIntroModel()));
+
+        pageBody.add(
+                intakeHeader,
+                stepDetails,
+                createNavigationContainer("vorigeStapContainer", "vorigeStap", vorigeStap(), "intake.button.vorige"),
+                createNavigationContainer("volgendeStapContainer", "volgendeStap", volgendeStap(), "intake.button.volgende")
+        );
+
+        keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel(),
+                getSidebarPartnerGegevensModel(), getSidebarGetuigenModel(), getActiveStep());
         pageBody.add(keuzesSidebar);
     }
 
-    private Link<Void> createTabLink(String id, IntakeStep step, Class<? extends IntakeBasePage> pageClass) {
-        Link<Void> tab = new Link<>(id) {
+    private WebMarkupContainer createNavigationContainer(String id, String linkId, IntakeStep targetStep, String labelKey) {
+        WebMarkupContainer container = new WebMarkupContainer(id);
+        container.setVisible(hasIntakeStepLayout() && hasStepNavigation() && targetStep != null);
+        container.add(createNavigationLink(linkId, targetStep, labelKey));
+        return container;
+    }
+
+    private Link<Void> createNavigationLink(String id, IntakeStep targetStep, String labelKey) {
+        Link<Void> link = new Link<>(id) {
             @Override
             public void onClick() {
                 if (dossierId != null) {
-                    setResponsePage(pageClass, makeDossierPageParameters(dossierId));
+                    if (getActiveStep() == IntakeStep.EXTRAS && targetStep == IntakeStep.CONTROLEREN) {
+                        marriageIntakeService.markeerExtrasDoorlopen(dossierId);
+                    }
+                    setResponsePage(targetStep.pageClass(), makeDossierPageParameters(dossierId));
                 }
             }
 
             @Override
-            public boolean isEnabled() {
-                return dossierId != null;
+            protected void onConfigure() {
+                super.onConfigure();
+                setEnabled(dossierId != null && targetStep != null);
             }
         };
-        boolean isActive = getActiveStep() == step;
-        tab.add(AttributeModifier.replace("aria-selected", String.valueOf(isActive)));
-        if (isActive) {
-            tab.add(AttributeModifier.append("class", " rd-tab--active"));
-            tab.add(AttributeModifier.replace("aria-current", "step"));
+        link.add(new Label("label", new ResourceModel(labelKey)));
+        return link;
+    }
+
+    private IntakeStep vorigeStap() {
+        IntakeStep current = getActiveStep();
+        if (current == null || current.ordinal() == 0) {
+            return null;
         }
-        return tab;
+        return IntakeStep.values()[current.ordinal() - 1];
+    }
+
+    private IntakeStep volgendeStap() {
+        IntakeStep current = getActiveStep();
+        if (current == null || current.ordinal() == IntakeStep.values().length - 1) {
+            return null;
+        }
+        return IntakeStep.values()[current.ordinal() + 1];
     }
 
     @Override
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
         response.render(MarriageIntakeHeaderItems.MARRIAGE_INTAKE_CSS);
+        response.render(JavaScriptHeaderItem.forReference(
+                new PackageResourceReference(IntakeBasePage.class, "intake-read-aloud.js")));
     }
 }

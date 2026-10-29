@@ -54,7 +54,7 @@ class ContactGegevensFormTest extends BaseWicketTest {
         tester.startPage(JullieGegevensPage.class, params);
         tester.assertRenderedPage(JullieGegevensPage.class);
 
-        String formPath = "pageLayout:pageLayout_body:pageBody:pageBody_body:partnerCards:0:contactGegevensForm";
+        String formPath = "pageLayout:pageLayout_body:pageBody:pageBody_body:partnerKaarten:partnerCards:0:contactGegevensForm";
 
         // Trigger auto-save for telefoonnummer via AjaxFormComponentUpdatingBehavior
         FormComponent<?> telefoonnummerControl = (FormComponent<?>) tester.getComponentFromLastRenderedPage(
@@ -134,7 +134,7 @@ class ContactGegevensFormTest extends BaseWicketTest {
 
     private void wijzigTelefoonnummerOpKaart(int kaart, String telefoonnummer) {
         FormComponent<?> control = (FormComponent<?>) tester.getComponentFromLastRenderedPage(
-                "pageLayout:pageLayout_body:pageBody:pageBody_body:partnerCards:" + kaart
+                "pageLayout:pageLayout_body:pageBody:pageBody_body:partnerKaarten:partnerCards:" + kaart
                         + ":contactGegevensForm:telefoonnummerInput:input-container:control");
         tester.getRequest().getPostParameters().setParameterValue(control.getInputName(), telefoonnummer);
         tester.addRequestHeader("sec-fetch-site", "same-origin");

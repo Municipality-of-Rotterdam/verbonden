@@ -9,7 +9,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import nl.rotterdam.nl_design_system.wicket.components.radio_button.RdRadioButton;
 import nl.rotterdam.nl_design_system.wicket.components.radio_group.RdRadioGroup;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -27,17 +26,10 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 public class MarriageIntakePage extends IntakeBasePage {
-
-    private static final DecimalFormat PRIJS_FORMAT =
-            new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL")));
 
     private static final DateTimeFormatter DATUM_FORMAT =
             DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -57,7 +49,32 @@ public class MarriageIntakePage extends IntakeBasePage {
 
     @Override
     protected IntakeStep getActiveStep() {
-        return IntakeStep.DE_DAG;
+        return IntakeStep.MIJN_DAG;
+    }
+
+    @Override
+    protected boolean hasStepNavigation() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasIntakeStepLayout() {
+        return true;
+    }
+
+    @Override
+    protected boolean hasIntakeContentBorder() {
+        return false;
+    }
+
+    @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("intake.step.mijndag");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("intake.intro.marriageintake");
     }
 
     @Override
@@ -77,11 +94,11 @@ public class MarriageIntakePage extends IntakeBasePage {
                 DossierSamenvattingDto d = marriageIntakeService.findByDossierId(dossierId);
                 return new DossierSamenvattingDto(d.id(), registratieType, d.ceremonieSoort(),
                         d.prijs(), d.datumTijdHuwelijk(), d.huwelijksLocatie(),
-                        d.gegevensBevestigd(), d.getuigenBevestigd(), d.getuigenGedeeltelijkIngevuld(), d.extras(),
+                        d.gegevensBevestigd(), d.getuigenBevestigd(), d.getuigenGedeeltelijkIngevuld(), d.extras(), d.extrasDoorlopen(),
                         d.aantalGekozenAchternamen(), d.partnerGekoppeld(), d.totalPrijs(), d.status(), d.ingediendOp(), d.ontbrekendeOnderdelen());
             };
         }
-        return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, false, List.of(), 0, false, null,
+        return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, false, List.of(), false, 0, false, null,
                 DossierStatus.CONCEPT, null, List.of());
     }
 
@@ -92,8 +109,6 @@ public class MarriageIntakePage extends IntakeBasePage {
         if (dossierId != null) {
             registratieType = marriageIntakeService.findByDossierId(dossierId).registratieType();
         }
-
-        pageBody.add(new RdHeading("heading", getString("intake.heading"), 1));
 
         Form<Void> form = new Form<>("form");
         pageBody.add(form);
@@ -121,7 +136,7 @@ public class MarriageIntakePage extends IntakeBasePage {
                 item.add(prijsPrefix);
 
                 // Price badge (text only; CSS class utrecht-status-badge applied in HTML)
-                item.add(new Label("prijs", "€\u00a0" + formatPrijs(dto.prijs())));
+                item.add(new Label("prijs", "€\u00a0" + dto.prijs().format()));
 
                 // Bullet points
                 item.add(new ListView<>("bullets", dto.bulletPoints()) {
@@ -179,13 +194,6 @@ public class MarriageIntakePage extends IntakeBasePage {
                 target.add(keuzesSidebar);
             }
         });
-    }
-
-    private static String formatPrijs(BigDecimal prijs) {
-        if (prijs == null) {
-            return "";
-        }
-        return PRIJS_FORMAT.format(prijs);
     }
 
 }

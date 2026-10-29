@@ -14,32 +14,48 @@
     <!-- Alert: requested dossier is full and this BSN has no access -->
     <div wicket:id="notAuthorizedAlert"></div>
 
-    <!-- Tab navigation -->
-    <nav wicket:id="stappen" class="rd-tabs" aria-label="Stappen" role="tablist">
-        <a wicket:id="tabDeDag" class="rd-tab" role="tab" aria-selected="false">
-            <wicket:message key="intake.tab.dedag">Dé dag</wicket:message>
-        </a>
-        <a wicket:id="tabJullieGegevens" class="rd-tab" role="tab" aria-selected="false">
-            <wicket:message key="intake.tab.jullie.gegevens">Jullie gegevens</wicket:message>
-        </a>
-        <a wicket:id="tabGetuigen" class="rd-tab" role="tab" aria-selected="false">
-            <wicket:message key="intake.tab.getuigen">De getuigen</wicket:message>
-        </a>
-        <a wicket:id="tabExtras" class="rd-tab" role="tab" aria-selected="false">
-            <wicket:message key="intake.tab.extras">Extra's</wicket:message>
-        </a>
-    </nav>
-
     <!-- Two-column layout: main content + sidebar -->
     <div class="row g-4">
 
         <!-- Main content (filled by sub-pages) -->
-        <div class="col-12 col-lg-8">
-            <wicket:child/>
+        <div class="col-12 col-lg-9">
+            <div class="rd-intake-step">
+                <div wicket:id="intakeHeader" class="rd-intake-step__header">
+                    <h1 wicket:id="intakeHeading">Maak jullie dag om nooit te vergeten</h1>
+                    <button class="rd-read-aloud" type="button" data-intake-read-aloud
+                            wicket:message="data-start-label:intake.read.aloud,data-stop-label:intake.read.aloud.stop">
+                        <span class="rd-read-aloud__menu" aria-hidden="true">&#9776;</span>
+                        <span class="rd-read-aloud__speaker" aria-hidden="true">&#128266;</span>
+                        <span class="rd-read-aloud__label"><wicket:message key="intake.read.aloud">Lees voor</wicket:message></span>
+                        <span class="rd-read-aloud__play" aria-hidden="true">&#9654;</span>
+                    </button>
+                </div>
+
+                <div wicket:id="vorigeStapContainer" class="rd-vorige-nav">
+                    <a wicket:id="vorigeStap" class="rd-secondary-button">
+                        <span aria-hidden="true">&#8592;</span>
+                        <span wicket:id="label">Vorige stap</span>
+                    </a>
+                </div>
+
+                <div wicket:id="stepDetails" class="rd-intake-step__title">
+                    <h2 wicket:id="stepHeading">Mijn dag</h2>
+                    <p class="rd-intro-text" wicket:id="stepIntro"></p>
+                </div>
+
+                <div class="rd-intake-content"><wicket:child/></div>
+
+                <div wicket:id="volgendeStapContainer" class="rd-verder-nav">
+                    <a wicket:id="volgendeStap" class="rd-secondary-button">
+                        <span wicket:id="label">Volgende stap</span>
+                        <span aria-hidden="true">&#8594;</span>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Sidebar -->
-        <div class="col-12 col-lg-4">
+        <div class="col-12 col-lg-3">
             <div wicket:id="keuzesSidebar"></div>
         </div>
 

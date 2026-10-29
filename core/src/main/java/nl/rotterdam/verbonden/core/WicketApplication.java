@@ -10,11 +10,15 @@ import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.Trouwb
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeCreatePage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeUpdatePage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.ExtrasPage;
+import nl.rotterdam.verbonden.core.features.marriage_intake.ui.ControlerenPage;
+import nl.rotterdam.verbonden.core.features.marriage_intake.ui.BetalingPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsUpdatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
+import nl.rotterdam.verbonden.core.ui.BedragWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BuitenlandsPersoonsnummerWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BurgerServiceNummerWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
@@ -123,6 +127,7 @@ public class WicketApplication extends WicketBootStandardWebApplication {
     @Override
     protected IConverterLocator newConverterLocator() {
         ConverterLocator locator = (ConverterLocator) super.newConverterLocator();
+        locator.set(Bedrag.class, new BedragWicketConverter());
         locator.set(LocalDate.class, new LocalDateWicketConverter());
         locator.set(LocalTime.class, new LocalTimeWicketConverter());
         locator.set(PersonFullName.class, new PersonFullNameWicketConverter());
@@ -200,6 +205,8 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/mijn-dag/${dossierId}/jullie-gegevens", JullieGegevensPage.class);
         mountPage("/mijn-dag/${dossierId}/de-getuigen", DeGetuigenPage.class);
         mountPage("/mijn-dag/${dossierId}/extras", ExtrasPage.class);
+        mountPage("/mijn-dag/${dossierId}/controleren", ControlerenPage.class);
+        mountPage("/mijn-dag/${dossierId}/betalen", BetalingPage.class);
         mountPage("/mijn-dag/${dossierId}/aanvraag", AanvraagStatusPage.class);
         mountPage("/beheer/dossiers", DossierAdministrationPage.class);
         mountPage("/beheer/dossiers/nieuw", DossierCreatePage.class);

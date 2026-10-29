@@ -81,8 +81,12 @@ class DeDagPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
-    void zijbalkNoemtWatNogIngevuldMoetWorden_enLinktNaarHetJuisteTabblad() {
-        startPage(maakDossier(CeremonieSoort.KLEIN));
+    void controlerenPaginaNoemtWatNogIngevuldMoetWorden_enLinktNaarDeJuisteStap() {
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        PageParameters params = new PageParameters();
+        params.add("dossierId", dossierId.toString());
+        zetNavigatieHeaders();
+        tester.startPage(ControlerenPage.class, params);
 
         tester.assertContains("Kies een datum");
         tester.assertContains("Kies een trouwlocatie");
@@ -90,7 +94,7 @@ class DeDagPageTest extends BaseWicketTest {
         tester.assertContains("Kies allebei de achternaam die jullie willen gebruiken");
         tester.assertContains("Vul de gegevens van alle getuigen in");
 
-        klikOp("keuzesSidebar:bevestigForm:nogNietCompleetHint:specifiek:onderdelen:4:link");
+        klikOp("bevestigForm:nogNietCompleetHint:specifiek:onderdelen:4:link");
 
         tester.assertRenderedPage(DeGetuigenPage.class);
     }

@@ -79,7 +79,7 @@ public class TrouwboekjeAdministrationPage extends AdministrationBasePage {
                                      String componentId,
                                      IModel<ListTrouwboekjeDto> rowModel) {
                 cellItem.add(new Label(componentId,
-                        rowModel.map(dto -> dto.prijs() != null ? dto.prijs().toPlainString() : "")));
+                        rowModel.map(dto -> dto.prijs() != null ? dto.prijs().format() : "")));
             }
         });
 

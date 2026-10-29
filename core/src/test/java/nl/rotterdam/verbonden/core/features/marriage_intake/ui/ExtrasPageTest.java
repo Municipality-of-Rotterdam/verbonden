@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
@@ -19,11 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +41,7 @@ class ExtrasPageTest extends BaseWicketTest {
     @WithMockUser(username = "999990007")
     void trouwboekjeKiezen_slaatOpEnVerverstAlleenKeuzesEnSidebar() {
         long trouwboekjeId = trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
-                "Linnen trouwboekje", "Linnen", "/trouwboekjes/linnen.webp", new BigDecimal("42.50"), null, null));
+                "Linnen trouwboekje", "Linnen", "/trouwboekjes/linnen.webp", Bedrag.of("42.50"), null, null));
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990007")));
         ExtrasPage page = tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
@@ -98,6 +95,25 @@ class ExtrasPageTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString()).doesNotContain(INTERNATIONALE_AKTE_INTRO);
     }
 
+    @Test
+    @WithMockUser(username = "999990020")
+    void extraOptiesHebbenConsistenteKaartenEnPrijsStaatRechtsUitgelijnd() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null,
+                        new BurgerServiceNummer("999990020")));
+
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html.split("rd-extra-sectie card mb-4 p-4", -1)).hasSize(4);
+        assertThat(html).contains("rd-intake-content--unbordered");
+        assertThat(html.indexOf("Volgende stap"))
+                .isGreaterThan(html.lastIndexOf("rd-extra-sectie card mb-4 p-4"));
+        assertThat(html)
+                .contains("rd-trouwboekje-keuzes")
+                .contains("rd-extra-keuze-item d-flex align-items-center justify-content-between flex-wrap gap-2");
+    }
+
     private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, BurgerServiceNummer bsn) {
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, ceremonieSoort, null, bsn));
@@ -108,7 +124,6 @@ class ExtrasPageTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString()).contains(INTERNATIONALE_AKTE_INTRO);
         assertThat(tester.getLastResponseAsString()).contains("Internationale huwelijksakte");
         tester.assertLabel("pageLayout:pageLayout_body:pageBody:pageBody_body:extrasForm:internationaleAkteSection:internationaleAktePrijs",
-                new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL")))
-                        .format(InternationaleAkteTarief.prijsOp(LocalDate.now())));
+                InternationaleAkteTarief.prijsOp(LocalDate.now()).format());
     }
 }

@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.remote_local.features.mock_digid.ui;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import nl.rotterdam.verbonden.core.burger_common.BurgerBasePage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.MarriageIntakePage;
@@ -17,11 +18,15 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvid
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.flow.RedirectToUrlException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,6 +35,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class MockDigiDLoginPage extends BurgerBasePage {
+
+    private static final HttpSessionRequestCache REQUEST_CACHE = new HttpSessionRequestCache();
 
     private record TestBurger(String bsn, String naam, String beschrijving) implements Serializable {}
 
@@ -141,6 +148,22 @@ public class MockDigiDLoginPage extends BurgerBasePage {
         HttpSession session = request.getSession(true);
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
+        // Terug naar de pagina die de burger opvroeg voordat Spring Security naar /inloggen omleidde,
+        // bijvoorbeeld de uitnodigingslink van de partner
+        HttpServletResponse response = (HttpServletResponse) RequestCycle.get().getResponse().getContainerResponse();
+        SavedRequest savedRequest = REQUEST_CACHE.getRequest(request, response);
+        if (savedRequest != null) {
+            REQUEST_CACHE.removeRequest(request, response);
+            throw new RedirectToUrlException(zonderContinueParameter(savedRequest.getRedirectUrl()));
+        }
         setResponsePage(MarriageIntakePage.class);
+    }
+
+    /**
+     * Spring Security voegt {@code ?continue} toe aan de bewaarde URL. Die parameter is alleen nodig als de
+     * {@code RequestCacheAwareFilter} het bewaarde request moet opruimen; dat gebeurt hierboven al.
+     */
+    private static String zonderContinueParameter(String url) {
+        return UriComponentsBuilder.fromUriString(url).replaceQueryParam("continue").build().toUriString();
     }
 }

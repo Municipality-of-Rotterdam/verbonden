@@ -8,7 +8,10 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.util.visit.IVisit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -40,6 +43,30 @@ class DeGetuigenPageTest extends BaseWicketTest {
         tester.assertContains("Getuige 2");
         tester.assertContains("Getuige 3");
         tester.assertContains("Getuige 4");
+    }
+
+    @Test
+    @WithMockUser(username = "999990202")
+    void paginaToontGedeeldeStapindeling() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990202")));
+        tester.startPage(DeGetuigenPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        String html = tester.getLastResponseAsString();
+        int readAloud = html.indexOf("data-intake-read-aloud");
+        int previous = html.indexOf("Vorige stap");
+        int stepHeading = html.indexOf("De getuigen", previous);
+        int intro = html.indexOf("Geef hieronder de namen", stepHeading);
+        int content = html.indexOf("rd-intake-content", intro);
+        int next = html.indexOf("Volgende stap", content);
+
+        assertThat(html).contains("Maak jullie dag om nooit te vergeten", "rd-intake-step-layout");
+        assertThat(readAloud).isGreaterThanOrEqualTo(0);
+        assertThat(previous).isGreaterThan(readAloud);
+        assertThat(stepHeading).isGreaterThan(previous);
+        assertThat(intro).isGreaterThan(stepHeading);
+        assertThat(content).isGreaterThan(intro);
+        assertThat(next).isGreaterThan(content);
     }
 
     @Test
@@ -196,5 +223,45 @@ class DeGetuigenPageTest extends BaseWicketTest {
         assertThat(samenvatting.getuigenBevestigd()).isFalse();
         assertThat(samenvatting.getuigenGedeeltelijkIngevuld()).isFalse();
     }
-}
 
+    @Test
+    @WithMockUser(username = "999990202")
+    void getuigeOpslaanViaAjax_herlaadtDePaginaNiet() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990202")));
+        tester.startPage(DeGetuigenPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        FormComponent<?> naam = naamveldVanGetuige(1);
+        tester.getRequest().getPostParameters().setParameterValue(naam.getInputName(), "Jan Jansen");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.executeBehavior(naam.getBehaviors(AjaxFormComponentUpdatingBehavior.class).getFirst());
+
+        // Geen nieuwe page-request (die springt naar boven): alleen het veld en de sidebar worden ververst
+        tester.assertRenderedPage(DeGetuigenPage.class);
+        tester.assertComponentOnAjaxResponse("pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar");
+        assertThat(ajaxComponent("pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar")).contains("Jan Jansen");
+        assertThat(marriageIntakeService.findGetuigen(dossierId))
+                .extracting(GetuigeDto::naam)
+                .containsExactly("Jan Jansen");
+    }
+
+    /**
+     * De markup van een component in het laatste Ajax-antwoord.
+     */
+    private String ajaxComponent(String pad) {
+        String markupId = tester.getComponentFromLastRenderedPage(pad).getMarkupId();
+        String response = tester.getLastResponseAsString();
+        int start = response.indexOf("<component id=\"" + markupId + "\"");
+        assertThat(start).as("component %s in Ajax-antwoord", markupId).isGreaterThanOrEqualTo(0);
+        return response.substring(start, response.indexOf("</component>", start));
+    }
+
+    private FormComponent<?> naamveldVanGetuige(int volgnummer) {
+        String pad = "getuigen:" + (volgnummer - 1) + ":getuigeForm";
+        return tester.getLastRenderedPage().visitChildren(FormComponent.class, (FormComponent<?> component, IVisit<FormComponent<?>> visit) -> {
+            if (component.getPageRelativePath().contains(pad)) {
+                visit.stop(component);
+            }
+        });
+    }
+}

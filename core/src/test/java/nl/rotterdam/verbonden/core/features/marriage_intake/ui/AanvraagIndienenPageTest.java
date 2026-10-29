@@ -18,11 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class AanvraagIndienenPageTest extends BaseWicketTest {
 
-    private static final String SIDEBAR = "pageLayout:pageLayout_body:pageBody:pageBody_body:keuzesSidebar";
-    private static final String BEVESTIG_FORM = SIDEBAR + ":bevestigForm";
+    private static final String PAGE_BODY = "pageLayout:pageLayout_body:pageBody:pageBody_body";
+    private static final String BEVESTIG_FORM = PAGE_BODY + ":bevestigForm";
     private static final String BEVESTIG_BUTTON = BEVESTIG_FORM + ":bevestigButton";
-    private static final String DIALOG_CONTENT = BEVESTIG_FORM + ":bevestigDialog:content";
-    private static final String DIALOG_ACTIES = "bevestigDialog:content:footerContent:acties:acties_body:";
 
     @Autowired
     private CompleetDossierTestData testData;
@@ -38,7 +36,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
     void onvolledigDossier_bevestigButtonIsUitgeschakeld() {
         UUID dossierId = testData.maakConceptDossier();
 
-        tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
 
         tester.assertDisabled(BEVESTIG_BUTTON);
         tester.assertContains("Dit moet nog gebeuren voordat jullie je keuzes kunnen bevestigen");
@@ -46,50 +44,143 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990020")
-    void compleetDossier_bevestigButtonOpentBevestigingsdialoog() {
+    void controlerenToontCorrecteDagnaamEnBevestigingsinformatieVoorDeKnop() {
         UUID dossierId = testData.maakCompleetDossier();
-        tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
-        tester.assertEnabled(BEVESTIG_BUTTON);
-        tester.assertInvisible(DIALOG_CONTENT);
 
-        tester.executeAjaxEvent(BEVESTIG_BUTTON, "click");
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
 
-        tester.assertVisible(DIALOG_CONTENT);
-        tester.assertComponentOnAjaxResponse(DIALOG_CONTENT);
-        tester.assertContains("Wil je je keuzes definitief vastleggen\\?");
-        tester.assertContains("Rotterdam stuurt je een factuur voor de kosten.");
-        assertThat(tester.getLastResponseAsString()).contains(".showModal()");
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("Dé dag")
+                .contains("Controleer jullie keuzes goed.")
+                .contains("Na bevestiging gaan jullie verder naar de betalingspagina.")
+                .contains("Na betaling ontvangen jullie een bevestiging per e-mail.")
+                .contains("Jullie reservering blijft 3 dagen geldig.")
+                .contains("Binnen die periode kunnen jullie de aanvraag gratis aanpassen.")
+                .contains("Daarna is wijzigen niet meer mogelijk.")
+                .contains("Dan betalen jullie € 50 administratiekosten.")
+                .contains("rd-status-icon rd-status-icon--current-check")
+                .doesNotContain("<dialog");
+        String confirmButtonMarkupId = tester.getComponentFromLastRenderedPage(BEVESTIG_BUTTON).getMarkupId();
+        assertThat(html.indexOf("Controleer jullie keuzes goed."))
+                .isLessThan(html.indexOf("id=\"" + confirmButtonMarkupId + "\""));
     }
 
     @Test
     @WithMockUser(username = "999990020")
-    void annuleren_sluitDialoogEnLaatDossierOngewijzigd() {
+    void statusWordtOnderControlerenInDeSidebarGetoond() {
         UUID dossierId = testData.maakCompleetDossier();
-        tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
-        tester.executeAjaxEvent(BEVESTIG_BUTTON, "click");
+        marriageIntakeService.dienIn(dossierId);
 
-        tester.executeAjaxEvent(BEVESTIG_FORM + ":" + DIALOG_ACTIES + "annulerenButton", "click");
+        tester.startPage(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));
 
-        tester.assertInvisible(DIALOG_CONTENT);
+        String html = tester.getLastResponseAsString();
+        int controlerenSection = html.indexOf("rd-keuzes-section rd-progress-review");
+        assertThat(html.indexOf("Controleren", controlerenSection))
+                .isLessThan(html.indexOf("rd-keuzes-status", controlerenSection));
+        tester.assertVisible(PAGE_BODY + ":keuzesSidebar:controlerenSection:statusContainer");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void bevestigenOpentBetalingspaginaZonderDossierInTeDienen() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+        tester.assertEnabled(BEVESTIG_BUTTON);
+
+        tester.getRequest().setHeader("Origin", "http://localhost");
+        tester.newFormTester(BEVESTIG_FORM).submit("bevestigButton");
+
+        tester.assertRenderedPage(BetalingPage.class);
         assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
     }
 
     @Test
     @WithMockUser(username = "999990020")
-    void bevestigen_dientDossierInEnToontStatuspagina() {
+    void betalingUitvoerenDientDossierInEnToontStatuspagina() {
         UUID dossierId = testData.maakCompleetDossier();
-        tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
-        tester.executeAjaxEvent(BEVESTIG_BUTTON, "click");
+        tester.startPage(BetalingPage.class, makeDossierPageParameters(dossierId));
+        String betalingForm = PAGE_BODY + ":betalingForm";
+        tester.assertEnabled(betalingForm + ":betalingButton");
 
         // Zoals een browser: anders weigert Wicket's CSRF-bescherming de POST.
         tester.getRequest().setHeader("Origin", "http://localhost");
-        tester.newFormTester(BEVESTIG_FORM).submit(DIALOG_ACTIES + "indienenButton");
+        tester.newFormTester(betalingForm).submit("betalingButton");
 
         assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.INGEDIEND);
         tester.assertRenderedPage(AanvraagStatusPage.class);
         tester.assertContains("De huwelijksaanvraag is ontvangen en wordt in behandeling genomen.");
         tester.assertContains("Wat gebeurt er nu\\?");
-        tester.assertInvisible(BEVESTIG_FORM);
+        assertThat(tester.getLastResponseAsString()).doesNotContain("bevestigButton");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void betalingNietGeluktKeertTerugNaarControlerenMetMelding() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(BetalingPage.class, makeDossierPageParameters(dossierId));
+
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(PAGE_BODY + ":betalingMislukt");
+
+        tester.assertRenderedPage(ControlerenPage.class);
+        tester.assertVisible(PAGE_BODY + ":betalingMislukt");
+        tester.assertContains("De betaling is niet gelukt of afgebroken.");
+        assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
+
+        // De melding is eenmalig: na een refresh van de pagina is hij weg
+        tester.startPage(tester.getLastRenderedPage());
+        tester.assertRenderedPage(ControlerenPage.class);
+        tester.assertInvisible(PAGE_BODY + ":betalingMislukt");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void betaalknopBlijftActiefAlsDossierNietCompleetIs() {
+        UUID dossierId = testData.maakConceptDossier();
+        tester.startPage(BetalingPage.class, makeDossierPageParameters(dossierId));
+        String betalingForm = PAGE_BODY + ":betalingForm";
+
+        tester.assertEnabled(betalingForm + ":betalingButton");
+        tester.getRequest().setHeader("Origin", "http://localhost");
+        tester.newFormTester(betalingForm).submit("betalingButton");
+
+        tester.assertRenderedPage(ControlerenPage.class);
+        assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void extraStapNavigeertNaarControlerenEnTerug() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(ExtrasPage.class, makeDossierPageParameters(dossierId));
+        tester.assertEnabled(PAGE_BODY + ":volgendeStapContainer:volgendeStap");
+
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(PAGE_BODY + ":volgendeStapContainer:volgendeStap");
+
+        tester.assertRenderedPage(ControlerenPage.class);
+        tester.assertContains("Controleren");
+        tester.assertContains("Samenvatting");
+        tester.assertContains("Jullie gegevens");
+        tester.assertContains("De getuigen");
+        tester.assertContains("Totaal bedrag");
+        tester.assertEnabled(PAGE_BODY + ":bevestigForm:bevestigButton");
+
+        tester.assertEnabled(PAGE_BODY + ":vorigeStapContainer:vorigeStap");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(PAGE_BODY + ":vorigeStapContainer:vorigeStap");
+
+        tester.assertRenderedPage(ExtrasPage.class);
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.addRequestHeader("sec-fetch-mode", "navigate");
+        tester.clickLink(PAGE_BODY + ":vorigeStapContainer:vorigeStap");
+        tester.assertRenderedPage(DeGetuigenPage.class);
+        assertThat(SidebarStatusIconen.statusIcoon(tester.getLastResponseAsString(), IntakeStep.EXTRAS).getAttribute("class"))
+                .contains("rd-status-icon--complete");
     }
 
     @Test

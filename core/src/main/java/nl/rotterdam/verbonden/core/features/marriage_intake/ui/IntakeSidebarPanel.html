@@ -9,90 +9,94 @@
     <!-- Dé dag section -->
     <div class="rd-keuzes-section">
         <h3 class="rd-keuzes-section__heading">
-            <wicket:message key="intake.sidebar.section.dedag">Dé dag</wicket:message>
+            <span wicket:id="algemeenStatusIcon" aria-hidden="true"></span>
+            <a wicket:id="algemeenLink"><wicket:message key="intake.sidebar.section.algemeen">Algemeen</wicket:message></a>
         </h3>
 
         <div wicket:id="dossierGegevens">
             <!-- Registratie type (live updating on MarriageIntakePage via AJAX) -->
-            <a href="#" class="rd-keuzes-item rd-keuzes-item--link">
+            <div class="rd-keuzes-item">
                 <span wicket:id="registratieTypeLabel">type</span>
-            </a>
+            </div>
 
             <!-- Ceremony soort + prijs (only shown when a real dossier exists) -->
             <div wicket:id="ceremonieDossierGegevens"
                  class="rd-keuzes-item d-flex justify-content-between align-items-center">
-                <a href="#" class="rd-keuzes-item__label">
+                <span class="rd-keuzes-item__label">
                     <span wicket:id="ceremonieSoortLabel">soort</span>
-                </a>
+                </span>
                 <span class="rd-keuzes-item__prijs">
                     &#x20AC;&nbsp;<span wicket:id="ceremoniePrijs">prijs</span>
                 </span>
             </div>
 
+            <h4 class="rd-keuzes-subheading">
+                <span wicket:id="datumStatusIcon" aria-hidden="true"></span>
+                <a wicket:id="datumLink"><wicket:message key="intake.sidebar.section.datum">Datum &amp; Tijd</wicket:message></a>
+            </h4>
             <!-- Datum: shown when a date has been chosen -->
-            <a href="#" wicket:id="datumGekozen" class="rd-keuzes-item rd-keuzes-item--link">
+            <div wicket:id="datumGekozen" class="rd-keuzes-item">
                 <span wicket:id="datumLabel">datum</span>
                 <span wicket:id="tijdGekozen">&nbsp;<span wicket:id="tijdLabel">tijd</span></span>
-            </a>
+            </div>
             <!-- Datum: placeholder when no date chosen yet -->
-            <a href="#" wicket:id="datumNogKiezen" class="rd-keuzes-item rd-keuzes-item--link rd-keuzes-item--muted">
+            <div wicket:id="datumNogKiezen" class="rd-keuzes-item rd-keuzes-item--muted">
                 <wicket:message key="intake.sidebar.datum.nogniet">Datum nog kiezen</wicket:message>
-            </a>
+            </div>
 
             <!-- Locatie: shown when a location has been chosen -->
             <div wicket:id="locatieGekozen"
                  class="rd-keuzes-item d-flex justify-content-between align-items-center">
-                <a href="#" class="rd-keuzes-item__label">
-                    <span wicket:id="locatieLabel">locatie</span>
-                </a>
+                <span class="rd-keuzes-item__label" wicket:id="locatieLabel">locatie</span>
             </div>
             <!-- Locatie: placeholder when no location chosen yet -->
             <div wicket:id="locatieNogKiezen"
                  class="rd-keuzes-item d-flex justify-content-between align-items-center">
-                <a href="#" class="rd-keuzes-item__label rd-keuzes-item--muted">
+                <span class="rd-keuzes-item__label rd-keuzes-item--muted">
                     <wicket:message key="intake.sidebar.locatie.nogniet">Locatie nog kiezen</wicket:message>
-                </a>
+                </span>
             </div>
         </div>
     </div>
 
-    <hr class="rd-keuzes-divider"/>
-
     <!-- Gegevens & Getuigen section -->
     <div class="rd-keuzes-section">
         <h3 class="rd-keuzes-section__heading">
-            <wicket:message key="intake.sidebar.section.gegevens">Gegevens &amp; Getuigen</wicket:message>
+            <span wicket:id="gegevensProgressIcon" aria-hidden="true"></span>
+            <a wicket:id="gegevensLink"><wicket:message key="intake.sidebar.section.jullie.gegevens">Jullie gegevens</wicket:message></a>
         </h3>
 
-        <div wicket:id="gegevensStatusIcon" class="rd-keuzes-item rd-keuzes-item--status">
-            <span wicket:id="gegevensStatusCheckGreen" class="rd-status-icon rd-status-icon--check" aria-hidden="true"></span>
-            <span wicket:id="gegevensStatusCheckGrey" class="rd-status-icon rd-status-icon--check-partial" aria-hidden="true"></span>
-            <span wicket:id="gegevensStatusEmpty" class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
-            <a href="#" wicket:id="jullieGegevensLink"><wicket:message key="intake.sidebar.gegevens.link">Jullie gegevens</wicket:message></a>
+        <p wicket:id="geenGegevens" class="rd-keuzes-empty">
+            <wicket:message key="intake.sidebar.gegevens.nogniet">Nog geen gegevens ingevuld</wicket:message>
+        </p>
+        <div wicket:id="gekozenNamen" class="rd-keuzes-item">
+            <span wicket:id="gekozenNaam">Naam</span>
         </div>
-        <div wicket:id="getuigenRegel" class="rd-keuzes-item rd-keuzes-item--status">
-            <span wicket:id="getuigenStatusCheck" class="rd-status-icon rd-status-icon--check" aria-hidden="true"></span>
-            <span wicket:id="getuigenStatusPartial" class="rd-status-icon rd-status-icon--check-partial" aria-hidden="true"></span>
-            <span wicket:id="getuigenStatusEmpty" class="rd-status-icon rd-status-icon--empty" aria-hidden="true"></span>
-            <a href="#" wicket:id="getuigenLink"><wicket:message key="intake.sidebar.getuigen.link">Getuigen</wicket:message></a>
-        </div>
-
         <!-- Herinnering zolang de tweede partner het dossier nog niet heeft gekoppeld -->
         <div wicket:id="partnerHerinnering" class="rd-keuzes-info rd-keuzes-herinnering" role="note">
             <span class="rd-keuzes-info__icon" aria-hidden="true">&#9432;</span>
             <span>
                 <wicket:message key="intake.sidebar.partner.nietgekoppeld">Uw partner heeft het dossier nog niet gekoppeld.</wicket:message>
-                <a href="#" wicket:id="partnerUitnodigenLink"><wicket:message key="intake.sidebar.partner.uitnodigen">Partner uitnodigen</wicket:message></a>
             </span>
         </div>
-    </div>
+        <h4 class="rd-keuzes-subheading">
+            <span wicket:id="getuigenProgressIcon" aria-hidden="true"></span>
+            <a wicket:id="getuigenLink"><wicket:message key="intake.sidebar.section.getuigen">De getuigen</wicket:message></a>
+        </h4>
+        <p wicket:id="geenGetuigen" class="rd-keuzes-empty">
+            <wicket:message key="intake.sidebar.getuigen.nogniet">Nog geen getuigen ingevuld</wicket:message>
+        </p>
+        <div wicket:id="getuigenNamen" class="rd-keuzes-item">
+            <span wicket:id="getuigeNaam">Naam getuige</span>
+        </div>
 
-    <hr class="rd-keuzes-divider"/>
+    </div>
 
     <!-- Extra's section -->
     <div class="rd-keuzes-section">
         <h3 class="rd-keuzes-section__heading">
-            <wicket:message key="intake.sidebar.section.extras">Extra&#x2019;s</wicket:message>
+            <span wicket:id="extrasProgressIcon" aria-hidden="true"></span>
+            <a wicket:id="extrasLink"><wicket:message key="intake.sidebar.section.extras">Extra&#x2019;s</wicket:message></a>
         </h3>
         <p wicket:id="extrasNogNiet" class="rd-keuzes-empty">
             <wicket:message key="intake.sidebar.extras.nogniet">Nog geen extra&#x2019;s gekozen</wicket:message>
@@ -107,66 +111,19 @@
         </div>
     </div>
 
-    <hr class="rd-keuzes-divider"/>
-
-    <!-- Totaal section -->
-    <div wicket:id="totaalContainer" class="rd-keuzes-section">
-        <div class="rd-keuzes-item d-flex justify-content-between align-items-center rd-keuzes-item--totaal">
-            <strong><wicket:message key="intake.sidebar.totaal">Totaal</wicket:message></strong>
-            <span class="rd-keuzes-item__prijs">
-                &#x20AC;&nbsp;<span wicket:id="totaalPrijs">totaal</span>
+    <div wicket:id="controlerenSection" class="rd-keuzes-section rd-progress-review">
+        <h3 class="rd-keuzes-section__heading">
+            <span wicket:id="controlerenProgressIcon" aria-hidden="true"></span>
+            <a wicket:id="controlerenLink"><wicket:message key="intake.sidebar.controleren">Controleren</wicket:message></a>
+        </h3>
+        <div wicket:id="statusContainer" class="rd-keuzes-status" role="status">
+            <span class="rd-keuzes-status__label">
+                <wicket:message key="intake.sidebar.status">Status</wicket:message>
             </span>
+            <span wicket:id="statusLabel" class="rd-keuzes-status__badge">Ingediend</span>
         </div>
-    </div>
-
-    <hr class="rd-keuzes-divider"/>
-
-    <!-- Status (shown once the dossier has been submitted) -->
-    <div wicket:id="statusContainer" class="rd-keuzes-status" role="status">
-        <span class="rd-keuzes-status__label">
-            <wicket:message key="intake.sidebar.status">Status</wicket:message>
-        </span>
-        <span wicket:id="statusLabel" class="rd-keuzes-status__badge">Ingediend</span>
-    </div>
-
-    <!-- Confirm button + confirmation dialog -->
-    <form wicket:id="bevestigForm">
-        <button wicket:id="bevestigButton" type="submit"></button>
-        <div wicket:id="nogNietCompleetHint" class="rd-keuzes-hint">
-            <p wicket:id="algemeen" class="rd-keuzes-hint__tekst">
-                <wicket:message key="intake.sidebar.bevestig.nognietcompleet">Vul eerst alle onderdelen in. Daarna kunnen jullie je keuzes bevestigen.</wicket:message>
-            </p>
-            <wicket:container wicket:id="specifiek">
-                <p class="rd-keuzes-hint__tekst">
-                    <wicket:message key="intake.sidebar.bevestig.nogintevullen">Dit moet nog gebeuren voordat jullie je keuzes kunnen bevestigen:</wicket:message>
-                </p>
-                <ul class="rd-keuzes-hint__lijst">
-                    <li wicket:id="onderdelen"><a href="#" wicket:id="link"><span wicket:id="label">onderdeel</span></a></li>
-                </ul>
-            </wicket:container>
-        </div>
-
-        <dialog wicket:id="bevestigDialog" class="rd-bevestig-dialog">
-            <p class="rd-bevestig-dialog__factuur">
-                <span class="rd-bevestig-dialog__factuur-icoon" aria-hidden="true">&#x20AC;</span>
-                <wicket:message key="intake.bevestig.dialog.factuur">Rotterdam stuurt je een factuur voor de kosten.</wicket:message>
-            </p>
-        </dialog>
-    </form>
-
-    <!-- Info box -->
-    <div wicket:id="reserveringInfo" class="rd-keuzes-info" role="note">
-        <span class="rd-keuzes-info__icon" aria-hidden="true">&#9432;</span>
-        <wicket:message key="intake.sidebar.reservering.info">Jullie keuze blijft 3 dagen gereserveerd.</wicket:message>
     </div>
 
 </div>
-
-<wicket:fragment wicket:id="bevestigDialogActies">
-    <div wicket:id="acties">
-        <button wicket:id="indienenButton" type="submit"></button>
-        <button wicket:id="annulerenButton" type="submit" class="rd-bevestig-dialog__annuleren"></button>
-    </div>
-</wicket:fragment>
 
 </wicket:panel>

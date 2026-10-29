@@ -19,7 +19,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.math.BigDecimal;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -109,7 +109,7 @@ public class BeschikbaarheidUpdatePage extends AdministrationBasePage {
                             LambdaModel.of(model, BeschikbaarheidFormDto::getPrijs,
                                     BeschikbaarheidFormDto::setPrijs),
                             Model.of("Prijs (euro)")).setRequired(true).setHtmlInputType("number")
-                            .setModelType(BigDecimal.class),
+                            .setModelType(Bedrag.class),
                     new RdFormFieldTextInput<>("ingangsdatum",
                             LambdaModel.of(model, BeschikbaarheidFormDto::getIngangsdatum,
                                     BeschikbaarheidFormDto::setIngangsdatum),
@@ -135,7 +135,7 @@ public class BeschikbaarheidUpdatePage extends AdministrationBasePage {
                     f.getStartTijd(),
                     f.getEindTijd(),
                     f.getDuurInMinuten(),
-                    f.getPrijs() != null ? f.getPrijs() : BigDecimal.ZERO,
+                    f.getPrijs() != null ? f.getPrijs() : Bedrag.ZERO,
                     f.getIngangsdatum(),
                     f.getEinddatum()
             ));

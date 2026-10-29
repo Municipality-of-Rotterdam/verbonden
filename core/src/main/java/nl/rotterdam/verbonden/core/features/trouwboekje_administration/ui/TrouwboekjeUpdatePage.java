@@ -19,7 +19,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.math.BigDecimal;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import java.time.LocalDate;
 
 @AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
@@ -88,7 +88,7 @@ public class TrouwboekjeUpdatePage extends AdministrationBasePage {
                             LambdaModel.of(model, TrouwboekjeFormDto::getPrijs, TrouwboekjeFormDto::setPrijs),
                             Model.of("Prijs"),
                             Model.of("Prijs in euro's, bijv. 40.50"))
-                            .setModelType(BigDecimal.class),
+                            .setModelType(Bedrag.class),
                     new RdFormFieldTextInput<>("startdatum",
                             LambdaModel.of(model, TrouwboekjeFormDto::getStartdatum, TrouwboekjeFormDto::setStartdatum),
                             Model.of("Startdatum"),
