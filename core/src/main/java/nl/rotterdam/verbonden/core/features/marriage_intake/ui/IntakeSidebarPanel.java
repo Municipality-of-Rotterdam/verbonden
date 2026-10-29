@@ -74,7 +74,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         IModel<String> registratieModel = LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::registratieType, RegistratieType::getLabel));
         dossierGegevens.add(new Label("registratieTypeLabel", registratieModel));
-        add(stepLink("dedagLink", IntakeStep.MIJN_DAG));
+        add(stepLink("algemeenLink", IntakeStep.MIJN_DAG));
         dossierGegevens.add(stepLink("datumLink", IntakeStep.DE_DAG));
 
         // Ceremony row — only shown when a persisted dossier exists (id > 0)

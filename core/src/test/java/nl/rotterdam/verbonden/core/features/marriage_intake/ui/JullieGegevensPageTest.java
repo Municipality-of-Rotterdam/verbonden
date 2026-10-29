@@ -100,7 +100,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
 
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         tester.addRequestHeader("sec-fetch-mode", "navigate");
-        tester.clickLink(SIDEBAR + "dedagLink");
+        tester.clickLink(SIDEBAR + "algemeenLink");
 
         tester.assertRenderedPage(MarriageIntakePage.class);
     }

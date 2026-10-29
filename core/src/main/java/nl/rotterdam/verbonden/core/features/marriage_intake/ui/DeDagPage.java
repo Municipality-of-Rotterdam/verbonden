@@ -60,7 +60,7 @@ public class DeDagPage extends IntakeBasePage {
 
     @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return Model.of(marriageIntakeService.findByDossierId(dossierId));
+        return LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
     }
 
     public static void respond(UUID dossierId) {
