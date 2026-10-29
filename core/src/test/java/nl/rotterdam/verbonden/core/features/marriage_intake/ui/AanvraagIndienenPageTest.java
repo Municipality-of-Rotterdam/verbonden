@@ -39,7 +39,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
 
         tester.assertDisabled(BEVESTIG_BUTTON);
-        tester.assertContains("Dit moet nog gebeuren voordat jullie je keuzes kunnen bevestigen");
+        tester.assertContains("Dit moet nog gebeuren voordat u uw keuzes kunt bevestigen");
     }
 
     @Test
@@ -52,17 +52,17 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         String html = tester.getLastResponseAsString();
         assertThat(html)
                 .contains("Dé dag")
-                .contains("Controleer jullie keuzes goed.")
-                .contains("Na bevestiging gaan jullie verder naar de betalingspagina.")
-                .contains("Na betaling ontvangen jullie een bevestiging per e-mail.")
-                .contains("Jullie reservering blijft 3 dagen geldig.")
-                .contains("Binnen die periode kunnen jullie de aanvraag gratis aanpassen.")
+                .contains("Controleer uw keuzes goed.")
+                .contains("Na bevestiging gaat u verder naar de betalingspagina.")
+                .contains("Na betaling ontvangt u een bevestiging per e-mail.")
+                .contains("Uw reservering blijft 3 dagen geldig.")
+                .contains("Binnen die periode kunt u de aanvraag gratis aanpassen.")
                 .contains("Daarna is wijzigen niet meer mogelijk.")
-                .contains("Dan betalen jullie € 50 administratiekosten.")
+                .contains("Dan betaalt u € 50 administratiekosten.")
                 .contains("rd-status-icon rd-status-icon--current-check")
                 .doesNotContain("<dialog");
         String confirmButtonMarkupId = tester.getComponentFromLastRenderedPage(BEVESTIG_BUTTON).getMarkupId();
-        assertThat(html.indexOf("Controleer jullie keuzes goed."))
+        assertThat(html.indexOf("Controleer uw keuzes goed."))
                 .isLessThan(html.indexOf("id=\"" + confirmButtonMarkupId + "\""));
     }
 
@@ -109,7 +109,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
         assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.INGEDIEND);
         tester.assertRenderedPage(AanvraagStatusPage.class);
-        tester.assertContains("De huwelijksaanvraag is ontvangen en wordt in behandeling genomen.");
+        tester.assertContains("We hebben uw aanvraag ontvangen. De gemeente gaat die nu bekijken.");
         tester.assertContains("Wat gebeurt er nu\\?");
         assertThat(tester.getLastResponseAsString()).doesNotContain("bevestigButton");
     }
@@ -164,7 +164,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(ControlerenPage.class);
         tester.assertContains("Controleren");
         tester.assertContains("Samenvatting");
-        tester.assertContains("Jullie gegevens");
+        tester.assertContains("Uw gegevens");
         tester.assertContains("De getuigen");
         tester.assertContains("Totaal bedrag");
         tester.assertEnabled(PAGE_BODY + ":bevestigForm:bevestigButton");
@@ -219,7 +219,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.startPage(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));
 
         tester.assertRenderedPage(AanvraagStatusPage.class);
-        tester.assertContains("Jullie aanvraag is afgewezen");
+        tester.assertContains("Uw aanvraag is afgewezen");
         assertThat(tester.getLastResponseAsString()).doesNotContain("Wat gebeurt er nu?");
     }
 }

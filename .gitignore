@@ -42,3 +42,6 @@ application.properties
 
 ### Local MCP config (machine-specific, e.g. JetBrains IDE plugin port) ###
 .mcp.json
+
+### Local Claude Code settings (personal) ###
+.claude/settings.local.json
