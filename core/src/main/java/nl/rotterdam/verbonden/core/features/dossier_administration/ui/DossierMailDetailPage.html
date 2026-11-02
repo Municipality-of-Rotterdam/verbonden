@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>E-mail</title>
+</head>
+<body>
+<wicket:extend>
+    <h1 wicket:id="titel">E-mail</h1>
+
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar dossier</a></p>
+
+    <section class="rd-dossier-sectie">
+        <h2>Gegevens</h2>
+        <dl class="rd-dossier-gegevens">
+            <dt>Onderwerp</dt>
+            <dd wicket:id="onderwerp">-</dd>
+            <dt>Soort e-mail</dt>
+            <dd wicket:id="type">-</dd>
+            <dt>Afzender</dt>
+            <dd wicket:id="afzender">-</dd>
+            <dt>Ontvangers</dt>
+            <dd wicket:id="ontvangers">-</dd>
+            <dt>Aangemaakt op</dt>
+            <dd wicket:id="aangemaakt">-</dd>
+            <dt>Status</dt>
+            <dd wicket:id="status">-</dd>
+            <dt>Volgende poging</dt>
+            <dd wicket:id="volgendePoging">-</dd>
+        </dl>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <h2>Verzendpogingen</h2>
+        <table class="utrecht-table">
+            <thead class="utrecht-table__header">
+            <tr class="utrecht-table__row">
+                <th class="utrecht-table__header-cell">Poging</th>
+                <th class="utrecht-table__header-cell">Tijdstip</th>
+                <th class="utrecht-table__header-cell">Status</th>
+                <th class="utrecht-table__header-cell">Foutmelding</th>
+            </tr>
+            </thead>
+            <tbody class="utrecht-table__body">
+            <tr wicket:id="pogingen" class="utrecht-table__row">
+                <td class="utrecht-table__cell" wicket:id="volgnummer">1</td>
+                <td class="utrecht-table__cell" wicket:id="tijdstip">-</td>
+                <td class="utrecht-table__cell" wicket:id="pogingStatus">-</td>
+                <td class="utrecht-table__cell" wicket:id="foutmelding"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p wicket:id="geenPogingen"></p>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <h2>Inhoud</h2>
+        <iframe wicket:id="inhoud" sandbox="" title="Inhoud van de e-mail" class="w-100"
+                style="min-height: 40rem; border: 1px solid #ccc;"></iframe>
+    </section>
+</wicket:extend>
+</body>
+</html>
