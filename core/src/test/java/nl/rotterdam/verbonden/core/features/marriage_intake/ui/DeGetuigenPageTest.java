@@ -60,7 +60,7 @@ class DeGetuigenPageTest extends BaseWicketTest {
         int content = html.indexOf("rd-intake-content", intro);
         int next = html.indexOf("Volgende stap", content);
 
-        assertThat(html).contains("Maak jullie dag om nooit te vergeten", "rd-intake-step-layout");
+        assertThat(html).contains("Maak uw dag om nooit te vergeten", "rd-intake-step-layout");
         assertThat(readAloud).isGreaterThanOrEqualTo(0);
         assertThat(previous).isGreaterThan(readAloud);
         assertThat(stepHeading).isGreaterThan(previous);

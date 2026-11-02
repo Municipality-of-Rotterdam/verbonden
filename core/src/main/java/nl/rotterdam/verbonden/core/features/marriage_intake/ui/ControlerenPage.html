@@ -4,7 +4,7 @@
 
     <div class="rd-controleer-kaart">
         <h2><wicket:message key="controleren.samenvatting">Samenvatting</wicket:message></h2>
-        <p><wicket:message key="controleren.samenvatting.intro">Pas jullie keuzes aan via de links bij de onderdelen.</wicket:message></p>
+        <p><wicket:message key="controleren.samenvatting.intro">Pas uw keuzes aan via de links bij de onderdelen.</wicket:message></p>
 
         <section class="rd-controleer-sectie">
             <div class="rd-controleer-sectie__kop">
@@ -31,7 +31,7 @@
 
         <section class="rd-controleer-sectie">
             <div class="rd-controleer-sectie__kop">
-                <h3><wicket:message key="controleren.jullie.gegevens">Jullie gegevens</wicket:message></h3>
+                <h3><wicket:message key="controleren.jullie.gegevens">Uw gegevens</wicket:message></h3>
                 <a wicket:id="wijzigGegevens"><wicket:message key="controleren.aanpassen">Aanpassen</wicket:message></a>
             </div>
             <div wicket:id="partners" class="rd-controleer-rij">
@@ -73,19 +73,19 @@
 
     <form wicket:id="bevestigForm" class="rd-controleer-bevestigen">
         <div class="rd-controleer-bevestig-informatie" role="note">
-            <p><wicket:message key="controleren.betalen.voorbereiding">Controleer jullie keuzes goed. Na bevestiging gaan jullie verder naar de betalingspagina.</wicket:message></p>
-            <p><wicket:message key="controleren.betalen.pagina">Na betaling ontvangen jullie een bevestiging per e-mail.</wicket:message></p>
-            <p><wicket:message key="controleren.betalen.reservering">Jullie reservering blijft 3 dagen geldig. Binnen die periode kunnen jullie de aanvraag gratis aanpassen. Daarna is wijzigen niet meer mogelijk.</wicket:message></p>
-            <p><wicket:message key="controleren.betalen.annuleren">Annuleren jullie na die 3 dagen? Dan betalen jullie € 50 administratiekosten.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.voorbereiding">Controleer uw keuzes goed. Na bevestiging gaat u verder naar de betalingspagina.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.pagina">Na betaling ontvangt u een bevestiging per e-mail.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.reservering">Uw reservering blijft 3 dagen geldig. Binnen die periode kunt u de aanvraag gratis aanpassen. Daarna is wijzigen niet meer mogelijk.</wicket:message></p>
+            <p><wicket:message key="controleren.betalen.annuleren">Annuleert u na die 3 dagen? Dan betaalt u € 50 administratiekosten.</wicket:message></p>
         </div>
         <button wicket:id="bevestigButton" type="submit"></button>
         <div wicket:id="nogNietCompleetHint" class="rd-keuzes-hint">
             <p wicket:id="algemeen" class="rd-keuzes-hint__tekst">
-                <wicket:message key="intake.sidebar.bevestig.nognietcompleet">Vul eerst alle onderdelen in. Daarna kunnen jullie je keuzes bevestigen.</wicket:message>
+                <wicket:message key="intake.sidebar.bevestig.nognietcompleet">Vul eerst alle onderdelen in. Daarna kunt u uw keuzes bevestigen.</wicket:message>
             </p>
             <wicket:container wicket:id="specifiek">
                 <p class="rd-keuzes-hint__tekst">
-                    <wicket:message key="intake.sidebar.bevestig.nogintevullen">Dit moet nog gebeuren voordat jullie je keuzes kunnen bevestigen:</wicket:message>
+                    <wicket:message key="intake.sidebar.bevestig.nogintevullen">Dit moet nog gebeuren voordat u uw keuzes kunt bevestigen:</wicket:message>
                 </p>
                 <ul class="rd-keuzes-hint__lijst">
                     <li wicket:id="onderdelen"><a href="#" wicket:id="link"><span wicket:id="label">onderdeel</span></a></li>

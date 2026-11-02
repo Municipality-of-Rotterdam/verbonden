@@ -134,10 +134,10 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.startPage(DeGetuigenPage.class, params);
         tester.assertVisible(SIDEBAR + "partnerHerinnering");
         String html = tester.getLastResponseAsString();
-        assertThat(html).contains("Uw partner heeft het dossier nog niet gekoppeld.")
+        assertThat(html).contains("Uw partner doet nog niet mee.")
                 .doesNotContain("partnerUitnodigenLink");
         int sidebarStart = html.indexOf("rd-keuzes-panel");
-        assertThat(html.indexOf("Uw partner heeft het dossier nog niet gekoppeld.", sidebarStart))
+        assertThat(html.indexOf("Uw partner doet nog niet mee.", sidebarStart))
                 .isLessThan(html.indexOf("De getuigen", sidebarStart));
     }
 

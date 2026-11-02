@@ -233,7 +233,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(DeDagPage.class);
         // The links on the page point to the citizen's own dossier
         assertThat(tester.getLastResponseAsString()).contains(eigenDossierId.toString());
-        tester.assertContains("U bent automatisch omgeleid naar uw eigen dossier");
+        tester.assertContains("Daarom ziet u nu uw eigen aanvraag");
     }
 
     @Test
@@ -245,7 +245,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.startPage(DatumKiezenPage.class, dossierParams(anderDossierId));
 
         tester.assertRenderedPage(MarriageIntakePage.class);
-        tester.assertContains("U bent niet gemachtigd om het opgevraagde dossier in te zien");
+        tester.assertContains("U mag deze aanvraag niet bekijken");
     }
 
     @Test
