@@ -33,6 +33,7 @@ Elke feature-package bevat de volgende sub-packages:
     - **Gebruik altijd primitieven** (`long`, `int`, `boolean`, …) in plaats van wrapper-typen (`Long`, `Integer`, `Boolean`, …) waar dat mogelijk is — dit geldt voor methode-parameters én retourtypen in services én repositories.
 
 ### Wicket
+- Roep in `onInitialize()` nooit `getObject()` aan op een `LoadableDetachableModel` of een model dat daarvan afhankelijk is. Gebruik afgeleide modellen via `model.map(...)` voor componenten en zichtbaarheid, zodat data pas tijdens renderen wordt geladen en na detach bij een volgende request wordt vernieuwd.
 - Injecteer altijd een service **interface** (niet de implementatie) via `@SpringBean`, zodat Wicket een JDK dynamic proxy kan aanmaken (voorkomt CGLIB-/Objenesis-problemen zonder no-arg constructor).
 - Activeer het Rotterdam NLDS-thema via `PatchingNldsRotterdamDesignSystemThemeBehavior.INSTANCE` direct op de page (niet via een `TransparentWebMarkupContainer` op `<html>`), zodat `<wicket:fragment>`-tags vindbaar blijven.
 - **`RdFormFieldTextInput` met een niet-`String` modeltype:** wanneer het HTML-inputtype een custom Java-type vereist (bijv. `setHtmlInputType("time")` → `LocalTime`, `setHtmlInputType("date")` → `LocalDate`, `setHtmlInputType("number")` → `Integer`/`BigDecimal`), roep dan altijd `setModelType(Xxx.class)` aan zodat Wicket het type correct kan converteren bij formulier-submit. Voorbeeld: `.setHtmlInputType("time").setModelType(LocalTime.class)`.
@@ -81,3 +82,9 @@ Elke feature-package bevat de volgende sub-packages:
 - Value types worden gebruikt in JPA Entities, DTOs (`CreateXxxDto`, `ChangeXxxDto`, `ListXxxDto`) en `FormDto`-klassen — consistent door alle lagen heen.
 - `ValueHolder<T>` staat in `nl.rotterdam.verbonden.domain` — een gedeeld package, niet in een feature-package — zodat meerdere features het kunnen hergebruiken.
 - Concrete value types (bijv. `PersonFullName`, `Telefoonnummer`, `Emailadres`, `BurgerServiceNummer`) staan **ook** in `nl.rotterdam.verbonden.domain`, samen met hun exceptions: ze zijn applicatiebreed en niet aan één feature gebonden. Alleen hun `AttributeConverter` (in `persistence`) en eventuele `IConverter` (in een `ui`-package) blijven bij de laag waar ze worden gebruikt.
+
+### Teksten
+- Schrijf teksten op burgerpagina's (o.a. `marriage_intake`, `burger_common`) op **taalniveau B1**, volgens de regels in `.claude/skills/taalniveau/SKILL.md`. Dit geldt voor alle tekst die een burger ziet: koppen, uitleg, knoppen, foutmeldingen en validatiemeldingen.
+- Spreek de burger aan met **u/uw**, ook als de tekst over beide partners gaat ("Plan uw dag", "U kunt", "Uw gegevens"). Gebruik nooit je/jij/jouw of jullie.
+- Controleer nieuwe of gewijzigde burgerteksten met die skill voordat je ze oplevert.
+- Beheerpagina's zijn voor medewerkers; daar is vaktaal toegestaan (C1). Schrijf ook daar zo eenvoudig als het kan.

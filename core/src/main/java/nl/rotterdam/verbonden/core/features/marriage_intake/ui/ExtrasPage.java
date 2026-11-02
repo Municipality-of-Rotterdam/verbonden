@@ -6,7 +6,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenv
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -25,11 +24,7 @@ import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -51,6 +46,16 @@ public class ExtrasPage extends IntakeBasePage {
     }
 
     @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("extras.heading");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("extras.intro");
+    }
+
+    @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
         return LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
     }
@@ -63,10 +68,13 @@ public class ExtrasPage extends IntakeBasePage {
     }
 
     @Override
+    protected boolean hasIntakeContentBorder() {
+        return false;
+    }
+
+    @Override
     protected void onInitialize() {
         super.onInitialize();
-
-        pageBody.add(new RdHeading("heading", getString("extras.heading"), 1));
 
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
         SaveExtrasDto selecties = marriageIntakeService.findExtrasSelecties(dossierId);
@@ -106,7 +114,6 @@ public class ExtrasPage extends IntakeBasePage {
                 }
             });
             ringenSection.add(ringenCheckbox);
-            add(ringenSection);
 
             // --- Muziek ---
             WebMarkupContainer muziekSection = new WebMarkupContainer("muziekSection") {
@@ -126,7 +133,9 @@ public class ExtrasPage extends IntakeBasePage {
                 }
             });
             muziekSection.add(muziekCheckbox);
-            add(muziekSection);
+            WebMarkupContainer ceremonieExtrasSection = new WebMarkupContainer("ceremonieExtrasSection");
+            ceremonieExtrasSection.add(ringenSection, muziekSection);
+            add(ceremonieExtrasSection);
 
             // --- Trouwboekje ---
             List<TrouwboekjeKeuzeDto> trouwboekjes = marriageIntakeService.findActieveTrouwboekjes();
@@ -154,7 +163,7 @@ public class ExtrasPage extends IntakeBasePage {
                 }
             });
             internationaleAkteSection.add(internationaleAkteCheckbox, new Label("internationaleAktePrijs",
-                    formatPrijs(marriageIntakeService.findInternationaleAktePrijs(dossierId))));
+                    marriageIntakeService.findInternationaleAktePrijs(dossierId).format()));
             add(internationaleAkteSection);
         }
 
@@ -180,7 +189,7 @@ public class ExtrasPage extends IntakeBasePage {
                     WebMarkupContainer prijsContainer = new WebMarkupContainer("prijsContainer");
                     prijsContainer.setVisible(trouwboekje.prijs() != null);
                     if (trouwboekje.prijs() != null) {
-                        prijsContainer.add(new Label("prijs", Model.of(formatPrijs(trouwboekje.prijs()))));
+                        prijsContainer.add(new Label("prijs", Model.of(trouwboekje.prijs().format())));
                     } else {
                         prijsContainer.add(new Label("prijs", Model.of("")));
                     }
@@ -215,9 +224,6 @@ public class ExtrasPage extends IntakeBasePage {
             };
         }
 
-        private String formatPrijs(BigDecimal prijs) {
-            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(prijs);
-        }
 
         @Override
         protected void onSubmit() {

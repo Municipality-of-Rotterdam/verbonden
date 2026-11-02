@@ -1,9 +1,9 @@
 package nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui;
 
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.ChangeTrouwboekjeDto;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class TrouwboekjeFormDto implements Serializable {
@@ -11,7 +11,7 @@ public class TrouwboekjeFormDto implements Serializable {
     private String naam;
     private String omschrijving;
     private String afbeelding;
-    private BigDecimal prijs;
+    private Bedrag prijs;
     private LocalDate startdatum;
     private LocalDate einddatum;
 
@@ -54,11 +54,11 @@ public class TrouwboekjeFormDto implements Serializable {
         this.afbeelding = afbeelding;
     }
 
-    public BigDecimal getPrijs() {
+    public Bedrag getPrijs() {
         return prijs;
     }
 
-    public void setPrijs(BigDecimal prijs) {
+    public void setPrijs(Bedrag prijs) {
         this.prijs = prijs;
     }
 

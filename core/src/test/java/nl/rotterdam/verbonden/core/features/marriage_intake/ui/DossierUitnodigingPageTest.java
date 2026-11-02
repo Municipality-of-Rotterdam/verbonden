@@ -32,7 +32,7 @@ class DossierUitnodigingPageTest extends BaseWicketTest {
         tester.startPage(MarriageIntakePage.class, dossierParameters(dossierId));
 
         tester.assertRenderedPage(DossierUitnodigingPage.class);
-        tester.assertContains("Ja, Ik wil!");
+        tester.assertContains("Ja, ik wil!");
         assertThat(marriageIntakeService.findDossierIdByBsn(new BurgerServiceNummer(PARTNER_2))).isEmpty();
     }
 
@@ -60,7 +60,7 @@ class DossierUitnodigingPageTest extends BaseWicketTest {
         tester.startPage(MarriageIntakePage.class, dossierParameters(dossierId));
 
         tester.assertRenderedPage(DossierUitnodigingPage.class);
-        tester.assertContains("dan vervalt je eigen aanvraag");
+        tester.assertContains("Dan stopt uw eigen aanvraag");
     }
 
     @Test

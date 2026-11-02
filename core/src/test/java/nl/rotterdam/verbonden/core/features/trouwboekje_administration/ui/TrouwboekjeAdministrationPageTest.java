@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui;
 
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.CreateTrouwboekjeDto;
 import nl.rotterdam.verbonden.core.identity.Roles;
@@ -23,7 +24,7 @@ class TrouwboekjeAdministrationPageTest extends BaseWicketTest {
     @Test
     void toontIconenVoorBewerkenEnVerwijderen() {
         trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
-                "Linnen trouwboekje", "Met linnen kaft", null, new BigDecimal("42.50"), null, null));
+                "Linnen trouwboekje", "Met linnen kaft", null, new Bedrag(new BigDecimal("42.50")), null, null));
 
         tester.startPage(TrouwboekjeAdministrationPage.class);
 

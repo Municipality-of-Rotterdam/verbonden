@@ -14,6 +14,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -31,8 +32,6 @@ import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.lang.Bytes;
 
-import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -336,7 +335,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         return datumTijd != null ? datumTijd.format(DATUM_TIJD) : "-";
     }
 
-    private static String prijs(BigDecimal prijs) {
-        return prijs != null ? NumberFormat.getCurrencyInstance(NEDERLAND).format(prijs) : "-";
+    private static String prijs(Bedrag prijs) {
+        return prijs != null ? "€ " + prijs.format() : "-";
     }
 }

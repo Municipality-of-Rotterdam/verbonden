@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.location_administration.domain;
 
-import java.math.BigDecimal;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,7 +13,7 @@ public record CreateBeschikbaarheidDto(
         LocalTime startTijd,
         LocalTime eindTijd,
         int duurInMinuten,
-        BigDecimal prijs,
+        Bedrag prijs,
         LocalDate ingangsdatum,
         LocalDate einddatum
 ) {

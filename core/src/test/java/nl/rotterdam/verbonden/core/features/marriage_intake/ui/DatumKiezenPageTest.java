@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -233,7 +233,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(DeDagPage.class);
         // The links on the page point to the citizen's own dossier
         assertThat(tester.getLastResponseAsString()).contains(eigenDossierId.toString());
-        tester.assertContains("U bent automatisch omgeleid naar uw eigen dossier");
+        tester.assertContains("Daarom ziet u nu uw eigen aanvraag");
     }
 
     @Test
@@ -245,7 +245,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
         tester.startPage(DatumKiezenPage.class, dossierParams(anderDossierId));
 
         tester.assertRenderedPage(MarriageIntakePage.class);
-        tester.assertContains("U bent niet gemachtigd om het opgevraagde dossier in te zien");
+        tester.assertContains("U mag deze aanvraag niet bekijken");
     }
 
     @Test
@@ -302,7 +302,7 @@ class DatumKiezenPageTest extends BaseWicketTest {
     private void maakBeschikbaarheid(long locatieId, HuwelijksType type,
                                      DayOfWeek dag, LocalTime start, LocalTime eind, int duur) {
         locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
-                locatieId, type, dag, start, eind, duur, BigDecimal.ZERO,
+                locatieId, type, dag, start, eind, duur, Bedrag.ZERO,
                 LocalDate.now().minusMonths(1), LocalDate.now().plusYears(2)));
     }
 }

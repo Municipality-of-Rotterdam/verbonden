@@ -3,9 +3,9 @@ package nl.rotterdam.verbonden.core.features.marriage_type_administration.ui;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.domain.ChangeMarriageTypeDto;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 
 public class MarriageTypeFormDto implements Serializable {
@@ -13,7 +13,7 @@ public class MarriageTypeFormDto implements Serializable {
     private CeremonieSoort soort = null;
     private String titel = "";
     private String tekst = "";
-    private BigDecimal prijs = null;
+    private Bedrag prijs = null;
     private String url = "";
     private ListLocatieDto locatie = null;
     private boolean active = true;
@@ -27,8 +27,8 @@ public class MarriageTypeFormDto implements Serializable {
     public String getTekst() { return tekst; }
     public void setTekst(String tekst) { this.tekst = tekst; }
 
-    public BigDecimal getPrijs() { return prijs; }
-    public void setPrijs(BigDecimal prijs) { this.prijs = prijs; }
+    public Bedrag getPrijs() { return prijs; }
+    public void setPrijs(Bedrag prijs) { this.prijs = prijs; }
 
     public String getUrl() { return url; }
     public void setUrl(String url) { this.url = url; }

@@ -7,15 +7,17 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.nl_design_system.wicket.components.fieldset.RdFieldset;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
-import nl.rotterdam.nl_design_system.wicket.components.heading.RdHeading;
+import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.util.ListModel;
@@ -44,8 +46,18 @@ public class DeGetuigenPage extends IntakeBasePage {
     }
 
     @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("intake.step.getuigen");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("de.getuigen.intro");
+    }
+
+    @Override
     protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
-        return Model.of(marriageIntakeService.findByDossierId(dossierId));
+        return LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
     }
 
     public static void respond(UUID dossierId) {
@@ -58,9 +70,6 @@ public class DeGetuigenPage extends IntakeBasePage {
     @Override
     protected void onInitialize() {
         super.onInitialize();
-
-        pageBody.add(new RdHeading("heading", getString("de.getuigen.heading"), 1));
-        pageBody.add(new Label("intro", new ResourceModel("de.getuigen.intro")));
 
         DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
         int maxGetuigen = dossier.ceremonieSoort().getAantalGetuigen();
@@ -75,7 +84,13 @@ public class DeGetuigenPage extends IntakeBasePage {
         }.setReuseItems(true));
     }
 
+    /**
+     * Slaat een getuige op via Ajax en ververst alleen het veld en de sidebar, zodat de pagina op mobiel niet naar
+     * boven springt.
+     */
     private class GetuigeForm extends Form<GetuigenItemFormDto> {
+
+        private RdFormFieldTextInput<PersonFullName> naamVeld;
 
         GetuigeForm(String id, IModel<GetuigenItemFormDto> model) {
             super(id, model);
@@ -88,38 +103,71 @@ public class DeGetuigenPage extends IntakeBasePage {
             IModel<GetuigenItemFormDto> model = getModel();
             int volgnummer = model.getObject().getVolgnummer();
 
+            naamVeld = new RdFormFieldTextInput<>("naam",
+                    LambdaModel.of(model, GetuigenItemFormDto::getNaam, GetuigenItemFormDto::setNaam),
+                    new ResourceModel("de.getuigen.naam.label"));
+            naamVeld.setModelType(PersonFullName.class);
+            naamVeld.setOutputMarkupId(true);
+            naamVeld.withTextInput((rdTextInput, _) -> rdTextInput.add(
+                    new AjaxFormComponentUpdatingBehavior("change") {
+                        @Override
+                        protected void onUpdate(AjaxRequestTarget target) {
+                            slaOp(target);
+                        }
+
+                        @Override
+                        protected void onError(AjaxRequestTarget target, RuntimeException e) {
+                            target.add(naamVeld);
+                        }
+                    }
+            ));
+
             RdFieldset<String> fieldset = new RdFieldset<>(
                     "getuigeFieldset", NULL_STRING_MODEL,
                     Model.of(getString("de.getuigen.getuige") + " " + volgnummer));
-            fieldset.add(
-                    new RdFormFieldTextInput<>("naam",
-                            LambdaModel.of(model, GetuigenItemFormDto::getNaam, GetuigenItemFormDto::setNaam),
-                            new ResourceModel("de.getuigen.naam.label"))
-                            .setModelType(PersonFullName.class)
-                            .withTextInput((rdTextInput, _) -> rdTextInput.add(
-                                    new AjaxFormComponentUpdatingBehavior("change") {
-                                        @Override
-                                        protected void onUpdate(AjaxRequestTarget target) {
-                                            slaOp();
-                                        }
-                                    }
-                            ))
-            );
+            fieldset.add(naamVeld);
             add(fieldset);
+
+            // Enter of "Gereed" op het mobiele toetsenbord verstuurt het formulier ook via Ajax
+            add(new AjaxFormSubmitBehavior(this, "submit") {
+                @Override
+                protected void updateAjaxAttributes(AjaxRequestAttributes attributes) {
+                    super.updateAjaxAttributes(attributes);
+                    attributes.setPreventDefault(true);
+                }
+
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    // Opslaan gebeurt al in Form#onSubmit(), dat deze behavior ook aanroept
+                    target.add(naamVeld, keuzesSidebar);
+                }
+
+                @Override
+                protected void onError(AjaxRequestTarget target) {
+                    target.add(naamVeld);
+                }
+            });
         }
 
+        /**
+         * Wordt aangeroepen bij zowel de Ajax-submit als een gewone submit zonder JavaScript. Geen redirect: die zou ook
+         * het Ajax-antwoord vervangen en de pagina laten herladen.
+         */
         @Override
         protected void onSubmit() {
-            slaOp();
+            opslaan();
         }
 
-        private void slaOp() {
+        private void slaOp(AjaxRequestTarget target) {
+            opslaan();
+            target.add(naamVeld, keuzesSidebar);
+        }
+
+        private void opslaan() {
             GetuigenItemFormDto formDto = getModelObject();
             PersonFullName naam = formDto.getNaam();
             marriageIntakeService.slaGetuigeOp(dossierId,
                     new SaveGetuigenDto(formDto.getVolgnummer(), naam==null ? null : naam.getValue()));
-            setResponsePage(DeGetuigenPage.class, makeDossierPageParameters(dossierId));
         }
     }
 }
-

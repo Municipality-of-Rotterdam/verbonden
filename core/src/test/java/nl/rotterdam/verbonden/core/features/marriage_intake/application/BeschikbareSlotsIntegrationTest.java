@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
@@ -27,7 +28,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -597,7 +597,7 @@ class BeschikbareSlotsIntegrationTest {
     private void maakBeschikbaarheid(long locatieId, HuwelijksType type,
                                      DayOfWeek dag, LocalTime start, LocalTime eind, int duur) {
         locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
-                locatieId, type, dag, start, eind, duur, BigDecimal.ZERO,
+                locatieId, type, dag, start, eind, duur, Bedrag.ZERO,
                 vandaag.minusMonths(1), vandaag.plusYears(2)));
     }
 

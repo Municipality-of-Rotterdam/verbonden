@@ -28,6 +28,32 @@ class MarriageIntakePageTest extends BaseWicketTest {
         tester.assertRenderedPage(MarriageIntakePage.class);
     }
 
+    @Test
+    @WithMockUser(username = "999990007")
+    void registratieEnCeremoniekeuzeHebbenEigenKaartZonderOmvattendeRand() {
+        tester.startPage(MarriageIntakePage.class);
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("rd-intake-content--unbordered")
+                .contains("rd-intake-step-layout--first-step")
+                .contains("rd-ceremonie-kaart");
+        assertThat(html.split("class=\"rd-card", -1)).hasSize(3);
+    }
+
+    /**
+     * De kenmerken van de ceremonie komen uit de database; V40 herschrijft de geseede teksten naar B1.
+     */
+    @Test
+    @WithMockUser(username = "999990007")
+    void toontKenmerkenVanDeCeremonieOpTaalniveauB1() {
+        tester.startPage(MarriageIntakePage.class);
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("U kiest zelf de datum (als die vrij is)")
+                .doesNotContain("mits beschikbaar");
+    }
+
     /**
      * De inleidende tekst staat in één property en gebruikt {@code <br/>} voor regelafbrekingen.
      */
