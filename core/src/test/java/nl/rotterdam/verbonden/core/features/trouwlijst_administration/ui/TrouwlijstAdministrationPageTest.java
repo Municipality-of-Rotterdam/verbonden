@@ -17,7 +17,7 @@ class TrouwlijstAdministrationPageTest extends BaseWicketTest {
         tester.startPage(TrouwlijstAdministrationPage.class);
 
         tester.assertRenderedPage(TrouwlijstAdministrationPage.class);
-        tester.assertInvisible(pad("exporteerLink"));
+        tester.assertInvisible(pad("exporteerForm"));
     }
 
     @Test
@@ -28,7 +28,17 @@ class TrouwlijstAdministrationPageTest extends BaseWicketTest {
         formTester("filterForm").select(weekVeld, 1);
         tester.executeAjaxEvent(pad("filterForm") + ":" + weekVeld, "change");
 
-        tester.assertVisible(pad("exporteerLink"));
-        assertThat(tester.getLastResponseAsString()).contains("Export lijst");
+        tester.assertVisible(pad("exporteerForm"));
+        assertThat(tester.getLastResponseAsString()).contains("Export lijst")
+                .contains("<button");
+    }
+
+    @Test
+    void exportknopIsEenGestijldeKnop() {
+        tester.startPage(TrouwlijstAdministrationPage.class);
+        String weekVeld = veld("filterForm", "input");
+        formTester("filterForm").select(weekVeld, 1);
+        tester.executeAjaxEvent(pad("filterForm") + ":" + weekVeld, "change");
+        assertThat(tester.getLastResponseAsString()).containsPattern("<button[^>]*utrecht-button[^>]*>\\s*(<[^>]*>)*\\s*Export lijst");
     }
 }

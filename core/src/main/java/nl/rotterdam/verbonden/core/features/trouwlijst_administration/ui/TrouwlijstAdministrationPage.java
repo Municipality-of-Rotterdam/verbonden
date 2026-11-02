@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.features.trouwlijst_administration.ui;
 
+import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
 import nl.rotterdam.verbonden.core.administration_common.RdFormFieldSelect;
@@ -19,7 +20,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.LambdaChoiceRenderer;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
@@ -74,7 +74,7 @@ public class TrouwlijstAdministrationPage extends AdministrationBasePage {
         resultaat.setOutputMarkupId(true);
         resultaat.add(
                 new RdDataTable<>("dossierTable", buildColumns(), new DossierDataProvider(), 50),
-                new ExporteerLink("exporteerLink")
+                new ExporteerForm("exporteerForm")
         );
         pageBody.add(new FilterForm("filterForm"), resultaat);
     }
@@ -176,10 +176,16 @@ public class TrouwlijstAdministrationPage extends AdministrationBasePage {
         }
     }
 
-    private class ExporteerLink extends Link<Void> {
+    private class ExporteerForm extends Form<Void> {
 
-        ExporteerLink(String id) {
+        ExporteerForm(String id) {
             super(id);
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            add(new RdButton("exporteerButton", Model.of("Export lijst")));
         }
 
         @Override
@@ -188,7 +194,7 @@ public class TrouwlijstAdministrationPage extends AdministrationBasePage {
         }
 
         @Override
-        public void onClick() {
+        protected void onSubmit() {
             TrouwlijstWeekDto week = weekModel.getObject();
             LocalDate van = week.van();
             byte[] excel = trouwlijstAdministrationService.exporteer(van, week.tot());
