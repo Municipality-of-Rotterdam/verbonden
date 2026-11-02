@@ -44,8 +44,8 @@ class AdministrationBasePageTest extends BaseWicketTest {
     void toontHetVerbondenLogo() {
         tester.startPage(BabsAdministrationPage.class);
 
-        assertThat(tester.getLastResponseAsString()).contains("src=\"/images/verbonden-logo.svg\"");
-        assertThat(getClass().getResource("/static/images/verbonden-logo.svg")).isNotNull();
+        assertThat(tester.getLastResponseAsString()).contains("src=\"/images/verbonden-logo-green-48.png\"");
+        assertThat(getClass().getResource("/static/images/verbonden-logo-green-48.png")).isNotNull();
     }
 
     @Test
