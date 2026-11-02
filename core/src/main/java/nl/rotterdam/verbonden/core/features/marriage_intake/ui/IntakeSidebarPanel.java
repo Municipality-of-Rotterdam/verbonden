@@ -1,48 +1,31 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
-import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
-import nl.rotterdam.nl_design_system.wicket.components.action_group.RdActionGroup;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
-import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogBorder;
-import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogHeadingLevel;
-import org.apache.wicket.Component;
-import org.apache.wicket.Page;
-import org.apache.wicket.ajax.AjaxRequestTarget;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.GenericPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.wicketstuff.minis.behavior.EnabledModelBehavior;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -50,13 +33,17 @@ import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPag
 
 public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
 
-    @SpringBean
-    private MarriageIntakeService marriageIntakeService;
+    private final IntakeStep activeStep;
+    private final IModel<List<PartnerGegevensDto>> partnerGegevensModel;
+    private final IModel<List<GetuigeDto>> getuigenModel;
 
-    private final IModel<DossierSamenvattingDto> dossierModel;
-    public IntakeSidebarPanel(String id, IModel<DossierSamenvattingDto> dossierModel) {
+    public IntakeSidebarPanel(String id, IModel<DossierSamenvattingDto> dossierModel,
+                              IModel<List<PartnerGegevensDto>> partnerGegevensModel,
+                              IModel<List<GetuigeDto>> getuigenModel, IntakeStep activeStep) {
         super(id, dossierModel);
-        this.dossierModel = dossierModel;
+        this.activeStep = activeStep;
+        this.partnerGegevensModel = partnerGegevensModel;
+        this.getuigenModel = getuigenModel;
         setOutputMarkupId(true);
     }
 
@@ -64,12 +51,16 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
     private DossierSamenvattingDto getDossierModelObject() {
         return getModelObject();
     }
-    
-    
 
     @Override
     protected void onInitialize() {
         super.onInitialize();
+        add(
+                progressIcon("algemeenStatusIcon", IntakeStep.MIJN_DAG),
+                progressIcon("gegevensProgressIcon", IntakeStep.JULLIE_GEGEVENS),
+                progressIcon("getuigenProgressIcon", IntakeStep.DE_GETUIGEN),
+                progressIcon("extrasProgressIcon", IntakeStep.EXTRAS)
+        );
 
         // Dé dag — registratie type row (visible when dossier is present)
         WebMarkupContainer dossierGegevens = new WebMarkupContainer("dossierGegevens") {
@@ -83,6 +74,8 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         IModel<String> registratieModel = LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::registratieType, RegistratieType::getLabel));
         dossierGegevens.add(new Label("registratieTypeLabel", registratieModel));
+        add(stepLink("algemeenLink", IntakeStep.MIJN_DAG));
+        dossierGegevens.add(stepLink("datumLink", IntakeStep.DE_DAG));
 
         // Ceremony row — only shown when a persisted dossier exists (id > 0)
         WebMarkupContainer ceremonieDossierGegevens = new WebMarkupContainer("ceremonieDossierGegevens") {
@@ -100,15 +93,16 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             if (d == null) {
                 return "";
             }
-            BigDecimal prijs = d.prijs();
+            Bedrag prijs = d.prijs();
             if (prijs == null) {
                 return "";
             }
-            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(prijs);
+            return prijs.format();
         });
         ceremonieDossierGegevens.add(new Label("ceremonieSoortLabel", ceremonieSoortModel));
         ceremonieDossierGegevens.add(new Label("ceremoniePrijs", ceremoniePrijsModel));
         dossierGegevens.add(ceremonieDossierGegevens);
+        dossierGegevens.add(progressIcon("datumStatusIcon", IntakeStep.DE_DAG));
 
         // Datum row — shown when datumTijdHuwelijk is set, otherwise "nog kiezen" placeholder
         WebMarkupContainer datumGekozen = new WebMarkupContainer("datumGekozen") {
@@ -185,50 +179,36 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         add(dossierGegevens);
 
         // Gegevens & Getuigen status icons
-        WebMarkupContainer gegevensRegel = new WebMarkupContainer("gegevensStatusIcon");
-        gegevensRegel.add(new WebMarkupContainer("gegevensStatusCheckGreen") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                DossierSamenvattingDto d = getDossierModelObject();
-                setVisible(d != null && d.aantalGekozenAchternamen() == 2);
-            }
-        });
-        gegevensRegel.add(new WebMarkupContainer("gegevensStatusCheckGrey") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                DossierSamenvattingDto d = getDossierModelObject();
-                setVisible(d != null && d.aantalGekozenAchternamen() == 1);
-            }
-        });
-        gegevensRegel.add(new WebMarkupContainer("gegevensStatusEmpty") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                DossierSamenvattingDto d = getDossierModelObject();
-                setVisible(d == null || d.aantalGekozenAchternamen() == 0);
-            }
-        });
-        add(gegevensRegel);
-        gegevensRegel.add(new Link<Void>("jullieGegevensLink") {
-            @Override
-            public void onClick() {
-                setResponsePage(JullieGegevensPage.class,
-                        makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
-            }
-
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                DossierSamenvattingDto samenvattingDto = getDossierModelObject();
-                setEnabled(samenvattingDto != null && samenvattingDto.id() != null && isWijzigbaar());
-            }
-        });
-
-
-        add(new GetuigenRegel());
-
+        add(stepLink("gegevensLink", IntakeStep.JULLIE_GEGEVENS));
+        IModel<List<String>> gekozenNamenModel = LambdaModel.of(() -> partnerGegevensModel.getObject().stream()
+                .map(PartnerGegevensDto::gekozenAchternaam)
+                .filter(naam -> naam != null && !naam.isBlank())
+                .toList());
+        add(
+                new WebMarkupContainer("geenGegevens")
+                        .add(new VisibleModelBehavior(gekozenNamenModel.map(List::isEmpty))),
+                new ListView<>("gekozenNamen", gekozenNamenModel) {
+                    @Override
+                    protected void populateItem(ListItem<String> item) {
+                        item.add(new Label("gekozenNaam", item.getModel()));
+                    }
+                }
+        );
+        add(stepLink("getuigenLink", IntakeStep.DE_GETUIGEN));
+        IModel<List<String>> getuigenNamenModel = LambdaModel.of(() -> getuigenModel.getObject().stream()
+                .map(GetuigeDto::naam)
+                .filter(naam -> naam != null && !naam.isBlank())
+                .toList());
+        add(
+                new WebMarkupContainer("geenGetuigen")
+                        .add(new VisibleModelBehavior(getuigenNamenModel.map(List::isEmpty))),
+                new ListView<>("getuigenNamen", getuigenNamenModel) {
+                    @Override
+                    protected void populateItem(ListItem<String> item) {
+                        item.add(new Label("getuigeNaam", item.getModel()));
+                    }
+                }
+        );
         add(new PartnerHerinnering());
 
         // Extra's list
@@ -262,8 +242,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                 WebMarkupContainer prijsContainer = new WebMarkupContainer("extraPrijsContainer");
                 prijsContainer.setVisible(extra.prijs() != null);
                 if (extra.prijs() != null) {
-                    String prijsText = new DecimalFormat("#,##0.00",
-                            new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(extra.prijs());
+                    String prijsText = extra.prijs().format();
                     prijsContainer.add(new Label("extraPrijs", Model.of(prijsText)));
                 } else {
                     prijsContainer.add(new Label("extraPrijs", Model.of("")));
@@ -274,37 +253,26 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         extrasListView.setReuseItems(false);
         add(extrasListView);
 
-        // Totaal (ceremony price + extras prices)
-        WebMarkupContainer totaalContainer = new WebMarkupContainer("totaalContainer") {
-            @Override
-            protected void onConfigure() {
-                super.onConfigure();
-                DossierSamenvattingDto d = getDossierModelObject();
-                setVisible(d != null && d.totalPrijs() != null);
-            }
-        };
-        IModel<String> totaalModel = LambdaModel.of(() -> {
-            DossierSamenvattingDto d = getDossierModelObject();
-            if (d == null || d.totalPrijs() == null) {
-                return "";
-            }
-            return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"))).format(d.totalPrijs());
-        });
-        totaalContainer.add(new Label("totaalPrijs", totaalModel));
-        add(totaalContainer);
-
-        add(new BevestigForm());
-
-        // Reservation info — only relevant while the dossier can still be changed
-        add(new WebMarkupContainer("reserveringInfo")
-                .add(new VisibleModelBehavior(LambdaModel.of(this::isWijzigbaar))));
-
-        // Status — shown once the dossier has been submitted
+        add(stepLink("extrasLink", IntakeStep.EXTRAS));
+        WebMarkupContainer controlerenSection = new WebMarkupContainer("controlerenSection");
         WebMarkupContainer statusContainer = new WebMarkupContainer("statusContainer");
         statusContainer.add(new VisibleModelBehavior(LambdaModel.of(() -> !isWijzigbaar())));
         statusContainer.add(new Label("statusLabel", LambdaModel.of(
                 () -> dossierValue(DossierSamenvattingDto::status, DossierStatus::getLabel))));
-        add(statusContainer);
+        controlerenSection.add(
+                progressIcon("controlerenProgressIcon", IntakeStep.CONTROLEREN),
+                stepLink("controlerenLink", IntakeStep.CONTROLEREN),
+                statusContainer
+        );
+        add(controlerenSection);
+    }
+
+    @Override
+    protected void onDetach() {
+        // Alleen het default model wordt automatisch gedetacht; zonder dit toont de sidebar na een Ajax-update oude data
+        partnerGegevensModel.detach();
+        getuigenModel.detach();
+        super.onDetach();
     }
 
     private boolean isWijzigbaar() {
@@ -312,166 +280,67 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         return d == null || d.status() == DossierStatus.CONCEPT;
     }
 
-    private boolean isCompleet() {
-        DossierSamenvattingDto d = getDossierModelObject();
-        return d != null && d.id() != null && d.compleet();
-    }
-
-    /**
-     * "Bevestig jullie keuzes": opens a modal dialog in which the citizen confirms that the choices
-     * are final. Only enabled when the dossier is complete.
-     */
-    private class BevestigForm extends Form<Void> {
-
-        private final RdDialogBorder bevestigDialog = new RdDialogBorder("bevestigDialog",
-                new ResourceModel("intake.bevestig.dialog.titel"),
-                RotterdamIconBehavior.supplyOf(RotterdamIconBehavior.CLOSE),
-                RdDialogHeadingLevel.LEVEL_2) {
-
+    private Link<Void> stepLink(String id, IntakeStep step) {
+        Link<Void> link = new Link<>(id) {
             @Override
-            protected @NonNull Component newFooterContent(@NonNull String id) {
-                return new BevestigDialogActies(id, this);
+            public void onClick() {
+                setResponsePage(step.pageClass(), makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
             }
 
             @Override
-            protected void onClose(@NonNull AjaxRequestTarget target) {
-                close(target);
+            protected void onConfigure() {
+                super.onConfigure();
+                DossierSamenvattingDto d = getDossierModelObject();
+                setEnabled(d != null && d.id() != null && isWijzigbaar());
             }
         };
+        setCurrentStep(link, step);
+        return link;
+    }
 
-        BevestigForm() {
-            super("bevestigForm");
-        }
-
-        @Override
-        protected void onInitialize() {
-            super.onInitialize();
-            add(new VisibleModelBehavior(LambdaModel.of(IntakeSidebarPanel.this::isWijzigbaar)));
-
-            add(
-                    new RdAjaxButton("bevestigButton", new ResourceModel("intake.sidebar.bevestig")) {
-
-                        @Override
-                        protected void onSubmit(AjaxRequestTarget target) {
-                            bevestigDialog.showModal(target);
-                        }
-
-                        @Override
-                        protected void onConfigure() {
-                            super.onConfigure();
-                            setEnabled(isCompleet());
-                        }
-                    }
-                    .setDefaultFormProcessing(false)
-                    .add(new EnabledModelBehavior(dossierModel.map(DossierSamenvattingDto::compleet))),
-                    new NogNietCompleetHint(),
-                    bevestigDialog
-            );
+    private void setCurrentStep(Link<Void> link, IntakeStep step) {
+        if (activeStep == step) {
+            link.add(AttributeModifier.append("class", " rd-progress-step--active"));
+            link.add(AttributeModifier.replace("aria-current", "step"));
         }
     }
 
-    /**
-     * Tells the citizen which parts still have to be filled in before the choices can be confirmed,
-     * each with a link to the tab where it can be done.
-     */
-    private class NogNietCompleetHint extends WebMarkupContainer {
+    private Label progressIcon(String id, IntakeStep step) {
+        return new Label(id, Model.of("")) {
+            @Override
+            protected void onConfigure() {
+                super.onConfigure();
+                setDefaultModelObject(isStepComplete(step) ? "" : step.ordinal() + 1);
+            }
 
-        NogNietCompleetHint() {
-            super("nogNietCompleetHint");
-        }
-
-        @Override
-        protected void onInitialize() {
-            super.onInitialize();
-            IModel<List<OntbrekendOnderdeel>> ontbrekendModel = LambdaModel.of(() -> {
-                DossierSamenvattingDto d = getDossierModelObject();
-                return d != null && d.id() != null ? d.ontbrekendeOnderdelen() : List.of();
-            });
-            add(
-                    // A dossier that has not been created yet: nothing specific to point to
-                    new WebMarkupContainer("algemeen")
-                            .add(new VisibleModelBehavior(ontbrekendModel.map(List::isEmpty))),
-                    new WebMarkupContainer("specifiek")
-                            .add(new OntbrekendeOnderdelen(ontbrekendModel))
-                            .add(new VisibleModelBehavior(ontbrekendModel.map(l -> !l.isEmpty())))
-            );
-        }
-
-        @Override
-        protected void onConfigure() {
-            super.onConfigure();
-            setVisible(!isCompleet());
-        }
+            @Override
+            protected void onComponentTag(ComponentTag tag) {
+                super.onComponentTag(tag);
+                boolean complete = isStepComplete(step);
+                boolean current = activeStep == step;
+                String state = complete
+                        ? current ? "rd-status-icon--current-check" : "rd-status-icon--complete"
+                        : current ? "rd-status-icon--current" : "rd-status-icon--upcoming";
+                tag.put("class", "rd-status-icon " + state);
+            }
+        };
     }
 
-    private class OntbrekendeOnderdelen extends ListView<OntbrekendOnderdeel> {
-
-        OntbrekendeOnderdelen(IModel<List<OntbrekendOnderdeel>> model) {
-            super("onderdelen", model);
+    private boolean isStepComplete(IntakeStep step) {
+        DossierSamenvattingDto d = getDossierModelObject();
+        if (d == null || d.id() == null) {
+            return false;
         }
-
-        @Override
-        protected void populateItem(ListItem<OntbrekendOnderdeel> item) {
-            OntbrekendOnderdeel onderdeel = item.getModelObject();
-            item.add(new Link<Void>("link") {
-                @Override
-                public void onClick() {
-                    setResponsePage(pageVoor(onderdeel),
-                            makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
-                }
-            }.add(new Label("label", new ResourceModel("intake.sidebar.ontbrekend." + onderdeel.name()))));
-        }
-
-        private Class<? extends Page> pageVoor(OntbrekendOnderdeel onderdeel) {
-            return switch (onderdeel) {
-                case DATUM -> DatumKiezenPage.class;
-                case LOCATIE -> DeDagPage.class;
-                case PARTNER_GEKOPPELD, ACHTERNAMEN -> JullieGegevensPage.class;
-                case GETUIGEN -> DeGetuigenPage.class;
-            };
-        }
-    }
-
-    private class BevestigDialogActies extends Fragment {
-
-        private final RdDialogBorder dialog;
-
-        BevestigDialogActies(String id, RdDialogBorder dialog) {
-            super(id, "bevestigDialogActies", IntakeSidebarPanel.this);
-            this.dialog = dialog;
-        }
-
-        @Override
-        protected void onInitialize() {
-            super.onInitialize();
-
-            RdButton indienenButton = new RdButton("indienenButton",
-                    new ResourceModel("intake.bevestig.dialog.bevestigen")) {
-                @Override
-                public void onSubmit() {
-                    UUID dossierId = requireNonNull(getDossierModelObject()).id();
-                    try {
-                        marriageIntakeService.dienIn(dossierId);
-                    } catch (DossierNietWijzigbaarException e) {
-                        // Already submitted (e.g. by the partner); the status page shows the current state
-                    }
-                    AanvraagStatusPage.respond(dossierId);
-                }
-            };
-            indienenButton.setDefaultFormProcessing(false);
-            indienenButton.setAppearance(RdButtonAppearance.PRIMARY_ACTION);
-
-            RdAjaxButton annulerenButton = new RdAjaxButton("annulerenButton",
-                    new ResourceModel("intake.bevestig.dialog.annuleren")) {
-                @Override
-                protected void onSubmit(AjaxRequestTarget target) {
-                    dialog.close(target);
-                }
-            };
-            annulerenButton.setDefaultFormProcessing(false);
-
-            add(new RdActionGroup("acties").add(indienenButton, annulerenButton));
-        }
+        return switch (step) {
+            case MIJN_DAG -> d.registratieType() != null && d.ceremonieSoort() != null;
+            case DE_DAG -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.DATUM)
+                    && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.LOCATIE);
+            case JULLIE_GEGEVENS -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.PARTNER_GEKOPPELD)
+                    && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.ACHTERNAMEN);
+            case DE_GETUIGEN -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.GETUIGEN);
+            case EXTRAS -> d.status() != DossierStatus.CONCEPT || d.extrasDoorlopen();
+            case CONTROLEREN -> d.compleet();
+        };
     }
 
     private <I, O> String dossierValue(Function<DossierSamenvattingDto, I> extractor, Function<I, O> mapper) {
@@ -489,18 +358,6 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         }
 
         @Override
-        protected void onInitialize() {
-            super.onInitialize();
-            add(new Link<Void>("partnerUitnodigenLink") {
-                @Override
-                public void onClick() {
-                    setResponsePage(JullieGegevensPage.class,
-                            makeDossierPageParameters(requireNonNull(getDossierModelObject()).id()));
-                }
-            });
-        }
-
-        @Override
         protected void onConfigure() {
             super.onConfigure();
             DossierSamenvattingDto d = getDossierModelObject();
@@ -508,46 +365,4 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
         }
     }
 
-    private class GetuigenRegel extends WebMarkupContainer {
-
-        public GetuigenRegel() {
-            super("getuigenRegel");
-        }
-
-        @Override
-        protected void onInitialize() {
-            super.onInitialize();
-            add(
-                    new WebMarkupContainer("getuigenStatusCheck")
-                            .add(new VisibleModelBehavior(dossierModel.map(DossierSamenvattingDto::getuigenBevestigd))),
-
-                    new WebMarkupContainer("getuigenStatusPartial")
-                            .add(new VisibleModelBehavior(dossierModel.map(DossierSamenvattingDto::getuigenGedeeltelijkIngevuld))),
-
-                    new WebMarkupContainer("getuigenStatusEmpty") {
-                        @Override
-                        protected void onConfigure() {
-                            super.onConfigure();
-                            DossierSamenvattingDto d = getDossierModelObject();
-                            setVisible(d == null || (!d.getuigenBevestigd() && !d.getuigenGedeeltelijkIngevuld()));
-                        }
-                    },
-
-                    new Link<Void>("getuigenLink") {
-
-                        @Override
-                        public void onClick() {
-                            DeGetuigenPage.respond(requireNonNull(getDossierModelObject()).id());
-                        }
-
-                        @Override
-                        protected void onConfigure() {
-                            super.onConfigure();
-                            DossierSamenvattingDto samenvattingDto = getDossierModelObject();
-                            setEnabled(samenvattingDto != null && samenvattingDto.id() != null && isWijzigbaar());
-                        }
-                    }
-            );
-        }
-    }
 }

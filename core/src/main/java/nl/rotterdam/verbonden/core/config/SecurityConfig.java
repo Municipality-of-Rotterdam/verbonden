@@ -171,7 +171,8 @@ public class SecurityConfig {
 
         ClientRegistrationRepository clientRegistrationRepository = clientRegistrationRepositoryProvider.getIfAvailable();
         if (clientRegistrationRepository != null) {
-            http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/", true));
+            // Na het inloggen terug naar de opgevraagde pagina (bijv. de uitnodigingslink), anders naar "/"
+            http.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/"));
         }
 
         BurgerSecurityCustomizer burgerSecurityCustomizer = burgerSecurityCustomizerProvider.getIfAvailable();

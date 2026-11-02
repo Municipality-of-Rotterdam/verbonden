@@ -2,7 +2,6 @@ package nl.rotterdam.verbonden.app_local;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.EMBEDDED;
@@ -12,7 +11,6 @@ import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.EM
 // on app-local's test classpath.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureEmbeddedDatabase(provider = EMBEDDED)
-@AutoConfigureTestRestTemplate
 class VerbondenApplicationTests {
 
     @Test

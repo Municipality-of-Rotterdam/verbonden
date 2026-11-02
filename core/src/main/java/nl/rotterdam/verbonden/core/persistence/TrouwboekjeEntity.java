@@ -1,7 +1,7 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -23,7 +23,8 @@ public class TrouwboekjeEntity {
     private String afbeelding;
 
     @Column(name = "prijs", precision = 10, scale = 2)
-    private BigDecimal prijs;
+    @Convert(converter = BedragAttributeConverter.class)
+    private Bedrag prijs;
 
     @Column(name = "startdatum")
     private LocalDate startdatum;
@@ -65,11 +66,11 @@ public class TrouwboekjeEntity {
         this.afbeelding = afbeelding;
     }
 
-    public BigDecimal getPrijs() {
+    public Bedrag getPrijs() {
         return prijs;
     }
 
-    public void setPrijs(BigDecimal prijs) {
+    public void setPrijs(Bedrag prijs) {
         this.prijs = prijs;
     }
 

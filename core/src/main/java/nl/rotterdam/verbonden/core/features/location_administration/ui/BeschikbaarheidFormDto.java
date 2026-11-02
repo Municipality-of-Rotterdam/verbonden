@@ -2,9 +2,9 @@ package nl.rotterdam.verbonden.core.features.location_administration.ui;
 
 import nl.rotterdam.verbonden.core.features.location_administration.domain.ChangeBeschikbaarheidDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,7 +16,7 @@ public class BeschikbaarheidFormDto implements Serializable {
     private LocalTime startTijd = null;
     private LocalTime eindTijd = null;
     private int duurInMinuten = 30;
-    private BigDecimal prijs = BigDecimal.ZERO;
+    private Bedrag prijs = Bedrag.ZERO;
     private LocalDate ingangsdatum = LocalDate.of(2026, 1, 1);
     private LocalDate einddatum = LocalDate.of(2026, 12, 31);
 
@@ -60,11 +60,11 @@ public class BeschikbaarheidFormDto implements Serializable {
         this.duurInMinuten = duurInMinuten;
     }
 
-    public BigDecimal getPrijs() {
+    public Bedrag getPrijs() {
         return prijs;
     }
 
-    public void setPrijs(BigDecimal prijs) {
+    public void setPrijs(Bedrag prijs) {
         this.prijs = prijs;
     }
 

@@ -8,7 +8,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 
-import java.math.BigDecimal;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,8 +61,12 @@ public class HuwelijksDossierEntity {
     @Column(name = "internationale_akte", nullable = false)
     private boolean internationaleAkte = false;
 
+    @Column(name = "extras_doorlopen", nullable = false)
+    private boolean extrasDoorlopen = false;
+
     @Column(name = "internationale_akte_prijs")
-    private BigDecimal internationaleAktePrijs;
+    @Convert(converter = BedragAttributeConverter.class)
+    private Bedrag internationaleAktePrijs;
 
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
@@ -118,7 +122,7 @@ public class HuwelijksDossierEntity {
     }
 
     /**
-     * Voegt een partner toe die zich online met DigiD heeft geïdentificeerd; de eerste partner krijgt
+     * Voegt een partner toe die zich online met DigiD heeft geÃ¯dentificeerd; de eerste partner krijgt
      * volgorde 1, de tweede volgorde 2.
      *
      * @throws IllegalStateException wanneer het dossier al twee partners heeft
@@ -186,6 +190,17 @@ public class HuwelijksDossierEntity {
         this.internationaleAkte = registratieType == RegistratieType.HUWELIJK && internationaleAkte;
     }
 
+    /**
+     * Legt vast dat de burger de (optionele) stap Extra’s heeft doorlopen.
+     */
+    public void markeerExtrasDoorlopen() {
+        this.extrasDoorlopen = true;
+    }
+
+    public boolean isExtrasDoorlopen() {
+        return extrasDoorlopen;
+    }
+
     public boolean isRingenUitwisselen() {
         return ringenUitwisselen;
     }
@@ -202,11 +217,11 @@ public class HuwelijksDossierEntity {
         return internationaleAkte;
     }
 
-    public BigDecimal getInternationaleAktePrijs() {
+    public Bedrag getInternationaleAktePrijs() {
         return internationaleAktePrijs;
     }
 
-    public void setInternationaleAktePrijs(BigDecimal internationaleAktePrijs) {
+    public void setInternationaleAktePrijs(Bedrag internationaleAktePrijs) {
         this.internationaleAktePrijs = internationaleAktePrijs;
     }
 

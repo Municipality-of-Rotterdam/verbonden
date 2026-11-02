@@ -1,14 +1,15 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.domain;
 
+import nl.rotterdam.verbonden.core.domain.Bedrag;
+
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 public record IntakeMarriageTypeDto(
         CeremonieSoort soort,
         String titel,
-        BigDecimal prijs,
+        Bedrag prijs,
         String prijsPrefix,
         List<String> bulletPoints,
         LocalDate eersteGelegenheid,

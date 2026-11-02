@@ -24,7 +24,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
-import java.math.BigDecimal;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import java.util.List;
 
 @AuthorizeInstantiation({Roles.BEHEER, Roles.SUPERUSER})
@@ -91,7 +91,7 @@ public class MarriageTypeUpdatePage extends AdministrationBasePage {
                             Model.of("Prijs"),
                             Model.of("Prijs in euro's, bijv. 267.81"))
                             .setRequired(true)
-                            .setModelType(BigDecimal.class),
+                            .setModelType(Bedrag.class),
                     new RdFormFieldTextInput<>("url",
                             LambdaModel.of(model, MarriageTypeFormDto::getUrl, MarriageTypeFormDto::setUrl),
                             Model.of("URL")).setRequired(true),

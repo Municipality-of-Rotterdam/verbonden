@@ -39,7 +39,7 @@ class DeDagPageTest extends BaseWicketTest {
         klikOp("locatieLink");
 
         tester.assertVisible(PAGE_BODY + "nietBeschikbaarAlert");
-        tester.assertContains("Bij een kleine of middelgrote ceremonie kunnen jullie geen trouwlocatie kiezen");
+        tester.assertContains("Bij een kleine of middelgrote ceremonie kunt u geen trouwlocatie kiezen");
     }
 
     @Test
@@ -49,7 +49,7 @@ class DeDagPageTest extends BaseWicketTest {
 
         klikOp("babsLink");
 
-        tester.assertContains("Bij een kleine of middelgrote ceremonie kunnen jullie geen voorkeur voor een trouwambtenaar opgeven");
+        tester.assertContains("Bij een kleine of middelgrote ceremonie kunt u geen voorkeur voor een trouwambtenaar opgeven");
     }
 
     @Test
@@ -67,8 +67,8 @@ class DeDagPageTest extends BaseWicketTest {
     void kleineCeremonie_introNoemtDatJullieAlleenDeDatumKiezen() {
         startPage(maakDossier(CeremonieSoort.KLEIN));
 
-        tester.assertContains("Daarbij kiezen jullie alleen de datum");
-        tester.assertContainsNot("Begin bij het onderdeel wat jullie het belangrijkst vinden");
+        tester.assertContains("Daarbij kiest u alleen de datum");
+        tester.assertContainsNot("Begin bij het onderdeel dat u het belangrijkst vindt");
     }
 
     @Test
@@ -76,21 +76,25 @@ class DeDagPageTest extends BaseWicketTest {
     void groteCeremonie_introLaatJullieZelfBeginnenBijHetBelangrijksteOnderdeel() {
         startPage(maakDossier(CeremonieSoort.GROOT));
 
-        tester.assertContains("Begin bij het onderdeel wat jullie het belangrijkst vinden");
+        tester.assertContains("Begin bij het onderdeel dat u het belangrijkst vindt");
     }
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
-    void zijbalkNoemtWatNogIngevuldMoetWorden_enLinktNaarHetJuisteTabblad() {
-        startPage(maakDossier(CeremonieSoort.KLEIN));
+    void controlerenPaginaNoemtWatNogIngevuldMoetWorden_enLinktNaarDeJuisteStap() {
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        PageParameters params = new PageParameters();
+        params.add("dossierId", dossierId.toString());
+        zetNavigatieHeaders();
+        tester.startPage(ControlerenPage.class, params);
 
         tester.assertContains("Kies een datum");
         tester.assertContains("Kies een trouwlocatie");
-        tester.assertContains("Laat uw partner het dossier koppelen");
-        tester.assertContains("Kies allebei de achternaam die jullie willen gebruiken");
+        tester.assertContains("Uw partner moet nog inloggen en meedoen");
+        tester.assertContains("Kies allebei de achternaam die u wilt gebruiken");
         tester.assertContains("Vul de gegevens van alle getuigen in");
 
-        klikOp("keuzesSidebar:bevestigForm:nogNietCompleetHint:specifiek:onderdelen:4:link");
+        klikOp("bevestigForm:nogNietCompleetHint:specifiek:onderdelen:4:link");
 
         tester.assertRenderedPage(DeGetuigenPage.class);
     }

@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
@@ -18,7 +19,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -50,7 +50,8 @@ class ExtrasSelectieIntegrationTest {
             "2026-12-31, 17.80",
             "2027-01-01, 18.30",
             "2027-06-15, 18.30"})
-    void huwelijk_slaatInternationaleAkteOp(LocalDate vandaag, BigDecimal tariefVandaag) {
+    void huwelijk_slaatInternationaleAkteOp(LocalDate vandaag, String tariefVandaag) {
+        Bedrag verwachtTarief = Bedrag.of(tariefVandaag);
         klok.zetOp(vandaag);
         UUID dossierId = maakDossier(RegistratieType.HUWELIJK, "999990007");
 
@@ -59,8 +60,8 @@ class ExtrasSelectieIntegrationTest {
         assertThat(marriageIntakeService.findExtrasSelecties(dossierId).internationaleAkte()).isTrue();
         assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
                 .extracting(SidebarExtraItemDto::naam, SidebarExtraItemDto::prijs)
-                .containsExactly(tuple("Internationale huwelijksakte", tariefVandaag));
-        assertThat(marriageIntakeService.findInternationaleAktePrijs(dossierId)).isEqualByComparingTo(tariefVandaag);
+                .containsExactly(tuple("Internationale huwelijksakte", verwachtTarief));
+        assertThat(marriageIntakeService.findInternationaleAktePrijs(dossierId)).isEqualTo(verwachtTarief);
     }
 
     @Test
@@ -75,7 +76,7 @@ class ExtrasSelectieIntegrationTest {
     @Test
     void gekozenTrouwboekje_wordtOpgeslagenEnMetPrijsInSidebarGetoond() {
         long trouwboekjeId = trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
-                "Linnen trouwboekje", null, "/trouwboekjes/linnen.webp", new BigDecimal("42.50"), null, null));
+                "Linnen trouwboekje", null, "/trouwboekjes/linnen.webp", Bedrag.of("42.50"), null, null));
         UUID dossierId = maakDossier(RegistratieType.HUWELIJK, "999990019");
 
         assertThat(marriageIntakeService.findActieveTrouwboekjes())
@@ -86,7 +87,7 @@ class ExtrasSelectieIntegrationTest {
 
         assertThat(marriageIntakeService.findExtrasSelecties(dossierId).trouwboekjeId()).isEqualTo(trouwboekjeId);
         assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
-                .containsExactly(new SidebarExtraItemDto("Linnen trouwboekje", new BigDecimal("42.50")));
+                .containsExactly(new SidebarExtraItemDto("Linnen trouwboekje", Bedrag.of("42.50")));
     }
 
     /** Een trouwboekje is te kiezen vanaf de startdatum, tot (niet tot en met) de einddatum. */
@@ -99,7 +100,7 @@ class ExtrasSelectieIntegrationTest {
     void trouwboekje_isAlleenTussenStartEnEinddatumTeKiezen(LocalDate vandaag, boolean kiesbaar) {
         klok.zetOp(vandaag);
         long trouwboekjeId = trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
-                "Seizoensboekje", null, "/trouwboekjes/seizoen.webp", new BigDecimal("30.00"),
+                "Seizoensboekje", null, "/trouwboekjes/seizoen.webp", Bedrag.of("30.00"),
                 LocalDate.of(2026, 11, 1), LocalDate.of(2026, 12, 1)));
 
         assertThat(marriageIntakeService.findActieveTrouwboekjes())

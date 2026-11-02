@@ -1,9 +1,9 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
 
-import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -38,7 +38,8 @@ public class LocatieBeschikbaarheidEntity {
     private int duurInMinuten;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal prijs;
+    @Convert(converter = BedragAttributeConverter.class)
+    private Bedrag prijs;
 
     @Column(nullable = false)
     private LocalDate ingangsdatum;
@@ -98,11 +99,11 @@ public class LocatieBeschikbaarheidEntity {
         this.duurInMinuten = duurInMinuten;
     }
 
-    public BigDecimal getPrijs() {
+    public Bedrag getPrijs() {
         return prijs;
     }
 
-    public void setPrijs(BigDecimal prijs) {
+    public void setPrijs(Bedrag prijs) {
         this.prijs = prijs;
     }
 
