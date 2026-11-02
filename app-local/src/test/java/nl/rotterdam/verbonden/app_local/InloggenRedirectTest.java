@@ -2,7 +2,6 @@ package nl.rotterdam.verbonden.app_local;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
@@ -25,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureEmbeddedDatabase(provider = EMBEDDED)
-@AutoConfigureTestRestTemplate
 class InloggenRedirectTest {
 
     private static final Pattern INLOGLINK_VAN_PIETER =
