@@ -94,6 +94,8 @@ class DossierMailIntegrationTest {
         assertThat(detail.afzender()).isEqualTo("Gemeente Rotterdam <noreply@rotterdam.nl>");
         assertThat(detail.inhoud())
                 .contains("Kwik van Willegenburgh", "Kwek van Willegenburgh", "Klein", "Wat gebeurt er nu?")
+                .contains("<li>" + naamMetKeuze(dossierId, 1) + "</li>", "<li>" + naamMetKeuze(dossierId, 2) + "</li>")
+                .doesNotContain("Jansen - Jansen")
                 .doesNotContain("{{");
         assertThat(mailSender.berichten()).isEmpty();
     }
@@ -220,6 +222,12 @@ class DossierMailIntegrationTest {
                 .hasSize(1);
         assertThatThrownBy(() -> dossierAdministrationService.findMail(UUID.randomUUID(), mailId))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private String naamMetKeuze(UUID dossierId, int volgorde) {
+        var partner = marriageIntakeService.findPartnerGegevens(dossierId).stream()
+                .filter(p -> p.volgorde() == volgorde).findFirst().orElseThrow();
+        return partner.voornamen() + " " + partner.gekozenAchternaam();
     }
 
     private List<DossierMailPogingDto> pogingen(UUID dossierId, long mailId) {

@@ -59,7 +59,7 @@ final class MailTemplate {
             String vervanging;
             if (deel.group(4) != null) {
                 Object waarde = zoek(beschikbaar, deel.group(4));
-                vervanging = waarde == null ? "" : HtmlUtils.htmlEscape(waarde.toString());
+                vervanging = waarde == null ? "" : HtmlUtils.htmlEscape(waarde.toString(), "UTF-8");
             } else {
                 Object waarde = zoek(beschikbaar, deel.group(2));
                 String binnenste = deel.group(3);

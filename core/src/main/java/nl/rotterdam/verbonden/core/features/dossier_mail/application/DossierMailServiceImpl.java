@@ -292,11 +292,16 @@ class DossierMailServiceImpl implements DossierMailService {
                 .collect(Collectors.joining(" "));
     }
 
+    /**
+     * De voornamen met de gekozen achternaam, die al de volledige keuze is (bijvoorbeeld "Jansen - Dëhlano");
+     * zonder keuze de achternaam uit de BRP.
+     */
     private static String naamkeuze(PartnerGegevensDto partner) {
-        String naam = voluit(partner);
-        return partner.gekozenAchternaam() != null && !partner.gekozenAchternaam().isBlank()
-                ? naam + " - " + partner.gekozenAchternaam()
-                : naam;
+        boolean heeftKeuze = partner.gekozenAchternaam() != null && !partner.gekozenAchternaam().isBlank();
+        return Stream.of(partner.voornamen(), heeftKeuze ? partner.gekozenAchternaam() : partner.achternaam())
+                .filter(Objects::nonNull)
+                .filter(waarde -> !waarde.isBlank())
+                .collect(Collectors.joining(" "));
     }
 
     private record Zendopdracht(String afzender, String ontvangers, String onderwerp, String inhoud) {
