@@ -21,6 +21,9 @@ public enum DossierStatus {
 
     public static final Set<DossierStatus> ACTIEF = EnumSet.complementOf(EnumSet.of(GEANNULEERD));
 
+    /** Na het indienen kan een medewerker een betaalmutatie toevoegen, en kan de burger die betalen. */
+    public static final Set<DossierStatus> BETAALMUTATIES_MOGELIJK = EnumSet.of(INGEDIEND, GEACCEPTEERD);
+
     private final String label;
 
     DossierStatus(String label) {

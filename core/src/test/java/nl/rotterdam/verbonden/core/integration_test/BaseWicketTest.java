@@ -29,6 +29,18 @@ public abstract class BaseWicketTest {
         return tester.newFormTester(pad(formId));
     }
 
+    /**
+     * De laatst getoonde pagina moet serialiseerbaar zijn: Wicket bewaart pagina's in de pagestore (Infinispan). De
+     * serializer logt een fout en geeft {@code null} als dat niet lukt, bijv. door een gewone lambda in een veld.
+     */
+    protected void assertPaginaSerialiseerbaar() {
+        org.apache.wicket.Page pagina = tester.getLastRenderedPage();
+        org.assertj.core.api.Assertions.assertThat(
+                        application.getFrameworkSettings().getSerializer().serialize(pagina))
+                .as("%s is serialiseerbaar", pagina.getClass().getSimpleName())
+                .isNotNull();
+    }
+
     /** Het pad van een component op de laatst getoonde pagina, op basis van zijn wicket:id. */
     protected String pad(String id) {
         Component component = tester.getLastRenderedPage().visitChildren(

@@ -12,7 +12,8 @@ De code is opgedeeld in de volgende packages:
 - `nl.rotterdam.verbonden.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
 - `nl.rotterdam.verbonden.error_common` — gedeelde foutafhandeling voor burger- en beheerfoutpagina's: `ServletErrorAttributes` en `VerbondenExceptionMapper` (kiest bij een `/beheer`-request de `Administration*ErrorPage` in plaats van de `Burger*ErrorPage`).
 - `nl.rotterdam.verbonden.config` — Spring Boot configuratieklassen.
-- `nl.rotterdam.verbonden.identity` — publiek SPI-contract (adapter-poorten zoals `PersonLookupService`, `BurgerLoginPageMount`, `CurrentUserProvider`) waartegen adapter-modules zoals `remote-local` bouwen. Bewuste uitzondering op de feature-packageconventie hieronder: dit is geen feature maar een cross-cutting contract, gebruikt door meerdere features én door `WicketApplication`/`config`.
+- `nl.rotterdam.verbonden.identity` — publiek SPI-contract (adapter-poorten zoals `PersonLookupService`, `BurgerLoginPageMount`, `AdapterPageMount`, `CurrentUserProvider`) waartegen adapter-modules zoals `remote-local` bouwen. Bewuste uitzondering op de feature-packageconventie hieronder: dit is geen feature maar een cross-cutting contract, gebruikt door meerdere features én door `WicketApplication`/`config`.
+- `nl.rotterdam.verbonden.online_betalen` — publiek SPI-contract voor online betalen, met dezelfde uitzondering als `identity`. Uitgaand implementeert een adapter `OnlineBetaalService` (mock in `remote-local`, een echte betaalprovider in een productie-adapter). Inkomend roept de adapter `BetaalUitslagVerwerker` aan zodra de betaalprovider de uitslag meldt; core implementeert die. Het dossier wordt pas ingediend op die uitslag, nooit op wat de browser na het betalen meestuurt.
 
 Elke feature-package bevat de volgende sub-packages:
 - `feature.<naam>.ui` — Wicket-pagina's en UI-hulpklassen (FormDto, componenten).
