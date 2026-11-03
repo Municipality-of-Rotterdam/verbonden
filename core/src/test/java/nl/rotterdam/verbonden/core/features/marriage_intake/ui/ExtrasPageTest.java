@@ -114,6 +114,20 @@ class ExtrasPageTest extends BaseWicketTest {
                 .contains("rd-extra-keuze-item d-flex align-items-center justify-content-between flex-wrap gap-2");
     }
 
+    @Test
+    @WithMockUser(username = "999990020")
+    void aantalBezoekersToontHetMaximumVanDeCeremonie() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990020")));
+
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("U mag maximaal 8 bezoekers meenemen.")
+                .doesNotContain("{0}");
+    }
+
     private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, BurgerServiceNummer bsn) {
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, ceremonieSoort, null, bsn));

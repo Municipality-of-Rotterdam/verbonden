@@ -135,7 +135,7 @@ public class ExtrasPage extends IntakeBasePage {
             WebMarkupContainer bezoekersSection = new WebMarkupContainer("bezoekersSection");
             bezoekersSection.add(
                     new Label("bezoekersMaximum", ceremonieSoort.heeftMaxAantalBezoekers()
-                            ? new StringResourceModel("extras.bezoekers.maximum", Model.of(ceremonieSoort.getMaxAantalBezoekers()))
+                            ? new StringResourceModel("extras.bezoekers.maximum").setParameters(ceremonieSoort.getMaxAantalBezoekers())
                             : new ResourceModel("extras.bezoekers.geenmaximum")),
                     aantalBezoekersVeld);
             add(bezoekersSection);
