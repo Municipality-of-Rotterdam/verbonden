@@ -123,6 +123,12 @@ public class ControlerenPage extends IntakeBasePage {
                 visibleWhen("ceremoniePrijsContainer", dossierModel.map(dossier -> dossier.prijs() != null),
                         new Label("ceremoniePrijs", dossierModel.map(dossier ->
                                 Objects.requireNonNull(dossier.prijs()).format()))),
+                visibleWhen("taalRij", dossierModel.map(dossier -> dossier.taal() != null),
+                        new Label("taal", dossierModel.map(dossier ->
+                                Objects.requireNonNull(dossier.taal()).getLabel()))),
+                visibleWhen("bezoekersRij", dossierModel.map(dossier -> dossier.aantalBezoekers() != null),
+                        new Label("aantalBezoekers", dossierModel.map(dossier ->
+                                String.valueOf(dossier.aantalBezoekers())))),
                 visibleWhen("datumRij", dossierModel.map(dossier -> dossier.datumTijdHuwelijk() != null),
                         new Label("datum", dossierModel.map(dossier ->
                                 Objects.requireNonNull(dossier.datumTijdHuwelijk()).format(DATUM_FORMAT)))),
