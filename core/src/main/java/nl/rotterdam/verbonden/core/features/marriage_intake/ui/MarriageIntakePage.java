@@ -115,6 +115,8 @@ public class MarriageIntakePage extends IntakeBasePage {
 
 
         form.add(registrationGroup);
+        form.add(new Label("registratieMeer", new ResourceModel("intake.registratie.meer.html"))
+                .setEscapeModelStrings(false));
         RadioGroup<RegistratieType> regRadioGroup = registrationGroup.getRadioGroup();
         registrationGroup.add(new RdRadioButton<>("huwelijk", Model.of(RegistratieType.HUWELIJK), regRadioGroup));
         registrationGroup.add(new RdRadioButton<>("geregistreerdPartnerschap",
