@@ -79,6 +79,18 @@ class ControlerenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990020")
+    void samenvattingToontTaalEnAantalBezoekers() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("Taal van de ceremonie")
+                .contains("Nederlands")
+                .contains("Aantal bezoekers");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
     void totaalStaatInDeSamenvattingEnBevestigenDaarbuiten() {
         UUID dossierId = testData.maakCompleetDossier();
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
