@@ -19,6 +19,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Persoo
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierInzageRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeCeremonieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
@@ -152,8 +153,8 @@ class DossierBeheerIntegrationTest {
                     partner.buitenlandsPersoonsnummer(), partner.bsn() == null ? PERSOONSGEGEVENS : null));
         }
 
-        marriageIntakeService.slaTaalOp(dossierId, CeremonieTaal.NEDERLANDS);
-        marriageIntakeService.slaAantalBezoekersOp(dossierId, 4);
+        dossierAdministrationService.updateCeremonie(dossierId,
+                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, CeremonieTaal.NEDERLANDS, 4));
 
         dossierAdministrationService.dienIn(dossierId);
 
@@ -261,6 +262,27 @@ class DossierBeheerIntegrationTest {
         UUID anderDossier = maakDossierMetPartnerZonderBsn();
 
         assertThatThrownBy(() -> dossierAdministrationService.findBestand(anderDossier, bestandId))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void updateCeremonie_legtTaalEnAantalBezoekersVast() {
+        UUID dossierId = maakDossierMetPartnerZonderBsn();
+
+        dossierAdministrationService.updateCeremonie(dossierId,
+                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, CeremonieTaal.ENGELS, 6));
+
+        DossierDetailDto detail = dossierAdministrationService.findDetail(dossierId);
+        assertThat(detail.taal()).isEqualTo(CeremonieTaal.ENGELS);
+        assertThat(detail.aantalBezoekers()).isEqualTo(6);
+    }
+
+    @Test
+    void updateCeremonie_weigertMeerBezoekersDanHetMaximum() {
+        UUID dossierId = maakDossierMetPartnerZonderBsn();
+
+        assertThatThrownBy(() -> dossierAdministrationService.updateCeremonie(dossierId,
+                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, CeremonieTaal.ENGELS, 9)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
