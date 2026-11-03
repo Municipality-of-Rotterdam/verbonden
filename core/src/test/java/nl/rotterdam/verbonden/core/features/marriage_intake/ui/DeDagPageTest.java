@@ -94,7 +94,7 @@ class DeDagPageTest extends BaseWicketTest {
         tester.assertContains("Kies allebei de achternaam die u wilt gebruiken");
         tester.assertContains("Vul de gegevens van alle getuigen in");
 
-        klikOp("bevestigForm:nogNietCompleetHint:specifiek:onderdelen:4:link");
+        klikOp("bevestigForm:nogNietCompleetHint:specifiek:onderdelen:5:link");
 
         tester.assertRenderedPage(DeGetuigenPage.class);
     }

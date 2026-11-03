@@ -10,6 +10,8 @@ import java.util.UUID;
 public record DossierSamenvattingDto(
         UUID id,
         RegistratieType registratieType,
+        CeremonieTaal taal,
+        Integer aantalBezoekers,
         CeremonieSoort ceremonieSoort,
         Bedrag prijs,
         LocalDateTime datumTijdHuwelijk,

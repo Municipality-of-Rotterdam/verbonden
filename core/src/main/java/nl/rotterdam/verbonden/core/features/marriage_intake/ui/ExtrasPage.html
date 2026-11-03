@@ -2,6 +2,18 @@
 
     <form wicket:id="extrasForm">
 
+        <!-- Aantal bezoekers -->
+        <div wicket:id="bezoekersSection" class="rd-extra-sectie card mb-4 p-4">
+            <h2 class="rd-extra-sectie__heading">
+                <wicket:message key="extras.bezoekers.heading">Aantal bezoekers</wicket:message>
+            </h2>
+            <p>
+                <wicket:message key="extras.bezoekers.intro">Hoeveel bezoekers komen er naar de ceremonie?</wicket:message>
+                <span wicket:id="bezoekersMaximum">Maximaal 8 bezoekers</span>
+            </p>
+            <div wicket:id="aantalBezoekersInput"></div>
+        </div>
+
         <div wicket:id="ceremonieExtrasSection" class="rd-extra-sectie card mb-4 p-4">
             <!-- Ringen uitwisselen -->
             <div wicket:id="ringenSection">

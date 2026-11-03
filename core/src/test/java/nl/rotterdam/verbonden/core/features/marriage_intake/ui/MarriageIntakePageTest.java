@@ -38,7 +38,7 @@ class MarriageIntakePageTest extends BaseWicketTest {
                 .contains("rd-intake-content--unbordered")
                 .contains("rd-intake-step-layout--first-step")
                 .contains("rd-ceremonie-kaart");
-        assertThat(html.split("class=\"rd-card", -1)).hasSize(3);
+        assertThat(html.split("class=\"rd-card", -1)).hasSize(4);
     }
 
     /**

@@ -105,7 +105,7 @@ class ExtrasPageTest extends BaseWicketTest {
         tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
 
         String html = tester.getLastResponseAsString();
-        assertThat(html.split("rd-extra-sectie card mb-4 p-4", -1)).hasSize(4);
+        assertThat(html.split("rd-extra-sectie card mb-4 p-4", -1)).hasSize(5);
         assertThat(html).contains("rd-intake-content--unbordered");
         assertThat(html.indexOf("Volgende stap"))
                 .isGreaterThan(html.lastIndexOf("rd-extra-sectie card mb-4 p-4"));

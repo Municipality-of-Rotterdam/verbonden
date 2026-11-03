@@ -332,13 +332,15 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
             return false;
         }
         return switch (step) {
-            case MIJN_DAG -> d.registratieType() != null && d.ceremonieSoort() != null;
+            case MIJN_DAG -> d.registratieType() != null && d.ceremonieSoort() != null
+                    && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.TAAL);
             case DE_DAG -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.DATUM)
                     && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.LOCATIE);
             case JULLIE_GEGEVENS -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.PARTNER_GEKOPPELD)
                     && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.ACHTERNAMEN);
             case DE_GETUIGEN -> !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.GETUIGEN);
-            case EXTRAS -> d.status() != DossierStatus.CONCEPT || d.extrasDoorlopen();
+            case EXTRAS -> d.status() != DossierStatus.CONCEPT
+                    || d.extrasDoorlopen() && !d.ontbrekendeOnderdelen().contains(OntbrekendOnderdeel.AANTAL_BEZOEKERS);
             case CONTROLEREN -> d.compleet();
         };
     }

@@ -20,6 +20,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.repository.Do
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
@@ -150,6 +151,9 @@ class DossierBeheerIntegrationTest {
                     "Smith", null, null,
                     partner.buitenlandsPersoonsnummer(), partner.bsn() == null ? PERSOONSGEGEVENS : null));
         }
+
+        marriageIntakeService.slaTaalOp(dossierId, CeremonieTaal.NEDERLANDS);
+        marriageIntakeService.slaAantalBezoekersOp(dossierId, 4);
 
         dossierAdministrationService.dienIn(dossierId);
 

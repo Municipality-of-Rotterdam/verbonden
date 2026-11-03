@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.features.location_administration.domain.Creat
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
@@ -51,8 +52,10 @@ public class CompleetDossierTestData {
                 .map(IntakeMarriageTypeDto::locatieId)
                 .findFirst()
                 .orElseThrow();
-        return marriageIntakeService.create(
+        UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, locatieId, BSN_PARTNER_1));
+        marriageIntakeService.slaTaalOp(dossierId, CeremonieTaal.NEDERLANDS);
+        return dossierId;
     }
 
     /**
@@ -70,6 +73,7 @@ public class CompleetDossierTestData {
         marriageIntakeService.slaGetuigenOp(dossierId, List.of(
                 new SaveGetuigenDto(1, "Kwik van Willegenburgh"),
                 new SaveGetuigenDto(2, "Kwek van Willegenburgh")));
+        marriageIntakeService.slaAantalBezoekersOp(dossierId, 4);
         return dossierId;
     }
 
