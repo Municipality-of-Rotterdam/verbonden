@@ -1,8 +1,12 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
+import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.CreateTrouwboekjeDto;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import org.junit.jupiter.api.Test;
@@ -31,6 +35,9 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
     @Autowired
     private DossierAdministrationService dossierAdministrationService;
 
+    @Autowired
+    private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
+
     @Test
     @WithMockUser(username = "999990020")
     void onvolledigDossier_bevestigButtonIsUitgeschakeld() {
@@ -39,7 +46,12 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
 
         tester.assertDisabled(BEVESTIG_BUTTON);
-        tester.assertContains("Dit moet nog gebeuren voordat u uw keuzes kunt bevestigen");
+        tester.assertContains("Voor jullie alle keuzes kunnen bevestigen:");
+        tester.assertContains("Uw partner moet inloggen met een eigen DigiD.");
+        tester.assertContains("Kies allebei welke achternaam jullie willen gaan gebruiken.");
+        tester.assertContains("Vul de gegevens van jullie getuigen in.");
+        tester.assertContains("Jullie gegevens invullen");
+        tester.assertContains("Jullie getuigen doorgeven");
     }
 
     @Test
@@ -51,19 +63,31 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
         String html = tester.getLastResponseAsString();
         assertThat(html)
-                .contains("Dé dag")
+                .contains("Jullie dag")
                 .contains("Controleer uw keuzes goed.")
                 .contains("Na bevestiging gaat u verder naar de betalingspagina.")
                 .contains("Na betaling ontvangt u een bevestiging per e-mail.")
-                .contains("Uw reservering blijft 3 dagen geldig.")
-                .contains("Binnen die periode kunt u de aanvraag gratis aanpassen.")
-                .contains("Daarna is wijzigen niet meer mogelijk.")
+                .contains("Jullie keuzes blijven 3 dagen bewaard.")
+                .contains("Zorg dat jullie binnen 3 dagen alles hebben ingevuld en de keuzes bevestigen.")
                 .contains("Dan betaalt u € 50 administratiekosten.")
                 .contains("rd-status-icon rd-status-icon--current-check")
                 .doesNotContain("<dialog");
         String confirmButtonMarkupId = tester.getComponentFromLastRenderedPage(BEVESTIG_BUTTON).getMarkupId();
         assertThat(html.indexOf("Controleer uw keuzes goed."))
                 .isLessThan(html.indexOf("id=\"" + confirmButtonMarkupId + "\""));
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void controlerenToontBoekjeNaamMetTrouwboekjeVoorvoegsel() {
+        long trouwboekjeId = trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
+                "Bordeaux", "Bordeaux", null, Bedrag.of("42.50"), null, null));
+        UUID dossierId = testData.maakCompleetDossier();
+        marriageIntakeService.slaExtrasOp(dossierId, new SaveExtrasDto(false, false, trouwboekjeId, false));
+
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        tester.assertContains("Trouwboekje bordeaux");
     }
 
     @Test
@@ -164,8 +188,8 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(ControlerenPage.class);
         tester.assertContains("Controleren");
         tester.assertContains("Samenvatting");
-        tester.assertContains("Uw gegevens");
-        tester.assertContains("De getuigen");
+        tester.assertContains("Jullie gegevens");
+        tester.assertContains("Jullie getuigen");
         tester.assertContains("Totaal bedrag");
         tester.assertEnabled(PAGE_BODY + ":bevestigForm:bevestigButton");
 
