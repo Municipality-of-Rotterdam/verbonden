@@ -11,7 +11,6 @@ import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -48,6 +47,11 @@ public class DeGetuigenPage extends IntakeBasePage {
     @Override
     protected IModel<String> getStepHeadingModel() {
         return new ResourceModel("intake.step.getuigen");
+    }
+
+    @Override
+    protected IModel<String> getStepQuestionModel() {
+        return new ResourceModel("de.getuigen.heading");
     }
 
     @Override
