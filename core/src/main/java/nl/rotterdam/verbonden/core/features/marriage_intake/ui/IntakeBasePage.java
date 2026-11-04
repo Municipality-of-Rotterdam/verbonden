@@ -76,6 +76,10 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         return Model.of("");
     }
 
+    protected IModel<String> getStepQuestionModel() {
+        return null;
+    }
+
     protected IModel<String> getStepIntroModel() {
         return Model.of("");
     }
@@ -167,7 +171,12 @@ public abstract class IntakeBasePage extends BurgerBasePage {
 
         WebMarkupContainer stepDetails = new WebMarkupContainer("stepDetails");
         stepDetails.setVisible(intakeStepLayout);
+        IModel<String> stepQuestionModel = getStepQuestionModel();
+        Label stepQuestion = new Label("stepQuestion",
+                stepQuestionModel != null ? stepQuestionModel : Model.of(""));
+        stepQuestion.setVisible(stepQuestionModel != null);
         stepDetails.add(new Label("stepHeading", getStepHeadingModel()),
+                stepQuestion,
                 new Label("stepIntro", getStepIntroModel()));
 
         pageBody.add(
