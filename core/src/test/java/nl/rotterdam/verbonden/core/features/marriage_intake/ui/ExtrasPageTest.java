@@ -39,6 +39,25 @@ class ExtrasPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990007")
+    void ringenUitwisselenToontDeJaEnNeeKeuzes() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990007")));
+
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("Ringen uitwisselen")
+                .contains("Wilt u tijdens de ceremonie een ring bij elkaar omdoen?")
+                .contains("Ja")
+                .contains("Nee")
+                .contains("type=\"radio\"");
+        assertThat(html).doesNotContain("Ringen uitwisselen tijdens ceremonie");
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
     void trouwboekjeKiezen_slaatOpEnVerverstAlleenKeuzesEnSidebar() {
         long trouwboekjeId = trouwboekjeAdministrationService.create(new CreateTrouwboekjeDto(
                 "Linnen trouwboekje", "Linnen", "/trouwboekjes/linnen.webp", Bedrag.of("42.50"), null, null));
