@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraI
 import nl.rotterdam.verbonden.core.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
@@ -169,6 +170,18 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     }
 
     @Override
+    @Transactional
+    public void slaTaalOp(UUID dossierId, CeremonieTaal taal) {
+        getWijzigbaarDossier(dossierId).wijzigTaal(taal);
+    }
+
+    @Override
+    @Transactional
+    public void slaAantalBezoekersOp(UUID dossierId, int aantalBezoekers) {
+        getWijzigbaarDossier(dossierId).wijzigAantalBezoekers(aantalBezoekers);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<UUID> findDossierIdByBsn(BurgerServiceNummer bsn) {
         return findActiefDossier(bsn).map(HuwelijksDossierEntity::getUuid);
@@ -266,6 +279,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
+                e.getTaal(),
+                e.getAantalBezoekers(),
                 e.getCeremonieSoort(),
                 prijs,
                 datumTijdHuwelijk,
@@ -320,11 +335,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     }
 
     /**
-     * Een dossier is compleet wanneer datum en locatie gekozen zijn, beide partners hun achternaam
-     * hebben gekozen en alle vereiste getuigen zijn ingevuld.
+     * Een dossier is compleet wanneer de taal, datum en locatie gekozen zijn, beide partners hun achternaam
+     * hebben gekozen en alle vereiste getuigen en het aantal bezoekers zijn ingevuld.
      */
     private List<OntbrekendOnderdeel> ontbrekendeOnderdelen(HuwelijksDossierEntity dossier) {
         List<OntbrekendOnderdeel> ontbrekend = new ArrayList<>();
+        if (dossier.getTaal() == null) {
+            ontbrekend.add(OntbrekendOnderdeel.TAAL);
+        }
         if (findDatumTijdHuwelijk(dossier) == null) {
             ontbrekend.add(OntbrekendOnderdeel.DATUM);
         }
@@ -339,6 +357,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
         if (getuigenRepository.countByDossier_IdAndNaamIsNotNull(dossier.getId()) < vereistAantalGetuigen(dossier)) {
             ontbrekend.add(OntbrekendOnderdeel.GETUIGEN);
+        }
+        if (dossier.getAantalBezoekers() == null) {
+            ontbrekend.add(OntbrekendOnderdeel.AANTAL_BEZOEKERS);
         }
         return List.copyOf(ontbrekend);
     }

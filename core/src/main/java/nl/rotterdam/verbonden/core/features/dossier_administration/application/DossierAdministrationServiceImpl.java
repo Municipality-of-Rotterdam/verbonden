@@ -133,6 +133,8 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                 dossier.getIngediendOp(),
                 dossier.getRegistratieType(),
                 dossier.getCeremonieSoort(),
+                dossier.getTaal(),
+                dossier.getAantalBezoekers(),
                 samenvatting.huwelijksLocatie(),
                 samenvatting.datumTijdHuwelijk(),
                 samenvatting.prijs(),
@@ -222,8 +224,10 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Override
     @Transactional
     public void updateCeremonie(UUID dossierId, ChangeCeremonieDto dto) {
-        getDossier(dossierId).wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(),
-                locatieVoor(dto.ceremonieSoort()));
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        dossier.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), locatieVoor(dto.ceremonieSoort()));
+        dossier.wijzigTaal(dto.taal());
+        dossier.wijzigAantalBezoekers(dto.aantalBezoekers());
     }
 
     @Override

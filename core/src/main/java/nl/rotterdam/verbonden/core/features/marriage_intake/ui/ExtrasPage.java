@@ -6,6 +6,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenv
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -20,9 +21,11 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.validation.validator.RangeValidator;
 
 import java.util.List;
 import java.util.Objects;
@@ -81,7 +84,7 @@ public class ExtrasPage extends IntakeBasePage {
         boolean isGroot = dossier.ceremonieSoort() == CeremonieSoort.GROOT;
         boolean isHuwelijk = dossier.registratieType() == RegistratieType.HUWELIJK;
 
-        pageBody.add(new ExtrasForm("extrasForm", selecties, isGroot, isHuwelijk));
+        pageBody.add(new ExtrasForm("extrasForm", selecties, dossier, isGroot, isHuwelijk));
     }
 
     private class ExtrasForm extends Form<ExtrasFormDto> {
@@ -90,8 +93,11 @@ public class ExtrasPage extends IntakeBasePage {
         private final boolean isHuwelijk;
         private WebMarkupContainer trouwboekjeSection;
 
-        ExtrasForm(String id, SaveExtrasDto selecties, boolean isGroot, boolean isHuwelijk) {
-            super(id, Model.of(ExtrasFormDto.vanSelecties(selecties)));
+        private final CeremonieSoort ceremonieSoort;
+
+        ExtrasForm(String id, SaveExtrasDto selecties, DossierSamenvattingDto dossier, boolean isGroot, boolean isHuwelijk) {
+            super(id, Model.of(ExtrasFormDto.vanSelecties(selecties, dossier.aantalBezoekers())));
+            this.ceremonieSoort = dossier.ceremonieSoort();
             this.isGroot = isGroot;
             this.isHuwelijk = isHuwelijk;
         }
@@ -101,6 +107,33 @@ public class ExtrasPage extends IntakeBasePage {
             super.onInitialize();
 
             IModel<ExtrasFormDto> model = getModel();
+
+            // --- Aantal bezoekers ---
+            RdFormFieldTextInput<Integer> aantalBezoekersVeld = new RdFormFieldTextInput<>("aantalBezoekersInput",
+                    LambdaModel.of(model, ExtrasFormDto::getAantalBezoekers, ExtrasFormDto::setAantalBezoekers),
+                    new ResourceModel("extras.bezoekers.label"));
+            aantalBezoekersVeld.setHtmlInputType("number").setModelType(Integer.class);
+            aantalBezoekersVeld.setOutputMarkupId(true);
+            aantalBezoekersVeld.withTextInput((rdTextInput, _) -> {
+                rdTextInput.setRequired(true);
+                rdTextInput.add(RangeValidator.range(0, ceremonieSoort.getMaxAantalBezoekers()));
+                rdTextInput.add(new AjaxFormComponentUpdatingBehavior("change") {
+                    @Override
+                    protected void onUpdate(AjaxRequestTarget target) {
+                        marriageIntakeService.slaAantalBezoekersOp(dossierId, getModelObject().getAantalBezoekers());
+                        target.add(aantalBezoekersVeld, keuzesSidebar);
+                    }
+
+                    @Override
+                    protected void onError(AjaxRequestTarget target, RuntimeException e) {
+                        target.add(aantalBezoekersVeld);
+                    }
+                });
+            });
+            WebMarkupContainer bezoekersSection = new WebMarkupContainer("bezoekersSection");
+            bezoekersSection.add(
+                    new Label("bezoekersMaximum", new StringResourceModel("extras.bezoekers.maximum").setParameters(ceremonieSoort.getMaxAantalBezoekers())), aantalBezoekersVeld);
+            add(bezoekersSection);
 
             // --- Ringen uitwisselen ---
             WebMarkupContainer ringenSection = new WebMarkupContainer("ringenSection");
@@ -228,6 +261,10 @@ public class ExtrasPage extends IntakeBasePage {
         @Override
         protected void onSubmit() {
             slaOp();
+            Integer aantalBezoekers = getModelObject().getAantalBezoekers();
+            if (aantalBezoekers != null) {
+                marriageIntakeService.slaAantalBezoekersOp(dossierId, aantalBezoekers);
+            }
             setResponsePage(ExtrasPage.class, makeDossierPageParameters(dossierId));
         }
 

@@ -105,13 +105,27 @@ class ExtrasPageTest extends BaseWicketTest {
         tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
 
         String html = tester.getLastResponseAsString();
-        assertThat(html.split("rd-extra-sectie card mb-4 p-4", -1)).hasSize(4);
+        assertThat(html.split("rd-extra-sectie card mb-4 p-4", -1)).hasSize(5);
         assertThat(html).contains("rd-intake-content--unbordered");
         assertThat(html.indexOf("Volgende stap"))
                 .isGreaterThan(html.lastIndexOf("rd-extra-sectie card mb-4 p-4"));
         assertThat(html)
                 .contains("rd-trouwboekje-keuzes")
                 .contains("rd-extra-keuze-item d-flex align-items-center justify-content-between flex-wrap gap-2");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void aantalBezoekersToontHetMaximumVanDeCeremonie() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990020")));
+
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("U mag met maximaal 4 bezoekers komen, inclusief beide partners en de getuigen.")
+                .doesNotContain("{0}");
     }
 
     private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, BurgerServiceNummer bsn) {

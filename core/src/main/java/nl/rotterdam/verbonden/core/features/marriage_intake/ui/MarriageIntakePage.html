@@ -20,6 +20,35 @@
             <span wicket:id="registratieMeer">Lees meer</span>
         </p>
 
+        <!-- Taal van de ceremonie -->
+        <div class="rd-card" wicket:id="taalGroup">
+            <p class="rd-intro-text">
+                <span wicket:id="taalToelichting">Toelichting</span>
+            </p>
+            <div class="d-flex flex-column gap-3">
+                <label class="rd-radio-option" for="taal-nederlands-input">
+                    <input type="radio" wicket:id="nederlands" id="taal-nederlands-input"/>
+                    <wicket:message key="intake.taal.nederlands">Nederlands</wicket:message>
+                </label>
+                <label class="rd-radio-option" for="taal-engels-input">
+                    <input type="radio" wicket:id="engels" id="taal-engels-input"/>
+                    <wicket:message key="intake.taal.engels">Engels</wicket:message>
+                </label>
+                <label class="rd-radio-option" for="taal-frans-input">
+                    <input type="radio" wicket:id="frans" id="taal-frans-input"/>
+                    <wicket:message key="intake.taal.frans">Frans</wicket:message>
+                </label>
+                <label class="rd-radio-option" for="taal-duits-input">
+                    <input type="radio" wicket:id="duits" id="taal-duits-input"/>
+                    <wicket:message key="intake.taal.duits">Duits</wicket:message>
+                </label>
+                <label class="rd-radio-option" for="taal-anders-input">
+                    <input type="radio" wicket:id="anders" id="taal-anders-input"/>
+                    <wicket:message key="intake.taal.anders">Anders (tolk nodig)</wicket:message>
+                </label>
+            </div>
+        </div>
+
         <div class="rd-card rd-ceremonie-kaart">
             <h2 class="rd-ceremony-heading">
                 <wicket:message key="intake.soort.heading">Wat voor ceremonie wilt u?</wicket:message>

@@ -73,6 +73,9 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                 new BookmarkablePageLink<>("ceremonieWijzigen", DossierCeremonieUpdatePage.class, dossierParams),
                 new Label("registratieType", dossier.registratieType().getLabel()),
                 new Label("ceremonieSoort", dossier.ceremonieSoort().getLabel()),
+                new Label("taal", dossier.taal() != null ? dossier.taal().getLabel() : "Nog niet gekozen"),
+                new Label("aantalBezoekers", dossier.aantalBezoekers() != null
+                        ? String.valueOf(dossier.aantalBezoekers()) : "Nog niet ingevuld"),
                 new Label("ceremoniePrijs", prijs(dossier.ceremoniePrijs())),
                 new Label("locatie", tekst(dossier.locatieNaam())),
 

@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
@@ -38,6 +39,15 @@ public class MarriageIntakePage extends IntakeBasePage {
     private MarriageIntakeService marriageIntakeService;
 
     private RegistratieType registratieType = RegistratieType.GEREGISTREERD_PARTNERSCHAP;
+
+    private CeremonieTaal taal;
+
+    private final RdRadioGroup<CeremonieTaal> taalGroup = new RdRadioGroup<>(
+            "taalGroup",
+            new PropertyModel<>(this, "taal"),
+            new ResourceModel("intake.taal.legend"),
+            new ResourceModel("intake.taal.description")
+    );
 
     private final RdRadioGroup<RegistratieType> registrationGroup = new RdRadioGroup<>(
             "registrationGroup",
@@ -92,13 +102,13 @@ public class MarriageIntakePage extends IntakeBasePage {
         if (dossierId != null) {
             return () -> {
                 DossierSamenvattingDto d = marriageIntakeService.findByDossierId(dossierId);
-                return new DossierSamenvattingDto(d.id(), registratieType, d.ceremonieSoort(),
+                return new DossierSamenvattingDto(d.id(), registratieType, d.taal(), d.aantalBezoekers(), d.ceremonieSoort(),
                         d.prijs(), d.datumTijdHuwelijk(), d.huwelijksLocatie(),
                         d.gegevensBevestigd(), d.getuigenBevestigd(), d.getuigenGedeeltelijkIngevuld(), d.extras(), d.extrasDoorlopen(),
                         d.aantalGekozenAchternamen(), d.partnerGekoppeld(), d.totalPrijs(), d.status(), d.ingediendOp(), d.ontbrekendeOnderdelen());
             };
         }
-        return () -> new DossierSamenvattingDto(null, registratieType, CeremonieSoort.KLEIN, null, null, null, false, false, false, List.of(), false, 0, false, null,
+        return () -> new DossierSamenvattingDto(null, registratieType, taal, null, CeremonieSoort.KLEIN, null, null, null, false, false, false, List.of(), false, 0, false, null,
                 DossierStatus.CONCEPT, null, List.of());
     }
 
@@ -107,7 +117,9 @@ public class MarriageIntakePage extends IntakeBasePage {
         super.onInitialize();
 
         if (dossierId != null) {
-            registratieType = marriageIntakeService.findByDossierId(dossierId).registratieType();
+            DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
+            registratieType = dossier.registratieType();
+            taal = dossier.taal();
         }
 
         Form<Void> form = new Form<>("form");
@@ -121,6 +133,17 @@ public class MarriageIntakePage extends IntakeBasePage {
         registrationGroup.add(new RdRadioButton<>("huwelijk", Model.of(RegistratieType.HUWELIJK), regRadioGroup));
         registrationGroup.add(new RdRadioButton<>("geregistreerdPartnerschap",
                 Model.of(RegistratieType.GEREGISTREERD_PARTNERSCHAP), regRadioGroup));
+
+        form.add(taalGroup);
+        RadioGroup<CeremonieTaal> taalRadioGroup = taalGroup.getRadioGroup();
+        taalRadioGroup.setRequired(true);
+        taalGroup.add(new Label("taalToelichting", new ResourceModel("intake.taal.toelichting.html"))
+                .setEscapeModelStrings(false),
+                new RdRadioButton<>("nederlands", Model.of(CeremonieTaal.NEDERLANDS), taalRadioGroup),
+                new RdRadioButton<>("engels", Model.of(CeremonieTaal.ENGELS), taalRadioGroup),
+                new RdRadioButton<>("frans", Model.of(CeremonieTaal.FRANS), taalRadioGroup),
+                new RdRadioButton<>("duits", Model.of(CeremonieTaal.DUITS), taalRadioGroup),
+                new RdRadioButton<>("anders", Model.of(CeremonieTaal.ANDERS), taalRadioGroup));
 
         // Load ceremony types from database
         List<IntakeMarriageTypeDto> marriageTypes = marriageIntakeService.findAllMarriageTypes();
@@ -172,6 +195,8 @@ public class MarriageIntakePage extends IntakeBasePage {
                             dossierId = marriageIntakeService.create(
                                     new CreateDossierDto(registratieType, dto.soort(), dto.locatieId(), getCurrentBsn()));
                         }
+
+                        marriageIntakeService.slaTaalOp(dossierId, taal);
 
                         DeDagPage.respond(dossierId);
                     }

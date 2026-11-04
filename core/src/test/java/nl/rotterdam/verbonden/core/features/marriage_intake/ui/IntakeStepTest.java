@@ -22,6 +22,8 @@ class IntakeStepTest {
 
     @Test
     void missingPartsRouteToTheirOwningStep() {
+        assertThat(IntakeStep.pageVoor(OntbrekendOnderdeel.TAAL)).isEqualTo(MarriageIntakePage.class);
+        assertThat(IntakeStep.pageVoor(OntbrekendOnderdeel.AANTAL_BEZOEKERS)).isEqualTo(ExtrasPage.class);
         assertThat(IntakeStep.pageVoor(OntbrekendOnderdeel.DATUM)).isEqualTo(DatumKiezenPage.class);
         assertThat(IntakeStep.pageVoor(OntbrekendOnderdeel.LOCATIE)).isEqualTo(DeDagPage.class);
         assertThat(IntakeStep.pageVoor(OntbrekendOnderdeel.PARTNER_GEKOPPELD)).isEqualTo(JullieGegevensPage.class);
