@@ -8,10 +8,10 @@ import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationA
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
+import nl.rotterdam.verbonden.core.features.trouwlijst_administration.ui.TrouwlijstAdministrationPage;
 import nl.rotterdam.nl_design_system.rotterdam_css.wicket.PatchingNldsRotterdamDesignSystemThemeBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconType;
-import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_logo.RotterdamLogoImage;
 import nl.rotterdam.nl_design_system.wicket.components.body.RdBodyTransparentContainer;
 import nl.rotterdam.nl_design_system.wicket.components.page_body.RdPageBodyBorder;
 import nl.rotterdam.nl_design_system.wicket.components.root.RdRootTransparentContainer;
@@ -64,7 +64,8 @@ public abstract class AdministrationBasePage extends WebPage {
             new NavigationItem("Trouwlocaties", RotterdamIconType.LOCATION, LocationAdministrationPage.class),
             new NavigationItem("Huwelijkstypen", RotterdamIconType.RING, MarriageTypeAdministrationPage.class),
             new NavigationItem("Dossiers", RotterdamIconType.DOCUMENT, DossierAdministrationPage.class),
-            new NavigationItem("Trouwboekjes", RotterdamIconType.FILE, TrouwboekjeAdministrationPage.class)
+            new NavigationItem("Trouwboekjes", RotterdamIconType.FILE, TrouwboekjeAdministrationPage.class),
+            new NavigationItem("Trouwlijst", RotterdamIconType.CALENDAR, TrouwlijstAdministrationPage.class)
     );
 
     protected final RdPageBodyBorder pageBody;
@@ -75,7 +76,6 @@ public abstract class AdministrationBasePage extends WebPage {
         add(new RdBodyTransparentContainer("body"));
 
         add(new SidebarToggle("sidebarToggle"));
-        add(new RotterdamLogoImage("rotterdamLogoImage"));
         add(new ListView<>("navigationItems", NAVIGATION_ITEMS.stream()
                 .filter(item -> magOpenen(item.page()))
                 .toList()) {

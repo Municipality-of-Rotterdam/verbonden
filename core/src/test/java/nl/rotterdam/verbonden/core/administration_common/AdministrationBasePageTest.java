@@ -41,6 +41,15 @@ class AdministrationBasePageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(roles = Roles.BEHEER)
+    void toontHetVerbondenLogo() {
+        tester.startPage(BabsAdministrationPage.class);
+
+        assertThat(tester.getLastResponseAsString()).contains("src=\"/images/VBR_logo_green.svg\"");
+        assertThat(getClass().getResource("/static/images/VBR_logo_green.svg")).isNotNull();
+    }
+
+    @Test
+    @WithMockUser(roles = Roles.BEHEER)
     void markeertHetMenuItemVanDeHuidigePagina() {
         tester.startPage(LocationAdministrationPage.class);
 
