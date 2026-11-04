@@ -2,9 +2,9 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.domain;
 
 public enum CeremonieSoort {
 
-    KLEIN("Klein", 2, 8),
+    KLEIN("Klein", 2, 4),
     MIDDELGROOT("Middelgroot", 4, 16),
-    GROOT("Groot", 4, Integer.MAX_VALUE);
+    GROOT("Groot", 4, 100);
 
     private final String label;
     private final int aantalGetuigen;
@@ -28,13 +28,9 @@ public enum CeremonieSoort {
     }
 
     /**
-     * Het maximale aantal bezoekers bij deze ceremonie; {@link Integer#MAX_VALUE} wanneer er geen maximum is.
+     * Het maximale aantal bezoekers bij deze ceremonie;
      */
     public int getMaxAantalBezoekers() {
         return maxAantalBezoekers;
-    }
-
-    public boolean heeftMaxAantalBezoekers() {
-        return maxAantalBezoekers != Integer.MAX_VALUE;
     }
 }

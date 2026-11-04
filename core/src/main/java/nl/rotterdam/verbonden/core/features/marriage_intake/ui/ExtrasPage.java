@@ -116,9 +116,7 @@ public class ExtrasPage extends IntakeBasePage {
             aantalBezoekersVeld.setOutputMarkupId(true);
             aantalBezoekersVeld.withTextInput((rdTextInput, _) -> {
                 rdTextInput.setRequired(true);
-                rdTextInput.add(ceremonieSoort.heeftMaxAantalBezoekers()
-                        ? RangeValidator.range(0, ceremonieSoort.getMaxAantalBezoekers())
-                        : RangeValidator.minimum(0));
+                rdTextInput.add(RangeValidator.range(0, ceremonieSoort.getMaxAantalBezoekers()));
                 rdTextInput.add(new AjaxFormComponentUpdatingBehavior("change") {
                     @Override
                     protected void onUpdate(AjaxRequestTarget target) {
@@ -134,10 +132,7 @@ public class ExtrasPage extends IntakeBasePage {
             });
             WebMarkupContainer bezoekersSection = new WebMarkupContainer("bezoekersSection");
             bezoekersSection.add(
-                    new Label("bezoekersMaximum", ceremonieSoort.heeftMaxAantalBezoekers()
-                            ? new StringResourceModel("extras.bezoekers.maximum").setParameters(ceremonieSoort.getMaxAantalBezoekers())
-                            : new ResourceModel("extras.bezoekers.geenmaximum")),
-                    aantalBezoekersVeld);
+                    new Label("bezoekersMaximum", new StringResourceModel("extras.bezoekers.maximum").setParameters(ceremonieSoort.getMaxAantalBezoekers())), aantalBezoekersVeld);
             add(bezoekersSection);
 
             // --- Ringen uitwisselen ---

@@ -18,6 +18,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import java.util.List;
+import java.util.Map;
 
 public class DossierCeremonieUpdatePage extends DossierBeheerBasePage {
 
@@ -63,7 +64,7 @@ public class DossierCeremonieUpdatePage extends DossierBeheerBasePage {
                     new RdFormFieldTextInput<>("aantalBezoekers",
                             LambdaModel.of(model, CeremonieFormDto::getAantalBezoekers, CeremonieFormDto::setAantalBezoekers),
                             Model.of("Aantal bezoekers"),
-                            Model.of("Maximaal 8 bij een klein en 16 bij een middelgroot huwelijk; bij een groot huwelijk is er geen maximum"))
+                            Model.of("Maximaal 4 bij een klein en 16 bij een middelgroot huwelijk en bij een groot huwelijk is het maximum 100"))
                             .setHtmlInputType("number")
                             .setModelType(Integer.class)
                             .setRequired(true),
@@ -75,10 +76,8 @@ public class DossierCeremonieUpdatePage extends DossierBeheerBasePage {
         protected void onSubmit() {
             CeremonieFormDto f = getModelObject();
             if (f.getAantalBezoekers() < 0 || f.getAantalBezoekers() > f.getCeremonieSoort().getMaxAantalBezoekers()) {
-                error(f.getCeremonieSoort().heeftMaxAantalBezoekers()
-                        ? "Bij een " + f.getCeremonieSoort().getLabel().toLowerCase() + " huwelijk mogen maximaal "
-                        + f.getCeremonieSoort().getMaxAantalBezoekers() + " bezoekers komen."
-                        : "Vul een aantal bezoekers van 0 of meer in.");
+                error( "Bij een " + f.getCeremonieSoort().getLabel().toLowerCase() + " huwelijk mogen maximaal "
+                        + f.getCeremonieSoort().getMaxAantalBezoekers() + " bezoekers komen.");
                 return;
             }
             dossierAdministrationService.updateCeremonie(dossierId,
