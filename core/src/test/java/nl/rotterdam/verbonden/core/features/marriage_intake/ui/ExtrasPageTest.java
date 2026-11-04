@@ -124,7 +124,7 @@ class ExtrasPageTest extends BaseWicketTest {
         tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
 
         assertThat(tester.getLastResponseAsString())
-                .contains("U mag maximaal 8 bezoekers meenemen.")
+                .contains("U mag met maximaal 4 bezoekers komen, inclusief beide partners en de getuigen.")
                 .doesNotContain("{0}");
     }
 

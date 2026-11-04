@@ -39,22 +39,23 @@ class TaalEnAantalBezoekersIntegrationTest {
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
 
         marriageIntakeService.slaTaalOp(dossierId, CeremonieTaal.FRANS);
-        marriageIntakeService.slaAantalBezoekersOp(dossierId, 5);
+        marriageIntakeService.slaAantalBezoekersOp(dossierId, 3);
 
         var dossier = marriageIntakeService.findByDossierId(dossierId);
         assertThat(dossier.taal()).isEqualTo(CeremonieTaal.FRANS);
-        assertThat(dossier.aantalBezoekers()).isEqualTo(5);
+        assertThat(dossier.aantalBezoekers()).isEqualTo(3);
         assertThat(dossier.ontbrekendeOnderdelen())
                 .doesNotContain(OntbrekendOnderdeel.TAAL, OntbrekendOnderdeel.AANTAL_BEZOEKERS);
     }
 
     @ParameterizedTest(name = "{0}: {1} bezoekers toegestaan = {2}")
     @CsvSource({
-            "KLEIN, 8, true",
-            "KLEIN, 9, false",
+            "KLEIN, 4, true",
+            "KLEIN, 5, false",
             "MIDDELGROOT, 16, true",
             "MIDDELGROOT, 17, false",
-            "GROOT, 500, true",
+            "GROOT, 100, true",
+            "GROOT, 101, false",
             "GROOT, -1, false"})
     void aantalBezoekers_isBeperktDoorHetMaximumVanDeCeremonie(CeremonieSoort soort, int aantal, boolean toegestaan) {
         UUID dossierId = maakDossier(soort);

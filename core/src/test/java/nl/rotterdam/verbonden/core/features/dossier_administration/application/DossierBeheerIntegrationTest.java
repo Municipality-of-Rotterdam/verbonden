@@ -270,11 +270,11 @@ class DossierBeheerIntegrationTest {
         UUID dossierId = maakDossierMetPartnerZonderBsn();
 
         dossierAdministrationService.updateCeremonie(dossierId,
-                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, CeremonieTaal.ENGELS, 6));
+                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, CeremonieTaal.ENGELS, 4));
 
         DossierDetailDto detail = dossierAdministrationService.findDetail(dossierId);
         assertThat(detail.taal()).isEqualTo(CeremonieTaal.ENGELS);
-        assertThat(detail.aantalBezoekers()).isEqualTo(6);
+        assertThat(detail.aantalBezoekers()).isEqualTo(4);
     }
 
     @Test
