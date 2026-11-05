@@ -1,0 +1,16 @@
+<wicket:extend>
+    <h1>Betalingen</h1>
+
+    <p>Alle online betalingen, nieuwste eerst. Crediteren kan niet in Verbonden.</p>
+
+    <form wicket:id="zoekForm" class="d-flex gap-2 mb-3">
+        <input wicket:id="zoektermVeld" type="text" class="utrecht-textbox" placeholder="Zoek op betalingskenmerk, kenmerk betaalprovider (basket-id) of dossier-ID"/>
+        <button wicket:id="zoekButton" type="submit" class="utrecht-button utrecht-button--primary-action">Zoeken</button>
+    </form>
+
+    <table wicket:id="betalingTable"></table>
+
+    <wicket:fragment wicket:id="dossierLinkFragment">
+        <a wicket:id="link"><span wicket:id="dossierId"></span></a>
+    </wicket:fragment>
+</wicket:extend>
