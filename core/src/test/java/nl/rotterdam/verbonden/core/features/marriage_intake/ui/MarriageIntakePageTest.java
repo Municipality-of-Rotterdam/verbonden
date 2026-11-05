@@ -42,16 +42,32 @@ class MarriageIntakePageTest extends BaseWicketTest {
     }
 
     /**
-     * De kenmerken van de ceremonie komen uit de database; V40 herschrijft de geseede teksten naar B1.
+     * De namen en kenmerken van de ceremonie komen uit de database.
      */
     @Test
     @WithMockUser(username = "999990007")
-    void toontKenmerkenVanDeCeremonieOpTaalniveauB1() {
+    void toontDeNieuweNamenEnKenmerkenVanDeCeremonie() {
         tester.startPage(MarriageIntakePage.class);
 
         assertThat(tester.getLastResponseAsString())
-                .contains("U kiest zelf de datum (als die vrij is)")
-                .doesNotContain("mits beschikbaar");
+                .contains("Gratis")
+                .contains("U kiest zelf een datum. De ceremonie is op maandagochtend.")
+                .contains("De ceremonie is in de felicitatiezaal in het stadhuis.")
+                .contains("U neemt 2 getuigen mee. Andere gasten zijn niet welkom.")
+                .contains("U kiest de trouwambtenaar niet zelf.")
+                .contains("De trouwambtenaar houdt geen toespraak.")
+                .contains("De ceremonie duurt 10 minuten.")
+                .contains("Eenvoudig")
+                .contains("U kiest zelf een datum uit de beschikbare data.")
+                .contains("Er zijn maximaal 16 personen, inclusief u en uw partner.")
+                .contains("De trouwambtenaar houdt een toespraak.")
+                .contains("De ceremonie duurt 15 minuten.")
+                .contains("Standaard")
+                .contains("U kiest een trouwzaal in het stadhuis of een eigen locatie.")
+                .contains("Het aantal personen hangt af van de locatie die u kiest.")
+                .contains("U kunt uw voorkeur voor een trouwambtenaar aangeven.")
+                .contains("De ceremonie duurt 30 minuten tot 1 uur.")
+                .doesNotContain("Middelgroot", "Groot");
     }
 
     /**
