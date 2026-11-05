@@ -36,6 +36,11 @@ import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
 import nl.rotterdam.verbonden.core.identity.PersonLookupService;
 import nl.rotterdam.verbonden.core.persistence.DossierBestandEntity;
 import nl.rotterdam.verbonden.core.persistence.DossierInzageEntity;
+import nl.rotterdam.verbonden.core.persistence.DossierMailEntity;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierMailDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierMailPogingDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierMailDto;
+import nl.rotterdam.verbonden.core.features.dossier_mail.repository.DossierMailRepository;
 import nl.rotterdam.verbonden.core.persistence.GetuigeEntity;
 import nl.rotterdam.verbonden.core.persistence.HuwelijksDossierEntity;
 import nl.rotterdam.verbonden.core.persistence.HuwelijksDossiersPartnerEntity;
@@ -49,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,6 +66,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     private final DossierAdministrationRepository dossierAdministrationRepository;
     private final DossierBestandRepository dossierBestandRepository;
     private final DossierInzageRepository dossierInzageRepository;
+    private final DossierMailRepository dossierMailRepository;
     private final GetuigenRepository getuigenRepository;
     private final MarriageTypeLocationRepository marriageTypeLocationRepository;
     private final TrouwboekjeRepository trouwboekjeRepository;
@@ -71,6 +78,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     DossierAdministrationServiceImpl(DossierAdministrationRepository dossierAdministrationRepository,
                                      DossierBestandRepository dossierBestandRepository,
                                      DossierInzageRepository dossierInzageRepository,
+                                     DossierMailRepository dossierMailRepository,
                                      GetuigenRepository getuigenRepository,
                                      MarriageTypeLocationRepository marriageTypeLocationRepository,
                                      TrouwboekjeRepository trouwboekjeRepository,
@@ -81,6 +89,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         this.dossierAdministrationRepository = dossierAdministrationRepository;
         this.dossierBestandRepository = dossierBestandRepository;
         this.dossierInzageRepository = dossierInzageRepository;
+        this.dossierMailRepository = dossierMailRepository;
         this.getuigenRepository = getuigenRepository;
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
         this.trouwboekjeRepository = trouwboekjeRepository;
@@ -389,6 +398,54 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Transactional
     public void deleteBestand(UUID dossierId, long bestandId) {
         dossierBestandRepository.delete(getBestand(dossierId, bestandId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ListDossierMailDto> findMails(UUID dossierId) {
+        getDossier(dossierId);
+        return dossierMailRepository.findByDossier_UuidOrderByAangemaaktOpDescIdDesc(dossierId).stream()
+                .map(mail -> new ListDossierMailDto(
+                        mail.getId(),
+                        mail.getType(),
+                        mail.getOnderwerp(),
+                        ontvangers(mail),
+                        mail.getStatus(),
+                        mail.getAangemaaktOp(),
+                        mail.getPogingen().size(),
+                        mail.getPogingen().isEmpty() ? null : mail.getPogingen().getLast().getTijdstip(),
+                        mail.getVolgendePogingOp()))
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public DossierMailDto findMail(UUID dossierId, long mailId) {
+        DossierMailEntity mail = dossierMailRepository.findByIdAndDossier_Uuid(mailId, dossierId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "E-mail " + mailId + " hoort niet bij dossier " + dossierId));
+        registreerInzage(dossierId, InzageActie.EMAIL_BEKEKEN);
+        return new DossierMailDto(
+                mail.getId(),
+                mail.getType(),
+                mail.getAfzender(),
+                ontvangers(mail),
+                mail.getOnderwerp(),
+                mail.getInhoud(),
+                mail.getStatus(),
+                mail.getAangemaaktOp(),
+                mail.getVolgendePogingOp(),
+                mail.getPogingen().stream()
+                        .map(poging -> new DossierMailPogingDto(
+                                poging.getVolgnummer(), poging.getTijdstip(), poging.getStatus(), poging.getFoutmelding()))
+                        .toList());
+    }
+
+    private static List<String> ontvangers(DossierMailEntity mail) {
+        return Arrays.stream(mail.getOntvangers().split(","))
+                .map(String::trim)
+                .filter(adres -> !adres.isEmpty())
+                .toList();
     }
 
     private DossierBestandEntity getBestand(UUID dossierId, long bestandId) {
