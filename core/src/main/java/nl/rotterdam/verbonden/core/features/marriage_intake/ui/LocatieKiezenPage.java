@@ -69,6 +69,11 @@ public class LocatieKiezenPage extends IntakeBasePage {
         return true;
     }
 
+    @Override
+    protected boolean hasIntakeContentBorder() {
+        return false;
+    }
+
     public static void respond(UUID dossierId) {
         RequestCycle.get().setResponsePage(LocatieKiezenPage.class, makeDossierPageParameters(dossierId));
     }
