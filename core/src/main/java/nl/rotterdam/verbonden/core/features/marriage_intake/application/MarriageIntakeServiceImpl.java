@@ -21,6 +21,9 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriag
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.AfspraakRepository;
@@ -170,6 +173,46 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ListLocatieDto> findLocaties() {
+        return locatieRepository.findAllProjectedUnpaged();
+    }
+
+    @Override
+    @Transactional
+    public void kiesLocatie(UUID dossierId, long locatieId) {
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
+        if (dossier.getCeremonieSoort() != CeremonieSoort.GROOT) {
+            throw new IllegalStateException("Een trouwlocatie kiezen kan alleen bij een grote ceremonie");
+        }
+        TrouwlocatieEntity locatie = locatieRepository.findById(locatieId)
+                .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + locatieId));
+        dossier.wijzigCeremonie(dossier.getRegistratieType(), dossier.getCeremonieSoort(), locatie);
+    }
+
+    @Override
+    @Transactional
+    public void slaVrijeTrouwlocatieOp(UUID dossierId, SaveVrijeTrouwlocatieDto dto) {
+        if (dto.naam() == null || dto.naam().isBlank()
+                || dto.adres() == null || dto.adres().isBlank()
+                || dto.telefoonnummer() == null) {
+            throw new IllegalArgumentException("Naam, adres en telefoonnummer van de vrije trouwlocatie zijn verplicht");
+        }
+        getWijzigbaarDossier(dossierId).kiesVrijeTrouwlocatie(
+                dto.naam().trim(), dto.adres().trim(), dto.telefoonnummer(),
+                dto.contactpersoon() == null || dto.contactpersoon().isBlank()
+                        ? null : dto.contactpersoon().trim());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<VrijeTrouwlocatieDto> findVrijeTrouwlocatie(UUID dossierId) {
+        return Optional.ofNullable(getDossier(dossierId).getVrijeTrouwlocatie())
+                .map(locatie -> new VrijeTrouwlocatieDto(locatie.getNaam(), locatie.getAdres(),
+                        locatie.getTelefoonnummer(), locatie.getContactpersoon(), locatie.isGoedgekeurd()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<UUID> findDossierIdByBsn(BurgerServiceNummer bsn) {
         return findActiefDossier(bsn).map(HuwelijksDossierEntity::getUuid);
     }
@@ -230,7 +273,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         LocalDateTime datumTijdHuwelijk = findDatumTijdHuwelijk(e);
 
-        String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
+        String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam()
+                : e.getVrijeTrouwlocatie() != null ? e.getVrijeTrouwlocatie().getNaam() : null;
 
         Bedrag prijs = marriageTypeRepository.findBySoort(e.getCeremonieSoort())
                 .map(MarriageTypeEntity::getPrijs)
@@ -328,7 +372,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         if (findDatumTijdHuwelijk(dossier) == null) {
             ontbrekend.add(OntbrekendOnderdeel.DATUM);
         }
-        if (dossier.getLocatie() == null) {
+        if (dossier.getLocatie() == null && dossier.getVrijeTrouwlocatie() == null) {
             ontbrekend.add(OntbrekendOnderdeel.LOCATIE);
         }
         if (dossier.getPartners().size() != 2) {

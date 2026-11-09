@@ -54,6 +54,8 @@ public interface DossierAdministrationService {
 
     void updateCeremonie(UUID dossierId, ChangeCeremonieDto dto);
 
+    void keurVrijeTrouwlocatieGoed(UUID dossierId);
+
     /**
      * De tijden waarop het huwelijk van dit dossier op {@code datum} nog kan plaatsvinden.
      */

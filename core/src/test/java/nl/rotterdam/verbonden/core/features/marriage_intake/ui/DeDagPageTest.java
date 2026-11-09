@@ -6,6 +6,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
+import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Transactional
 class DeDagPageTest extends BaseWicketTest {
@@ -54,12 +57,41 @@ class DeDagPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
-    void groteCeremonie_klikOpLocatie_meldtDatKiezenNogNietMogelijkIs() {
+    void groteCeremonie_klikOpLocatie_opentKeuzePagina() {
         startPage(maakDossier(CeremonieSoort.GROOT));
 
         klikOp("locatieLink");
 
-        tester.assertContains("Het kiezen van een trouwlocatie is op dit moment nog niet mogelijk");
+        tester.assertRenderedPage(LocatieKiezenPage.class);
+        tester.assertContains("Kies uw eigen locatie");
+        tester.assertContains("Naam van de locatie");
+        tester.assertContains("Adres van de locatie");
+        tester.assertContains("Telefoonnummer van de locatie");
+    }
+
+    @Test
+    @WithMockUser(username = "999990007", roles = "BURGER")
+    void vrijeLocatie_verplichteVeldenZijnNodigVoorOpslaan() {
+        UUID dossierId = maakDossier(CeremonieSoort.GROOT);
+        startPage(dossierId);
+        klikOp("locatieLink");
+
+        FormTester form = formTester("vrijeTrouwlocatieForm");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("vrijeTrouwlocatieForm", "opslaan"));
+
+        tester.assertRenderedPage(LocatieKiezenPage.class);
+        assertThat(marriageIntakeService.findVrijeTrouwlocatie(dossierId)).isEmpty();
+
+        form = formTester("vrijeTrouwlocatieForm");
+        form.setValue(veld("vrijeTrouwlocatieForm", "naam"), "Tuinzaal");
+        form.setValue(veld("vrijeTrouwlocatieForm", "adres"), "Straat 1, Rotterdam");
+        form.setValue(veld("vrijeTrouwlocatieForm", "telefoonnummer"), "0101234567");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("vrijeTrouwlocatieForm", "opslaan"));
+
+        tester.assertRenderedPage(DeDagPage.class);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).huwelijksLocatie()).isEqualTo("Tuinzaal");
     }
 
     @Test

@@ -90,6 +90,23 @@ class DossierBeheerIntegrationTest {
     }
 
     @Test
+    void vrijeLocatieVanBalieDossierWordtGetoondEnKanWordenGoedgekeurd() {
+        UUID dossierId = dossierAdministrationService.create(new CreateBalieDossierDto(AanmaakKanaal.BALIE,
+                RegistratieType.HUWELIJK, CeremonieSoort.GROOT, BSN_PARTNER_1, BSN_PARTNER_2, null, null,
+                null, "Tuinzaal", "Straat 1, Rotterdam", new Telefoonnummer("0101234567"), "Medewerker"));
+
+        DossierDetailDto detail = dossierAdministrationService.findDetail(dossierId);
+        assertThat(detail.locatieNaam()).isEqualTo("Tuinzaal");
+        assertThat(detail.vrijeTrouwlocatie()).isNotNull();
+        assertThat(detail.vrijeTrouwlocatie().adres()).isEqualTo("Straat 1, Rotterdam");
+        assertThat(detail.vrijeTrouwlocatie().goedgekeurd()).isFalse();
+
+        dossierAdministrationService.keurVrijeTrouwlocatieGoed(dossierId);
+
+        assertThat(dossierAdministrationService.findDetail(dossierId).vrijeTrouwlocatie().goedgekeurd()).isTrue();
+    }
+
+    @Test
     void create_partnerZonderBsn_gebruiktIngevoerdePersoonsgegevens() {
         UUID dossierId = maakDossierMetPartnerZonderBsn();
 

@@ -51,6 +51,22 @@
             <dt>Locatie</dt>
             <dd wicket:id="locatie">-</dd>
         </dl>
+        <div wicket:id="vrijeLocatieDetails">
+            <h3>Gegevens vrije locatie</h3>
+            <dl class="rd-dossier-gegevens">
+                <dt>Adres</dt>
+                <dd wicket:id="vrijeLocatieAdres"></dd>
+                <dt>Telefoonnummer</dt>
+                <dd wicket:id="vrijeLocatieTelefoonnummer"></dd>
+                <dt>Contactpersoon</dt>
+                <dd wicket:id="vrijeLocatieContactpersoon"></dd>
+                <dt>Status beoordeling</dt>
+                <dd wicket:id="vrijeLocatieStatus"></dd>
+            </dl>
+            <form wicket:id="vrijeLocatieGoedkeurenForm">
+                <button wicket:id="goedkeuren" type="submit"></button>
+            </form>
+        </div>
     </section>
 
     <section class="rd-dossier-sectie">

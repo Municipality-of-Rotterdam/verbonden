@@ -84,7 +84,24 @@ public class DeDagPage extends IntakeBasePage {
         // Location and BABS cannot be chosen yet; clicking a card explains why instead of doing nothing
         pageBody.add(
                 nietBeschikbaarAlert,
-                new NietBeschikbaarLink("locatieLink", "intake.card.locatie.niet.beschikbaar"),
+                new Link<Void>("locatieLink") {
+                    {
+                        add(AttributeModifier.replace("class", LoadableDetachableModel.of(() ->
+                                marriageIntakeService.findByDossierId(dossierId).ceremonieSoort() == CeremonieSoort.GROOT
+                                        ? "rd-keuze-card"
+                                        : "rd-keuze-card rd-keuze-card--niet-beschikbaar")));
+                    }
+
+                    @Override
+                    public void onClick() {
+                        CeremonieSoort soort = marriageIntakeService.findByDossierId(dossierId).ceremonieSoort();
+                        if (soort == CeremonieSoort.GROOT) {
+                            LocatieKiezenPage.respond(dossierId);
+                            return;
+                        }
+                        nietBeschikbaarMelding.setObject(getString("intake.card.locatie.niet.beschikbaar.klein"));
+                    }
+                },
                 new NietBeschikbaarLink("babsLink", "intake.card.babs.niet.beschikbaar")
         );
 

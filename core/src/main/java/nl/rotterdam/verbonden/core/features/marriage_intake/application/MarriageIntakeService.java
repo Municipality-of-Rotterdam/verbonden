@@ -14,6 +14,9 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 
 import java.time.LocalDate;
@@ -35,6 +38,14 @@ public interface MarriageIntakeService {
     UUID create(CreateDossierDto dto);
 
     void updateIntake(UUID dossierId, ChangeIntakeDto dto);
+
+    List<ListLocatieDto> findLocaties();
+
+    void kiesLocatie(UUID dossierId, long locatieId);
+
+    void slaVrijeTrouwlocatieOp(UUID dossierId, SaveVrijeTrouwlocatieDto dto);
+
+    Optional<VrijeTrouwlocatieDto> findVrijeTrouwlocatie(UUID dossierId);
 
     /**
      * Returns the UUID of the active dossier (see {@link DossierStatus#ACTIEF}) in which the given BSN appears

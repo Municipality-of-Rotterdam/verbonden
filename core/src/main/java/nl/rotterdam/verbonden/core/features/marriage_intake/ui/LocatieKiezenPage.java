@@ -1,0 +1,206 @@
+package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
+
+import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
+import org.apache.wicket.RestartResponseException;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.image.ExternalImage;
+import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LambdaModel;
+import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+
+import java.io.Serializable;
+import java.util.UUID;
+
+import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
+
+public class LocatieKiezenPage extends IntakeBasePage {
+
+    @SpringBean
+    private MarriageIntakeService marriageIntakeService;
+
+    @Override
+    protected IntakeStep getActiveStep() {
+        return IntakeStep.DE_DAG;
+    }
+
+    @Override
+    protected IModel<String> getTitleModel() {
+        return new ResourceModel("locatie.kiezen.page.title");
+    }
+
+    @Override
+    protected IModel<String> getStepHeadingModel() {
+        return new ResourceModel("locatie.kiezen.heading");
+    }
+
+    @Override
+    protected IModel<String> getStepIntroModel() {
+        return new ResourceModel("locatie.kiezen.intro");
+    }
+
+    @Override
+    protected IModel<DossierSamenvattingDto> getSidebarDossierModel() {
+        return LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
+    }
+
+    @Override
+    protected boolean hasStepNavigation() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasIntakeStepLayout() {
+        return true;
+    }
+
+    public static void respond(UUID dossierId) {
+        RequestCycle.get().setResponsePage(LocatieKiezenPage.class, makeDossierPageParameters(dossierId));
+    }
+
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
+        if (marriageIntakeService.findByDossierId(dossierId).ceremonieSoort() != CeremonieSoort.GROOT) {
+            throw new RestartResponseException(DeDagPage.class, makeDossierPageParameters(dossierId));
+        }
+
+        pageBody.add(
+                new ListView<>("locaties", LoadableDetachableModel.of(marriageIntakeService::findLocaties)) {
+                    @Override
+                    protected void populateItem(ListItem<ListLocatieDto> item) {
+                        ListLocatieDto locatie = item.getModelObject();
+                        item.add(
+                                new ExternalImage("foto", Model.of(locatie.fotoUrl()))
+                                        .setVisible(locatie.fotoUrl() != null),
+                                new Label("naam", locatie.naam()),
+                                new Label("omschrijving", locatie.omschrijving()).setVisible(locatie.omschrijving() != null),
+                                new Link<Void>("kies") {
+                                    @Override
+                                    public void onClick() {
+                                        marriageIntakeService.kiesLocatie(dossierId, locatie.id());
+                                        DeDagPage.respond(dossierId);
+                                    }
+                                }.add(new Label("kiesLabel", Model.of("Kies " + locatie.naam())))
+                        );
+                    }
+                },
+                new VrijeTrouwlocatieForm("vrijeTrouwlocatieForm"),
+                new Link<Void>("terugLink") {
+                    @Override
+                    public void onClick() {
+                        DeDagPage.respond(dossierId);
+                    }
+                }
+        );
+    }
+
+    private class VrijeTrouwlocatieForm extends Form<VrijeTrouwlocatieFormDto> {
+
+        VrijeTrouwlocatieForm(String id) {
+            super(id, Model.of(formulier()));
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            IModel<VrijeTrouwlocatieFormDto> model = getModel();
+            add(
+                    new RdFormFieldTextInput<>("naam",
+                            LambdaModel.of(model, VrijeTrouwlocatieFormDto::getNaam, VrijeTrouwlocatieFormDto::setNaam),
+                            Model.of("Naam van de locatie"))
+                            .setRequired(true),
+                    new RdFormFieldTextInput<>("adres",
+                            LambdaModel.of(model, VrijeTrouwlocatieFormDto::getAdres, VrijeTrouwlocatieFormDto::setAdres),
+                            Model.of("Adres van de locatie"))
+                            .setRequired(true),
+                    new RdFormFieldTextInput<>("telefoonnummer",
+                            LambdaModel.of(model, VrijeTrouwlocatieFormDto::getTelefoonnummer,
+                                    VrijeTrouwlocatieFormDto::setTelefoonnummer),
+                            Model.of("Telefoonnummer van de locatie"))
+                            .setModelType(Telefoonnummer.class)
+                            .setRequired(true),
+                    new RdFormFieldTextInput<>("contactpersoon",
+                            LambdaModel.of(model, VrijeTrouwlocatieFormDto::getContactpersoon,
+                                    VrijeTrouwlocatieFormDto::setContactpersoon),
+                            Model.of("Contactpersoon (optioneel)")),
+                    new RdButton("opslaan", new ResourceModel("locatie.kiezen.vrije.opslaan"))
+            );
+        }
+
+        @Override
+        protected void onSubmit() {
+            VrijeTrouwlocatieFormDto form = getModelObject();
+            marriageIntakeService.slaVrijeTrouwlocatieOp(dossierId, new SaveVrijeTrouwlocatieDto(
+                    form.getNaam(), form.getAdres(), form.getTelefoonnummer(), form.getContactpersoon()));
+            DeDagPage.respond(dossierId);
+        }
+    }
+
+    private VrijeTrouwlocatieFormDto formulier() {
+        VrijeTrouwlocatieDto dto = marriageIntakeService.findVrijeTrouwlocatie(dossierId).orElse(null);
+        VrijeTrouwlocatieFormDto form = new VrijeTrouwlocatieFormDto();
+        if (dto != null) {
+            form.setNaam(dto.naam());
+            form.setAdres(dto.adres());
+            form.setTelefoonnummer(dto.telefoonnummer());
+            form.setContactpersoon(dto.contactpersoon());
+        }
+        return form;
+    }
+
+    private static class VrijeTrouwlocatieFormDto implements Serializable {
+
+        private String naam;
+        private String adres;
+        private Telefoonnummer telefoonnummer;
+        private String contactpersoon;
+
+        public String getNaam() {
+            return naam;
+        }
+
+        public void setNaam(String naam) {
+            this.naam = naam;
+        }
+
+        public String getAdres() {
+            return adres;
+        }
+
+        public void setAdres(String adres) {
+            this.adres = adres;
+        }
+
+        public Telefoonnummer getTelefoonnummer() {
+            return telefoonnummer;
+        }
+
+        public void setTelefoonnummer(Telefoonnummer telefoonnummer) {
+            this.telefoonnummer = telefoonnummer;
+        }
+
+        public String getContactpersoon() {
+            return contactpersoon;
+        }
+
+        public void setContactpersoon(String contactpersoon) {
+            this.contactpersoon = contactpersoon;
+        }
+    }
+}
