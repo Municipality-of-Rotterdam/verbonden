@@ -9,10 +9,12 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.image.ExternalImage;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
@@ -23,8 +25,11 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.UUID;
 
 import static nl.rotterdam.verbonden.core.features.marriage_intake.ui.DossierPageParameterUtil.makeDossierPageParameters;
@@ -90,11 +95,22 @@ public class LocatieKiezenPage extends IntakeBasePage {
                     @Override
                     protected void populateItem(ListItem<ListLocatieDto> item) {
                         ListLocatieDto locatie = item.getModelObject();
+                        boolean hasFoto = isHttpUrl(locatie.fotoUrl());
+                        boolean hasDetailUrl = isHttpUrl(locatie.detailUrl());
                         item.add(
-                                new ExternalImage("foto", Model.of(locatie.fotoUrl()))
-                                        .setVisible(locatie.fotoUrl() != null),
+                                new ExternalImage("foto", Model.of(hasFoto ? locatie.fotoUrl().trim() : ""))
+                                        .add(AttributeModifier.replace("alt", locatie.naam()))
+                                        .setVisible(hasFoto),
                                 new Label("naam", locatie.naam()),
-                                new Label("omschrijving", locatie.omschrijving()).setVisible(locatie.omschrijving() != null),
+                                new Label("omschrijving",
+                                        Model.of(locatie.omschrijving() != null
+                                                ? Jsoup.clean(locatie.omschrijving(), Safelist.basic()) : ""))
+                                        .setEscapeModelStrings(false)
+                                        .setVisible(locatie.omschrijving() != null
+                                                && !locatie.omschrijving().isBlank()),
+                                new ExternalLink("meerInfo",
+                                        Model.of(hasDetailUrl ? locatie.detailUrl().trim() : ""))
+                                        .setVisible(hasDetailUrl),
                                 new Link<Void>("kies") {
                                     @Override
                                     public void onClick() {
@@ -113,6 +129,21 @@ public class LocatieKiezenPage extends IntakeBasePage {
                     }
                 }
         );
+    }
+
+    private static boolean isHttpUrl(String value) {
+        if (value == null || value.isBlank()) {
+            return false;
+        }
+        try {
+            URI uri = URI.create(value.trim());
+            return uri.isAbsolute()
+                    && uri.getHost() != null
+                    && ("http".equalsIgnoreCase(uri.getScheme())
+                    || "https".equalsIgnoreCase(uri.getScheme()));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     private class VrijeTrouwlocatieForm extends Form<VrijeTrouwlocatieFormDto> {

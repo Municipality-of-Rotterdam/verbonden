@@ -1,6 +1,8 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
@@ -25,6 +27,9 @@ class DeDagPageTest extends BaseWicketTest {
 
     @Autowired
     private MarriageIntakeService marriageIntakeService;
+
+    @Autowired
+    private LocationAdministrationService locationAdministrationService;
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
@@ -67,6 +72,29 @@ class DeDagPageTest extends BaseWicketTest {
         tester.assertContains("Naam van de locatie");
         tester.assertContains("Adres van de locatie");
         tester.assertContains("Telefoonnummer van de locatie");
+    }
+
+    @Test
+    @WithMockUser(username = "999990007", roles = "BURGER")
+    void locatiekaartToontVeiligeHtmlAfbeeldingEnInformatielink() {
+        locationAdministrationService.create(new CreateLocatieDto(
+                "Tuinzaal",
+                "https://example.test/tuinzaal.jpg",
+                "<p>Een <strong>mooie</strong> plek</p><script>alert('onveilig')</script>",
+                "https://example.test/tuinzaal"));
+        startPage(maakDossier(CeremonieSoort.GROOT));
+
+        klikOp("locatieLink");
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("<img")
+                .contains("src=\"https://example.test/tuinzaal.jpg\"")
+                .contains("<strong>mooie</strong>")
+                .contains("href=\"https://example.test/tuinzaal\"")
+                .contains("Meer informatie over deze locatie")
+                .doesNotContain("<script>")
+                .doesNotContain("alert('onveilig')");
     }
 
     @Test
