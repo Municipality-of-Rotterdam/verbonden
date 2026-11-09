@@ -91,7 +91,8 @@ public class LocatieKiezenPage extends IntakeBasePage {
         }
 
         pageBody.add(
-                new ListView<>("locaties", LoadableDetachableModel.of(marriageIntakeService::findLocaties)) {
+                new ListView<>("locaties",
+                        LoadableDetachableModel.of(() -> marriageIntakeService.findBeschikbareLocaties(dossierId))) {
                     @Override
                     protected void populateItem(ListItem<ListLocatieDto> item) {
                         ListLocatieDto locatie = item.getModelObject();

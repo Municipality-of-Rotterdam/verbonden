@@ -178,6 +178,15 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ListLocatieDto> findBeschikbareLocaties(UUID dossierId) {
+        Set<Long> beschikbareLocatieIds = afspraakPlanningService.findBeschikbareLocatieIds(dossierId);
+        return locatieRepository.findAllProjectedUnpaged().stream()
+                .filter(locatie -> beschikbareLocatieIds.contains(locatie.id()))
+                .toList();
+    }
+
+    @Override
     @Transactional
     public void kiesLocatie(UUID dossierId, long locatieId) {
         HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);

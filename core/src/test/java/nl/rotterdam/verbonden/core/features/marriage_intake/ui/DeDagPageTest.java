@@ -1,8 +1,12 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
+import nl.rotterdam.verbonden.core.config.PlanningConfig;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateLocatieDto;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
@@ -16,6 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +37,12 @@ class DeDagPageTest extends BaseWicketTest {
 
     @Autowired
     private LocationAdministrationService locationAdministrationService;
+
+    @Autowired
+    private PlanningConfig planningConfig;
+
+    @Autowired
+    private Clock clock;
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
@@ -77,11 +90,15 @@ class DeDagPageTest extends BaseWicketTest {
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
     void locatiekaartToontVeiligeHtmlAfbeeldingEnInformatielink() {
-        locationAdministrationService.create(new CreateLocatieDto(
+        long locatieId = locationAdministrationService.create(new CreateLocatieDto(
                 "Tuinzaal",
                 "https://example.test/tuinzaal.jpg",
                 "<p>Een <strong>mooie</strong> plek</p><script>alert('onveilig')</script>",
                 "https://example.test/tuinzaal"));
+        LocalDate datum = LocalDate.now(clock).plusDays(planningConfig.getVanafDagen());
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, datum.getDayOfWeek(), LocalTime.of(9, 0), LocalTime.of(9, 10),
+                10, Bedrag.ZERO, datum, datum));
         startPage(maakDossier(CeremonieSoort.GROOT));
 
         klikOp("locatieLink");

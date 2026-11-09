@@ -41,6 +41,8 @@ public interface MarriageIntakeService {
 
     List<ListLocatieDto> findLocaties();
 
+    List<ListLocatieDto> findBeschikbareLocaties(UUID dossierId);
+
     void kiesLocatie(UUID dossierId, long locatieId);
 
     void slaVrijeTrouwlocatieOp(UUID dossierId, SaveVrijeTrouwlocatieDto dto);

@@ -35,6 +35,8 @@ public interface AfspraakPlanningService {
      */
     List<LocalDateTime> findAllBeschikbareSlots(UUID dossierId);
 
+    Set<Long> findBeschikbareLocatieIds(UUID dossierId);
+
     List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum);
 
     /**

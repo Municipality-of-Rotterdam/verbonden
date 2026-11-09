@@ -348,6 +348,40 @@ class BeschikbareSlotsIntegrationTest {
     }
 
     @Test
+    void beschikbareLocaties_volgenHuwelijkstypeEnGeselecteerdTijdslot() {
+        List<ListLocatieDto> locaties = locationAdministrationService.findAllLocaties();
+        assertThat(locaties).hasSizeGreaterThanOrEqualTo(4);
+        long locatieOmNegenUur = locaties.get(0).id();
+        long locatieOmTienUur = locaties.get(1).id();
+        long locatieNietBeschikbaar = locaties.get(2).id();
+        long locatieAnderHuwelijkstype = locaties.get(3).id();
+        LocalDate maandag = volgendeWeekdag(DayOfWeek.MONDAY);
+
+        maakBeschikbaarheid(locatieOmNegenUur, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(9, 10), 10);
+        maakBeschikbaarheid(locatieOmTienUur, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(10, 0), LocalTime.of(10, 10), 10);
+        maakBeschikbaarheid(locatieNietBeschikbaar, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(9, 10), 10);
+        maakBeschikbaarheid(locatieAnderHuwelijkstype, HuwelijksType.EENVOUDIG, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(9, 10), 10);
+        maakNietBeschikbareDag(locatieNietBeschikbaar, maandag, "Gesloten");
+
+        UUID dossierId = maakDossier(CeremonieSoort.GROOT);
+
+        assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
+                .extracting(ListLocatieDto::id)
+                .contains(locatieOmNegenUur, locatieOmTienUur, locatieNietBeschikbaar)
+                .doesNotContain(locatieAnderHuwelijkstype);
+
+        marriageIntakeService.slaAfspraakOp(dossierId, maandag, LocalTime.of(9, 0));
+
+        assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
+                .extracting(ListLocatieDto::id)
+                .containsExactly(locatieOmNegenUur);
+    }
+
+    @Test
     void kleinDossier_zietAlleenSlotsBijGekoppeldeLocatie() {
         long gekoppeldId = vindGekoppeldeLocatieId(CeremonieSoort.KLEIN);
         long andereId = locationAdministrationService.findAllLocaties().stream()

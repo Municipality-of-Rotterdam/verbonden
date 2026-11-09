@@ -106,6 +106,38 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
         return vrijeSlotsTussen(getDossier(dossierId), vroegsteDatum(), laatsteDatum());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Set<Long> findBeschikbareLocatieIds(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        LocalDateTime geselecteerdTijdslot = afspraakRepository.findFirstByDossier_Id(dossier.getId())
+                .map(afspraak -> LocalDateTime.of(afspraak.getDatum(), afspraak.getStartTijd()))
+                .orElse(null);
+        LocalDate van = geselecteerdTijdslot != null ? geselecteerdTijdslot.toLocalDate() : vroegsteDatum();
+        LocalDate tot = geselecteerdTijdslot != null ? geselecteerdTijdslot.toLocalDate() : laatsteDatum();
+        Planning planning = laadPlanning(dossier.getCeremonieSoort(), van, tot, dossier);
+
+        if (geselecteerdTijdslot != null) {
+            LocalDate datum = geselecteerdTijdslot.toLocalDate();
+            LocalTime tijd = geselecteerdTijdslot.toLocalTime();
+            return planning.locaties().stream()
+                    .filter(locatie -> planning.isVrij(locatie.getId(), datum, tijd))
+                    .map(TrouwlocatieEntity::getId)
+                    .collect(toUnmodifiableSet());
+        }
+
+        Set<Long> beschikbareLocatieIds = new HashSet<>();
+        for (TrouwlocatieEntity locatie : planning.locaties()) {
+            for (LocalDate datum = van; !datum.isAfter(tot); datum = datum.plusDays(1)) {
+                if (planning.heeftVrijTijd(locatie.getId(), datum)) {
+                    beschikbareLocatieIds.add(locatie.getId());
+                    break;
+                }
+            }
+        }
+        return Set.copyOf(beschikbareLocatieIds);
+    }
+
     /** De eerste dag van de planningsperiode: eerder kan een burger geen datum kiezen. */
     private LocalDate vroegsteDatum() {
         return LocalDate.now(clock).plusDays(planningConfig.getVanafDagen());
@@ -245,6 +277,19 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                             && !b.getIngangsdatum().isAfter(datum)
                             && !b.getEinddatum().isBefore(datum))
                     .toList();
+        }
+
+        boolean heeftVrijTijd(long locatieId, LocalDate datum) {
+            Set<LocalTime> bezetOpDatum = bezetteTijden(locatieId, datum);
+            return beschikbaarheden(locatieId, datum).stream()
+                    .flatMap(b -> genereerSlots(b).stream())
+                    .anyMatch(tijd -> !bezetOpDatum.contains(tijd));
+        }
+
+        boolean isVrij(long locatieId, LocalDate datum, LocalTime tijd) {
+            return !bezetteTijden(locatieId, datum).contains(tijd)
+                    && beschikbaarheden(locatieId, datum).stream()
+                    .anyMatch(b -> genereerSlots(b).contains(tijd));
         }
 
         Set<LocalTime> bezetteTijden(long locatieId, LocalDate datum) {
