@@ -96,7 +96,7 @@ public class LocatieKiezenPage extends IntakeBasePage {
                     @Override
                     protected void populateItem(ListItem<ListLocatieDto> item) {
                         ListLocatieDto locatie = item.getModelObject();
-                        boolean hasFoto = isHttpUrl(locatie.fotoUrl());
+                        boolean hasFoto = isAllowedImageUrl(locatie.fotoUrl());
                         boolean hasDetailUrl = isHttpUrl(locatie.detailUrl());
                         item.add(
                                 new ExternalImage("foto", Model.of(hasFoto ? locatie.fotoUrl().trim() : ""))
@@ -136,12 +136,25 @@ public class LocatieKiezenPage extends IntakeBasePage {
         if (value == null || value.isBlank()) {
             return false;
         }
+
         try {
             URI uri = URI.create(value.trim());
             return uri.isAbsolute()
                     && uri.getHost() != null
                     && ("http".equalsIgnoreCase(uri.getScheme())
                     || "https".equalsIgnoreCase(uri.getScheme()));
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private static boolean isAllowedImageUrl(String value) {
+        if (value == null || value.isBlank()) {
+            return false;
+        }
+        try {
+            URI uri = URI.create(value.trim());
+            return !uri.isAbsolute() || isHttpUrl(value);
         } catch (IllegalArgumentException e) {
             return false;
         }

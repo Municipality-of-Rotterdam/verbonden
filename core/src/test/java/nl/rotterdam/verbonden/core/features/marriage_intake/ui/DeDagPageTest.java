@@ -92,7 +92,7 @@ class DeDagPageTest extends BaseWicketTest {
     void locatiekaartToontVeiligeHtmlAfbeeldingEnInformatielink() {
         long locatieId = locationAdministrationService.create(new CreateLocatieDto(
                 "Tuinzaal",
-                "https://example.test/tuinzaal.jpg",
+                "/assets/tuinzaal.jpg",
                 "<p>Een <strong>mooie</strong> plek</p><script>alert('onveilig')</script>",
                 "https://example.test/tuinzaal"));
         LocalDate datum = LocalDate.now(clock).plusDays(planningConfig.getVanafDagen());
@@ -106,7 +106,7 @@ class DeDagPageTest extends BaseWicketTest {
         String html = tester.getLastResponseAsString();
         assertThat(html)
                 .contains("<img")
-                .contains("src=\"https://example.test/tuinzaal.jpg\"")
+                .contains("src=\"/assets/tuinzaal.jpg\"")
                 .contains("<strong>mooie</strong>")
                 .contains("href=\"https://example.test/tuinzaal\"")
                 .contains("Meer informatie over deze locatie")
