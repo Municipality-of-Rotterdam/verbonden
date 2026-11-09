@@ -173,13 +173,6 @@
                 <version>3.5.4</version>
             </dependency>
 
-            <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
-            <dependency>
-                <groupId>org.jsoup</groupId>
-                <artifactId>jsoup</artifactId>
-                <version>1.24.1</version>
-            </dependency>
-
             <!-- Apache POI for xlsx import -->
             <dependency>
                 <groupId>org.apache.poi</groupId>
