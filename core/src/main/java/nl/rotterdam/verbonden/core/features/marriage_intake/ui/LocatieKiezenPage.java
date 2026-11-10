@@ -94,8 +94,6 @@ public class LocatieKiezenPage extends IntakeBasePage {
         }
 
         pageBody.add(
-                new Label("mogelijkheden", new ResourceModel("locatie.kiezen.mogelijkheden.html"))
-                        .setEscapeModelStrings(false),
                 new ListView<>("locaties",
                         LoadableDetachableModel.of(() -> marriageIntakeService.findBeschikbareLocaties(dossierId))) {
                     @Override
