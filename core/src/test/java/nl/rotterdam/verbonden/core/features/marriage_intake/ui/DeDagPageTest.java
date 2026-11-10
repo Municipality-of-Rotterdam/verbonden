@@ -114,7 +114,12 @@ class DeDagPageTest extends BaseWicketTest {
                 .contains("<li>U kiest uw top 3 trouwambtenaren van de gemeente.")
                 .contains("Kijk op de pagina Trouwambtenaar voor meer informatie.")
                 .contains("<li>De trouwambtenaar houdt een toespraak.");
-        tester.assertContains("U mag ook trouwen of een partnerschap registreren");
+        String vrijeLocatieKaart = Jsoup.parse(html).select("section.rd-trouwlocatie:has(form)").text();
+        assertThat(vrijeLocatieKaart)
+                .doesNotContain("U mag ook trouwen of een partnerschap registreren")
+                .doesNotContain("U betaalt tussen € 770,90 en € 2.168,60.")
+                .doesNotContain("De huur van de locatie betaalt u apart.")
+                .doesNotContain("U heeft hiervoor een locatieverklaring nodig.");
         assertThat(html)
                 .contains("€ 123,45")
                 .contains("€ 900,00")

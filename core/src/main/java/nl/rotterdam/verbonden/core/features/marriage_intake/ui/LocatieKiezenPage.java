@@ -106,16 +106,6 @@ public class LocatieKiezenPage extends IntakeBasePage {
                         WebMarkupContainer vrijeLocatie = new WebMarkupContainer("vrijeLocatie");
                         vrijeLocatie.setVisible(locatie.vrijeLocatie());
                         vrijeLocatie.add(
-                                new Label("vrijeLocatieTitel",
-                                        new ResourceModel("locatie.kiezen.vrije.titel")),
-                                new Label("vrijeLocatieUitleg",
-                                        new ResourceModel("locatie.kiezen.vrije.uitleg")),
-                                new Label("vrijeLocatieKosten",
-                                        new ResourceModel("locatie.kiezen.vrije.kosten")),
-                                new Label("vrijeLocatiePrijs",
-                                        new ResourceModel("locatie.kiezen.vrije.prijs")),
-                                new Label("vrijeLocatieVerklaring",
-                                        new ResourceModel("locatie.kiezen.vrije.verklaring")),
                                 new VrijeTrouwlocatieForm("vrijeTrouwlocatieForm", locatie)
                         );
                         item.add(
