@@ -1,10 +1,11 @@
 <wicket:extend>
-    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action">Terug naar De Dag</a></p>
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action"><span wicket:id="terugLabel"></span></a></p>
 
     <section class="rd-vrije-locatie">
-        <h3>Kies uw eigen locatie</h3>
-        <p>U kunt buiten een trouwzaal trouwen. De gemeente beoordeelt of uw locatie geschikt is.</p>
-        <p>Voor een vrije locatie gelden extra kosten. U heeft hiervoor een locatieverklaring nodig.</p>
+        <h3 wicket:id="vrijeLocatieTitel"></h3>
+        <p wicket:id="vrijeLocatieUitleg"></p>
+        <p wicket:id="vrijeLocatieKosten"></p>
+        <p wicket:id="vrijeLocatieVerklaring"></p>
         <form wicket:id="vrijeTrouwlocatieForm" class="d-flex flex-column gap-3">
             <div wicket:id="naam"></div>
             <div wicket:id="adres"></div>
@@ -16,11 +17,11 @@
 
     <section wicket:id="locaties" class="rd-trouwlocatie">
         <img wicket:id="foto" class="rd-trouwlocatie__foto" alt=""/>
-        <h3 wicket:id="naam">Locatie</h3>
-        <p wicket:id="omschrijving">Beschrijving</p>
-        <p><a wicket:id="meerInfo">Meer informatie over deze locatie</a></p>
+        <h3 wicket:id="naam"></h3>
+        <p wicket:id="omschrijving"></p>
+        <p><a wicket:id="meerInfo"><span wicket:id="meerInfoLabel"></span></a></p>
         <a wicket:id="kies" class="utrecht-button utrecht-button--primary-action">
-            <span wicket:id="kiesLabel">Kies locatie</span>
+            <span wicket:id="kiesLabel"></span>
         </a>
     </section>
 </wicket:extend>

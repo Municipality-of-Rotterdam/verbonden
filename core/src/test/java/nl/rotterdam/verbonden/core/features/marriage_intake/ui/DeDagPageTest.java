@@ -85,6 +85,8 @@ class DeDagPageTest extends BaseWicketTest {
         tester.assertContains("Naam van de locatie");
         tester.assertContains("Adres van de locatie");
         tester.assertContains("Telefoonnummer van de locatie");
+        assertThat(tester.getLastResponseAsString()).contains("Contactpersoon (optioneel)");
+        tester.assertContains("U kunt buiten een trouwzaal trouwen");
     }
 
     @Test
@@ -110,6 +112,8 @@ class DeDagPageTest extends BaseWicketTest {
                 .contains("<strong>mooie</strong>")
                 .contains("href=\"https://example.test/tuinzaal\"")
                 .contains("Meer informatie over deze locatie")
+                .contains("Kies Tuinzaal")
+                .contains("Terug naar De Dag")
                 .doesNotContain("<script>")
                 .doesNotContain("alert('onveilig')");
     }

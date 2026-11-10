@@ -23,6 +23,7 @@ import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jsoup.Jsoup;
@@ -111,6 +112,8 @@ public class LocatieKiezenPage extends IntakeBasePage {
                                                 && !locatie.omschrijving().isBlank()),
                                 new ExternalLink("meerInfo",
                                         Model.of(hasDetailUrl ? locatie.detailUrl().trim() : ""))
+                                        .add(new Label("meerInfoLabel",
+                                                new ResourceModel("locatie.kiezen.locatie.meer.informatie")))
                                         .setVisible(hasDetailUrl),
                                 new Link<Void>("kies") {
                                     @Override
@@ -118,17 +121,23 @@ public class LocatieKiezenPage extends IntakeBasePage {
                                         marriageIntakeService.kiesLocatie(dossierId, locatie.id());
                                         DeDagPage.respond(dossierId);
                                     }
-                                }.add(new Label("kiesLabel", Model.of("Kies " + locatie.naam())))
+                                }.add(new Label("kiesLabel",
+                                        new StringResourceModel("locatie.kiezen.locatie.kies", item)
+                                                .setParameters(locatie.naam())))
                         );
                     }
                 },
+                new Label("vrijeLocatieTitel", new ResourceModel("locatie.kiezen.vrije.titel")),
+                new Label("vrijeLocatieUitleg", new ResourceModel("locatie.kiezen.vrije.uitleg")),
+                new Label("vrijeLocatieKosten", new ResourceModel("locatie.kiezen.vrije.kosten")),
+                new Label("vrijeLocatieVerklaring", new ResourceModel("locatie.kiezen.vrije.verklaring")),
                 new VrijeTrouwlocatieForm("vrijeTrouwlocatieForm"),
                 new Link<Void>("terugLink") {
                     @Override
                     public void onClick() {
                         DeDagPage.respond(dossierId);
                     }
-                }
+                }.add(new Label("terugLabel", new ResourceModel("locatie.kiezen.terug")))
         );
     }
 
@@ -173,22 +182,22 @@ public class LocatieKiezenPage extends IntakeBasePage {
             add(
                     new RdFormFieldTextInput<>("naam",
                             LambdaModel.of(model, VrijeTrouwlocatieFormDto::getNaam, VrijeTrouwlocatieFormDto::setNaam),
-                            Model.of("Naam van de locatie"))
+                            new ResourceModel("locatie.kiezen.vrije.naam"))
                             .setRequired(true),
                     new RdFormFieldTextInput<>("adres",
                             LambdaModel.of(model, VrijeTrouwlocatieFormDto::getAdres, VrijeTrouwlocatieFormDto::setAdres),
-                            Model.of("Adres van de locatie"))
+                            new ResourceModel("locatie.kiezen.vrije.adres"))
                             .setRequired(true),
                     new RdFormFieldTextInput<>("telefoonnummer",
                             LambdaModel.of(model, VrijeTrouwlocatieFormDto::getTelefoonnummer,
                                     VrijeTrouwlocatieFormDto::setTelefoonnummer),
-                            Model.of("Telefoonnummer van de locatie"))
+                            new ResourceModel("locatie.kiezen.vrije.telefoonnummer"))
                             .setModelType(Telefoonnummer.class)
                             .setRequired(true),
                     new RdFormFieldTextInput<>("contactpersoon",
                             LambdaModel.of(model, VrijeTrouwlocatieFormDto::getContactpersoon,
                                     VrijeTrouwlocatieFormDto::setContactpersoon),
-                            Model.of("Contactpersoon (optioneel)")),
+                            new ResourceModel("locatie.kiezen.vrije.contactpersoon")),
                     new RdButton("opslaan", new ResourceModel("locatie.kiezen.vrije.opslaan"))
             );
         }
