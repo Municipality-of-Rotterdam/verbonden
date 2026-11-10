@@ -157,6 +157,7 @@ public class SecurityConfig {
                         .requestMatchers("/wicket/resource/**").permitAll()
                         // Afbeeldingen van trouwboekjes: ook zichtbaar in beheer, voor medewerkers zonder ROLE_BURGER
                         .requestMatchers("/trouwboekjes/**").permitAll()
+                        .requestMatchers("/trouwlocaties/**").permitAll()
                         .requestMatchers("/actuator", "/actuator/**").permitAll()
                         .anyRequest().hasRole("BURGER")
                 )
