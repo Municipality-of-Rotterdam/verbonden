@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateLocatieDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateNietBeschikbareDagDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
@@ -403,11 +404,19 @@ class BeschikbareSlotsIntegrationTest {
         locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
                 locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.of(21, 0), LocalTime.of(23, 59),
                 60, Bedrag.of("2168.60"), begin, einde));
+        long reguliereLocatieId = locationAdministrationService.create(new CreateLocatieDto(
+                "Andere trouwzaal", null, null, null, false));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                reguliereLocatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(10, 0), LocalTime.of(11, 0), 60, Bedrag.ZERO, begin, einde));
 
         UUID dossierId = maakDossier(CeremonieSoort.GROOT);
         marriageIntakeService.slaVrijeTrouwlocatieOp(dossierId,
                 new SaveVrijeTrouwlocatieDto("Eigen zaal", "Rotterdam", new Telefoonnummer("0101234567"), null));
         marriageIntakeService.slaAfspraakOp(dossierId, LocalDate.of(2026, 4, 20), LocalTime.of(10, 0));
+        assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
+                .extracting(ListLocatieDto::id)
+                .contains(locatieId, reguliereLocatieId);
         assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
                 .anySatisfy(extra -> assertThat(extra.prijs()).isEqualTo(Bedrag.of("770.90")));
 

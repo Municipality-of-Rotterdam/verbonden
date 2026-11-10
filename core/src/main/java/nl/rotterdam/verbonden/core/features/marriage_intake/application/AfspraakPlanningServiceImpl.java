@@ -127,16 +127,10 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                     .collect(toUnmodifiableSet());
         }
 
-        Set<Long> beschikbareLocatieIds = new HashSet<>();
-        for (TrouwlocatieEntity locatie : planning.locaties()) {
-            for (LocalDate datum = van; !datum.isAfter(tot); datum = datum.plusDays(1)) {
-                if (planning.heeftVrijTijd(locatie.getId(), datum)) {
-                    beschikbareLocatieIds.add(locatie.getId());
-                    break;
-                }
-            }
-        }
-        return Set.copyOf(beschikbareLocatieIds);
+        return planning.locaties().stream()
+                .filter(locatie -> planning.beschikbaarhedenPerLocatie().containsKey(locatie.getId()))
+                .map(TrouwlocatieEntity::getId)
+                .collect(toUnmodifiableSet());
     }
 
     /** De eerste dag van de planningsperiode: eerder kan een burger geen datum kiezen. */
@@ -296,13 +290,6 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                             && !b.getIngangsdatum().isAfter(datum)
                             && !b.getEinddatum().isBefore(datum))
                     .toList();
-        }
-
-        boolean heeftVrijTijd(long locatieId, LocalDate datum) {
-            Set<LocalTime> bezetOpDatum = bezetteTijden(locatieId, datum);
-            return beschikbaarheden(locatieId, datum).stream()
-                    .flatMap(b -> genereerSlots(b).stream())
-                    .anyMatch(tijd -> !bezetOpDatum.contains(tijd));
         }
 
         boolean isVrij(long locatieId, LocalDate datum, LocalTime tijd) {
