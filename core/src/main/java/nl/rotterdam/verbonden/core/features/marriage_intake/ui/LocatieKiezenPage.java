@@ -200,21 +200,26 @@ public class LocatieKiezenPage extends IntakeBasePage {
             RdButton kiesVrijeLocatie = new RdButton("opslaan",
                     new ResourceModel("locatie.kiezen.vrije.opslaan"));
             kiesVrijeLocatie.setAppearance(RdButtonAppearance.PRIMARY_ACTION);
+            kiesVrijeLocatie.setDefaultFormProcessing(true);
+            RdFormFieldTextInput<String> naam = new RdFormFieldTextInput<>("naam",
+                    LambdaModel.of(model, VrijeTrouwlocatieFormDto::getNaam, VrijeTrouwlocatieFormDto::setNaam),
+                    new ResourceModel("locatie.kiezen.vrije.naam")).setRequired(true);
+            naam.getTextField().add(AttributeModifier.replace("required", "required"));
+            RdFormFieldTextInput<String> adres = new RdFormFieldTextInput<>("adres",
+                    LambdaModel.of(model, VrijeTrouwlocatieFormDto::getAdres, VrijeTrouwlocatieFormDto::setAdres),
+                    new ResourceModel("locatie.kiezen.vrije.adres")).setRequired(true);
+            adres.getTextField().add(AttributeModifier.replace("required", "required"));
+            RdFormFieldTextInput<Telefoonnummer> telefoonnummer = new RdFormFieldTextInput<>("telefoonnummer",
+                    LambdaModel.of(model, VrijeTrouwlocatieFormDto::getTelefoonnummer,
+                            VrijeTrouwlocatieFormDto::setTelefoonnummer),
+                    new ResourceModel("locatie.kiezen.vrije.telefoonnummer"))
+                    .setModelType(Telefoonnummer.class)
+                    .setRequired(true);
+            telefoonnummer.getTextField().add(AttributeModifier.replace("required", "required"));
             add(
-                    new RdFormFieldTextInput<>("naam",
-                            LambdaModel.of(model, VrijeTrouwlocatieFormDto::getNaam, VrijeTrouwlocatieFormDto::setNaam),
-                            new ResourceModel("locatie.kiezen.vrije.naam"))
-                            .setRequired(true),
-                    new RdFormFieldTextInput<>("adres",
-                            LambdaModel.of(model, VrijeTrouwlocatieFormDto::getAdres, VrijeTrouwlocatieFormDto::setAdres),
-                            new ResourceModel("locatie.kiezen.vrije.adres"))
-                            .setRequired(true),
-                    new RdFormFieldTextInput<>("telefoonnummer",
-                            LambdaModel.of(model, VrijeTrouwlocatieFormDto::getTelefoonnummer,
-                                    VrijeTrouwlocatieFormDto::setTelefoonnummer),
-                            new ResourceModel("locatie.kiezen.vrije.telefoonnummer"))
-                            .setModelType(Telefoonnummer.class)
-                            .setRequired(true),
+                    naam,
+                    adres,
+                    telefoonnummer,
                     new RdFormFieldTextInput<>("contactpersoon",
                             LambdaModel.of(model, VrijeTrouwlocatieFormDto::getContactpersoon,
                                     VrijeTrouwlocatieFormDto::setContactpersoon),

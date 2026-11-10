@@ -15,6 +15,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieTy
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -159,6 +160,8 @@ class DeDagPageTest extends BaseWicketTest {
         startPage(dossierId);
         klikOp("locatieLink");
 
+        assertThat(Jsoup.parse(tester.getLastResponseAsString()).select("form input[required]"))
+                .hasSize(3);
         FormTester form = formTester("vrijeTrouwlocatieForm");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         form.submit(veld("vrijeTrouwlocatieForm", "opslaan"));
