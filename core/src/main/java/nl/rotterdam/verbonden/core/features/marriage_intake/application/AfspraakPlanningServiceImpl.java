@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.config.PlanningConfig;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.verbonden.core.features.location_administration.repository.BeschikbaarheidRepository;
 import nl.rotterdam.verbonden.core.features.location_administration.repository.LocatieRepository;
@@ -8,7 +9,6 @@ import nl.rotterdam.verbonden.core.features.location_administration.repository.N
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BezetTijdslot;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
-import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
@@ -175,6 +175,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
     public void boekAfspraak(UUID dossierId, LocalDate datum, LocalTime startTijd) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         Planning planning = laadPlanning(dossier.getCeremonieSoort(), datum, datum, dossier);
+        boolean vrijeLocatie = dossier.getLocatie() != null && dossier.getLocatie().isVrijeLocatie();
 
         for (TrouwlocatieEntity locatie : planning.locaties()) {
             for (LocatieBeschikbaarheidEntity slot : planning.beschikbaarheden(locatie.getId(), datum)) {
@@ -189,8 +190,11 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                     afspraak.setDatum(datum);
                     afspraak.setStartTijd(startTijd);
                     afspraak.setEindTijd(eindTijd);
-                    afspraak.setLocatiePrijs(locatie.isVrijeLocatie()
-                            ? VrijeLocatieTarief.bepaal(datum, startTijd) : slot.getPrijs());
+                    List<Bedrag> dagTarieven = planning.beschikbaarheden(locatie.getId(), datum).stream()
+                            .map(LocatieBeschikbaarheidEntity::getPrijs)
+                            .toList();
+                    afspraak.setLocatiePrijs(vrijeLocatie
+                            ? VrijeLocatieTarief.bepaal(datum, slot.getPrijs(), dagTarieven) : slot.getPrijs());
                     afspraakRepository.save(afspraak);
                     return;
                 }
@@ -248,13 +252,11 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                 + beschikbaarheid.getStartTijd().getMinute();
         int eindMinuten = beschikbaarheid.getEindTijd().getHour() * 60
                 + beschikbaarheid.getEindTijd().getMinute();
-        if (eindMinuten == startMinuten) {
-            eindMinuten = 24 * 60;
-        } else if (eindMinuten < startMinuten) {
-            eindMinuten += 24 * 60;
-        }
         int duur = beschikbaarheid.getDuurInMinuten();
-        for (int current = startMinuten; current + duur <= eindMinuten; current += duur) {
+        for (int current = startMinuten;
+             current + duur <= eindMinuten
+                     || (eindMinuten == 23 * 60 + 59 && current + duur == 24 * 60);
+             current += duur) {
             slots.add(LocalTime.of((current / 60) % 24, current % 60));
         }
         return slots;

@@ -284,8 +284,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         LocalDateTime datumTijdHuwelijk = findDatumTijdHuwelijk(e);
 
-        String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam()
-                : e.getVrijeTrouwlocatie() != null ? e.getVrijeTrouwlocatie().getNaam() : null;
+        String locatieNaam = e.getVrijeTrouwlocatie() != null ? e.getVrijeTrouwlocatie().getNaam()
+                : e.getLocatie() != null ? e.getLocatie().getNaam() : null;
 
         Bedrag prijs = marriageTypeRepository.findBySoort(e.getCeremonieSoort())
                 .map(MarriageTypeEntity::getPrijs)
@@ -299,7 +299,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         List<SidebarExtraItemDto> extraItems = new ArrayList<>();
         afspraakRepository.findFirstByDossier_Id(e.getId())
-                .filter(afspraak -> afspraak.getLocatiePrijs() != null)
+                .filter(afspraak -> afspraak.getLocatiePrijs() != null
+                        && afspraak.getLocatiePrijs().isPositive())
                 .ifPresent(afspraak -> extraItems.add(new SidebarExtraItemDto(
                         "Kosten trouwlocatie", afspraak.getLocatiePrijs())));
         if (e.isRingenUitwisselen()) {

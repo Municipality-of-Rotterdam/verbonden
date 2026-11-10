@@ -103,7 +103,8 @@ class DeDagPageTest extends BaseWicketTest {
                 "Tuinzaal",
                 "/assets/tuinzaal.jpg",
                 "<p>Een <strong>mooie</strong> plek</p><script>alert('onveilig')</script>",
-                "https://example.test/tuinzaal"));
+                "https://example.test/tuinzaal",
+                false));
         LocalDate datum = LocalDate.now(clock).plusDays(planningConfig.getVanafDagen());
         locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
                 locatieId, HuwelijksType.REGULIER, datum.getDayOfWeek(), LocalTime.of(9, 0), LocalTime.of(9, 10),

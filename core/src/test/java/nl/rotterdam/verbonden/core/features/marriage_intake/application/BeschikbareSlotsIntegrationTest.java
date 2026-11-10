@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.Bedrag;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
@@ -11,6 +12,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.config.PlanningConfig;
 import nl.rotterdam.verbonden.core.integration_test.InstelbareKlok;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
@@ -379,6 +381,45 @@ class BeschikbareSlotsIntegrationTest {
         assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
                 .extracting(ListLocatieDto::id)
                 .containsExactly(locatieOmNegenUur);
+    }
+
+    @Test
+    void vrijeLocatieBeperktDePlanningEnSlaatFeestdagtariefOp() {
+        klok.zetOp(LocalDate.of(2026, 4, 1));
+        long locatieId = locationAdministrationService.findAllLocaties().stream()
+                .filter(ListLocatieDto::vrijeLocatie)
+                .findFirst().orElseThrow().id();
+        LocalDate begin = LocalDate.of(2026, 1, 1);
+        LocalDate einde = LocalDate.of(2026, 12, 31);
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.MIDNIGHT, LocalTime.of(9, 0),
+                60, Bedrag.of("2168.60"), begin, einde));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(17, 0),
+                60, Bedrag.of("770.90"), begin, einde));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.of(17, 0), LocalTime.of(21, 0),
+                60, Bedrag.of("1084.30"), begin, einde));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.of(21, 0), LocalTime.of(23, 59),
+                60, Bedrag.of("2168.60"), begin, einde));
+
+        UUID dossierId = maakDossier(CeremonieSoort.GROOT);
+        marriageIntakeService.slaVrijeTrouwlocatieOp(dossierId,
+                new SaveVrijeTrouwlocatieDto("Eigen zaal", "Rotterdam", new Telefoonnummer("0101234567"), null));
+        marriageIntakeService.slaAfspraakOp(dossierId, LocalDate.of(2026, 4, 20), LocalTime.of(10, 0));
+        assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
+                .anySatisfy(extra -> assertThat(extra.prijs()).isEqualTo(Bedrag.of("770.90")));
+
+        UUID feestdagDossierId = maakDossier(CeremonieSoort.GROOT);
+        marriageIntakeService.slaVrijeTrouwlocatieOp(feestdagDossierId,
+                new SaveVrijeTrouwlocatieDto("Andere zaal", "Rotterdam", new Telefoonnummer("0101234567"), null));
+        marriageIntakeService.slaAfspraakOp(feestdagDossierId, LocalDate.of(2026, 4, 27), LocalTime.of(10, 0));
+        assertThat(marriageIntakeService.findByDossierId(feestdagDossierId).extras())
+                .anySatisfy(extra -> {
+                    assertThat(extra.naam()).isEqualTo("Kosten trouwlocatie");
+                    assertThat(extra.prijs()).isEqualTo(Bedrag.of("2168.60"));
+                });
     }
 
     @Test

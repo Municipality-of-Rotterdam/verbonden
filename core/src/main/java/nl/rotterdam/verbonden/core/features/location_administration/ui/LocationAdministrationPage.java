@@ -57,6 +57,16 @@ public class LocationAdministrationPage extends AdministrationBasePage {
             }
         });
 
+        columns.add(new AbstractColumn<>(Model.of("Soort"), "vrijeLocatie") {
+            @Override
+            public void populateItem(Item<ICellPopulator<ListLocatieDto>> cellItem,
+                                     String componentId,
+                                     IModel<ListLocatieDto> rowModel) {
+                cellItem.add(new Label(componentId,
+                        rowModel.map(locatie -> locatie.vrijeLocatie() ? "Vrije locatie" : "Vaste locatie")));
+            }
+        });
+
         columns.add(new AbstractColumn<>(Model.of("Acties")) {
             @Override
             public void populateItem(Item<ICellPopulator<ListLocatieDto>> cellItem,
