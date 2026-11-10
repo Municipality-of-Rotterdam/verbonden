@@ -98,7 +98,7 @@ public class LocatieKiezenPage extends IntakeBasePage {
                         LoadableDetachableModel.of(() -> marriageIntakeService.findBeschikbareLocaties(dossierId))) {
                     @Override
                     protected void populateItem(ListItem<BeschikbareLocatieDto> item) {
-                    BeschikbareLocatieDto locatie = item.getModelObject();
+                        BeschikbareLocatieDto locatie = item.getModelObject();
                         boolean hasFoto = isAllowedImageUrl(locatie.fotoUrl());
                         boolean hasDetailUrl = isHttpUrl(locatie.detailUrl());
                         WebMarkupContainer vrijeLocatie = new WebMarkupContainer("vrijeLocatie");
