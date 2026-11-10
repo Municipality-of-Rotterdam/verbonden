@@ -89,7 +89,7 @@ class DeDagPageTest extends BaseWicketTest {
         assertThat(html)
                 .contains("Contactpersoon (optioneel)")
                 .contains("<h4>Mogelijkheden</h4>")
-                .contains("<li>De ceremonie duurt 60 minuten.</li>")
+                .contains("<li>Uw ceremonie duurt 60 minuten.</li>")
                 .contains("<li>U kiest uw top 3 trouwambtenaren van de gemeente.")
                 .contains("Kijk op de pagina Trouwambtenaar voor meer informatie.")
                 .contains("<li>De trouwambtenaar houdt een toespraak.");
