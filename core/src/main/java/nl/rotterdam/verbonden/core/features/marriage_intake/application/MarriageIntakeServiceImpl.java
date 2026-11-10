@@ -195,6 +195,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
         TrouwlocatieEntity locatie = locatieRepository.findById(locatieId)
                 .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + locatieId));
+        verwijderAfspraakAlsLocatieWijzigt(dossier, locatie);
         dossier.wijzigCeremonie(dossier.getRegistratieType(), dossier.getCeremonieSoort(), locatie);
     }
 
@@ -208,10 +209,18 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
         TrouwlocatieEntity locatie = locatieRepository.findFirstByVrijeLocatieTrue()
                 .orElseThrow(() -> new IllegalStateException("Geen vrije trouwlocatie beheerd"));
-        getWijzigbaarDossier(dossierId).kiesVrijeTrouwlocatie(locatie,
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
+        verwijderAfspraakAlsLocatieWijzigt(dossier, locatie);
+        dossier.kiesVrijeTrouwlocatie(locatie,
                 dto.naam().trim(), dto.adres().trim(), dto.telefoonnummer(),
                 dto.contactpersoon() == null || dto.contactpersoon().isBlank()
                         ? null : dto.contactpersoon().trim());
+    }
+
+    private void verwijderAfspraakAlsLocatieWijzigt(HuwelijksDossierEntity dossier, TrouwlocatieEntity locatie) {
+        afspraakRepository.findFirstByDossier_Id(dossier.getId())
+                .filter(afspraak -> !Objects.equals(afspraak.getLocatie().getId(), locatie.getId()))
+                .ifPresent(afspraak -> afspraakRepository.deleteByDossier_Id(dossier.getId()));
     }
 
     @Override
