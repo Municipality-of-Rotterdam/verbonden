@@ -127,6 +127,55 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                     .collect(toUnmodifiableSet());
         }
 
+        @Override
+        @Transactional(readOnly = true)
+        public Map<Long, Bedrag> findBeschikbareLocatiePrijzen(UUID dossierId) {
+            HuwelijksDossierEntity dossier = getDossier(dossierId);
+            AfspraakEntity afspraak = afspraakRepository.findFirstByDossier_Id(dossier.getId()).orElse(null);
+            if (afspraak == null) {
+                return Map.of();
+            }
+
+            LocalDate datum = afspraak.getDatum();
+            LocalTime tijd = afspraak.getStartTijd();
+            Planning planning = laadPlanning(dossier.getCeremonieSoort(), datum, datum, dossier, false);
+            Map<Long, Bedrag> prijzen = new java.util.HashMap<>();
+            for (TrouwlocatieEntity locatie : planning.locaties()) {
+                if (!planning.isVrij(locatie.getId(), datum, tijd)) {
+                    continue;
+                }
+                prijsVoor(planning, locatie, datum, tijd)
+                        .ifPresent(prijs -> prijzen.put(locatie.getId(), prijs));
+            }
+            return Map.copyOf(prijzen);
+        }
+
+        @Override
+        @Transactional
+        public void verplaatsAfspraakNaarGekozenLocatie(UUID dossierId) {
+            HuwelijksDossierEntity dossier = getDossier(dossierId);
+            afspraakRepository.findFirstByDossier_Id(dossier.getId()).ifPresent(afspraak -> {
+                TrouwlocatieEntity locatie = dossier.getLocatie();
+                if (locatie == null) {
+                    throw new IllegalStateException("Kies eerst een trouwlocatie");
+                }
+
+                LocalDate datum = afspraak.getDatum();
+                LocalTime tijd = afspraak.getStartTijd();
+                Planning planning = laadPlanning(dossier.getCeremonieSoort(), datum, datum, dossier, false);
+                if (!planning.isVrij(locatie.getId(), datum, tijd)) {
+                    throw new IllegalStateException("De gekozen locatie is niet beschikbaar op het gekozen tijdstip");
+                }
+
+                LocatieBeschikbaarheidEntity beschikbaarheid = beschikbaarheidVoor(planning, locatie.getId(), datum, tijd)
+                        .orElseThrow(() -> new IllegalStateException(
+                                "Geen beschikbaar tijdslot gevonden voor " + datum + " " + tijd));
+                afspraak.setLocatie(locatie);
+                afspraak.setEindTijd(tijd.plusMinutes(beschikbaarheid.getDuurInMinuten()));
+                afspraak.setLocatiePrijs(berekenLocatiePrijs(planning, locatie, datum, beschikbaarheid));
+            });
+        }
+
         return planning.locaties().stream()
                 .filter(locatie -> planning.beschikbaarhedenPerLocatie().containsKey(locatie.getId()))
                 .map(TrouwlocatieEntity::getId)
@@ -169,7 +218,6 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
     public void boekAfspraak(UUID dossierId, LocalDate datum, LocalTime startTijd) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         Planning planning = laadPlanning(dossier.getCeremonieSoort(), datum, datum, dossier);
-        boolean vrijeLocatie = dossier.getLocatie() != null && dossier.getLocatie().isVrijeLocatie();
 
         for (TrouwlocatieEntity locatie : planning.locaties()) {
             for (LocatieBeschikbaarheidEntity slot : planning.beschikbaarheden(locatie.getId(), datum)) {
@@ -184,11 +232,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                     afspraak.setDatum(datum);
                     afspraak.setStartTijd(startTijd);
                     afspraak.setEindTijd(eindTijd);
-                    List<Bedrag> dagTarieven = planning.beschikbaarheden(locatie.getId(), datum).stream()
-                            .map(LocatieBeschikbaarheidEntity::getPrijs)
-                            .toList();
-                    afspraak.setLocatiePrijs(vrijeLocatie
-                            ? VrijeLocatieTarief.bepaal(datum, slot.getPrijs(), dagTarieven) : slot.getPrijs());
+                    afspraak.setLocatiePrijs(berekenLocatiePrijs(planning, locatie, datum, slot));
                     afspraakRepository.save(afspraak);
                     return;
                 }
@@ -221,7 +265,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
     private Planning laadPlanning(CeremonieSoort ceremonieSoort, LocalDate van, LocalDate tot,
                                   HuwelijksDossierEntity eigenDossier, boolean beperkTotGekozenLocatie) {
         List<TrouwlocatieEntity> locaties = beperkTotGekozenLocatie && eigenDossier != null
-                && eigenDossier.getLocatie() != null && eigenDossier.getLocatie().isVrijeLocatie()
+                && eigenDossier.getLocatie() != null
                 ? List.of(eigenDossier.getLocatie()) : resolveLocaties(ceremonieSoort);
         if (locaties.isEmpty()) {
             return new Planning(locaties, Map.of(), Set.of(), Map.of());
@@ -243,6 +287,30 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                         mapping(BezetTijdslot::startTijd, toUnmodifiableSet())));
 
         return new Planning(locaties, beschikbaarhedenPerLocatie, nietBeschikbaar, bezet);
+    }
+
+    private static Bedrag berekenLocatiePrijs(Planning planning, TrouwlocatieEntity locatie, LocalDate datum,
+                                               LocatieBeschikbaarheidEntity beschikbaarheid) {
+        if (!locatie.isVrijeLocatie()) {
+            return beschikbaarheid.getPrijs();
+        }
+        List<Bedrag> dagTarieven = planning.beschikbaarheden(locatie.getId(), datum).stream()
+                .map(LocatieBeschikbaarheidEntity::getPrijs)
+                .toList();
+        return VrijeLocatieTarief.bepaal(datum, beschikbaarheid.getPrijs(), dagTarieven);
+    }
+
+    private static java.util.Optional<Bedrag> prijsVoor(Planning planning, TrouwlocatieEntity locatie,
+                                                         LocalDate datum, LocalTime tijd) {
+        return beschikbaarheidVoor(planning, locatie.getId(), datum, tijd)
+                .map(beschikbaarheid -> berekenLocatiePrijs(planning, locatie, datum, beschikbaarheid));
+    }
+
+    private static java.util.Optional<LocatieBeschikbaarheidEntity> beschikbaarheidVoor(
+            Planning planning, long locatieId, LocalDate datum, LocalTime tijd) {
+        return planning.beschikbaarheden(locatieId, datum).stream()
+                .filter(beschikbaarheid -> genereerSlots(beschikbaarheid).contains(tijd))
+                .findFirst();
     }
 
     private static List<LocalTime> genereerSlots(LocatieBeschikbaarheidEntity beschikbaarheid) {

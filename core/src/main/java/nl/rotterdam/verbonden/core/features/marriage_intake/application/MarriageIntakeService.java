@@ -16,7 +16,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegeve
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
-import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
+
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 
 import java.time.LocalDate;
@@ -41,7 +41,7 @@ public interface MarriageIntakeService {
 
     List<ListLocatieDto> findLocaties();
 
-    List<ListLocatieDto> findBeschikbareLocaties(UUID dossierId);
+    List<BeschikbareLocatieDto> findBeschikbareLocaties(UUID dossierId);
 
     void kiesLocatie(UUID dossierId, long locatieId);
 

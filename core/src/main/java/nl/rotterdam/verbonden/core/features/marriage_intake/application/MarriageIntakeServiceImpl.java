@@ -14,6 +14,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCo
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BeschikbareLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
@@ -179,12 +180,16 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ListLocatieDto> findBeschikbareLocaties(UUID dossierId) {
+    public List<BeschikbareLocatieDto> findBeschikbareLocaties(UUID dossierId) {
         Set<Long> beschikbareLocatieIds = afspraakPlanningService.findBeschikbareLocatieIds(dossierId);
+        Map<Long, Bedrag> locatiePrijzen = afspraakPlanningService.findBeschikbareLocatiePrijzen(dossierId);
         return locatieRepository.findAllProjectedUnpaged().stream()
                 .filter(locatie -> beschikbareLocatieIds.contains(locatie.id()))
                 .sorted(Comparator.comparing(ListLocatieDto::vrijeLocatie).reversed()
                         .thenComparing(ListLocatieDto::naam))
+                .map(locatie -> new BeschikbareLocatieDto(locatie.id(), locatie.naam(), locatie.fotoUrl(),
+                        locatie.omschrijving(), locatie.detailUrl(), locatie.vrijeLocatie(),
+                        locatiePrijzen.get(locatie.id())))
                 .toList();
     }
 
@@ -197,8 +202,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
         TrouwlocatieEntity locatie = locatieRepository.findById(locatieId)
                 .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + locatieId));
-        verwijderAfspraakAlsLocatieWijzigt(dossier, locatie);
+        if (!afspraakPlanningService.findBeschikbareLocatieIds(dossierId).contains(locatieId)) {
+            throw new IllegalStateException("De gekozen locatie is niet beschikbaar voor deze ceremonie");
+        }
         dossier.wijzigCeremonie(dossier.getRegistratieType(), dossier.getCeremonieSoort(), locatie);
+        afspraakPlanningService.verplaatsAfspraakNaarGekozenLocatie(dossierId);
     }
 
     @Override
@@ -212,17 +220,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         TrouwlocatieEntity locatie = locatieRepository.findFirstByVrijeLocatieTrue()
                 .orElseThrow(() -> new IllegalStateException("Geen vrije trouwlocatie beheerd"));
         HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
-        verwijderAfspraakAlsLocatieWijzigt(dossier, locatie);
         dossier.kiesVrijeTrouwlocatie(locatie,
                 dto.naam().trim(), dto.adres().trim(), dto.telefoonnummer(),
                 dto.contactpersoon() == null || dto.contactpersoon().isBlank()
                         ? null : dto.contactpersoon().trim());
-    }
-
-    private void verwijderAfspraakAlsLocatieWijzigt(HuwelijksDossierEntity dossier, TrouwlocatieEntity locatie) {
-        afspraakRepository.findFirstByDossier_Id(dossier.getId())
-                .filter(afspraak -> !Objects.equals(afspraak.getLocatie().getId(), locatie.getId()))
-                .ifPresent(afspraak -> afspraakRepository.deleteByDossier_Id(dossier.getId()));
+        afspraakPlanningService.verplaatsAfspraakNaarGekozenLocatie(dossierId);
     }
 
     @Override

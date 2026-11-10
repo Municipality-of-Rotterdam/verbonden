@@ -1,10 +1,11 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
-import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BeschikbareLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
@@ -96,8 +97,8 @@ public class LocatieKiezenPage extends IntakeBasePage {
                 new ListView<>("locaties",
                         LoadableDetachableModel.of(() -> marriageIntakeService.findBeschikbareLocaties(dossierId))) {
                     @Override
-                    protected void populateItem(ListItem<ListLocatieDto> item) {
-                        ListLocatieDto locatie = item.getModelObject();
+                    protected void populateItem(ListItem<BeschikbareLocatieDto> item) {
+                    BeschikbareLocatieDto locatie = item.getModelObject();
                         boolean hasFoto = isAllowedImageUrl(locatie.fotoUrl());
                         boolean hasDetailUrl = isHttpUrl(locatie.detailUrl());
                         WebMarkupContainer vrijeLocatie = new WebMarkupContainer("vrijeLocatie");
@@ -126,6 +127,9 @@ public class LocatieKiezenPage extends IntakeBasePage {
                                         .setEscapeModelStrings(false)
                                         .setVisible(locatie.omschrijving() != null
                                                 && !locatie.omschrijving().isBlank()),
+                                new Label("prijs", Model.of(locatie.prijs() == null
+                                        ? "" : "€ " + locatie.prijs().format()))
+                                        .setVisible(locatie.prijs() != null),
                                 new ExternalLink("meerInfo",
                                         Model.of(hasDetailUrl ? locatie.detailUrl().trim() : ""))
                                         .add(new Label("meerInfoLabel",
@@ -184,7 +188,7 @@ public class LocatieKiezenPage extends IntakeBasePage {
 
     private class VrijeTrouwlocatieForm extends Form<VrijeTrouwlocatieFormDto> {
 
-        VrijeTrouwlocatieForm(String id, ListLocatieDto locatie) {
+        VrijeTrouwlocatieForm(String id, BeschikbareLocatieDto locatie) {
             super(id, Model.of(locatie.vrijeLocatie() ? formulier() : new VrijeTrouwlocatieFormDto()));
             setVisible(locatie.vrijeLocatie());
         }
@@ -193,6 +197,9 @@ public class LocatieKiezenPage extends IntakeBasePage {
         protected void onInitialize() {
             super.onInitialize();
             IModel<VrijeTrouwlocatieFormDto> model = getModel();
+            RdButton kiesVrijeLocatie = new RdButton("opslaan",
+                    new ResourceModel("locatie.kiezen.vrije.opslaan"));
+            kiesVrijeLocatie.setAppearance(RdButtonAppearance.PRIMARY_ACTION);
             add(
                     new RdFormFieldTextInput<>("naam",
                             LambdaModel.of(model, VrijeTrouwlocatieFormDto::getNaam, VrijeTrouwlocatieFormDto::setNaam),
@@ -212,7 +219,7 @@ public class LocatieKiezenPage extends IntakeBasePage {
                             LambdaModel.of(model, VrijeTrouwlocatieFormDto::getContactpersoon,
                                     VrijeTrouwlocatieFormDto::setContactpersoon),
                             new ResourceModel("locatie.kiezen.vrije.contactpersoon")),
-                    new RdButton("opslaan", new ResourceModel("locatie.kiezen.vrije.opslaan"))
+                    kiesVrijeLocatie
             );
         }
 

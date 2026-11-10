@@ -1,12 +1,14 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,6 +38,10 @@ public interface AfspraakPlanningService {
     List<LocalDateTime> findAllBeschikbareSlots(UUID dossierId);
 
     Set<Long> findBeschikbareLocatieIds(UUID dossierId);
+
+    Map<Long, Bedrag> findBeschikbareLocatiePrijzen(UUID dossierId);
+
+    void verplaatsAfspraakNaarGekozenLocatie(UUID dossierId);
 
     List<LocalTime> findBeschikbareTijden(UUID dossierId, LocalDate datum);
 
