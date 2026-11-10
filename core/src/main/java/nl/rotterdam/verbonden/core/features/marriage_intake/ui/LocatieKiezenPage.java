@@ -18,6 +18,7 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.LoadableDetachableModel;
@@ -101,6 +102,21 @@ public class LocatieKiezenPage extends IntakeBasePage {
                         ListLocatieDto locatie = item.getModelObject();
                         boolean hasFoto = isAllowedImageUrl(locatie.fotoUrl());
                         boolean hasDetailUrl = isHttpUrl(locatie.detailUrl());
+                        WebMarkupContainer vrijeLocatie = new WebMarkupContainer("vrijeLocatie");
+                        vrijeLocatie.setVisible(locatie.vrijeLocatie());
+                        vrijeLocatie.add(
+                                new Label("vrijeLocatieTitel",
+                                        new ResourceModel("locatie.kiezen.vrije.titel")),
+                                new Label("vrijeLocatieUitleg",
+                                        new ResourceModel("locatie.kiezen.vrije.uitleg")),
+                                new Label("vrijeLocatieKosten",
+                                        new ResourceModel("locatie.kiezen.vrije.kosten")),
+                                new Label("vrijeLocatiePrijs",
+                                        new ResourceModel("locatie.kiezen.vrije.prijs")),
+                                new Label("vrijeLocatieVerklaring",
+                                        new ResourceModel("locatie.kiezen.vrije.verklaring")),
+                                new VrijeTrouwlocatieForm("vrijeTrouwlocatieForm", locatie)
+                        );
                         item.add(
                                 new ExternalImage("foto", Model.of(hasFoto ? locatie.fotoUrl().trim() : ""))
                                         .add(AttributeModifier.replace("alt", locatie.naam()))
@@ -117,6 +133,7 @@ public class LocatieKiezenPage extends IntakeBasePage {
                                         .add(new Label("meerInfoLabel",
                                                 new ResourceModel("locatie.kiezen.locatie.meer.informatie")))
                                         .setVisible(hasDetailUrl),
+                                vrijeLocatie,
                                 new Link<Void>("kies") {
                                     @Override
                                     public void onClick() {
@@ -126,15 +143,10 @@ public class LocatieKiezenPage extends IntakeBasePage {
                                 }.add(new Label("kiesLabel",
                                         new StringResourceModel("locatie.kiezen.locatie.kies", item)
                                                 .setParameters(locatie.naam())))
+                                        .setVisible(!locatie.vrijeLocatie())
                         );
                     }
                 },
-                new Label("vrijeLocatieTitel", new ResourceModel("locatie.kiezen.vrije.titel")),
-                new Label("vrijeLocatieUitleg", new ResourceModel("locatie.kiezen.vrije.uitleg")),
-                new Label("vrijeLocatieKosten", new ResourceModel("locatie.kiezen.vrije.kosten")),
-                new Label("vrijeLocatiePrijs", new ResourceModel("locatie.kiezen.vrije.prijs")),
-                new Label("vrijeLocatieVerklaring", new ResourceModel("locatie.kiezen.vrije.verklaring")),
-                new VrijeTrouwlocatieForm("vrijeTrouwlocatieForm"),
                 new Link<Void>("terugLink") {
                     @Override
                     public void onClick() {
@@ -174,8 +186,9 @@ public class LocatieKiezenPage extends IntakeBasePage {
 
     private class VrijeTrouwlocatieForm extends Form<VrijeTrouwlocatieFormDto> {
 
-        VrijeTrouwlocatieForm(String id) {
-            super(id, Model.of(formulier()));
+        VrijeTrouwlocatieForm(String id, ListLocatieDto locatie) {
+            super(id, Model.of(locatie.vrijeLocatie() ? formulier() : new VrijeTrouwlocatieFormDto()));
+            setVisible(locatie.vrijeLocatie());
         }
 
         @Override

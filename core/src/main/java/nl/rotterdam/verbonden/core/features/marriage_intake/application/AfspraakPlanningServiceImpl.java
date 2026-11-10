@@ -116,7 +116,7 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                 .orElse(null);
         LocalDate van = geselecteerdTijdslot != null ? geselecteerdTijdslot.toLocalDate() : vroegsteDatum();
         LocalDate tot = geselecteerdTijdslot != null ? geselecteerdTijdslot.toLocalDate() : laatsteDatum();
-        Planning planning = laadPlanning(dossier.getCeremonieSoort(), van, tot, dossier);
+        Planning planning = laadPlanning(dossier.getCeremonieSoort(), van, tot, dossier, false);
 
         if (geselecteerdTijdslot != null) {
             LocalDate datum = geselecteerdTijdslot.toLocalDate();
@@ -221,7 +221,12 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
      */
     private Planning laadPlanning(CeremonieSoort ceremonieSoort, LocalDate van, LocalDate tot,
                                   HuwelijksDossierEntity eigenDossier) {
-        List<TrouwlocatieEntity> locaties = eigenDossier != null
+        return laadPlanning(ceremonieSoort, van, tot, eigenDossier, true);
+    }
+
+    private Planning laadPlanning(CeremonieSoort ceremonieSoort, LocalDate van, LocalDate tot,
+                                  HuwelijksDossierEntity eigenDossier, boolean beperkTotGekozenLocatie) {
+        List<TrouwlocatieEntity> locaties = beperkTotGekozenLocatie && eigenDossier != null
                 && eigenDossier.getLocatie() != null && eigenDossier.getLocatie().isVrijeLocatie()
                 ? List.of(eigenDossier.getLocatie()) : resolveLocaties(ceremonieSoort);
         if (locaties.isEmpty()) {

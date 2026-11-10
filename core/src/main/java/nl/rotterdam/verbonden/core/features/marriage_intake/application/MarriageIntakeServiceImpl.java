@@ -182,7 +182,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public List<ListLocatieDto> findBeschikbareLocaties(UUID dossierId) {
         Set<Long> beschikbareLocatieIds = afspraakPlanningService.findBeschikbareLocatieIds(dossierId);
         return locatieRepository.findAllProjectedUnpaged().stream()
-                .filter(locatie -> !locatie.vrijeLocatie() && beschikbareLocatieIds.contains(locatie.id()))
+                .filter(locatie -> beschikbareLocatieIds.contains(locatie.id()))
+                .sorted(Comparator.comparing(ListLocatieDto::vrijeLocatie).reversed()
+                        .thenComparing(ListLocatieDto::naam))
                 .toList();
     }
 
