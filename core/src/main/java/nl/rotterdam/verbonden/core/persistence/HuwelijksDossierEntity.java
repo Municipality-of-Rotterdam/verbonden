@@ -187,14 +187,18 @@ public class HuwelijksDossierEntity {
         }
     }
 
-    public void kiesVrijeTrouwlocatie(String naam, String adres, Telefoonnummer telefoonnummer, String contactpersoon) {
+    public void kiesVrijeTrouwlocatie(TrouwlocatieEntity locatie, String naam, String adres,
+                                     Telefoonnummer telefoonnummer, String contactpersoon) {
         if (ceremonieSoort != CeremonieSoort.GROOT) {
             throw new IllegalStateException("Een vrije trouwlocatie is alleen mogelijk bij een grote ceremonie");
+        }
+        if (locatie == null || !locatie.isVrijeLocatie()) {
+            throw new IllegalArgumentException("De beheerde locatie moet een vrije locatie zijn");
         }
         if (naam == null || naam.isBlank() || adres == null || adres.isBlank() || telefoonnummer == null) {
             throw new IllegalArgumentException("Naam, adres en telefoonnummer van de vrije trouwlocatie zijn verplicht");
         }
-        locatie = null;
+        this.locatie = locatie;
         vrijeTrouwlocatie = new VrijeTrouwlocatieEntity(this, naam, adres, telefoonnummer, contactpersoon);
     }
 

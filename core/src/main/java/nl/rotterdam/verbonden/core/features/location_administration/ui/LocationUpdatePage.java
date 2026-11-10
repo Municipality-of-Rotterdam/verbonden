@@ -9,6 +9,7 @@ import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_checkbox.RdFormFieldCheckbox;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.Session;
 import org.apache.wicket.authroles.authorization.strategies.role.annotations.AuthorizeInstantiation;
@@ -367,6 +368,9 @@ public class LocationUpdatePage extends AdministrationBasePage {
                             LambdaModel.of(model, LocatieFormDto::getDetailUrl, LocatieFormDto::setDetailUrl),
                             Model.of("Detail URL"),
                             Model.of("URL naar de detailpagina van de trouwlocatie")),
+                    new RdFormFieldCheckbox("vrijeLocatie",
+                            LambdaModel.of(model, LocatieFormDto::isVrijeLocatie, LocatieFormDto::setVrijeLocatie),
+                            Model.of("Vrije locatie (klanten vullen zelf hun adresgegevens in)")),
                     new RdButton("opslaan", Model.of("Opslaan"))
             );
         }
@@ -379,7 +383,8 @@ public class LocationUpdatePage extends AdministrationBasePage {
                     f.getNaam(),
                     f.getFotoUrl(),
                     f.getOmschrijving(),
-                    f.getDetailUrl()
+                    f.getDetailUrl(),
+                    f.isVrijeLocatie()
             ));
             PageParameters params = new PageParameters();
             params.add("id", locatieId);

@@ -182,7 +182,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public List<ListLocatieDto> findBeschikbareLocaties(UUID dossierId) {
         Set<Long> beschikbareLocatieIds = afspraakPlanningService.findBeschikbareLocatieIds(dossierId);
         return locatieRepository.findAllProjectedUnpaged().stream()
-                .filter(locatie -> beschikbareLocatieIds.contains(locatie.id()))
+                .filter(locatie -> !locatie.vrijeLocatie() && beschikbareLocatieIds.contains(locatie.id()))
                 .toList();
     }
 
@@ -206,7 +206,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                 || dto.telefoonnummer() == null) {
             throw new IllegalArgumentException("Naam, adres en telefoonnummer van de vrije trouwlocatie zijn verplicht");
         }
-        getWijzigbaarDossier(dossierId).kiesVrijeTrouwlocatie(
+        TrouwlocatieEntity locatie = locatieRepository.findFirstByVrijeLocatieTrue()
+                .orElseThrow(() -> new IllegalStateException("Geen vrije trouwlocatie beheerd"));
+        getWijzigbaarDossier(dossierId).kiesVrijeTrouwlocatie(locatie,
                 dto.naam().trim(), dto.adres().trim(), dto.telefoonnummer(),
                 dto.contactpersoon() == null || dto.contactpersoon().isBlank()
                         ? null : dto.contactpersoon().trim());
@@ -296,6 +298,10 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         int aantalGekozenAchternamen = aantalGekozenAchternamen(e);
 
         List<SidebarExtraItemDto> extraItems = new ArrayList<>();
+        afspraakRepository.findFirstByDossier_Id(e.getId())
+                .filter(afspraak -> afspraak.getLocatiePrijs() != null)
+                .ifPresent(afspraak -> extraItems.add(new SidebarExtraItemDto(
+                        "Kosten trouwlocatie", afspraak.getLocatiePrijs())));
         if (e.isRingenUitwisselen()) {
             extraItems.add(new SidebarExtraItemDto("Ringen uitwisselen", null));
         }

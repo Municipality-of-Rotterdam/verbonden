@@ -8,6 +8,7 @@ import nl.rotterdam.verbonden.core.features.location_administration.repository.N
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BezetTijdslot;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.AfspraakRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
@@ -188,6 +189,8 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                     afspraak.setDatum(datum);
                     afspraak.setStartTijd(startTijd);
                     afspraak.setEindTijd(eindTijd);
+                    afspraak.setLocatiePrijs(locatie.isVrijeLocatie()
+                            ? VrijeLocatieTarief.bepaal(datum, startTijd) : slot.getPrijs());
                     afspraakRepository.save(afspraak);
                     return;
                 }
@@ -214,7 +217,9 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
      */
     private Planning laadPlanning(CeremonieSoort ceremonieSoort, LocalDate van, LocalDate tot,
                                   HuwelijksDossierEntity eigenDossier) {
-        List<TrouwlocatieEntity> locaties = resolveLocaties(ceremonieSoort);
+        List<TrouwlocatieEntity> locaties = eigenDossier != null
+                && eigenDossier.getLocatie() != null && eigenDossier.getLocatie().isVrijeLocatie()
+                ? List.of(eigenDossier.getLocatie()) : resolveLocaties(ceremonieSoort);
         if (locaties.isEmpty()) {
             return new Planning(locaties, Map.of(), Set.of(), Map.of());
         }
@@ -239,11 +244,18 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
 
     private static List<LocalTime> genereerSlots(LocatieBeschikbaarheidEntity beschikbaarheid) {
         List<LocalTime> slots = new ArrayList<>();
-        LocalTime current = beschikbaarheid.getStartTijd();
+        int startMinuten = beschikbaarheid.getStartTijd().getHour() * 60
+                + beschikbaarheid.getStartTijd().getMinute();
+        int eindMinuten = beschikbaarheid.getEindTijd().getHour() * 60
+                + beschikbaarheid.getEindTijd().getMinute();
+        if (eindMinuten == startMinuten) {
+            eindMinuten = 24 * 60;
+        } else if (eindMinuten < startMinuten) {
+            eindMinuten += 24 * 60;
+        }
         int duur = beschikbaarheid.getDuurInMinuten();
-        while (!current.plusMinutes(duur).isAfter(beschikbaarheid.getEindTijd())) {
-            slots.add(current);
-            current = current.plusMinutes(duur);
+        for (int current = startMinuten; current + duur <= eindMinuten; current += duur) {
+            slots.add(LocalTime.of((current / 60) % 24, current % 60));
         }
         return slots;
     }

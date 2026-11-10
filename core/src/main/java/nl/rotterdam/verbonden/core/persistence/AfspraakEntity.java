@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -29,6 +30,10 @@ public class AfspraakEntity {
 
     @Column(name = "eind_tijd", nullable = false)
     private LocalTime eindTijd;
+
+    @Column(name = "locatie_prijs", precision = 10, scale = 2)
+    @Convert(converter = BedragAttributeConverter.class)
+    private Bedrag locatiePrijs;
 
     protected AfspraakEntity() {
     }
@@ -75,5 +80,13 @@ public class AfspraakEntity {
 
     public void setEindTijd(LocalTime eindTijd) {
         this.eindTijd = eindTijd;
+    }
+
+    public Bedrag getLocatiePrijs() {
+        return locatiePrijs;
+    }
+
+    public void setLocatiePrijs(Bedrag locatiePrijs) {
+        this.locatiePrijs = locatiePrijs;
     }
 }

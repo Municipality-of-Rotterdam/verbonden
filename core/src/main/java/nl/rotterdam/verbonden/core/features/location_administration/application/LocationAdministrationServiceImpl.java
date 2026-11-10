@@ -69,6 +69,7 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
         entity.setFotoUrl(dto.fotoUrl());
         entity.setOmschrijving(dto.omschrijving());
         entity.setDetailUrl(dto.detailUrl());
+        entity.setVrijeLocatie(dto.vrijeLocatie());
         return locatieRepository.save(entity).getId();
     }
 
@@ -81,6 +82,7 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
         entity.setFotoUrl(dto.fotoUrl());
         entity.setOmschrijving(dto.omschrijving());
         entity.setDetailUrl(dto.detailUrl());
+        entity.setVrijeLocatie(dto.vrijeLocatie());
         locatieRepository.save(entity);
     }
 
@@ -194,7 +196,7 @@ class LocationAdministrationServiceImpl implements LocationAdministrationService
 
     private ChangeLocatieDto toChangeDto(TrouwlocatieEntity entity) {
         return new ChangeLocatieDto(entity.getId(), entity.getNaam(), entity.getFotoUrl(),
-                entity.getOmschrijving(), entity.getDetailUrl());
+                entity.getOmschrijving(), entity.getDetailUrl(), entity.isVrijeLocatie());
     }
 
     private ChangeBeschikbaarheidDto toChangeBeschikbaarheidDto(LocatieBeschikbaarheidEntity entity) {

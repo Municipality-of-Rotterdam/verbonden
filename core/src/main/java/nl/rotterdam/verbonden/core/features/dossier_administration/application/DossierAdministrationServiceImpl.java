@@ -190,7 +190,9 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                         .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + dto.locatieId()));
         dossier.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), locatie);
         if (vrijeLocatieIngevuld) {
-            dossier.kiesVrijeTrouwlocatie(dto.vrijeLocatieNaam(), dto.vrijeLocatieAdres(),
+            TrouwlocatieEntity vrijeLocatie = locatieRepository.findFirstByVrijeLocatieTrue()
+                    .orElseThrow(() -> new IllegalStateException("Geen vrije trouwlocatie beheerd"));
+            dossier.kiesVrijeTrouwlocatie(vrijeLocatie, dto.vrijeLocatieNaam(), dto.vrijeLocatieAdres(),
                     dto.vrijeLocatieTelefoonnummer(), dto.vrijeLocatieContactpersoon());
         }
         dossier.voegPartnerToe(dto.bsnPartner1(), medewerker);
