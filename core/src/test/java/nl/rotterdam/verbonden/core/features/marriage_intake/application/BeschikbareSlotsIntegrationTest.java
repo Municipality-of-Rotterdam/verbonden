@@ -476,7 +476,7 @@ class BeschikbareSlotsIntegrationTest {
         assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
                 .filteredOn(BeschikbareLocatieDto::prijs, Bedrag.of("900.00"))
                 .extracting(BeschikbareLocatieDto::id)
-                .contains(frijeLocatieId);
+                .contains(vrijeLocatieId);
     }
 
     @Test

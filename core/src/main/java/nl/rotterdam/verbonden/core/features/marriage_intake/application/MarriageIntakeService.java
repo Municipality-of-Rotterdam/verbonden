@@ -18,6 +18,8 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrou
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
 
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BeschikbareLocatieDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

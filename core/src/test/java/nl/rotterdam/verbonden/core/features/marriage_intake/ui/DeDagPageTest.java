@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.features.location_administration.application.
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateLocatieDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
@@ -76,7 +77,26 @@ class DeDagPageTest extends BaseWicketTest {
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
     void groteCeremonie_klikOpLocatie_opentKeuzePagina() {
-        startPage(maakDossier(CeremonieSoort.GROOT));
+        LocalDate datum = LocalDate.now(clock).plusDays(planningConfig.getVanafDagen());
+        ListLocatieDto vrijeLocatie = locationAdministrationService.findAllLocaties().stream()
+                .filter(ListLocatieDto::vrijeLocatie)
+                .findFirst().orElseThrow();
+        locationAdministrationService.findBeschikbaarheden(vrijeLocatie.id())
+                .forEach(b -> locationAdministrationService.deleteBeschikbaarheid(b.id()));
+        locationAdministrationService.findNietBeschikbareDagen(vrijeLocatie.id())
+                .forEach(d -> locationAdministrationService.deleteNietBeschikbareDag(d.id()));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                vrijeLocatie.id(), HuwelijksType.REGULIER, datum.getDayOfWeek(),
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 60, Bedrag.of("900.00"), datum, datum));
+        long reguliereLocatieId = locationAdministrationService.create(new CreateLocatieDto(
+                "Trouwzaal", null, null, null, false));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                reguliereLocatieId, HuwelijksType.REGULIER, datum.getDayOfWeek(),
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 60, Bedrag.of("123.45"), datum, datum));
+        UUID dossierId = maakDossier(CeremonieSoort.GROOT);
+        marriageIntakeService.kiesLocatie(dossierId, reguliereLocatieId);
+        marriageIntakeService.slaAfspraakOp(dossierId, datum, LocalTime.of(9, 0));
+        startPage(dossierId);
 
         klikOp("locatieLink");
 
@@ -94,6 +114,11 @@ class DeDagPageTest extends BaseWicketTest {
                 .contains("Kijk op de pagina Trouwambtenaar voor meer informatie.")
                 .contains("<li>De trouwambtenaar houdt een toespraak.");
         tester.assertContains("U kunt buiten een trouwzaal trouwen");
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("€ 123,45")
+                .contains("€ 900,00")
+                .contains("123,45");
     }
 
     @Test

@@ -127,59 +127,59 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
                     .collect(toUnmodifiableSet());
         }
 
-        @Override
-        @Transactional(readOnly = true)
-        public Map<Long, Bedrag> findBeschikbareLocatiePrijzen(UUID dossierId) {
-            HuwelijksDossierEntity dossier = getDossier(dossierId);
-            AfspraakEntity afspraak = afspraakRepository.findFirstByDossier_Id(dossier.getId()).orElse(null);
-            if (afspraak == null) {
-                return Map.of();
+        return planning.locaties().stream()
+                .filter(locatie -> planning.beschikbaarhedenPerLocatie().containsKey(locatie.getId()))
+                .map(TrouwlocatieEntity::getId)
+                .collect(toUnmodifiableSet());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Long, Bedrag> findBeschikbareLocatiePrijzen(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        AfspraakEntity afspraak = afspraakRepository.findFirstByDossier_Id(dossier.getId()).orElse(null);
+        if (afspraak == null) {
+            return Map.of();
+        }
+
+        LocalDate datum = afspraak.getDatum();
+        LocalTime tijd = afspraak.getStartTijd();
+        Planning planning = laadPlanning(dossier.getCeremonieSoort(), datum, datum, dossier, false);
+        Map<Long, Bedrag> prijzen = new java.util.HashMap<>();
+        for (TrouwlocatieEntity locatie : planning.locaties()) {
+            if (!planning.isVrij(locatie.getId(), datum, tijd)) {
+                continue;
+            }
+            prijsVoor(planning, locatie, datum, tijd)
+                    .ifPresent(prijs -> prijzen.put(locatie.getId(), prijs));
+        }
+        return Map.copyOf(prijzen);
+    }
+
+    @Override
+    @Transactional
+    public void verplaatsAfspraakNaarGekozenLocatie(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        afspraakRepository.findFirstByDossier_Id(dossier.getId()).ifPresent(afspraak -> {
+            TrouwlocatieEntity locatie = dossier.getLocatie();
+            if (locatie == null) {
+                throw new IllegalStateException("Kies eerst een trouwlocatie");
             }
 
             LocalDate datum = afspraak.getDatum();
             LocalTime tijd = afspraak.getStartTijd();
             Planning planning = laadPlanning(dossier.getCeremonieSoort(), datum, datum, dossier, false);
-            Map<Long, Bedrag> prijzen = new java.util.HashMap<>();
-            for (TrouwlocatieEntity locatie : planning.locaties()) {
-                if (!planning.isVrij(locatie.getId(), datum, tijd)) {
-                    continue;
-                }
-                prijsVoor(planning, locatie, datum, tijd)
-                        .ifPresent(prijs -> prijzen.put(locatie.getId(), prijs));
+            if (!planning.isVrij(locatie.getId(), datum, tijd)) {
+                throw new IllegalStateException("De gekozen locatie is niet beschikbaar op het gekozen tijdstip");
             }
-            return Map.copyOf(prijzen);
-        }
 
-        @Override
-        @Transactional
-        public void verplaatsAfspraakNaarGekozenLocatie(UUID dossierId) {
-            HuwelijksDossierEntity dossier = getDossier(dossierId);
-            afspraakRepository.findFirstByDossier_Id(dossier.getId()).ifPresent(afspraak -> {
-                TrouwlocatieEntity locatie = dossier.getLocatie();
-                if (locatie == null) {
-                    throw new IllegalStateException("Kies eerst een trouwlocatie");
-                }
-
-                LocalDate datum = afspraak.getDatum();
-                LocalTime tijd = afspraak.getStartTijd();
-                Planning planning = laadPlanning(dossier.getCeremonieSoort(), datum, datum, dossier, false);
-                if (!planning.isVrij(locatie.getId(), datum, tijd)) {
-                    throw new IllegalStateException("De gekozen locatie is niet beschikbaar op het gekozen tijdstip");
-                }
-
-                LocatieBeschikbaarheidEntity beschikbaarheid = beschikbaarheidVoor(planning, locatie.getId(), datum, tijd)
-                        .orElseThrow(() -> new IllegalStateException(
-                                "Geen beschikbaar tijdslot gevonden voor " + datum + " " + tijd));
-                afspraak.setLocatie(locatie);
-                afspraak.setEindTijd(tijd.plusMinutes(beschikbaarheid.getDuurInMinuten()));
-                afspraak.setLocatiePrijs(berekenLocatiePrijs(planning, locatie, datum, beschikbaarheid));
-            });
-        }
-
-        return planning.locaties().stream()
-                .filter(locatie -> planning.beschikbaarhedenPerLocatie().containsKey(locatie.getId()))
-                .map(TrouwlocatieEntity::getId)
-                .collect(toUnmodifiableSet());
+            LocatieBeschikbaarheidEntity beschikbaarheid = beschikbaarheidVoor(planning, locatie.getId(), datum, tijd)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Geen beschikbaar tijdslot gevonden voor " + datum + " " + tijd));
+            afspraak.setLocatie(locatie);
+            afspraak.setEindTijd(tijd.plusMinutes(beschikbaarheid.getDuurInMinuten()));
+            afspraak.setLocatiePrijs(berekenLocatiePrijs(planning, locatie, datum, beschikbaarheid));
+        });
     }
 
     /** De eerste dag van de planningsperiode: eerder kan een burger geen datum kiezen. */
@@ -264,7 +264,10 @@ class AfspraakPlanningServiceImpl implements AfspraakPlanningService {
 
     private Planning laadPlanning(CeremonieSoort ceremonieSoort, LocalDate van, LocalDate tot,
                                   HuwelijksDossierEntity eigenDossier, boolean beperkTotGekozenLocatie) {
-        List<TrouwlocatieEntity> locaties = beperkTotGekozenLocatie && eigenDossier != null
+        boolean gebruiktGekozenLocatie = beperkTotGekozenLocatie && eigenDossier != null
+                && (eigenDossier.getCeremonieSoort() == CeremonieSoort.GROOT
+                || (eigenDossier.getLocatie() != null && eigenDossier.getLocatie().isVrijeLocatie()));
+        List<TrouwlocatieEntity> locaties = gebruiktGekozenLocatie
                 && eigenDossier.getLocatie() != null
                 ? List.of(eigenDossier.getLocatie()) : resolveLocaties(ceremonieSoort);
         if (locaties.isEmpty()) {
