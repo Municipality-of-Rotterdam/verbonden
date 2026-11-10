@@ -113,12 +113,13 @@ class DeDagPageTest extends BaseWicketTest {
                 .contains("<li>U kiest uw top 3 trouwambtenaren van de gemeente.")
                 .contains("Kijk op de pagina Trouwambtenaar voor meer informatie.")
                 .contains("<li>De trouwambtenaar houdt een toespraak.");
-        tester.assertContains("U kunt buiten een trouwzaal trouwen");
-        String html = tester.getLastResponseAsString();
+        tester.assertContains("U mag ook trouwen of een partnerschap registreren");
         assertThat(html)
                 .contains("€ 123,45")
                 .contains("€ 900,00")
-                .contains("123,45");
+                .contains("123,45")
+                .containsPattern("(?s)<button[^>]*class=\"[^\"]*utrecht-button--primary-action")
+                .containsPattern("(?s)<a[^>]*class=\"utrecht-button utrecht-button--primary-action\"");
     }
 
     @Test

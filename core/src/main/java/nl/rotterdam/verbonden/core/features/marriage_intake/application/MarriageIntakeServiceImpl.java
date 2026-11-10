@@ -181,15 +181,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     @Override
     @Transactional(readOnly = true)
     public List<BeschikbareLocatieDto> findBeschikbareLocaties(UUID dossierId) {
-        Set<Long> beschikbareLocatieIds = afspraakPlanningService.findBeschikbareLocatieIds(dossierId);
-        Map<Long, Bedrag> locatiePrijzen = afspraakPlanningService.findBeschikbareLocatiePrijzen(dossierId);
+        var locatiePlanning = afspraakPlanningService.findBeschikbareLocaties(dossierId);
         return locatieRepository.findAllProjectedUnpaged().stream()
-                .filter(locatie -> beschikbareLocatieIds.contains(locatie.id()))
+                .filter(locatie -> locatiePlanning.locatieIds().contains(locatie.id()))
                 .sorted(Comparator.comparing(ListLocatieDto::vrijeLocatie).reversed()
                         .thenComparing(ListLocatieDto::naam))
                 .map(locatie -> new BeschikbareLocatieDto(locatie.id(), locatie.naam(), locatie.fotoUrl(),
                         locatie.omschrijving(), locatie.detailUrl(), locatie.vrijeLocatie(),
-                        locatiePrijzen.get(locatie.id())))
+                        locatiePlanning.prijzen().get(locatie.id())))
                 .toList();
     }
 
@@ -202,7 +201,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
         TrouwlocatieEntity locatie = locatieRepository.findById(locatieId)
                 .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + locatieId));
-        if (!afspraakPlanningService.findBeschikbareLocatieIds(dossierId).contains(locatieId)) {
+        if (!afspraakPlanningService.findBeschikbareLocaties(dossierId).locatieIds().contains(locatieId)) {
             throw new IllegalStateException("De gekozen locatie is niet beschikbaar voor deze ceremonie");
         }
         dossier.wijzigCeremonie(dossier.getRegistratieType(), dossier.getCeremonieSoort(), locatie);
