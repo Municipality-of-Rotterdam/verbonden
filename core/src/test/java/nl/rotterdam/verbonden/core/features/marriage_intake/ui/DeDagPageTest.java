@@ -109,11 +109,9 @@ class DeDagPageTest extends BaseWicketTest {
         String html = tester.getLastResponseAsString();
         assertThat(html)
                 .contains("Contactpersoon (optioneel)")
-                .contains("<h4>Mogelijkheden</h4>")
-                .contains("<li>Uw ceremonie duurt 60 minuten.</li>")
-                .contains("<li>U kiest uw top 3 trouwambtenaren van de gemeente.")
-                .contains("Kijk op de pagina Trouwambtenaar voor meer informatie.")
-                .contains("<li>De trouwambtenaar houdt een toespraak.");
+                .doesNotContain("Mogelijkheden")
+                .doesNotContain("Uw ceremonie duurt 60 minuten.")
+                .doesNotContain("U kiest uw top 3 trouwambtenaren van de gemeente.");
         String vrijeLocatieKaart = Jsoup.parse(html).select("section.rd-trouwlocatie:has(form)").text();
         assertThat(vrijeLocatieKaart)
                 .doesNotContain("U mag ook trouwen of een partnerschap registreren")
