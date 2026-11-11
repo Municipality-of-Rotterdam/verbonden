@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 
 @Entity
-@Table(name = "vrije_trouwlocaties")
+@Table(name = "dossier_vrije_trouwlocaties")
 public class VrijeTrouwlocatieEntity {
 
     @Id

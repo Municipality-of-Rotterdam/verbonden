@@ -90,12 +90,16 @@ public class DossierCreatePage extends AdministrationBasePage {
                                     BalieDossierFormDto::setVrijeLocatieContactpersoon),
                             Model.of("Contactpersoon (optioneel)"))
             );
-            vrijeLocatieVelden.add(new VisibleModelBehavior(model.map(BalieDossierFormDto::isVrijeLocatie)));
+            vrijeLocatieVelden.add(new VisibleModelBehavior(model.map(f ->
+                    f.getLocatie() != null && f.getLocatie().vrijeLocatie())));
 
-            RdFormFieldCheckbox vrijeLocatieCheckbox = new RdFormFieldCheckbox("vrijeLocatie",
-                    LambdaModel.of(model, BalieDossierFormDto::isVrijeLocatie, BalieDossierFormDto::setVrijeLocatie),
-                    Model.of("Vrije locatie"));
-            vrijeLocatieCheckbox.getControl().add(new AjaxFormComponentUpdatingBehavior("change") {
+            RdFormFieldSelect<ListLocatieDto> locatie = new RdFormFieldSelect<>("locatie",
+                    LambdaModel.of(model, BalieDossierFormDto::getLocatie, BalieDossierFormDto::setLocatie),
+                    Model.of("Trouwlocatie"),
+                    marriageIntakeService.findLocaties(),
+                    new LambdaChoiceRenderer<>(ListLocatieDto::naam, ListLocatieDto::id))
+                    .setNullValid(true);
+            locatie.getInput().add(new AjaxFormComponentUpdatingBehavior("change") {
                 @Override
                 protected void onUpdate(AjaxRequestTarget target) {
                     target.add(locatieKeuze);
@@ -103,13 +107,7 @@ public class DossierCreatePage extends AdministrationBasePage {
             });
 
             locatieKeuze.add(
-                    vrijeLocatieCheckbox,
-                    new RdFormFieldSelect<>("locatie",
-                            LambdaModel.of(model, BalieDossierFormDto::getLocatie, BalieDossierFormDto::setLocatie),
-                            Model.of("Trouwlocatie"),
-                            marriageIntakeService.findLocaties(),
-                            new LambdaChoiceRenderer<>(ListLocatieDto::naam, ListLocatieDto::id))
-                            .add(new VisibleModelBehavior(model.map(f -> !f.isVrijeLocatie()))),
+                    locatie,
                     vrijeLocatieVelden
             );
             locatieKeuze.add(new VisibleModelBehavior(model.map(f -> f.getCeremonieSoort() == CeremonieSoort.GROOT)));
@@ -192,16 +190,16 @@ public class DossierCreatePage extends AdministrationBasePage {
                 error("Controleer de identiteit van beide partners voordat u het dossier aanmaakt.");
                 return;
             }
+            boolean vrijeLocatieNietIngevuld = f.getLocatie() != null && f.getLocatie().vrijeLocatie()
+                    && (isLeeg(f.getVrijeLocatieNaam()) || isLeeg(f.getVrijeLocatieAdres())
+                    || f.getVrijeLocatieTelefoonnummer() == null);
             if (f.getCeremonieSoort() == CeremonieSoort.GROOT
-                    && (f.isVrijeLocatie()
-                    ? isLeeg(f.getVrijeLocatieNaam()) || isLeeg(f.getVrijeLocatieAdres())
-                    || f.getVrijeLocatieTelefoonnummer() == null
-                    : f.getLocatie() == null)) {
+                    && (f.getLocatie() == null || vrijeLocatieNietIngevuld)) {
                 error("Kies een trouwlocatie of vul alle verplichte gegevens van uw vrije locatie in.");
                 return;
             }
             try {
-                boolean vrijeLocatie = f.getCeremonieSoort() == CeremonieSoort.GROOT && f.isVrijeLocatie();
+                boolean vrijeLocatie = f.getLocatie() != null && f.getLocatie().vrijeLocatie();
                 UUID dossierId = dossierAdministrationService.create(new CreateBalieDossierDto(
                         f.getKanaal(),
                         f.getRegistratieType(),
@@ -210,7 +208,7 @@ public class DossierCreatePage extends AdministrationBasePage {
                         f.isPartner2ZonderBsn() ? null : f.getBsnPartner2(),
                         f.isPartner2ZonderBsn() ? f.getPartner2().getPersoonsnummer() : null,
                         f.isPartner2ZonderBsn() ? f.getPartner2().naarDto() : null,
-                        f.getCeremonieSoort() == CeremonieSoort.GROOT && !vrijeLocatie
+                        f.getCeremonieSoort() == CeremonieSoort.GROOT && f.getLocatie() != null
                                 ? f.getLocatie().id() : null,
                         vrijeLocatie ? f.getVrijeLocatieNaam() : null,
                         vrijeLocatie ? f.getVrijeLocatieAdres() : null,

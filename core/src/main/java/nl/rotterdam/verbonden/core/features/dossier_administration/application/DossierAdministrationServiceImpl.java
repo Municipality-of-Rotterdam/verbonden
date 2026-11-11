@@ -179,20 +179,27 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
 
         String medewerker = medewerker();
         HuwelijksDossierEntity dossier = new HuwelijksDossierEntity(dto.kanaal(), medewerker);
-        boolean vrijeLocatieIngevuld = dto.vrijeLocatieNaam() != null || dto.vrijeLocatieAdres() != null
-                || dto.vrijeLocatieTelefoonnummer() != null || dto.vrijeLocatieContactpersoon() != null;
-        if (vrijeLocatieIngevuld && dto.locatieId() != null) {
-            throw new IllegalArgumentException("Kies een vaste locatie of een vrije locatie, niet allebei");
+        boolean vrijeLocatieIngevuld = !isLeeg(dto.vrijeLocatieNaam()) || !isLeeg(dto.vrijeLocatieAdres())
+                || dto.vrijeLocatieTelefoonnummer() != null || !isLeeg(dto.vrijeLocatieContactpersoon());
+        if (dto.ceremonieSoort() == CeremonieSoort.GROOT && dto.locatieId() == null) {
+            throw new IllegalArgumentException("Kies een trouwlocatie voor een grote ceremonie");
         }
         TrouwlocatieEntity locatie = dto.locatieId() == null
                 ? locatieVoor(dto.ceremonieSoort())
                 : locatieRepository.findById(dto.locatieId())
                         .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + dto.locatieId()));
+        boolean vrijeLocatie = locatie != null && locatie.isVrijeLocatie();
+        if (vrijeLocatie && dto.ceremonieSoort() != CeremonieSoort.GROOT) {
+            throw new IllegalArgumentException("Een vrije trouwlocatie is alleen mogelijk bij een grote ceremonie");
+        }
+        if (vrijeLocatie != vrijeLocatieIngevuld) {
+            throw new IllegalArgumentException(vrijeLocatie
+                    ? "Vul de verplichte gegevens van de vrije trouwlocatie in"
+                    : "Vul alleen gegevens van een vrije trouwlocatie in bij de vrije locatie");
+        }
         dossier.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), locatie);
-        if (vrijeLocatieIngevuld) {
-            TrouwlocatieEntity vrijeLocatie = locatieRepository.findFirstByVrijeLocatieTrue()
-                    .orElseThrow(() -> new IllegalStateException("Geen vrije trouwlocatie beheerd"));
-            dossier.kiesVrijeTrouwlocatie(vrijeLocatie, dto.vrijeLocatieNaam(), dto.vrijeLocatieAdres(),
+        if (vrijeLocatie) {
+            dossier.kiesVrijeTrouwlocatie(locatie, dto.vrijeLocatieNaam(), dto.vrijeLocatieAdres(),
                     dto.vrijeLocatieTelefoonnummer(), dto.vrijeLocatieContactpersoon());
         }
         dossier.voegPartnerToe(dto.bsnPartner1(), medewerker);

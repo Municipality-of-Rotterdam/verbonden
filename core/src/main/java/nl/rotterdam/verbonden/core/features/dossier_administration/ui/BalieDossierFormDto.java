@@ -15,7 +15,6 @@ public class BalieDossierFormDto implements Serializable {
     private RegistratieType registratieType = RegistratieType.HUWELIJK;
     private CeremonieSoort ceremonieSoort;
     private ListLocatieDto locatie;
-    private boolean vrijeLocatie;
     private String vrijeLocatieNaam;
     private String vrijeLocatieAdres;
     private Telefoonnummer vrijeLocatieTelefoonnummer;
@@ -57,14 +56,6 @@ public class BalieDossierFormDto implements Serializable {
 
     public void setLocatie(ListLocatieDto locatie) {
         this.locatie = locatie;
-    }
-
-    public boolean isVrijeLocatie() {
-        return vrijeLocatie;
-    }
-
-    public void setVrijeLocatie(boolean vrijeLocatie) {
-        this.vrijeLocatie = vrijeLocatie;
     }
 
     public String getVrijeLocatieNaam() {

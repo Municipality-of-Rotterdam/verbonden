@@ -17,6 +17,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Partne
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerNietInBrpException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PersoonsgegevensDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierInzageRepository;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
@@ -91,9 +92,12 @@ class DossierBeheerIntegrationTest {
 
     @Test
     void vrijeLocatieVanBalieDossierWordtGetoondEnKanWordenGoedgekeurd() {
+        long vrijeLocatieId = marriageIntakeService.findLocaties().stream()
+                .filter(ListLocatieDto::vrijeLocatie)
+                .findFirst().orElseThrow().id();
         UUID dossierId = dossierAdministrationService.create(new CreateBalieDossierDto(AanmaakKanaal.BALIE,
                 RegistratieType.HUWELIJK, CeremonieSoort.GROOT, BSN_PARTNER_1, BSN_PARTNER_2, null, null,
-                null, "Tuinzaal", "Straat 1, Rotterdam", new Telefoonnummer("0101234567"), "Medewerker"));
+                vrijeLocatieId, "Tuinzaal", "Straat 1, Rotterdam", new Telefoonnummer("0101234567"), "Medewerker"));
 
         DossierDetailDto detail = dossierAdministrationService.findDetail(dossierId);
         assertThat(detail.locatieNaam()).isEqualTo("Tuinzaal");
