@@ -74,7 +74,8 @@ class InloggenRedirectTest {
         HttpRequest.Builder request = HttpRequest.newBuilder(uri)
                 .header("Sec-Fetch-Site", "same-origin")
                 .header("Sec-Fetch-Mode", "navigate");
-        String cookieHeader = cookies.getCookieStore().get(uri).stream()
+        // The local test server uses HTTP; forward Secure cookies to preserve the HTTPS session flow.
+        String cookieHeader = cookies.getCookieStore().getCookies().stream()
                 .map(cookie -> cookie.getName() + "=" + cookie.getValue())
                 .collect(Collectors.joining("; "));
         if (!cookieHeader.isEmpty()) {
