@@ -1,5 +1,7 @@
 package nl.rotterdam.verbonden.core.domain;
 
+import jakarta.annotation.Nonnull;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,6 +30,10 @@ public record Bedrag(BigDecimal value) implements ValueHolder<BigDecimal>, Compa
         return new Bedrag(value.add(Objects.requireNonNull(bedrag).value));
     }
 
+    public Bedrag minus(Bedrag bedrag) {
+        return new Bedrag(value.subtract(Objects.requireNonNull(bedrag).value));
+    }
+
     public boolean isPositive() {
         return value.signum() > 0;
     }
@@ -48,7 +54,7 @@ public record Bedrag(BigDecimal value) implements ValueHolder<BigDecimal>, Compa
     }
 
     @Override
-    public String toString() {
+    @Nonnull public String toString() {
         return "Bedrag[" + value.toPlainString() + "]";
     }
 }

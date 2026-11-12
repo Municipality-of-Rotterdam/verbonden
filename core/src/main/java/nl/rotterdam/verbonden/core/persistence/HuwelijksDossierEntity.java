@@ -46,7 +46,15 @@ public class HuwelijksDossierEntity {
 
     @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("volgorde ASC")
-    private List<HuwelijksDossiersPartnerEntity> partners = new ArrayList<>();
+    private final List<HuwelijksDossiersPartnerEntity> partners = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    private List<BetalingEntity> betalingen = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    private final List<BetaalmutatieEntity> betaalmutaties = new ArrayList<>();
 
     @Column(name = "ringen_uitwisselen", nullable = false)
     private boolean ringenUitwisselen = false;
@@ -163,6 +171,68 @@ public class HuwelijksDossierEntity {
                 this, partners.size() + 1, bsn, persoonsnummer, identiteitGecontroleerdDoor);
         partners.add(partner);
         return partner;
+    }
+
+    /**
+     * Start een betaalpoging voor de aanvraag zelf.
+     */
+    public BetalingEntity startRegistratieBetaling(String betalingskenmerk, Bedrag bedrag,
+                                                   BurgerServiceNummer betalerBsn, LocalDateTime gestartOp) {
+        return voegBetalingToe(new BetalingEntity(this, null, betalingskenmerk, bedrag, betalerBsn, gestartOp));
+    }
+
+    /**
+     * Start een betaalpoging voor een betaalmutatie van dit dossier.
+     */
+    public BetalingEntity startMutatieBetaling(BetaalmutatieEntity betaalmutatie, String betalingskenmerk,
+                                               BurgerServiceNummer betalerBsn, LocalDateTime gestartOp) {
+        if (!betaalmutatie.getDossier().getId().equals(id)) {
+            throw new IllegalArgumentException("Betaalmutatie " + betaalmutatie.getId() + " hoort niet bij dossier " + uuid);
+        }
+        return voegBetalingToe(new BetalingEntity(this, betaalmutatie, betalingskenmerk, betaalmutatie.getBedrag(),
+                betalerBsn, gestartOp));
+    }
+
+    private BetalingEntity voegBetalingToe(BetalingEntity betaling) {
+        betalingen.add(betaling);
+        return betaling;
+    }
+
+    public List<BetalingEntity> getBetalingen() {
+        return betalingen;
+    }
+
+    /**
+     * Voegt een bedrag toe dat het paar nog moet betalen.
+     *
+     * @param prijswijziging of het bedrag het verschil is doordat het dossier duurder werd (zit dan in de
+     *                       totaalprijs), of een handmatige mutatie bovenop de totaalprijs
+     */
+    public BetaalmutatieEntity voegBetaalmutatieToe(String omschrijving, Bedrag bedrag, boolean prijswijziging,
+                                                    String aangemaaktDoor, LocalDateTime aangemaaktOp) {
+        BetaalmutatieEntity mutatie = new BetaalmutatieEntity(this, omschrijving, bedrag, prijswijziging,
+                aangemaaktDoor, aangemaaktOp);
+        betaalmutaties.add(mutatie);
+        return mutatie;
+    }
+
+    public List<BetaalmutatieEntity> getBetaalmutaties() {
+        return betaalmutaties;
+    }
+
+    /**
+     * Verwijdert een betaalmutatie waarvoor nog geen betaling is gestart.
+     *
+     * @throws IllegalStateException wanneer er al een betaling voor de mutatie is gestart
+     */
+    public void verwijderBetaalmutatie(long betaalmutatieId) {
+        if (betalingen.stream().anyMatch(b -> b.getBetaalmutatie() != null
+                && b.getBetaalmutatie().getId() == betaalmutatieId)) {
+            throw new IllegalStateException("Voor betaalmutatie " + betaalmutatieId + " is al een betaling gestart");
+        }
+        if (!betaalmutaties.removeIf(m -> m.getId() == betaalmutatieId)) {
+            throw new IllegalArgumentException("Betaalmutatie " + betaalmutatieId + " hoort niet bij dossier " + uuid);
+        }
     }
 
     /**

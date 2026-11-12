@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.application.Marriage
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
+import nl.rotterdam.verbonden.core.integration_test.TestOnlineBetaalService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -31,6 +32,9 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
     @Autowired
     private DossierAdministrationService dossierAdministrationService;
 
+    @Autowired
+    private TestOnlineBetaalService betaalprovider;
+
     @Test
     @WithMockUser(username = "999990020")
     void onvolledigDossier_bevestigButtonIsUitgeschakeld() {
@@ -53,7 +57,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         assertThat(html)
                 .contains("Dé dag")
                 .contains("Controleer uw keuzes goed.")
-                .contains("Na bevestiging gaat u verder naar de betalingspagina.")
+                .contains("Na bevestiging gaat u verder naar de betaalpagina.")
                 .contains("Na betaling ontvangt u een bevestiging per e-mail.")
                 .contains("Uw reservering blijft 3 dagen geldig.")
                 .contains("Binnen die periode kunt u de aanvraag gratis aanpassen.")
@@ -83,71 +87,37 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990020")
-    void bevestigenOpentBetalingspaginaZonderDossierInTeDienen() {
-        UUID dossierId = testData.maakCompleetDossier();
+    void betaaldDossier_knopIsBevestigenEnBetalenEnGaatNaarDeBetaalprovider() {
+        UUID dossierId = testData.maakCompleetBetaaldDossier();
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
         tester.assertEnabled(BEVESTIG_BUTTON);
+        tester.assertContains("Bevestigen en betalen");
+        assertPaginaSerialiseerbaar();
 
         tester.getRequest().setHeader("Origin", "http://localhost");
         tester.newFormTester(BEVESTIG_FORM).submit("bevestigButton");
 
-        tester.assertRenderedPage(BetalingPage.class);
+        assertThat(tester.getLastResponse().getRedirectLocation()).startsWith(TestOnlineBetaalService.BETAALPAGINA);
         assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
+        betaalprovider.reset();
     }
 
     @Test
     @WithMockUser(username = "999990020")
-    void betalingUitvoerenDientDossierInEnToontStatuspagina() {
+    void gratisDossier_bevestigenDientMeteenInEnToontStatuspagina() {
         UUID dossierId = testData.maakCompleetDossier();
-        tester.startPage(BetalingPage.class, makeDossierPageParameters(dossierId));
-        String betalingForm = PAGE_BODY + ":betalingForm";
-        tester.assertEnabled(betalingForm + ":betalingButton");
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+        tester.assertContains("Bevestigen en indienen");
 
         // Zoals een browser: anders weigert Wicket's CSRF-bescherming de POST.
         tester.getRequest().setHeader("Origin", "http://localhost");
-        tester.newFormTester(betalingForm).submit("betalingButton");
+        tester.newFormTester(BEVESTIG_FORM).submit("bevestigButton");
 
         assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.INGEDIEND);
         tester.assertRenderedPage(AanvraagStatusPage.class);
         tester.assertContains("We hebben uw aanvraag ontvangen. De gemeente gaat die nu bekijken.");
         tester.assertContains("Wat gebeurt er nu\\?");
         assertThat(tester.getLastResponseAsString()).doesNotContain("bevestigButton");
-    }
-
-    @Test
-    @WithMockUser(username = "999990020")
-    void betalingNietGeluktKeertTerugNaarControlerenMetMelding() {
-        UUID dossierId = testData.maakCompleetDossier();
-        tester.startPage(BetalingPage.class, makeDossierPageParameters(dossierId));
-
-        tester.addRequestHeader("sec-fetch-site", "same-origin");
-        tester.addRequestHeader("sec-fetch-mode", "navigate");
-        tester.clickLink(PAGE_BODY + ":betalingMislukt");
-
-        tester.assertRenderedPage(ControlerenPage.class);
-        tester.assertVisible(PAGE_BODY + ":betalingMislukt");
-        tester.assertContains("De betaling is niet gelukt of afgebroken.");
-        assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
-
-        // De melding is eenmalig: na een refresh van de pagina is hij weg
-        tester.startPage(tester.getLastRenderedPage());
-        tester.assertRenderedPage(ControlerenPage.class);
-        tester.assertInvisible(PAGE_BODY + ":betalingMislukt");
-    }
-
-    @Test
-    @WithMockUser(username = "999990020")
-    void betaalknopBlijftActiefAlsDossierNietCompleetIs() {
-        UUID dossierId = testData.maakConceptDossier();
-        tester.startPage(BetalingPage.class, makeDossierPageParameters(dossierId));
-        String betalingForm = PAGE_BODY + ":betalingForm";
-
-        tester.assertEnabled(betalingForm + ":betalingButton");
-        tester.getRequest().setHeader("Origin", "http://localhost");
-        tester.newFormTester(betalingForm).submit("betalingButton");
-
-        tester.assertRenderedPage(ControlerenPage.class);
-        assertThat(marriageIntakeService.findStatus(dossierId)).isEqualTo(DossierStatus.CONCEPT);
     }
 
     @Test
