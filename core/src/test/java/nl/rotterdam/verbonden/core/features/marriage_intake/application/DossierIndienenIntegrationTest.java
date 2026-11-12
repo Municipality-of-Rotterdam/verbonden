@@ -1,12 +1,20 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.Bedrag;
+import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import nl.rotterdam.verbonden.core.integration_test.InstelbareKlok;
@@ -52,6 +60,29 @@ class DossierIndienenIntegrationTest {
         assertThat(dossier.status()).isEqualTo(DossierStatus.CONCEPT);
         assertThat(dossier.ingediendOp()).isNull();
         assertThat(dossier.compleet()).isFalse();
+    }
+
+    @Test
+    void vrijeTrouwlocatieVultDeLocatieAanEnVereistVerplichteGegevens() {
+        UUID dossierId = marriageIntakeService.create(new CreateDossierDto(
+                RegistratieType.HUWELIJK,
+                CeremonieSoort.GROOT,
+                null,
+                new BurgerServiceNummer("999990019")));
+
+        assertThatThrownBy(() -> marriageIntakeService.slaVrijeTrouwlocatieOp(dossierId,
+                new SaveVrijeTrouwlocatieDto("", " ", null, null)))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        marriageIntakeService.slaVrijeTrouwlocatieOp(dossierId,
+                new SaveVrijeTrouwlocatieDto("Tuinzaal", "Straat 1, Rotterdam",
+                        new Telefoonnummer("0101234567"), null));
+
+        DossierSamenvattingDto dossier = marriageIntakeService.findByDossierId(dossierId);
+        assertThat(dossier.huwelijksLocatie()).isEqualTo("Tuinzaal");
+        assertThat(dossier.ontbrekendeOnderdelen()).doesNotContain(OntbrekendOnderdeel.LOCATIE);
+        assertThat(marriageIntakeService.findVrijeTrouwlocatie(dossierId)).isPresent()
+                .get().extracting(VrijeTrouwlocatieDto::adres).isEqualTo("Straat 1, Rotterdam");
     }
 
     @Test

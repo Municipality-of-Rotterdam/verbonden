@@ -1,0 +1,23 @@
+<wicket:extend>
+    <p><a wicket:id="terugLink" class="utrecht-button utrecht-button--secondary-action"><span wicket:id="terugLabel"></span></a></p>
+
+    <section wicket:id="locaties" class="rd-trouwlocatie">
+        <img wicket:id="foto" class="rd-trouwlocatie__foto" alt=""/>
+        <h3 wicket:id="naam"></h3>
+        <p wicket:id="omschrijving"></p>
+        <p wicket:id="prijs"></p>
+        <p><a wicket:id="meerInfo"><span wicket:id="meerInfoLabel"></span></a></p>
+        <div wicket:id="vrijeLocatie">
+            <form wicket:id="vrijeTrouwlocatieForm" class="d-flex flex-column gap-3">
+                <div wicket:id="naam"></div>
+                <div wicket:id="adres"></div>
+                <div wicket:id="telefoonnummer"></div>
+                <div wicket:id="contactpersoon"></div>
+                <button wicket:id="opslaan" type="submit"></button>
+            </form>
+        </div>
+        <a wicket:id="kies" class="utrecht-button utrecht-button--primary-action">
+            <span wicket:id="kiesLabel"></span>
+        </a>
+    </section>
+</wicket:extend>

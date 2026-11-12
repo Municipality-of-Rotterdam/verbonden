@@ -15,16 +15,18 @@ public interface LocatieRepository extends JpaRepository<TrouwlocatieEntity, Lon
 
     @Query("""
             SELECT new nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto(
-                l.id, l.naam, l.fotoUrl, l.omschrijving, l.detailUrl)
+                l.id, l.naam, l.fotoUrl, l.omschrijving, l.detailUrl, l.vrijeLocatie)
             FROM TrouwlocatieEntity l
             """)
     Page<ListLocatieDto> findAllProjected(Pageable pageable);
 
     @Query("""
             SELECT new nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto(
-                l.id, l.naam, l.fotoUrl, l.omschrijving, l.detailUrl)
+                l.id, l.naam, l.fotoUrl, l.omschrijving, l.detailUrl, l.vrijeLocatie)
             FROM TrouwlocatieEntity l
             ORDER BY l.naam ASC
             """)
     List<ListLocatieDto> findAllProjectedUnpaged();
+
+    java.util.Optional<TrouwlocatieEntity> findFirstByVrijeLocatieTrue();
 }

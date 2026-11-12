@@ -23,6 +23,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraI
 import nl.rotterdam.verbonden.core.domain.Bedrag;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -81,6 +82,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                 new Label("ceremonieSoort", dossier.ceremonieSoort().getLabel()),
                 new Label("ceremoniePrijs", prijs(dossier.ceremoniePrijs())),
                 new Label("locatie", tekst(dossier.locatieNaam())),
+                vrijeLocatieDetails(),
 
                 new BookmarkablePageLink<>("afspraakWijzigen", DossierAfspraakUpdatePage.class, dossierParams),
                 new Label("datumTijdHuwelijk", dossier.datumTijdHuwelijk() != null
@@ -131,6 +133,43 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                         .setVisible(dossier.bestanden().isEmpty()),
                 new BestandToevoegenForm("bestandToevoegenForm")
         );
+    }
+
+    private WebMarkupContainer vrijeLocatieDetails() {
+        WebMarkupContainer details = new WebMarkupContainer("vrijeLocatieDetails");
+        boolean heeftVrijeLocatie = dossier.vrijeTrouwlocatie() != null;
+        details.setVisible(heeftVrijeLocatie);
+        details.add(
+                new Label("vrijeLocatieAdres", heeftVrijeLocatie ? dossier.vrijeTrouwlocatie().adres() : ""),
+                new Label("vrijeLocatieTelefoonnummer",
+                        heeftVrijeLocatie ? dossier.vrijeTrouwlocatie().telefoonnummer().getValue() : ""),
+                new Label("vrijeLocatieContactpersoon", heeftVrijeLocatie
+                        ? tekst(dossier.vrijeTrouwlocatie().contactpersoon()) : ""),
+                new Label("vrijeLocatieStatus", heeftVrijeLocatie && dossier.vrijeTrouwlocatie().goedgekeurd()
+                        ? "Goedgekeurd" : "Nog niet goedgekeurd"),
+                new VrijeLocatieGoedkeurenForm("vrijeLocatieGoedkeurenForm")
+                        .setVisible(heeftVrijeLocatie && !dossier.vrijeTrouwlocatie().goedgekeurd())
+        );
+        return details;
+    }
+
+    private class VrijeLocatieGoedkeurenForm extends Form<Void> {
+
+        VrijeLocatieGoedkeurenForm(String id) {
+            super(id);
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            add(new RdButton("goedkeuren", Model.of("Vrije locatie goedkeuren")));
+        }
+
+        @Override
+        protected void onSubmit() {
+            dossierAdministrationService.keurVrijeTrouwlocatieGoed(dossierId);
+            naarDetailPagina();
+        }
     }
 
     /**

@@ -1,16 +1,20 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.Bedrag;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateBeschikbaarheidDto;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateLocatieDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.CreateNietBeschikbareDagDto;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.HuwelijksType;
 import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BeschikbareLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.config.PlanningConfig;
 import nl.rotterdam.verbonden.core.integration_test.InstelbareKlok;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
@@ -345,6 +349,134 @@ class BeschikbareSlotsIntegrationTest {
         List<LocalTime> tijden = marriageIntakeService.findBeschikbareTijden(dossier, volgendeDonderdag);
         assertThat(tijden).contains(LocalTime.of(9, 0), LocalTime.of(9, 30));
         assertThat(tijden).contains(LocalTime.of(14, 0), LocalTime.of(14, 30));
+    }
+
+    @Test
+    void beschikbareLocaties_volgenHuwelijkstypeEnGeselecteerdTijdslot() {
+        List<ListLocatieDto> locaties = locationAdministrationService.findAllLocaties();
+        assertThat(locaties).hasSizeGreaterThanOrEqualTo(4);
+        long locatieOmNegenUur = locaties.get(0).id();
+        long locatieOmTienUur = locaties.get(1).id();
+        long locatieNietBeschikbaar = locaties.get(2).id();
+        long locatieAnderHuwelijkstype = locaties.get(3).id();
+        LocalDate maandag = volgendeWeekdag(DayOfWeek.MONDAY);
+
+        maakBeschikbaarheid(locatieOmNegenUur, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(9, 10), 10);
+        maakBeschikbaarheid(locatieOmTienUur, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(10, 0), LocalTime.of(10, 10), 10);
+        maakBeschikbaarheid(locatieNietBeschikbaar, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(9, 10), 10);
+        maakBeschikbaarheid(locatieAnderHuwelijkstype, HuwelijksType.EENVOUDIG, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(9, 10), 10);
+        maakNietBeschikbareDag(locatieNietBeschikbaar, maandag, "Gesloten");
+
+        UUID dossierId = maakDossier(CeremonieSoort.GROOT);
+
+        assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
+                .extracting(BeschikbareLocatieDto::id)
+                .contains(locatieOmNegenUur, locatieOmTienUur, locatieNietBeschikbaar)
+                .doesNotContain(locatieAnderHuwelijkstype);
+
+        marriageIntakeService.slaAfspraakOp(dossierId, maandag, LocalTime.of(9, 0));
+
+        assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
+                .extracting(BeschikbareLocatieDto::id)
+                .containsExactly(locatieOmNegenUur);
+    }
+
+    @Test
+    void vrijeLocatieBeperktDePlanningEnSlaatFeestdagtariefOp() {
+        klok.zetOp(LocalDate.of(2026, 4, 1));
+        long locatieId = locationAdministrationService.findAllLocaties().stream()
+                .filter(ListLocatieDto::vrijeLocatie)
+                .findFirst().orElseThrow().id();
+        LocalDate begin = LocalDate.of(2026, 1, 1);
+        LocalDate einde = LocalDate.of(2026, 12, 31);
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.MIDNIGHT, LocalTime.of(9, 0),
+                60, Bedrag.of("2168.60"), begin, einde));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(17, 0),
+                60, Bedrag.of("770.90"), begin, einde));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.of(17, 0), LocalTime.of(21, 0),
+                60, Bedrag.of("1084.30"), begin, einde));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                locatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY, LocalTime.of(21, 0), LocalTime.of(23, 59),
+                60, Bedrag.of("2168.60"), begin, einde));
+        long reguliereLocatieId = locationAdministrationService.create(new CreateLocatieDto(
+                "Andere trouwzaal", null, null, null, false));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                reguliereLocatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(10, 0), LocalTime.of(11, 0), 60, Bedrag.ZERO, begin, einde));
+
+        UUID dossierId = maakDossier(CeremonieSoort.GROOT);
+        marriageIntakeService.slaVrijeTrouwlocatieOp(dossierId,
+                new SaveVrijeTrouwlocatieDto("Eigen zaal", "Rotterdam", new Telefoonnummer("0101234567"), null));
+        marriageIntakeService.slaAfspraakOp(dossierId, LocalDate.of(2026, 4, 20), LocalTime.of(10, 0));
+        assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
+                .extracting(BeschikbareLocatieDto::id)
+                .contains(locatieId, reguliereLocatieId);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
+                .anySatisfy(extra -> assertThat(extra.prijs()).isEqualTo(Bedrag.of("770.90")));
+
+        UUID feestdagDossierId = maakDossier(CeremonieSoort.GROOT);
+        marriageIntakeService.slaVrijeTrouwlocatieOp(feestdagDossierId,
+                new SaveVrijeTrouwlocatieDto("Andere zaal", "Rotterdam", new Telefoonnummer("0101234567"), null));
+        marriageIntakeService.slaAfspraakOp(feestdagDossierId, LocalDate.of(2026, 4, 27), LocalTime.of(10, 0));
+        assertThat(marriageIntakeService.findByDossierId(feestdagDossierId).extras())
+                .anySatisfy(extra -> {
+                    assertThat(extra.naam()).isEqualTo("Kosten trouwlocatie");
+                    assertThat(extra.prijs()).isEqualTo(Bedrag.of("2168.60"));
+                });
+    }
+
+    @Test
+    void locatieWijzigen_behoudtAfspraakEnBerekentPrijsOpnieuw() {
+        LocalDate maandag = volgendeWeekdag(DayOfWeek.MONDAY);
+        LocalDate begin = LocalDate.of(2016, 1, 1);
+        LocalDate einde = LocalDate.of(2099, 12, 31);
+        long vrijeLocatieId = locationAdministrationService.findAllLocaties().stream()
+                .filter(ListLocatieDto::vrijeLocatie)
+                .findFirst().orElseThrow().id();
+        long eersteLocatieId = locationAdministrationService.create(
+                new CreateLocatieDto("Eerste locatie", null, null, null, false));
+        long tweedeLocatieId = locationAdministrationService.create(
+                new CreateLocatieDto("Tweede locatie", null, null, null, false));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                eersteLocatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 60, Bedrag.of("100.00"), begin, einde));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                tweedeLocatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 60, Bedrag.of("200.00"), begin, einde));
+        locationAdministrationService.createBeschikbaarheid(new CreateBeschikbaarheidDto(
+                vrijeLocatieId, HuwelijksType.REGULIER, DayOfWeek.MONDAY,
+                LocalTime.of(9, 0), LocalTime.of(10, 0), 60, Bedrag.of("900.00"), begin, einde));
+
+        UUID dossierId = maakDossier(CeremonieSoort.GROOT);
+        marriageIntakeService.kiesLocatie(dossierId, eersteLocatieId);
+        marriageIntakeService.slaAfspraakOp(dossierId, maandag, LocalTime.of(9, 0));
+
+        marriageIntakeService.kiesLocatie(dossierId, tweedeLocatieId);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).datumTijdHuwelijk())
+                .isEqualTo(maandag.atTime(9, 0));
+        assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
+                .anySatisfy(extra -> assertThat(extra.prijs()).isEqualTo(Bedrag.of("200.00")));
+
+        marriageIntakeService.slaVrijeTrouwlocatieOp(dossierId,
+                new SaveVrijeTrouwlocatieDto("Eigen zaal", "Straat 1", new Telefoonnummer("0101234567"), null));
+        assertThat(marriageIntakeService.findByDossierId(dossierId).datumTijdHuwelijk())
+                .isEqualTo(maandag.atTime(9, 0));
+        assertThat(marriageIntakeService.findByDossierId(dossierId).extras())
+                .anySatisfy(extra -> {
+                    assertThat(extra.naam()).isEqualTo("Kosten trouwlocatie");
+                    assertThat(extra.prijs()).isEqualTo(Bedrag.of("900.00"));
+                });
+        assertThat(marriageIntakeService.findBeschikbareLocaties(dossierId))
+                .filteredOn(BeschikbareLocatieDto::prijs, Bedrag.of("900.00"))
+                .extracting(BeschikbareLocatieDto::id)
+                .contains(vrijeLocatieId);
     }
 
     @Test

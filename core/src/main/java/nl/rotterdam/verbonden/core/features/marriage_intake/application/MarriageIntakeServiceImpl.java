@@ -14,6 +14,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCo
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BeschikbareLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
@@ -21,6 +22,9 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriag
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.AfspraakRepository;
@@ -169,6 +173,68 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ListLocatieDto> findLocaties() {
+        return locatieRepository.findAllProjectedUnpaged();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BeschikbareLocatieDto> findBeschikbareLocaties(UUID dossierId) {
+        var locatiePlanning = afspraakPlanningService.findBeschikbareLocaties(dossierId);
+        return locatieRepository.findAllProjectedUnpaged().stream()
+                .filter(locatie -> locatiePlanning.locatieIds().contains(locatie.id()))
+                .sorted(Comparator.comparing(ListLocatieDto::vrijeLocatie).reversed()
+                        .thenComparing(ListLocatieDto::naam))
+                .map(locatie -> new BeschikbareLocatieDto(locatie.id(), locatie.naam(), locatie.fotoUrl(),
+                        locatie.omschrijving(), locatie.detailUrl(), locatie.vrijeLocatie(),
+                        locatiePlanning.prijzen().get(locatie.id())))
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void kiesLocatie(UUID dossierId, long locatieId) {
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
+        if (dossier.getCeremonieSoort() != CeremonieSoort.GROOT) {
+            throw new IllegalStateException("Een trouwlocatie kiezen kan alleen bij een grote ceremonie");
+        }
+        TrouwlocatieEntity locatie = locatieRepository.findById(locatieId)
+                .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + locatieId));
+        if (!afspraakPlanningService.findBeschikbareLocaties(dossierId).locatieIds().contains(locatieId)) {
+            throw new IllegalStateException("De gekozen locatie is niet beschikbaar voor deze ceremonie");
+        }
+        dossier.wijzigCeremonie(dossier.getRegistratieType(), dossier.getCeremonieSoort(), locatie);
+        afspraakPlanningService.verplaatsAfspraakNaarGekozenLocatie(dossierId);
+    }
+
+    @Override
+    @Transactional
+    public void slaVrijeTrouwlocatieOp(UUID dossierId, SaveVrijeTrouwlocatieDto dto) {
+        if (dto.naam() == null || dto.naam().isBlank()
+                || dto.adres() == null || dto.adres().isBlank()
+                || dto.telefoonnummer() == null) {
+            throw new IllegalArgumentException("Naam, adres en telefoonnummer van de vrije trouwlocatie zijn verplicht");
+        }
+        TrouwlocatieEntity locatie = locatieRepository.findFirstByVrijeLocatieTrue()
+                .orElseThrow(() -> new IllegalStateException("Geen vrije trouwlocatie beheerd"));
+        HuwelijksDossierEntity dossier = getWijzigbaarDossier(dossierId);
+        dossier.kiesVrijeTrouwlocatie(locatie,
+                dto.naam().trim(), dto.adres().trim(), dto.telefoonnummer(),
+                dto.contactpersoon() == null || dto.contactpersoon().isBlank()
+                        ? null : dto.contactpersoon().trim());
+        afspraakPlanningService.verplaatsAfspraakNaarGekozenLocatie(dossierId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<VrijeTrouwlocatieDto> findVrijeTrouwlocatie(UUID dossierId) {
+        return Optional.ofNullable(getDossier(dossierId).getVrijeTrouwlocatie())
+                .map(locatie -> new VrijeTrouwlocatieDto(locatie.getNaam(), locatie.getAdres(),
+                        locatie.getTelefoonnummer(), locatie.getContactpersoon(), locatie.isGoedgekeurd()));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<UUID> findDossierIdByBsn(BurgerServiceNummer bsn) {
         return findActiefDossier(bsn).map(HuwelijksDossierEntity::getUuid);
     }
@@ -229,7 +295,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
 
         LocalDateTime datumTijdHuwelijk = findDatumTijdHuwelijk(e);
 
-        String locatieNaam = e.getLocatie() != null ? e.getLocatie().getNaam() : null;
+        String locatieNaam = e.getVrijeTrouwlocatie() != null ? e.getVrijeTrouwlocatie().getNaam()
+                : e.getLocatie() != null ? e.getLocatie().getNaam() : null;
 
         Bedrag prijs = marriageTypeRepository.findBySoort(e.getCeremonieSoort())
                 .map(MarriageTypeEntity::getPrijs)
@@ -242,6 +309,11 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         int aantalGekozenAchternamen = aantalGekozenAchternamen(e);
 
         List<SidebarExtraItemDto> extraItems = new ArrayList<>();
+        afspraakRepository.findFirstByDossier_Id(e.getId())
+                .filter(afspraak -> afspraak.getLocatiePrijs() != null
+                        && afspraak.getLocatiePrijs().isPositive())
+                .ifPresent(afspraak -> extraItems.add(new SidebarExtraItemDto(
+                        "Kosten trouwlocatie", afspraak.getLocatiePrijs())));
         if (e.isRingenUitwisselen()) {
             extraItems.add(new SidebarExtraItemDto("Ringen uitwisselen", null));
         }
@@ -327,7 +399,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         if (findDatumTijdHuwelijk(dossier) == null) {
             ontbrekend.add(OntbrekendOnderdeel.DATUM);
         }
-        if (dossier.getLocatie() == null) {
+        if (dossier.getLocatie() == null && dossier.getVrijeTrouwlocatie() == null) {
             ontbrekend.add(OntbrekendOnderdeel.LOCATIE);
         }
         if (dossier.getPartners().size() != 2) {

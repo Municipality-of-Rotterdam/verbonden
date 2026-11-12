@@ -125,6 +125,21 @@
     padding: 0;
 }
 
+.rd-intake-step-layout .rd-vrije-locatie,
+.rd-intake-step-layout .rd-trouwlocatie {
+    border: 1px solid #b9c9ce;
+    background: #fff;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.rd-intake-step-layout .rd-trouwlocatie__foto {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
 .rd-ceremonie-kaart .rd-ceremony-heading {
     margin-top: 0;
 }

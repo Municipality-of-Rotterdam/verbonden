@@ -6,6 +6,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
 
@@ -36,6 +37,7 @@ public record DossierDetailDto(
         RegistratieType registratieType,
         CeremonieSoort ceremonieSoort,
         String locatieNaam,
+        VrijeTrouwlocatieDto vrijeTrouwlocatie,
         LocalDateTime datumTijdHuwelijk,
         Bedrag ceremoniePrijs,
         List<DetailPartnerDto> partners,

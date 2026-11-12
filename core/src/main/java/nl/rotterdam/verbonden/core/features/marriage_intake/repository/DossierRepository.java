@@ -4,6 +4,7 @@ import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.persistence.HuwelijksDossierEntity;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Repository
 public interface DossierRepository extends JpaRepository<HuwelijksDossierEntity, Long> {
 
+    @EntityGraph(attributePaths = "locatie")
     Optional<HuwelijksDossierEntity> findByUuid(UUID uuid);
 
     /**

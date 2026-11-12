@@ -3,6 +3,7 @@ package nl.rotterdam.verbonden.core.persistence;
 import jakarta.persistence.*;
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
@@ -43,6 +44,9 @@ public class HuwelijksDossierEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locatie_id")
     private TrouwlocatieEntity locatie;
+
+    @OneToOne(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
+    private VrijeTrouwlocatieEntity vrijeTrouwlocatie;
 
     @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("volgorde ASC")
@@ -123,6 +127,10 @@ public class HuwelijksDossierEntity {
 
     public TrouwlocatieEntity getLocatie() {
         return locatie;
+    }
+
+    public VrijeTrouwlocatieEntity getVrijeTrouwlocatie() {
+        return vrijeTrouwlocatie;
     }
 
     public List<HuwelijksDossiersPartnerEntity> getPartners() {
@@ -243,9 +251,25 @@ public class HuwelijksDossierEntity {
         this.registratieType = registratieType;
         this.ceremonieSoort = ceremonieSoort;
         this.locatie = locatie;
+        this.vrijeTrouwlocatie = null;
         if (ceremonieSoort != CeremonieSoort.GROOT) {
             this.muziek = false;
         }
+    }
+
+    public void kiesVrijeTrouwlocatie(TrouwlocatieEntity locatie, String naam, String adres,
+                                     Telefoonnummer telefoonnummer, String contactpersoon) {
+        if (ceremonieSoort != CeremonieSoort.GROOT) {
+            throw new IllegalStateException("Een vrije trouwlocatie is alleen mogelijk bij een grote ceremonie");
+        }
+        if (locatie == null || !locatie.isVrijeLocatie()) {
+            throw new IllegalArgumentException("De beheerde locatie moet een vrije locatie zijn");
+        }
+        if (naam == null || naam.isBlank() || adres == null || adres.isBlank() || telefoonnummer == null) {
+            throw new IllegalArgumentException("Naam, adres en telefoonnummer van de vrije trouwlocatie zijn verplicht");
+        }
+        this.locatie = locatie;
+        vrijeTrouwlocatie = new VrijeTrouwlocatieEntity(this, naam, adres, telefoonnummer, contactpersoon);
     }
 
     /**

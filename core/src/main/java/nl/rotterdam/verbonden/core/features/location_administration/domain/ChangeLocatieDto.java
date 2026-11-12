@@ -5,6 +5,7 @@ public record ChangeLocatieDto(
         String naam,
         String fotoUrl,
         String omschrijving,
-        String detailUrl
+        String detailUrl,
+        boolean vrijeLocatie
 ) {
 }
