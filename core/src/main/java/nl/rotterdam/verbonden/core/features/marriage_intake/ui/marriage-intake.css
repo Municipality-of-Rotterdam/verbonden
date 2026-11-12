@@ -48,6 +48,7 @@
 .rd-intro-text {
     margin: 2rem 0 1.5rem;
     font-size: 1rem;
+    white-space: pre-line;
 }
 
 .rd-intake-step-layout .rd-intake-step__header h1 {
