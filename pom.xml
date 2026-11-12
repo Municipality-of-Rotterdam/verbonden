@@ -13,7 +13,7 @@
 
     <groupId>nl.rotterdam.verbonden</groupId>
     <artifactId>verbonden</artifactId>
-    <version>0.0.23-SNAPSHOT</version>
+    <version>0.0.24-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>verbonden</name>
@@ -171,13 +171,6 @@
                 <groupId>com.google.zxing</groupId>
                 <artifactId>core</artifactId>
                 <version>3.5.4</version>
-            </dependency>
-
-            <!-- Jsoup for web scraping (BABS import from rotterdam.nl) -->
-            <dependency>
-                <groupId>org.jsoup</groupId>
-                <artifactId>jsoup</artifactId>
-                <version>1.24.1</version>
             </dependency>
 
             <!-- Apache POI for xlsx import -->

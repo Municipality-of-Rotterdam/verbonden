@@ -1,6 +1,12 @@
 package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 
+import nl.rotterdam.verbonden.core.features.betaling_administration.domain.ListBetalingDto;
+import nl.rotterdam.verbonden.core.features.betaling_administration.ui.BetalingAdministrationPage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BetaalmutatieNietMogelijkException;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListBetaalmutatieDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
+import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.verbonden.core.administration_common.RdFormFieldFileUpload;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
@@ -107,6 +113,20 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                 },
                 new Label("geenExtras", "Geen extra's gekozen").setVisible(dossier.extras().isEmpty()),
                 new Label("totaalPrijs", prijs(dossier.totaalPrijs())),
+
+                new RdAlert("teVeelBetaald", Model.of(dossier.teVeelBetaald() != null
+                        ? "Er is " + prijs(dossier.teVeelBetaald()) + " meer betaald of te betalen dan het dossier nu "
+                          + "kost. Terugbetalen gaat buiten Verbonden om."
+                        : ""), RdAlertType.WARNING).setVisible(dossier.teVeelBetaald() != null),
+                new BetalingenListView("betalingen", dossier.betalingen()),
+                new Label("geenBetalingen", "Er zijn nog geen online betalingen.")
+                        .setVisible(dossier.betalingen().isEmpty()),
+
+                new BookmarkablePageLink<>("betaalmutatieToevoegen", BetaalmutatieCreatePage.class, dossierParams)
+                        .setVisible(DossierStatus.BETAALMUTATIES_MOGELIJK.contains(dossier.status())),
+                new BetaalmutatiesListView("betaalmutaties", dossier.betaalmutaties()),
+                new Label("geenBetaalmutaties", "Er zijn geen betaalmutaties.")
+                        .setVisible(dossier.betaalmutaties().isEmpty()),
 
                 new BestandenListView("bestanden", dossier.bestanden()),
                 new Label("geenBestanden", "Er zijn nog geen bestanden toegevoegd.")
@@ -253,6 +273,64 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         }
     }
 
+    private static class BetalingenListView extends ListView<ListBetalingDto> {
+
+        BetalingenListView(String id, List<ListBetalingDto> betalingen) {
+            super(id, betalingen);
+        }
+
+        @Override
+        protected void populateItem(ListItem<ListBetalingDto> item) {
+            ListBetalingDto betaling = item.getModelObject();
+            item.add(
+                    new Label("gestartOp", datumTijd(betaling.gestartOp())),
+                    new Label("waarvoor", betaling.waarvoor()),
+                    new Label("bedrag", prijs(betaling.bedrag())),
+                    new Label("status", BetalingAdministrationPage.statusLabel(betaling.status())),
+                    new Label("afgerondOp", datumTijd(betaling.afgerondOp())),
+                    new Label("betaler", betaling.betalerBsn().getValue()),
+                    new Label("kenmerk", betaling.betalingskenmerk())
+            );
+        }
+    }
+
+    private class BetaalmutatiesListView extends ListView<ListBetaalmutatieDto> {
+
+        BetaalmutatiesListView(String id, List<ListBetaalmutatieDto> betaalmutaties) {
+            super(id, betaalmutaties);
+        }
+
+        @Override
+        protected void populateItem(ListItem<ListBetaalmutatieDto> item) {
+            ListBetaalmutatieDto mutatie = item.getModelObject();
+
+            Form<Void> verwijderForm = new Form<>("verwijderForm");
+            RdButton verwijderen = new RdButton("verwijderen", Model.of("Verwijderen")) {
+                @Override
+                public void onSubmit() {
+                    try {
+                        dossierAdministrationService.deleteBetaalmutatie(dossierId, mutatie.id());
+                        naarDetailPagina();
+                    } catch (BetaalmutatieNietMogelijkException e) {
+                        error(e.getMessage());
+                    }
+                }
+            };
+            verwijderen.setAppearance(RdButtonAppearance.SECONDARY_ACTION);
+            verwijderForm.add(verwijderen);
+            verwijderForm.setVisible(mutatie.verwijderbaar());
+
+            item.add(
+                    new Label("omschrijving", mutatie.omschrijving()),
+                    new Label("bedrag", prijs(mutatie.bedrag())),
+                    new Label("status", mutatie.betaald() ? "Betaald" : "Te betalen"),
+                    new Label("aangemaakt", mutatie.aangemaaktDoor() + ", " + datumTijd(mutatie.aangemaaktOp())
+                            + (mutatie.prijswijziging() ? " (prijswijziging)" : "")),
+                    verwijderForm
+            );
+        }
+    }
+
     private class BestandenListView extends ListView<ListDossierBestandDto> {
 
         BestandenListView(String id, List<ListDossierBestandDto> bestanden) {
@@ -374,7 +452,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         return datumTijd != null ? datumTijd.format(DATUM_TIJD) : "-";
     }
 
-    private static String prijs(Bedrag prijs) {
+    static String prijs(Bedrag prijs) {
         return prijs != null ? "€ " + prijs.format() : "-";
     }
 }
