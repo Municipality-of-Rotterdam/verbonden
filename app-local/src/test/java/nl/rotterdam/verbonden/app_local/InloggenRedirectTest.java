@@ -7,6 +7,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.io.IOException;
 import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -14,6 +15,7 @@ import java.net.http.HttpResponse;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.EMBEDDED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,9 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Wie via een link (bijv. de uitnodigingslink van de partner) binnenkomt zonder ingelogd te zijn, moet na het
  * inloggen op die link terugkomen en niet op de startpagina.
  */
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = "server.servlet.session.cookie.secure=false")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureEmbeddedDatabase(provider = EMBEDDED)
 class InloggenRedirectTest {
 
@@ -34,8 +34,8 @@ class InloggenRedirectTest {
     @LocalServerPort
     private int port;
 
+    private final CookieManager cookies = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
     private final HttpClient client = HttpClient.newBuilder()
-            .cookieHandler(new CookieManager())
             .followRedirects(HttpClient.Redirect.NEVER)
             .build();
 
@@ -71,11 +71,19 @@ class InloggenRedirectTest {
     }
 
     private HttpResponse<String> get(URI uri) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder(uri)
+        HttpRequest.Builder request = HttpRequest.newBuilder(uri)
                 .header("Sec-Fetch-Site", "same-origin")
-                .header("Sec-Fetch-Mode", "navigate")
-                .build();
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+                .header("Sec-Fetch-Mode", "navigate");
+        String cookieHeader = cookies.getCookieStore().get(uri).stream()
+                .map(cookie -> cookie.getName() + "=" + cookie.getValue())
+                .collect(Collectors.joining("; "));
+        if (!cookieHeader.isEmpty()) {
+            request.header("Cookie", cookieHeader);
+        }
+
+        HttpResponse<String> response = client.send(request.build(), HttpResponse.BodyHandlers.ofString());
+        cookies.put(uri, response.headers().map());
+        return response;
     }
 
     private static String location(HttpResponse<?> response) {
