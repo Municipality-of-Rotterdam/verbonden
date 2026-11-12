@@ -22,7 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Wie via een link (bijv. de uitnodigingslink van de partner) binnenkomt zonder ingelogd te zijn, moet na het
  * inloggen op die link terugkomen en niet op de startpagina.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "server.servlet.session.cookie.secure=false")
 @AutoConfigureEmbeddedDatabase(provider = EMBEDDED)
 class InloggenRedirectTest {
 
