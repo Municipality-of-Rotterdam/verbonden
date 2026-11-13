@@ -3,6 +3,7 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierMailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierInzageRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.identity.Roles;
@@ -43,7 +44,7 @@ class DossierMailPaginaTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString())
                 .contains("E-mails")
                 .contains("Wij hebben uw aanvraag ontvangen")
-                .contains("partner1@example.com, partner2@example.com")
+                .contains("partner1@example.com", "partner2@example.com")
                 .contains("In wacht")
                 .contains("/mails/");
     }
@@ -60,14 +61,14 @@ class DossierMailPaginaTest extends BaseWicketTest {
     @Test
     void mailPagina_toontGegevensEnInhoudInEenBeveiligdeIframeEnLegtInzageVast() {
         UUID dossierId = maakIngediendDossier();
-        long mailId = dossierAdministrationService.findMails(dossierId).getFirst().id();
+        ListDossierMailDto mail = dossierAdministrationService.findMails(dossierId).getFirst();
 
-        tester.startPage(DossierMailDetailPage.class, DossierMailDetailPage.parametersVoor(dossierId, mailId));
+        tester.startPage(DossierMailDetailPage.class, DossierMailDetailPage.parametersVoor(dossierId, mail.id()));
 
         tester.assertRenderedPage(DossierMailDetailPage.class);
         assertThat(tester.getLastResponseAsString())
                 .contains("Wij hebben uw aanvraag ontvangen")
-                .contains("partner1@example.com, partner2@example.com")
+                .contains(mail.ontvanger())
                 .contains("Er is nog geen poging gedaan")
                 .contains("sandbox=\"\"")
                 // de HTML van de mail staat veilig als attribuutwaarde, niet als markup in de beheerpagina

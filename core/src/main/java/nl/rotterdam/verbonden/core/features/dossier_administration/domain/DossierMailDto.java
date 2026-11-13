@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * Een verstuurde e-mail met de inhoud zoals die is verstuurd en elke verzendpoging.
  *
+ * @param ontvanger        {@code null} als er niemand was om de e-mail naar te sturen
  * @param inhoud           de HTML van de e-mail
  * @param volgendePogingOp {@code null} wanneer er geen nieuwe poging meer volgt
  */
@@ -17,7 +18,7 @@ public record DossierMailDto(
         long id,
         DossierMailType type,
         String afzender,
-        List<String> ontvangers,
+        String ontvanger,
         String onderwerp,
         String inhoud,
         DossierMailStatus status,

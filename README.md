@@ -80,7 +80,8 @@ de ontvangen e-mails bekijkt u op <http://localhost:8025>.
 
 De mailserver en de afzender stelt u in met `spring.mail.*` en `verbonden.mail.*` in
 `app-local/src/main/resources/application.properties`. Daar staan ook de instellingen voor het opnieuw
-proberen als verzenden mislukt. E-mails worden met inhoud, ontvangers en elke verzendpoging bij het dossier
+proberen als verzenden mislukt. De SMTP-timeouts staan standaard op 10 seconden (`SmtpTimeoutConfig`). Elke
+partner krijgt een eigen e-mail. E-mails worden met inhoud, ontvanger en elke verzendpoging bij het dossier
 vastgelegd en zijn in het dossierbeheer te bekijken. De HTML-templates staan in
 `core/src/main/resources/mail-templates`.
 

@@ -5,9 +5,9 @@ import nl.rotterdam.verbonden.core.features.dossier_mail.domain.DossierMailType;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
+ * @param ontvanger         {@code null} als er niemand was om de e-mail naar te sturen
  * @param laatstePogingOp   {@code null} zolang er nog geen poging is gedaan
  * @param volgendePogingOp  {@code null} wanneer er geen nieuwe poging meer volgt
  */
@@ -15,7 +15,7 @@ public record ListDossierMailDto(
         long id,
         DossierMailType type,
         String onderwerp,
-        List<String> ontvangers,
+        String ontvanger,
         DossierMailStatus status,
         LocalDateTime aangemaaktOp,
         int aantalPogingen,

@@ -61,6 +61,11 @@ Elke feature-package bevat de volgende sub-packages:
 - Genereer nooit methoden of klassen die nergens worden aangeroepen of gebruikt.
 - Genereer **nooit** `serialVersionUID`-velden. We gebruiken Java-serialisatie niet op deze manier en willen geen achterwaartse compatibiliteit voor geserialiseerde klassen.
 
+### Database-migraties (Flyway)
+- Geef een nieuwe migratie als versie het moment van aanmaken: `VYYYY.MM.DD.HH.MM__omschrijving.sql` (bijv. `V2026.11.02.14.40__create_dossier_mails.sql`). Gebruik geen volgnummer; dat botst met andere branches. Alleen V1 tot en met V44 hebben nog een volgnummer.
+- Flyway draait met `outOfOrder` (zie `FlywayConfig`): een migratie met een ouder tijdstip dan de laatst uitgevoerde wordt alsnog uitgevoerd. Een migratie mag dus niet afhangen van een migratie uit een andere, nog niet gemergde branch.
+- `MigratieNamenTest` bewaakt de naamgeving.
+
 ### Integratietests
 - Gebruik in integratietests altijd **services** om testdata aan te maken, niet repositories of JPA Entities. Entities mogen alleen binnen service-implementaties gebruikt worden.
 - Gebruik `@Transactional` op de testklasse zodat elke test in een transactie draait die na afloop wordt teruggedraaid. Hierdoor is geen handmatige cleanup van testdata nodig.

@@ -19,25 +19,27 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraI
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.DossierRepository;
 import nl.rotterdam.verbonden.core.persistence.DossierMailEntity;
 import nl.rotterdam.verbonden.core.persistence.HuwelijksDossierEntity;
-import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.mail.MailParseException;
 import org.springframework.mail.MailPreparationException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,6 +48,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,6 +64,7 @@ class DossierMailServiceImpl implements DossierMailService {
 
     private static final String BEVESTIGING_TEMPLATE = "bevestiging-indiening.html";
     private static final int MAX_FOUTMELDING_LENGTE = 1000;
+    private static final Pattern TITEL = Pattern.compile("<title>(.*?)</title>", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
     /** Zolang een poging bezig is, pakt geen andere verwerker dezelfde e-mail op. */
     private static final Duration POGING_TIMEOUT = Duration.ofMinutes(5);
@@ -71,6 +76,7 @@ class DossierMailServiceImpl implements DossierMailService {
     private final MailConfig mailConfig;
     private final Clock clock;
     private final TransactionTemplate transactionTemplate;
+    private final MailTemplate bevestigingTemplate = MailTemplate.laad(BEVESTIGING_TEMPLATE);
 
     DossierMailServiceImpl(DossierMailRepository dossierMailRepository,
                            DossierRepository dossierRepository,
@@ -90,29 +96,62 @@ class DossierMailServiceImpl implements DossierMailService {
 
     @Override
     @Transactional
-    public long maakBevestigingsmail(UUID dossierId) {
+    public void maakBevestigingsmail(UUID dossierId) {
         HuwelijksDossierEntity dossier = dossierRepository.findByUuid(dossierId)
                 .orElseThrow(() -> new IllegalArgumentException("Dossier niet gevonden: " + dossierId));
         DossierSamenvattingDto samenvatting = marriageIntakeService.findByDossierId(dossierId);
         List<PartnerGegevensDto> partners = marriageIntakeService.findPartnerGegevens(dossierId);
         List<GetuigeDto> getuigen = marriageIntakeService.findGetuigen(dossierId);
-
-        String html = MailTemplate.laad(BEVESTIGING_TEMPLATE).render(bevestigingWaarden(samenvatting, partners, getuigen));
         LocalDateTime nu = LocalDateTime.now(clock);
+
+        // Een fout bij het opstellen mag het indienen niet tegenhouden: de e-mail wordt dan als mislukt vastgelegd.
+        String onderwerp = DossierMailType.BEVESTIGING_INDIENING.getLabel();
+        String html = "";
+        String fout = null;
+        try {
+            html = bevestigingTemplate.render(bevestigingWaarden(samenvatting, partners, getuigen));
+            onderwerp = titel(html);
+        } catch (RuntimeException e) {
+            LOG.error("Opstellen van de bevestigingsmail voor dossier {} is mislukt", dossierId, e);
+            fout = "Opstellen van de e-mail is mislukt: " + foutmelding(e);
+        }
+
         Set<String> ontvangers = partners.stream()
                 .map(PartnerGegevensDto::emailadres)
                 .filter(Objects::nonNull)
                 .map(Emailadres::getValue)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        DossierMailEntity mail = new DossierMailEntity(dossier, DossierMailType.BEVESTIGING_INDIENING, afzender(),
-                String.join(", ", ontvangers), Jsoup.parse(html).title(), html, nu);
         if (ontvangers.isEmpty()) {
-            mail.voegPogingToe(nu, DossierMailPogingStatus.MISLUKT, "Geen van de partners heeft een e-mailadres.");
-            mail.setStatus(DossierMailStatus.MISLUKT);
-            mail.setVolgendePogingOp(null);
+            DossierMailEntity mail = new DossierMailEntity(dossier, DossierMailType.BEVESTIGING_INDIENING, afzender(),
+                    null, onderwerp, html, nu);
+            markeerMislukt(mail, nu, fout != null ? fout : "Geen van de partners heeft een e-mailadres.");
+            dossierMailRepository.save(mail);
+            return;
         }
-        return dossierMailRepository.save(mail).getId();
+        // Eén e-mail per ontvanger, zodat een afgewezen adres of een nieuwe poging de andere partner niet raakt.
+        for (String ontvanger : ontvangers) {
+            DossierMailEntity mail = new DossierMailEntity(dossier, DossierMailType.BEVESTIGING_INDIENING, afzender(),
+                    ontvanger, onderwerp, html, nu);
+            if (fout != null) {
+                markeerMislukt(mail, nu, fout);
+            }
+            dossierMailRepository.save(mail);
+        }
+    }
+
+    /** Het onderwerp van een e-mail is de {@code <title>} van de template. */
+    private static String titel(String html) {
+        Matcher titel = TITEL.matcher(html);
+        if (!titel.find() || titel.group(1).isBlank()) {
+            throw new IllegalStateException("De e-mailtemplate heeft geen <title>");
+        }
+        return HtmlUtils.htmlUnescape(titel.group(1).strip());
+    }
+
+    private static void markeerMislukt(DossierMailEntity mail, LocalDateTime nu, String foutmelding) {
+        mail.voegPogingToe(nu, DossierMailPogingStatus.MISLUKT, foutmelding);
+        mail.setStatus(DossierMailStatus.MISLUKT);
+        mail.setVolgendePogingOp(null);
     }
 
     @Override
@@ -121,8 +160,13 @@ class DossierMailServiceImpl implements DossierMailService {
                 dossierMailRepository.findIdsKlaarVoorVerzending(DossierMailStatus.IN_WACHT, LocalDateTime.now(clock)));
         int verwerkt = 0;
         for (long id : Objects.requireNonNull(ids)) {
-            if (verwerk(id)) {
-                verwerkt++;
+            try {
+                if (verwerk(id)) {
+                    verwerkt++;
+                }
+            } catch (RuntimeException e) {
+                // Eén e-mail die misgaat, mag de rest van de e-mails niet tegenhouden.
+                LOG.error("Verwerken van e-mail {} is mislukt", id, e);
             }
         }
         return verwerkt;
@@ -140,19 +184,26 @@ class DossierMailServiceImpl implements DossierMailService {
         }
 
         String fout = null;
-        boolean tijdelijk = true;
+        boolean permanent = false;
         try {
             verstuur(opdracht);
         } catch (Exception e) {
             fout = foutmelding(e);
-            tijdelijk = isTijdelijk(e);
+            permanent = isPermanent(e);
             LOG.warn("Verzenden van e-mail {} is mislukt: {}", mailId, fout);
         }
         String foutmelding = fout;
-        boolean mislukt = fout != null;
-        boolean kanHerhalen = tijdelijk;
-        transactionTemplate.executeWithoutResult(status ->
-                registreerPoging(mailId, mislukt ? foutmelding : null, kanHerhalen));
+        boolean kanHerhalen = !permanent;
+        try {
+            transactionTemplate.executeWithoutResult(status -> registreerPoging(mailId, foutmelding, kanHerhalen));
+        } catch (RuntimeException e) {
+            if (foutmelding == null) {
+                LOG.error("E-mail {} is verstuurd, maar dat kon niet worden vastgelegd. Na {} kan hij nog een keer "
+                        + "worden verstuurd.", mailId, POGING_TIMEOUT, e);
+            } else {
+                LOG.error("De mislukte poging voor e-mail {} kon niet worden vastgelegd", mailId, e);
+            }
+        }
         return true;
     }
 
@@ -165,7 +216,7 @@ class DossierMailServiceImpl implements DossierMailService {
         }
         mail.setVolgendePogingOp(nu.plus(POGING_TIMEOUT));
         dossierMailRepository.saveAndFlush(mail);
-        return new Zendopdracht(mail.getAfzender(), mail.getOntvangers(), mail.getOnderwerp(), mail.getInhoud());
+        return new Zendopdracht(mail.getAfzender(), mail.getOntvanger(), mail.getOnderwerp(), mail.getInhoud());
     }
 
     private void verstuur(Zendopdracht opdracht) throws Exception {
@@ -176,7 +227,7 @@ class DossierMailServiceImpl implements DossierMailService {
         MimeMessage bericht = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(bericht, "UTF-8");
         helper.setFrom(new InternetAddress(opdracht.afzender()));
-        helper.setTo(InternetAddress.parse(opdracht.ontvangers()));
+        helper.setTo(new InternetAddress(opdracht.ontvanger(), true));
         helper.setSubject(opdracht.onderwerp());
         helper.setText(opdracht.inhoud(), true);
         sender.send(bericht);
@@ -191,13 +242,12 @@ class DossierMailServiceImpl implements DossierMailService {
             mail.setVolgendePogingOp(null);
             return;
         }
-        mail.voegPogingToe(nu, DossierMailPogingStatus.MISLUKT, foutmelding);
-        int aantalPogingen = mail.getPogingen().size();
+        int aantalPogingen = mail.getPogingen().size() + 1;
         if (kanHerhalen && aantalPogingen < mailConfig.getMaxPogingen()) {
+            mail.voegPogingToe(nu, DossierMailPogingStatus.MISLUKT, foutmelding);
             mail.setVolgendePogingOp(nu.plus(wachttijdNaPoging(aantalPogingen)));
         } else {
-            mail.setStatus(DossierMailStatus.MISLUKT);
-            mail.setVolgendePogingOp(null);
+            markeerMislukt(mail, nu, foutmelding);
         }
     }
 
@@ -213,22 +263,28 @@ class DossierMailServiceImpl implements DossierMailService {
     }
 
     /**
-     * Verzenden kan opnieuw worden geprobeerd, behalve als de mailserver een adres of het bericht zelf afwijst.
+     * Opnieuw proberen heeft geen zin als de mailserver het adres of het bericht zelf afwijst.
+     * {@link org.springframework.mail.javamail.JavaMailSenderImpl} geeft een fout per bericht door in een
+     * {@link MailSendException} zonder oorzaak, met de fout in {@link MailSendException#getMessageExceptions()}.
      */
-    private static boolean isTijdelijk(Throwable fout) {
+    private static boolean isPermanent(Throwable fout) {
         for (Throwable oorzaak = fout; oorzaak != null; oorzaak = oorzaak.getCause()) {
             if (oorzaak instanceof MailParseException || oorzaak instanceof MailPreparationException
                     || oorzaak instanceof AddressException) {
-                return false;
+                return true;
             }
             if (oorzaak instanceof SendFailedException sendFailed) {
                 Address[] ongeldig = sendFailed.getInvalidAddresses();
                 if (ongeldig != null && ongeldig.length > 0) {
-                    return false;
+                    return true;
                 }
             }
+            if (oorzaak instanceof MailSendException sendException
+                    && Arrays.stream(sendException.getMessageExceptions()).anyMatch(DossierMailServiceImpl::isPermanent)) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     private static String foutmelding(Throwable fout) {
@@ -268,7 +324,7 @@ class DossierMailServiceImpl implements DossierMailService {
 
         Map<String, Object> waarden = new HashMap<>();
         waarden.put("aanhef", partners.stream()
-                .map(DossierMailServiceImpl::voluit)
+                .map(partner -> naam(partner.voornamen(), partner.achternaam()))
                 .filter(naam -> !naam.isBlank())
                 .collect(Collectors.collectingAndThen(Collectors.joining(" en "),
                         aanhef -> aanhef.isBlank() ? "aanvrager" : aanhef)));
@@ -285,25 +341,23 @@ class DossierMailServiceImpl implements DossierMailService {
         return waarden;
     }
 
-    private static String voluit(PartnerGegevensDto partner) {
-        return Stream.of(partner.voornamen(), partner.achternaam())
-                .filter(Objects::nonNull)
-                .filter(waarde -> !waarde.isBlank())
-                .collect(Collectors.joining(" "));
-    }
-
     /**
      * De voornamen met de gekozen achternaam, die al de volledige keuze is (bijvoorbeeld "Jansen - Dëhlano");
      * zonder keuze de achternaam uit de BRP.
      */
     private static String naamkeuze(PartnerGegevensDto partner) {
         boolean heeftKeuze = partner.gekozenAchternaam() != null && !partner.gekozenAchternaam().isBlank();
-        return Stream.of(partner.voornamen(), heeftKeuze ? partner.gekozenAchternaam() : partner.achternaam())
+        return naam(partner.voornamen(), heeftKeuze ? partner.gekozenAchternaam() : partner.achternaam());
+    }
+
+    /** De niet-lege delen van een naam, gescheiden door een spatie. */
+    private static String naam(String... delen) {
+        return Stream.of(delen)
                 .filter(Objects::nonNull)
-                .filter(waarde -> !waarde.isBlank())
+                .filter(deel -> !deel.isBlank())
                 .collect(Collectors.joining(" "));
     }
 
-    private record Zendopdracht(String afzender, String ontvangers, String onderwerp, String inhoud) {
+    private record Zendopdracht(String afzender, String ontvanger, String onderwerp, String inhoud) {
     }
 }

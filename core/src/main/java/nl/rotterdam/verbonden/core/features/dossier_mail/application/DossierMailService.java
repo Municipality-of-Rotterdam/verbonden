@@ -9,14 +9,13 @@ import java.util.UUID;
 public interface DossierMailService {
 
     /**
-     * Maakt de bevestigingsmail voor een ingediend dossier, gericht aan beide partners, en legt die vast zodat hij
-     * wordt verzonden door {@link #verwerkOpenstaandeMails()}. Heeft geen van de partners een e-mailadres, dan wordt
-     * de e-mail vastgelegd als mislukt.
+     * Maakt voor een ingediend dossier een bevestigingsmail per partner met een e-mailadres, en legt die vast zodat
+     * hij wordt verzonden door {@link #verwerkOpenstaandeMails()}. Heeft geen van de partners een e-mailadres, of
+     * lukt het opstellen van de e-mail niet, dan wordt de e-mail vastgelegd als mislukt; het indienen gaat door.
      *
-     * @return het id van de vastgelegde e-mail
      * @throws IllegalArgumentException wanneer het dossier niet bestaat
      */
-    long maakBevestigingsmail(UUID dossierId);
+    void maakBevestigingsmail(UUID dossierId);
 
     /**
      * Verstuurt alle vastgelegde e-mails waarvan de volgende verzendpoging aan de beurt is. Een mislukte poging

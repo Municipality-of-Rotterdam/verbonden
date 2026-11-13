@@ -33,7 +33,7 @@ public class DossierMailDetailPage extends DossierBeheerBasePage {
 
                 new Label("onderwerp", mail.onderwerp()),
                 new Label("afzender", mail.afzender()),
-                new Label("ontvangers", mail.ontvangers().isEmpty() ? "-" : String.join(", ", mail.ontvangers())),
+                new Label("ontvanger", mail.ontvanger() != null ? mail.ontvanger() : "-"),
                 new Label("type", mail.type().getLabel()),
                 new Label("aangemaakt", datumTijd(mail.aangemaaktOp())),
                 new Label("status", mail.status().getLabel()),

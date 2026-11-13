@@ -6,7 +6,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Legt bij het indienen van een dossier de bevestigingsmail vast, binnen dezelfde transactie: een ingediend dossier
- * heeft dus altijd een bevestigingsmail.
+ * heeft dus altijd een bevestigingsmail. Lukt het opstellen van de e-mail niet, dan wordt hij als mislukt vastgelegd
+ * en gaat het indienen gewoon door.
  */
 @Component
 class BevestigingsmailBijIndienen {

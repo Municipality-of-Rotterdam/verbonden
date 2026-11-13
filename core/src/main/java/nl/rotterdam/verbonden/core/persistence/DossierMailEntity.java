@@ -35,9 +35,9 @@ public class DossierMailEntity {
     @Column(name = "afzender", nullable = false, updatable = false)
     private String afzender;
 
-    /** De e-mailadressen van de ontvangers, gescheiden door een komma. */
-    @Column(name = "ontvangers", nullable = false, updatable = false, columnDefinition = "TEXT")
-    private String ontvangers;
+    /** Het e-mailadres van de ontvanger; {@code null} als er niemand was om de e-mail naar te sturen. */
+    @Column(name = "ontvanger", updatable = false, length = 320)
+    private String ontvanger;
 
     @Column(name = "onderwerp", nullable = false, updatable = false)
     private String onderwerp;
@@ -63,11 +63,11 @@ public class DossierMailEntity {
     }
 
     public DossierMailEntity(HuwelijksDossierEntity dossier, DossierMailType type, String afzender,
-                             String ontvangers, String onderwerp, String inhoud, LocalDateTime aangemaaktOp) {
+                             String ontvanger, String onderwerp, String inhoud, LocalDateTime aangemaaktOp) {
         this.dossier = dossier;
         this.type = type;
         this.afzender = afzender;
-        this.ontvangers = ontvangers;
+        this.ontvanger = ontvanger;
         this.onderwerp = onderwerp;
         this.inhoud = inhoud;
         this.aangemaaktOp = aangemaaktOp;
@@ -77,20 +77,12 @@ public class DossierMailEntity {
     /**
      * Legt een verzendpoging vast. De volgorde van de pogingen volgt uit het aantal eerdere pogingen.
      */
-    public DossierMailPogingEntity voegPogingToe(LocalDateTime tijdstip, DossierMailPogingStatus pogingStatus,
-                                                 String foutmelding) {
-        DossierMailPogingEntity poging =
-                new DossierMailPogingEntity(this, pogingen.size() + 1, tijdstip, pogingStatus, foutmelding);
-        pogingen.add(poging);
-        return poging;
+    public void voegPogingToe(LocalDateTime tijdstip, DossierMailPogingStatus pogingStatus, String foutmelding) {
+        pogingen.add(new DossierMailPogingEntity(this, pogingen.size() + 1, tijdstip, pogingStatus, foutmelding));
     }
 
     public Long getId() {
         return id;
-    }
-
-    public HuwelijksDossierEntity getDossier() {
-        return dossier;
     }
 
     public DossierMailType getType() {
@@ -101,8 +93,8 @@ public class DossierMailEntity {
         return afzender;
     }
 
-    public String getOntvangers() {
-        return ontvangers;
+    public String getOntvanger() {
+        return ontvanger;
     }
 
     public String getOnderwerp() {

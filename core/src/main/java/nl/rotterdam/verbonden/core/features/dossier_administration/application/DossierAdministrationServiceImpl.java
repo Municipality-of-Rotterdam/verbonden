@@ -65,7 +65,6 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -557,7 +556,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                         mail.getId(),
                         mail.getType(),
                         mail.getOnderwerp(),
-                        ontvangers(mail),
+                        mail.getOntvanger(),
                         mail.getStatus(),
                         mail.getAangemaaktOp(),
                         mail.getPogingen().size(),
@@ -577,7 +576,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                 mail.getId(),
                 mail.getType(),
                 mail.getAfzender(),
-                ontvangers(mail),
+                mail.getOntvanger(),
                 mail.getOnderwerp(),
                 mail.getInhoud(),
                 mail.getStatus(),
@@ -587,13 +586,6 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                         .map(poging -> new DossierMailPogingDto(
                                 poging.getVolgnummer(), poging.getTijdstip(), poging.getStatus(), poging.getFoutmelding()))
                         .toList());
-    }
-
-    private static List<String> ontvangers(DossierMailEntity mail) {
-        return Arrays.stream(mail.getOntvangers().split(","))
-                .map(String::trim)
-                .filter(adres -> !adres.isEmpty())
-                .toList();
     }
 
     private DossierBestandEntity getBestand(UUID dossierId, long bestandId) {

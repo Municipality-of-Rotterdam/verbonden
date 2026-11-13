@@ -151,7 +151,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                     new BookmarkablePageLink<>("bekijken", DossierMailDetailPage.class,
                             DossierMailDetailPage.parametersVoor(dossierId, mail.id()))
                             .add(new Label("onderwerp", mail.onderwerp())),
-                    new Label("ontvangers", mail.ontvangers().isEmpty() ? "-" : String.join(", ", mail.ontvangers())),
+                    new Label("ontvanger", mail.ontvanger() != null ? mail.ontvanger() : "-"),
                     new Label("aangemaakt", datumTijd(mail.aangemaaktOp())),
                     new Label("status", mail.status().getLabel()),
                     new Label("pogingen", mail.aantalPogingen()),

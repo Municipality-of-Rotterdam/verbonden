@@ -1,8 +1,6 @@
 package nl.rotterdam.verbonden.core.features.dossier_mail.application;
 
-import jakarta.mail.Address;
 import jakarta.mail.Message;
-import jakarta.mail.SendFailedException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import nl.rotterdam.verbonden.core.domain.Emailadres;
@@ -43,6 +41,8 @@ class DossierMailIntegrationTest {
 
     private static final LocalDate DAG = LocalDate.of(2026, 10, 26);
     private static final LocalDateTime NU = DAG.atTime(12, 0);
+    private static final String PARTNER_1 = "partner1@example.com";
+    private static final String PARTNER_2 = "partner2@example.com";
 
     @Autowired
     private DossierMailService dossierMailService;
@@ -77,20 +77,20 @@ class DossierMailIntegrationTest {
     }
 
     @Test
-    void dienIn_legtBevestigingsmailVastVoorBeidePartners() {
-        UUID dossierId = maakIngediendDossier(true);
+    void dienIn_legtEenBevestigingsmailPerPartnerVast() {
+        UUID dossierId = maakIngediendDossier(PARTNER_1, PARTNER_2);
 
         List<ListDossierMailDto> mails = dossierAdministrationService.findMails(dossierId);
 
-        assertThat(mails).hasSize(1);
-        ListDossierMailDto mail = mails.getFirst();
-        assertThat(mail.onderwerp()).isEqualTo("Wij hebben uw aanvraag ontvangen");
-        assertThat(mail.ontvangers()).containsExactly("partner1@example.com", "partner2@example.com");
-        assertThat(mail.status()).isEqualTo(DossierMailStatus.IN_WACHT);
-        assertThat(mail.aantalPogingen()).isZero();
-        assertThat(mail.aangemaaktOp()).isEqualTo(NU);
+        assertThat(mails).extracting(ListDossierMailDto::ontvanger).containsExactlyInAnyOrder(PARTNER_1, PARTNER_2);
+        assertThat(mails).allSatisfy(mail -> {
+            assertThat(mail.onderwerp()).isEqualTo("Wij hebben uw aanvraag ontvangen");
+            assertThat(mail.status()).isEqualTo(DossierMailStatus.IN_WACHT);
+            assertThat(mail.aantalPogingen()).isZero();
+            assertThat(mail.aangemaaktOp()).isEqualTo(NU);
+        });
 
-        DossierMailDto detail = dossierAdministrationService.findMail(dossierId, mail.id());
+        DossierMailDto detail = dossierAdministrationService.findMail(dossierId, mails.getFirst().id());
         assertThat(detail.afzender()).isEqualTo("Gemeente Rotterdam <noreply@rotterdam.nl>");
         assertThat(detail.inhoud())
                 .contains("Kwik van Willegenburgh", "Kwek van Willegenburgh", "Klein", "Wat gebeurt er nu?")
@@ -101,35 +101,38 @@ class DossierMailIntegrationTest {
     }
 
     @Test
-    void verwerkOpenstaandeMails_verstuurtDeMailNaarBeidePartnersEnLegtDePogingVast() throws Exception {
-        UUID dossierId = maakIngediendDossier(true);
+    void verwerkOpenstaandeMails_verstuurtEenBerichtPerPartnerEnLegtDePogingVast() throws Exception {
+        UUID dossierId = maakIngediendDossier(PARTNER_1, PARTNER_2);
 
-        assertThat(dossierMailService.verwerkOpenstaandeMails()).isEqualTo(1);
+        assertThat(dossierMailService.verwerkOpenstaandeMails()).isEqualTo(2);
 
-        assertThat(mailSender.berichten()).hasSize(1);
-        MimeMessage bericht = mailSender.berichten().getFirst();
-        assertThat(bericht.getRecipients(Message.RecipientType.TO))
-                .extracting(adres -> ((InternetAddress) adres).getAddress())
-                .containsExactly("partner1@example.com", "partner2@example.com");
-        assertThat(bericht.getFrom()[0].toString()).isEqualTo("Gemeente Rotterdam <noreply@rotterdam.nl>");
-        assertThat(bericht.getSubject()).isEqualTo("Wij hebben uw aanvraag ontvangen");
-        bericht.saveChanges();
-        assertThat(bericht.getContentType()).contains("text/html");
+        assertThat(mailSender.berichten()).hasSize(2);
+        assertThat(mailSender.berichten())
+                .extracting(bericht -> ((InternetAddress) bericht.getRecipients(Message.RecipientType.TO)[0]).getAddress())
+                .containsExactlyInAnyOrder(PARTNER_1, PARTNER_2);
+        for (MimeMessage bericht : mailSender.berichten()) {
+            assertThat(bericht.getRecipients(Message.RecipientType.TO)).hasSize(1);
+            assertThat(bericht.getFrom()[0].toString()).isEqualTo("Gemeente Rotterdam <noreply@rotterdam.nl>");
+            assertThat(bericht.getSubject()).isEqualTo("Wij hebben uw aanvraag ontvangen");
+            bericht.saveChanges();
+            assertThat(bericht.getContentType()).contains("text/html");
+        }
 
-        ListDossierMailDto mail = dossierAdministrationService.findMails(dossierId).getFirst();
-        assertThat(mail.status()).isEqualTo(DossierMailStatus.VERZONDEN);
-        assertThat(mail.volgendePogingOp()).isNull();
-        assertThat(pogingen(dossierId, mail.id()))
-                .extracting(DossierMailPogingDto::status)
-                .containsExactly(DossierMailPogingStatus.GESLAAGD);
+        for (ListDossierMailDto mail : dossierAdministrationService.findMails(dossierId)) {
+            assertThat(mail.status()).isEqualTo(DossierMailStatus.VERZONDEN);
+            assertThat(mail.volgendePogingOp()).isNull();
+            assertThat(pogingen(dossierId, mail.id()))
+                    .extracting(DossierMailPogingDto::status)
+                    .containsExactly(DossierMailPogingStatus.GESLAAGD);
+        }
 
         assertThat(dossierMailService.verwerkOpenstaandeMails()).isZero();
-        assertThat(mailSender.berichten()).hasSize(1);
+        assertThat(mailSender.berichten()).hasSize(2);
     }
 
     @Test
     void verwerkOpenstaandeMails_bijStoring_probeertOpnieuwMetBackOffEnGeeftOpNaMaxPogingen() {
-        UUID dossierId = maakIngediendDossier(true);
+        UUID dossierId = maakIngediendDossier(PARTNER_1);
         mailSender.faalAltijdMet(new MailSendException("Mailserver niet bereikbaar"));
         long mailId = dossierAdministrationService.findMails(dossierId).getFirst().id();
 
@@ -155,6 +158,7 @@ class DossierMailIntegrationTest {
         assertThat(laatste.status()).isEqualTo(DossierMailStatus.MISLUKT);
         assertThat(laatste.volgendePogingOp()).isNull();
         assertThat(laatste.aantalPogingen()).isEqualTo(5);
+        assertThat(laatste.laatstePogingOp()).isEqualTo(DAG.plusDays(4).atTime(12, 0));
 
         klok.zetOp(DAG.plusDays(5));
         assertThat(dossierMailService.verwerkOpenstaandeMails()).isZero();
@@ -168,7 +172,7 @@ class DossierMailIntegrationTest {
 
     @Test
     void verwerkOpenstaandeMails_alsDeMailserverHerstelt_wordtDeMailAlsnogVerzonden() {
-        UUID dossierId = maakIngediendDossier(true);
+        UUID dossierId = maakIngediendDossier(PARTNER_1);
         mailSender.faalEenKeerMet(new MailSendException("Mailserver niet bereikbaar"));
         long mailId = dossierAdministrationService.findMails(dossierId).getFirst().id();
 
@@ -184,36 +188,51 @@ class DossierMailIntegrationTest {
     }
 
     @Test
-    void verwerkOpenstaandeMails_alsAdresWordtAfgewezen_wordtNietOpnieuwGeprobeerd() throws Exception {
-        UUID dossierId = maakIngediendDossier(true);
-        SendFailedException afwijzing = new SendFailedException("Ongeldig adres", null, new Address[0], new Address[0],
-                new Address[]{new InternetAddress("partner1@example.com")});
-        mailSender.faalAltijdMet(new MailSendException("Verzenden mislukt", afwijzing));
+    void verwerkOpenstaandeMails_alsEenAdresWordtAfgewezen_wordtAlleenDieMailNietOpnieuwGeprobeerd() {
+        UUID dossierId = maakIngediendDossier(PARTNER_1, PARTNER_2);
+        mailSender.weigerAdres(PARTNER_2);
 
-        dossierMailService.verwerkOpenstaandeMails();
+        assertThat(dossierMailService.verwerkOpenstaandeMails()).isEqualTo(2);
 
-        ListDossierMailDto mail = dossierAdministrationService.findMails(dossierId).getFirst();
-        assertThat(mail.status()).isEqualTo(DossierMailStatus.MISLUKT);
-        assertThat(mail.aantalPogingen()).isEqualTo(1);
-        assertThat(mail.volgendePogingOp()).isNull();
+        ListDossierMailDto afgewezen = mailAan(dossierId, PARTNER_2);
+        assertThat(afgewezen.status()).isEqualTo(DossierMailStatus.MISLUKT);
+        assertThat(afgewezen.aantalPogingen()).isEqualTo(1);
+        assertThat(afgewezen.volgendePogingOp()).isNull();
+        assertThat(pogingen(dossierId, afgewezen.id()).getFirst().foutmelding()).contains("550 user unknown");
+
+        assertThat(mailAan(dossierId, PARTNER_1).status()).isEqualTo(DossierMailStatus.VERZONDEN);
+        assertThat(mailSender.berichten()).hasSize(1);
+
+        klok.zetOp(DAG.plusDays(1));
+        assertThat(dossierMailService.verwerkOpenstaandeMails()).isZero();
     }
 
     @Test
     void dienIn_zonderEmailadressen_legtMislukteMailVast() {
-        UUID dossierId = maakIngediendDossier(false);
+        UUID dossierId = maakIngediendDossier();
 
-        ListDossierMailDto mail = dossierAdministrationService.findMails(dossierId).getFirst();
+        List<ListDossierMailDto> mails = dossierAdministrationService.findMails(dossierId);
 
+        assertThat(mails).hasSize(1);
+        ListDossierMailDto mail = mails.getFirst();
         assertThat(mail.status()).isEqualTo(DossierMailStatus.MISLUKT);
-        assertThat(mail.ontvangers()).isEmpty();
+        assertThat(mail.ontvanger()).isNull();
         assertThat(mail.aantalPogingen()).isEqualTo(1);
         assertThat(dossierMailService.verwerkOpenstaandeMails()).isZero();
         assertThat(mailSender.berichten()).isEmpty();
     }
 
     @Test
+    void mailserverHeeftStandaardTimeouts() {
+        assertThat(mailSender.getJavaMailProperties())
+                .containsEntry("mail.smtp.connectiontimeout", "10000")
+                .containsEntry("mail.smtp.timeout", "10000")
+                .containsEntry("mail.smtp.writetimeout", "10000");
+    }
+
+    @Test
     void findMail_legtInzageVast_enWeigertEenMailVanEenOnbekendDossier() {
-        UUID dossierId = maakIngediendDossier(true);
+        UUID dossierId = maakIngediendDossier(PARTNER_1);
         long mailId = dossierAdministrationService.findMails(dossierId).getFirst().id();
 
         dossierAdministrationService.findMail(dossierId, mailId);
@@ -234,11 +253,17 @@ class DossierMailIntegrationTest {
         return dossierAdministrationService.findMail(dossierId, mailId).pogingen();
     }
 
-    private UUID maakIngediendDossier(boolean metEmailadressen) {
+    private ListDossierMailDto mailAan(UUID dossierId, String ontvanger) {
+        return dossierAdministrationService.findMails(dossierId).stream()
+                .filter(mail -> ontvanger.equals(mail.ontvanger()))
+                .findFirst().orElseThrow();
+    }
+
+    /** Een ingediend dossier; partner 1, 2, ... krijgen de opgegeven e-mailadressen, op volgorde. */
+    private UUID maakIngediendDossier(String... emailadressen) {
         UUID dossierId = testData.maakCompleetDossier();
-        if (metEmailadressen) {
-            zetEmailadres(dossierId, 1, "partner1@example.com");
-            zetEmailadres(dossierId, 2, "partner2@example.com");
+        for (int i = 0; i < emailadressen.length; i++) {
+            zetEmailadres(dossierId, i + 1, emailadressen[i]);
         }
         marriageIntakeService.dienIn(dossierId);
         return dossierId;

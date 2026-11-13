@@ -1,4 +1,5 @@
--- E-mails die voor een dossier zijn verstuurd (of moesten worden verstuurd), met elke verzendpoging.
+-- E-mails die voor een dossier zijn verstuurd (of moesten worden verstuurd), één per ontvanger, met elke verzendpoging.
+-- ontvanger is leeg wanneer er niemand was om de e-mail naar te sturen.
 CREATE TABLE dossier_mails
 (
     id                BIGSERIAL PRIMARY KEY,
@@ -6,7 +7,7 @@ CREATE TABLE dossier_mails
     dossier_id        BIGINT       NOT NULL REFERENCES huwelijksdossiers (id) ON DELETE CASCADE,
     type              VARCHAR(40)  NOT NULL,
     afzender          VARCHAR(512) NOT NULL,
-    ontvangers        TEXT         NOT NULL,
+    ontvanger         VARCHAR(320),
     onderwerp         VARCHAR(255) NOT NULL,
     inhoud            TEXT         NOT NULL,
     status            VARCHAR(20)  NOT NULL,
