@@ -227,6 +227,35 @@
             </div>
         </form>
     </section>
+
+    <section class="rd-dossier-sectie">
+        <h2>E-mails</h2>
+        <table class="utrecht-table">
+            <thead class="utrecht-table__header">
+            <tr class="utrecht-table__row">
+                <th class="utrecht-table__header-cell">Onderwerp</th>
+                <th class="utrecht-table__header-cell">Ontvanger</th>
+                <th class="utrecht-table__header-cell">Aangemaakt</th>
+                <th class="utrecht-table__header-cell">Status</th>
+                <th class="utrecht-table__header-cell">Pogingen</th>
+                <th class="utrecht-table__header-cell">Laatste poging</th>
+                <th class="utrecht-table__header-cell">Volgende poging</th>
+            </tr>
+            </thead>
+            <tbody class="utrecht-table__body">
+            <tr wicket:id="mails" class="utrecht-table__row">
+                <td class="utrecht-table__cell"><a wicket:id="bekijken"><span wicket:id="onderwerp">Onderwerp</span></a></td>
+                <td class="utrecht-table__cell" wicket:id="ontvanger">-</td>
+                <td class="utrecht-table__cell" wicket:id="aangemaakt">-</td>
+                <td class="utrecht-table__cell" wicket:id="status">-</td>
+                <td class="utrecht-table__cell" wicket:id="pogingen">1</td>
+                <td class="utrecht-table__cell" wicket:id="laatstePoging">-</td>
+                <td class="utrecht-table__cell" wicket:id="volgendePoging">-</td>
+            </tr>
+            </tbody>
+        </table>
+        <p wicket:id="geenMails"></p>
+    </section>
 </wicket:extend>
 </body>
 </html>

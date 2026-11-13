@@ -16,7 +16,7 @@ import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.EM
 })
 @AutoConfigureEmbeddedDatabase(provider = EMBEDDED)
 @AutoConfigureTestRestTemplate
-@Import(InstelbareKlok.Config.class)
+@Import({InstelbareKlok.Config.class, OpvangendeMailSender.Config.class})
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

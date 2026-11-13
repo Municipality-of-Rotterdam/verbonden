@@ -30,6 +30,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierExt
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BetaalmutatieCreatePage;
 import nl.rotterdam.verbonden.core.features.betaling_administration.ui.BetalingAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierJsonResourceReference;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierMailDetailPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierGetuigenUpdatePage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierPartnerUpdatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.PersonFullNameWicketConverter;
@@ -224,6 +225,7 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/beheer/dossiers/${dossierId}/partners/${volgorde}", DossierPartnerUpdatePage.class);
         mountPage("/beheer/dossiers/${dossierId}/getuigen", DossierGetuigenUpdatePage.class);
         mountPage("/beheer/dossiers/${dossierId}/extras", DossierExtrasUpdatePage.class);
+        mountPage("/beheer/dossiers/${dossierId}/mails/${mailId}", DossierMailDetailPage.class);
         mountPage("/beheer/dossiers/${dossierId}/betaalmutaties/nieuw", BetaalmutatieCreatePage.class);
         mountPage("/beheer/betalingen", BetalingAdministrationPage.class);
         mountResource("/beheer/dossiers/${dossierId}/json", new DossierJsonResourceReference());

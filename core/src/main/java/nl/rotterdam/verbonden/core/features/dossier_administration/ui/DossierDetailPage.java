@@ -15,6 +15,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Detail
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierBestandDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierMailDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
@@ -59,6 +60,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         super(params);
 
         FeedbackPanel feedback = new FeedbackPanel("feedback");
+        List<ListDossierMailDto> mails = dossierAdministrationService.findMails(dossierId);
         PageParameters dossierParams = parametersVoor(dossierId);
 
         pageBody.add(
@@ -129,8 +131,34 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                 new BestandenListView("bestanden", dossier.bestanden()),
                 new Label("geenBestanden", "Er zijn nog geen bestanden toegevoegd.")
                         .setVisible(dossier.bestanden().isEmpty()),
-                new BestandToevoegenForm("bestandToevoegenForm")
+                new BestandToevoegenForm("bestandToevoegenForm"),
+
+                new MailsListView("mails", mails),
+                new Label("geenMails", "Er zijn nog geen e-mails verstuurd.").setVisible(mails.isEmpty())
         );
+    }
+
+    private class MailsListView extends ListView<ListDossierMailDto> {
+
+        MailsListView(String id, List<ListDossierMailDto> mails) {
+            super(id, mails);
+        }
+
+        @Override
+        protected void populateItem(ListItem<ListDossierMailDto> item) {
+            ListDossierMailDto mail = item.getModelObject();
+            item.add(
+                    new BookmarkablePageLink<>("bekijken", DossierMailDetailPage.class,
+                            DossierMailDetailPage.parametersVoor(dossierId, mail.id()))
+                            .add(new Label("onderwerp", mail.onderwerp())),
+                    new Label("ontvanger", mail.ontvanger() != null ? mail.ontvanger() : "-"),
+                    new Label("aangemaakt", datumTijd(mail.aangemaaktOp())),
+                    new Label("status", mail.status().getLabel()),
+                    new Label("pogingen", mail.aantalPogingen()),
+                    new Label("laatstePoging", mail.laatstePogingOp() != null ? datumTijd(mail.laatstePogingOp()) : "-"),
+                    new Label("volgendePoging", mail.volgendePogingOp() != null ? datumTijd(mail.volgendePogingOp()) : "-")
+            );
+        }
     }
 
     /**

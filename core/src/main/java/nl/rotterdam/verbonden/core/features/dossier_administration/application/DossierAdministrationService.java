@@ -10,7 +10,9 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Create
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierMailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierMailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerHeeftAlDossierException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerNietInBrpException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
@@ -136,6 +138,21 @@ public interface DossierAdministrationService {
     DossierBestandDto findBestand(UUID dossierId, long bestandId);
 
     void deleteBestand(UUID dossierId, long bestandId);
+
+    /**
+     * De e-mails die voor het dossier zijn verstuurd of nog worden verstuurd, de nieuwste eerst.
+     *
+     * @throws IllegalArgumentException wanneer het dossier niet bestaat
+     */
+    List<ListDossierMailDto> findMails(UUID dossierId);
+
+    /**
+     * Een e-mail van het dossier met inhoud en verzendpogingen. Legt in het inzagelog vast dat de ingelogde
+     * medewerker de e-mail heeft bekeken (AVG).
+     *
+     * @throws IllegalArgumentException wanneer het dossier of de e-mail niet bestaat
+     */
+    DossierMailDto findMail(UUID dossierId, long mailId);
 
     /**
      * Voegt een bedrag toe dat het paar nog online moet betalen, na het indienen.

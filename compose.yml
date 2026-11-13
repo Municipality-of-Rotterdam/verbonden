@@ -12,5 +12,12 @@ services:
       - postgres_data:/var/lib/postgresql
       - ./docker/postgres:/docker-entrypoint-initdb.d
 
+  # Lokale mailserver: vangt alle e-mail op. SMTP op poort 1025, inbox op http://localhost:8025.
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 volumes:
   postgres_data:
