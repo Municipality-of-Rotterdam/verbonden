@@ -55,7 +55,7 @@
         <wicket.version>10.12.0</wicket.version>
         <wicket-stuff.version>10.12.0</wicket-stuff.version>
         <rotterdam-nlds.version>0.1.1</rotterdam-nlds.version>
-        <wicket-webjars.version>4.0.15</wicket-webjars.version>
+        <wicket-webjars.version>5.0.0</wicket-webjars.version>
         <bootstrap.version>5.3.8</bootstrap.version>
         <wicket-spring-boot-starter.version>5.0.0</wicket-spring-boot-starter.version>
         <!-- Pinned to match the PostgreSQL major version used by compose.yml -->
