@@ -4,16 +4,15 @@
 
 ### Packagestructuur
 De code is opgedeeld in de volgende packages:
-- `nl.rotterdam.verbonden.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
-- `nl.rotterdam.verbonden.domain` — gedeelde domeininterfaces zoals `ValueHolder<T>`, die door meerdere feature-packages worden hergebruikt.
-- `nl.rotterdam.verbonden.features.babs_administration` — alle code voor het beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BAPS), opgedeeld in sub-packages (zie hieronder).
-- `nl.rotterdam.verbonden.features.marriage_intake` — alle code voor het huwelijksaangifteproces door burgers, opgedeeld in sub-packages (zie hieronder).
-- `nl.rotterdam.verbonden.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
-- `nl.rotterdam.verbonden.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
-- `nl.rotterdam.verbonden.error_common` — gedeelde foutafhandeling voor burger- en beheerfoutpagina's: `ServletErrorAttributes` en `VerbondenExceptionMapper` (kiest bij een `/beheer`-request de `Administration*ErrorPage` in plaats van de `Burger*ErrorPage`).
-- `nl.rotterdam.verbonden.config` — Spring Boot configuratieklassen.
-- `nl.rotterdam.verbonden.identity` — publiek SPI-contract (adapter-poorten zoals `PersonLookupService`, `BurgerLoginPageMount`, `AdapterPageMount`, `CurrentUserProvider`) waartegen adapter-modules zoals `remote-local` bouwen. Bewuste uitzondering op de feature-packageconventie hieronder: dit is geen feature maar een cross-cutting contract, gebruikt door meerdere features én door `WicketApplication`/`config`.
-- `nl.rotterdam.verbonden.online_betalen` — publiek SPI-contract voor online betalen, met dezelfde uitzondering als `identity`. Uitgaand implementeert een adapter `OnlineBetaalService` (mock in `remote-local`, een echte betaalprovider in een productie-adapter). Inkomend roept de adapter `BetaalUitslagVerwerker` aan zodra de betaalprovider de uitslag meldt; core implementeert die. Het dossier wordt pas ingediend op die uitslag, nooit op wat de browser na het betalen meestuurt.
+- `nl.rotterdam.verbonden.core.persistence` — bevat uitsluitend JPA Entity klassen (geen repositories).
+- `nl.rotterdam.verbonden.core.domain` — gedeelde domeininterfaces zoals `ValueHolder<T>`, die door meerdere feature-packages worden hergebruikt.
+- `nl.rotterdam.verbonden.core.features.<naam>` — één package per feature (bijv. `marriage_intake` voor de aanvraag door burgers, `babs_administration` voor het beheer van BABS), opgedeeld in sub-packages (zie hieronder).
+- `nl.rotterdam.verbonden.core.administration_common` — gedeelde basisklassen voor beheerpagina's: `AdministrationBasePage` (Bootstrap utilities CSS + Rotterdam NLDS-thema).
+- `nl.rotterdam.verbonden.core.burger_common` — gedeelde basisklassen voor burgerpagina's: `BurgerBasePage`.
+- `nl.rotterdam.verbonden.core.error_common` — gedeelde foutafhandeling voor burger- en beheerfoutpagina's: `ServletErrorAttributes` en `VerbondenExceptionMapper` (kiest bij een `/beheer`-request de `Administration*ErrorPage` in plaats van de `Burger*ErrorPage`).
+- `nl.rotterdam.verbonden.core.config` — Spring Boot configuratieklassen.
+- `nl.rotterdam.verbonden.core.identity` — publiek SPI-contract (adapter-poorten zoals `PersonLookupService`, `BurgerLoginPageMount`, `AdapterPageMount`, `CurrentUserProvider`) waartegen adapter-modules zoals `remote-local` bouwen. Bewuste uitzondering op de feature-packageconventie hieronder: dit is geen feature maar een cross-cutting contract, gebruikt door meerdere features én door `WicketApplication`/`config`.
+- `nl.rotterdam.verbonden.core.online_betalen` — publiek SPI-contract voor online betalen, met dezelfde uitzondering als `identity`. Uitgaand implementeert een adapter `OnlineBetaalService` (mock in `remote-local`, een echte betaalprovider in een productie-adapter). Inkomend roept de adapter `BetaalUitslagVerwerker` aan zodra de betaalprovider de uitslag meldt; core implementeert die. Het dossier wordt pas ingediend op die uitslag, nooit op wat de browser na het betalen meestuurt.
 
 Elke feature-package bevat de volgende sub-packages:
 - `feature.<naam>.ui` — Wicket-pagina's en UI-hulpklassen (FormDto, componenten).
@@ -23,7 +22,7 @@ Elke feature-package bevat de volgende sub-packages:
 
 ### Service layer
 - JPA Entities mogen de service layer niet verlaten.
-- De inputs en outputs van de service layer moeten altijd immutable `record` klassen zijn (DTOs).
+- De inputs en outputs van de service layer moeten altijd immutable `record` klassen zijn (DTOs, commands en resultaatobjecten).
 - Service implementaties mogen intern JPA Entities gebruiken, maar mogen ze **nooit** teruggeven aan of ontvangen van de presentation layer.
 - Annoteer alle lees-methoden in een `@Service`-implementatie met `@Transactional(readOnly = true)` en schrijf-/verwijdermethoden met `@Transactional`, zodat de Hibernate-sessie open blijft voor lazy-loaded collecties.
 - Splits de DTO's altijd op naar gebruik: gebruik `CreateXxxDto` voor aanmaken (geen id, geen aangemaaktOp), `ChangeXxxDto` voor wijzigen (met id, zonder aangemaaktOp), en `ListXxxDto` voor weergave/overzichten (uitsluitend de velden die in de lijstweergave worden getoond — niet alle entiteitsvelden). Dit zijn aparte `record`-klassen; dupliceer velden gerust.
@@ -32,6 +31,20 @@ Elke feature-package bevat de volgende sub-packages:
     - `update`-methoden retourneren `void`.
     - `delete`- en toggle-methoden accepteren de primaire sleutel als primitief (`long id`, niet `Long id`).
     - **Gebruik altijd primitieven** (`long`, `int`, `boolean`, …) in plaats van wrapper-typen (`Long`, `Integer`, `Boolean`, …) waar dat mogelijk is — dit geldt voor methode-parameters én retourtypen in services én repositories.
+- Een lijstweergave haalt wat ze per rij nodig heeft in dezelfde query op (`@EntityGraph` of `join fetch` op de repository-methode), zodat het aantal queries gelijk blijft bij meer rijen.
+
+### Bijwerkingen en externe systemen
+Geldt voor e-mail, betalen, notificaties en elke `@Scheduled`-verwerker.
+- Een bijwerking van een gebruikersactie (bijv. de bevestigingsmail bij het indienen) laat die actie altijd slagen. Vang fouten bij het voorbereiden op in de service-implementatie, log ze en leg de bijwerking vast als mislukt. Vang ze vóór de grens van een Spring-proxy: een exception die de proxy passeert, maakt de transactie van de actie rollback-only.
+- Geef elke ontvanger een eigen bericht met een eigen status, zodat een afgewezen adres of een nieuwe poging bij de één de ander niet raakt.
+- Een `@Scheduled`-verwerker vangt fouten per item op, zodat één fout item de rest van de batch laat doorgaan.
+- Elke verbinding met een extern systeem heeft een timeout, met de standaardwaarde in core (zie `SmtpTimeoutConfig`).
+- Bepaal of een fout tijdelijk of permanent is aan de hand van wat de library echt gooit: lees de Javadoc of broncode. Voorbeeld: `JavaMailSenderImpl` geeft een fout per bericht door in `MailSendException.getMessageExceptions()`, zonder cause.
+
+### Configuratie en dependencies
+- `core` is een bibliotheek zonder eigen `application.properties`. Standaardwaarden staan in core: als veldwaarde in een `@ConfigurationProperties`-klasse (zie `MailConfig`) of in een `@Configuration`-klasse. `app-local` bevat alleen lokale waarden (database, Mailpit) en dient als voorbeeld voor een productie-installatie.
+- Declareer elke library die je direct importeert in de `pom.xml` van de module; een transitieve dependency kan bij een update verdwijnen.
+- Laat `<version>` weg bij dependencies die Spring Boot beheert, zodat ze met de Boot-versie mee bewegen.
 
 ### Wicket
 - Roep in `onInitialize()` nooit `getObject()` aan op een `LoadableDetachableModel` of een model dat daarvan afhankelijk is. Gebruik afgeleide modellen via `model.map(...)` voor componenten en zichtbaarheid, zodat data pas tijdens renderen wordt geladen en na detach bij een volgende request wordt vernieuwd.
@@ -51,14 +64,13 @@ Elke feature-package bevat de volgende sub-packages:
     - In de statische `vanDto(XxxDto dto)`-methode worden waarden via setters overgenomen: `form.setVeld(dto.veld())`. Gebruik **nooit** een null-naar-lege-string coercitie zoals `dto.veld() != null ? dto.veld() : ""`. Uitzondering: voor `List`-velden geldt een fallback naar een lege `ArrayList` (`dto.lijst() != null ? new ArrayList<>(dto.lijst()) : new ArrayList<>()`).
 
 ### Algemeen
-- Gebruik `record` klassen voor DTOs, command- en resultaatobjecten.
-- JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`) en staan in `nl.rotterdam.verbonden.persistence`.
+- JPA Entity klassen eindigen op `Entity` (bijv. `BapsEntity`) en staan in `nl.rotterdam.verbonden.core.persistence`.
 - **Niet-wijzigbare velden van een Entity gaan via de constructor, niet via setters.** Velden die na het aanmaken nooit meer wijzigen (bijv. de parent-relatie, een BSN, een volgnummer) krijgen `updatable = false` op `@Column`/`@JoinColumn`, worden gezet in een constructor met argumenten en krijgen **geen setter**. Alleen velden die mogen wijzigen krijgen een setter. `@Id`- en `@Version`-velden krijgen nooit een setter. Een Entity met zo'n constructor heeft daarnaast een `protected` no-arg constructor, uitsluitend voor JPA. Gebruik geen `final` op entity-velden (niet toegestaan door de JPA-specificatie).
     - Kinderen die bij een parent-collectie horen, worden bij voorkeur via een methode op de parent aangemaakt (bijv. `HuwelijksDossierEntity.voegPartnerToe(bsn)`), zodat de parent afleidbare waarden zoals de volgorde bepaalt en de relatie in beide richtingen consistent blijft.
     - `EntityConventiesTest` (ArchUnit) bewaakt deze regel voor alle velden met `@Id`, `@Version` of `updatable = false`.
 - Voeg geen JPA-annotaties toe aan klassen buiten het `persistence`-package.
 - Aanmaken en wijzigen mogen nooit op dezelfde pagina staan. Gebruik altijd afzonderlijke pagina's (bijv. `BapsCreatePage` en `BapsUpdatePage`).
-- Genereer nooit methoden of klassen die nergens worden aangeroepen of gebruikt.
+- Voeg alleen code toe die wordt gebruikt: elke klasse, methode, getter en returnwaarde heeft een aanroeper die hem nodig heeft.
 - Genereer **nooit** `serialVersionUID`-velden. We gebruiken Java-serialisatie niet op deze manier en willen geen achterwaartse compatibiliteit voor geserialiseerde klassen.
 
 ### Database-migraties (Flyway)
@@ -70,6 +82,7 @@ Elke feature-package bevat de volgende sub-packages:
 - Gebruik in integratietests altijd **services** om testdata aan te maken, niet repositories of JPA Entities. Entities mogen alleen binnen service-implementaties gebruikt worden.
 - Gebruik `@Transactional` op de testklasse zodat elke test in een transactie draait die na afloop wordt teruggedraaid. Hierdoor is geen handmatige cleanup van testdata nodig.
 - **Let op bij nested transacties:** wanneer een service-methode `@Transactional(propagation = REQUIRES_NEW)` gebruikt, commit die inner-transactie onafhankelijk en wordt **niet** teruggedraaid door de `@Transactional` op de testklasse. In dat geval moet je de data handmatig opschonen in een `@BeforeEach`-methode via service-methoden (bijv. `delete()`/`deleteAll()`), zodat de database vóór elke test weer in de oorspronkelijke staat is.
+- Een test double van een library (bijv. `OpvangendeMailSender`) bootst de echte implementatie na, ook in de vorm van de exceptions: dezelfde klasse, dezelfde cause en dezelfde ingepakte fouten. Zo test de code wat hij in productie krijgt.
 - Wanneer seed-data (Flyway) interfereert met de test, verwijder die data via service-methoden in een `@BeforeEach`-methode. Door `@Transactional` wordt ook deze cleanup na de test teruggedraaid.
 
 ### Datum en tijd
@@ -86,8 +99,8 @@ Elke feature-package bevat de volgende sub-packages:
 - **JPA-integratie:** maak een `AttributeConverter` aan in het `persistence`-package die de conversie tussen het value type en het databasetype afhandelt. Gebruik `@Convert(converter = ...)` op het entity-veld.
 - **Wicket-integratie:** maak een `IConverter` aan in het `ui`-package die de conversie tussen `String` en het value type afhandelt. Vang validatie-excepties af en geef nette Wicket `ConversionException`-meldingen. Registreer de converter globaal in `WicketApplication.newConverterLocator()`.
 - Value types worden gebruikt in JPA Entities, DTOs (`CreateXxxDto`, `ChangeXxxDto`, `ListXxxDto`) en `FormDto`-klassen — consistent door alle lagen heen.
-- `ValueHolder<T>` staat in `nl.rotterdam.verbonden.domain` — een gedeeld package, niet in een feature-package — zodat meerdere features het kunnen hergebruiken.
-- Concrete value types (bijv. `PersonFullName`, `Telefoonnummer`, `Emailadres`, `BurgerServiceNummer`) staan **ook** in `nl.rotterdam.verbonden.domain`, samen met hun exceptions: ze zijn applicatiebreed en niet aan één feature gebonden. Alleen hun `AttributeConverter` (in `persistence`) en eventuele `IConverter` (in een `ui`-package) blijven bij de laag waar ze worden gebruikt.
+- `ValueHolder<T>` staat in `nl.rotterdam.verbonden.core.domain` — een gedeeld package, niet in een feature-package — zodat meerdere features het kunnen hergebruiken.
+- Concrete value types (bijv. `PersonFullName`, `Telefoonnummer`, `Emailadres`, `BurgerServiceNummer`) staan **ook** in `nl.rotterdam.verbonden.core.domain`, samen met hun exceptions: ze zijn applicatiebreed en niet aan één feature gebonden. Alleen hun `AttributeConverter` (in `persistence`) en eventuele `IConverter` (in een `ui`-package) blijven bij de laag waar ze worden gebruikt.
 
 ### Teksten
 - Schrijf teksten op burgerpagina's (o.a. `marriage_intake`, `burger_common`) op **taalniveau B1**, volgens de regels in `.claude/skills/taalniveau/SKILL.md`. Dit geldt voor alle tekst die een burger ziet: koppen, uitleg, knoppen, foutmeldingen en validatiemeldingen.
