@@ -10,6 +10,7 @@ Deze codebase bestaat uit de volgende features:
 - Beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BABS)
 - Beheren van Gemeentelijke locaties
 - Beheren van dossiers
+- Online betalen bij het indienen, en van latere wijzigingen (betaalmutaties)
 
 Dit is een proof-of-concept: de functionaliteit is nog incompleet en wordt
 actief doorontwikkeld. Zie [publiccode.yml](publiccode.yml) voor de
@@ -24,6 +25,7 @@ Dit project heeft de status: **development** (proof-of-concept). Zie
 
 - [Applicatie-architectuur](docs/applicatie-architectuur.md)
 - [Beoogde koppelingen](docs/beoogde-koppelingen.md)
+- [Online betalen](docs/online-betalen.md)
 - [Checklist organisatorische stappen open source publicatie](docs/open-source-publicatie-checklist.md)
 
 ## Modules

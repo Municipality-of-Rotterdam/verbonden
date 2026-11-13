@@ -1,5 +1,7 @@
 package nl.rotterdam.verbonden.core.features.dossier_administration.application;
 
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BetaalmutatieNietMogelijkException;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBetaalmutatieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeCeremonieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeExtrasDto;
@@ -151,4 +153,20 @@ public interface DossierAdministrationService {
      * @throws IllegalArgumentException wanneer het dossier of de e-mail niet bestaat
      */
     DossierMailDto findMail(UUID dossierId, long mailId);
+
+    /**
+     * Voegt een bedrag toe dat het paar nog online moet betalen, na het indienen.
+     *
+     * @return het id van de nieuwe betaalmutatie
+     * @throws BetaalmutatieNietMogelijkException wanneer het dossier geen betaalmutaties kent
+     *         (zie {@link DossierStatus#BETAALMUTATIES_MOGELIJK}), of de gegevens niet kloppen
+     */
+    long createBetaalmutatie(UUID dossierId, CreateBetaalmutatieDto dto);
+
+    /**
+     * Verwijdert een betaalmutatie waarvoor de burger nog geen betaling heeft gestart.
+     *
+     * @throws BetaalmutatieNietMogelijkException wanneer er al een betaling voor is gestart
+     */
+    void deleteBetaalmutatie(UUID dossierId, long betaalmutatieId);
 }

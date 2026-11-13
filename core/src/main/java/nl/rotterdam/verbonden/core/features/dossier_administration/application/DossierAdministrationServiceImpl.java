@@ -1,5 +1,12 @@
 package nl.rotterdam.verbonden.core.features.dossier_administration.application;
 
+import nl.rotterdam.verbonden.core.features.betaling_administration.application.BetalingAdministrationService;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BetaalmutatieNietMogelijkException;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBetaalmutatieDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListBetaalmutatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BetalingStatus;
+import nl.rotterdam.verbonden.core.persistence.BetaalmutatieEntity;
+import nl.rotterdam.verbonden.core.persistence.BetalingEntity;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeCeremonieDto;
@@ -24,7 +31,9 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.application.Marriage
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
+import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
@@ -52,11 +61,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 class DossierAdministrationServiceImpl implements DossierAdministrationService {
@@ -74,6 +87,8 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     private final AfspraakPlanningService afspraakPlanningService;
     private final PersonLookupService personLookupService;
     private final CurrentUserProvider currentUserProvider;
+    private final BetalingAdministrationService betalingAdministrationService;
+    private final Clock clock;
 
     DossierAdministrationServiceImpl(DossierAdministrationRepository dossierAdministrationRepository,
                                      DossierBestandRepository dossierBestandRepository,
@@ -85,7 +100,9 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                                      MarriageIntakeService marriageIntakeService,
                                      AfspraakPlanningService afspraakPlanningService,
                                      PersonLookupService personLookupService,
-                                     CurrentUserProvider currentUserProvider) {
+                                     CurrentUserProvider currentUserProvider,
+                                     BetalingAdministrationService betalingAdministrationService,
+                                     Clock clock) {
         this.dossierAdministrationRepository = dossierAdministrationRepository;
         this.dossierBestandRepository = dossierBestandRepository;
         this.dossierInzageRepository = dossierInzageRepository;
@@ -97,6 +114,8 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         this.afspraakPlanningService = afspraakPlanningService;
         this.personLookupService = personLookupService;
         this.currentUserProvider = currentUserProvider;
+        this.betalingAdministrationService = betalingAdministrationService;
+        this.clock = clock;
     }
 
     @Override
@@ -151,7 +170,87 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                 extraKeuzes,
                 samenvatting.totalPrijs(),
                 samenvatting.compleet(),
-                dossierBestandRepository.findOverzichtByDossierId(dossier.getId()));
+                dossierBestandRepository.findOverzichtByDossierId(dossier.getId()),
+                betalingAdministrationService.findByDossierId(dossierId),
+                betaalmutaties(dossier),
+                teVeelBetaald(dossier, samenvatting));
+    }
+
+    /**
+     * Wat er meer betaald of te betalen is dan het dossier kost. Het dossier kost de totaalprijs plus de handmatige
+     * betaalmutaties; automatische mutaties (prijswijziging) zitten al in de totaalprijs.
+     */
+    private static Bedrag teVeelBetaald(HuwelijksDossierEntity dossier, DossierSamenvattingDto samenvatting) {
+        if (!DossierStatus.BETAALMUTATIES_MOGELIJK.contains(dossier.getStatus())) {
+            return null;
+        }
+        List<ListBetaalmutatieDto> mutaties = betaalmutaties(dossier);
+        Bedrag betaald = dossier.getBetalingen().stream()
+                .filter(betaling -> betaling.getStatus() == BetalingStatus.GELUKT)
+                .map(BetalingEntity::getBedrag)
+                .reduce(Bedrag.ZERO, Bedrag::plus);
+        Bedrag open = som(mutaties.stream().filter(mutatie -> !mutatie.betaald()).toList());
+        Bedrag handmatig = som(mutaties.stream().filter(mutatie -> !mutatie.prijswijziging()).toList());
+        Bedrag teVeel = betaald.plus(open).minus(totaal(samenvatting).plus(handmatig));
+        return teVeel.isPositive() ? teVeel : null;
+    }
+
+    private static List<ListBetaalmutatieDto> betaalmutaties(HuwelijksDossierEntity dossier) {
+        return dossier.getBetaalmutaties().stream()
+                .map(mutatie -> {
+                    List<BetalingEntity> betalingen = dossier.getBetalingen().stream()
+                            // Op id: getBetaalmutatie() kan een Hibernate-proxy zijn
+                            .filter(betaling -> betaling.getBetaalmutatie() != null
+                                    && betaling.getBetaalmutatie().getId().equals(mutatie.getId()))
+                            .toList();
+                    return new ListBetaalmutatieDto(
+                            mutatie.getId(),
+                            mutatie.getOmschrijving(),
+                            mutatie.getBedrag(),
+                            betalingen.stream().anyMatch(betaling -> betaling.getStatus() == BetalingStatus.GELUKT),
+                            betalingen.isEmpty(),
+                            mutatie.isPrijswijziging(),
+                            mutatie.getAangemaaktDoor(),
+                            mutatie.getAangemaaktOp());
+                })
+                .toList();
+    }
+
+    private static Bedrag som(List<ListBetaalmutatieDto> mutaties) {
+        return mutaties.stream().map(ListBetaalmutatieDto::bedrag).reduce(Bedrag.ZERO, Bedrag::plus);
+    }
+
+    @Override
+    @Transactional
+    public long createBetaalmutatie(UUID dossierId, CreateBetaalmutatieDto dto) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        if (!DossierStatus.BETAALMUTATIES_MOGELIJK.contains(dossier.getStatus())) {
+            throw new BetaalmutatieNietMogelijkException(
+                    "Een betaalmutatie kan alleen bij een ingediend of geaccepteerd dossier.");
+        }
+        String omschrijving = dto.omschrijving() == null ? "" : dto.omschrijving().strip();
+        if (omschrijving.isEmpty() || omschrijving.length() > CreateBetaalmutatieDto.MAX_LENGTE_OMSCHRIJVING) {
+            throw new BetaalmutatieNietMogelijkException("Vul een omschrijving in van hoogstens "
+                    + CreateBetaalmutatieDto.MAX_LENGTE_OMSCHRIJVING + " tekens.");
+        }
+        if (dto.bedrag() == null || !dto.bedrag().isPositive()) {
+            throw new BetaalmutatieNietMogelijkException("Het bedrag moet groter zijn dan nul.");
+        }
+        BetaalmutatieEntity mutatie = dossier.voegBetaalmutatieToe(omschrijving, dto.bedrag(), false, medewerker(),
+                LocalDateTime.now(clock));
+        dossierAdministrationRepository.flush();
+        return mutatie.getId();
+    }
+
+    @Override
+    @Transactional
+    public void deleteBetaalmutatie(UUID dossierId, long betaalmutatieId) {
+        try {
+            getDossier(dossierId).verwijderBetaalmutatie(betaalmutatieId);
+        } catch (IllegalStateException e) {
+            throw new BetaalmutatieNietMogelijkException(
+                    "Deze betaalmutatie kan niet meer weg: de burger heeft er al een betaling voor gestart.");
+        }
     }
 
     @Override
@@ -231,8 +330,52 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Override
     @Transactional
     public void updateCeremonie(UUID dossierId, ChangeCeremonieDto dto) {
-        getDossier(dossierId).wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(),
-                locatieVoor(dto.ceremonieSoort()));
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        DossierSamenvattingDto voor = samenvattingVoorMeerprijs(dossier);
+        dossier.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), locatieVoor(dto.ceremonieSoort()));
+        if (voor != null) {
+            voegBetaalmutatieToeVoorMeerprijs(dossier, voor, marriageIntakeService.findByDossierId(dossierId),
+                    "Ceremonie gewijzigd naar " + dto.ceremonieSoort().getLabel().toLowerCase());
+        }
+    }
+
+    /**
+     * De samenvatting van vóór een wijziging, om de meerprijs te kunnen bepalen; {@code null} als het dossier geen
+     * betaalmutaties kent (bijv. een concept), zodat de samenvatting dan niet voor niets wordt opgehaald.
+     */
+    private DossierSamenvattingDto samenvattingVoorMeerprijs(HuwelijksDossierEntity dossier) {
+        return DossierStatus.BETAALMUTATIES_MOGELIJK.contains(dossier.getStatus())
+                ? marriageIntakeService.findByDossierId(dossier.getUuid())
+                : null;
+    }
+
+    /**
+     * Wordt een ingediend dossier door een wijziging duurder, dan moet het paar het verschil nog betalen: dat wordt
+     * een betaalmutatie. Wordt het goedkoper, dan valt dat onder crediteren, en dat gaat buiten Verbonden om; de
+     * detailpagina waarschuwt de medewerker dan.
+     */
+    private void voegBetaalmutatieToeVoorMeerprijs(HuwelijksDossierEntity dossier, DossierSamenvattingDto voor,
+                                                   DossierSamenvattingDto na, String omschrijving) {
+        Bedrag meerprijs = totaal(na).minus(totaal(voor));
+        if (meerprijs.isPositive()) {
+            int max = CreateBetaalmutatieDto.MAX_LENGTE_OMSCHRIJVING;
+            String kort = omschrijving.length() > max ? omschrijving.substring(0, max - 1) + "…" : omschrijving;
+            dossier.voegBetaalmutatieToe(kort, meerprijs, true, medewerker(), LocalDateTime.now(clock));
+        }
+    }
+
+    private static Bedrag totaal(DossierSamenvattingDto samenvatting) {
+        return samenvatting.totalPrijs() != null ? samenvatting.totalPrijs() : Bedrag.ZERO;
+    }
+
+    /** De extra's die er door een wijziging bij zijn gekomen, voor de omschrijving van de betaalmutatie. */
+    private static String nieuweExtras(DossierSamenvattingDto voor, DossierSamenvattingDto na) {
+        Set<String> eerder = voor.extras().stream().map(SidebarExtraItemDto::naam).collect(Collectors.toSet());
+        String nieuw = na.extras().stream()
+                .filter(extra -> extra.prijs() != null && !eerder.contains(extra.naam()))
+                .map(SidebarExtraItemDto::naam)
+                .collect(Collectors.joining(", "));
+        return nieuw.isEmpty() ? "Extra's gewijzigd" : nieuw;
     }
 
     @Override
@@ -300,6 +443,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Transactional
     public void updateExtras(UUID dossierId, ChangeExtrasDto dto) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
+        DossierSamenvattingDto voor = samenvattingVoorMeerprijs(dossier);
         dossier.wijzigExtras(dto.ringenUitwisselen(), dto.muziek(), dto.trouwboekjeId() != null
                 ? trouwboekjeRepository.findById(dto.trouwboekjeId()).orElse(null)
                 : null, dto.internationaleAkte());
@@ -309,6 +453,10 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
             dossier.setInternationaleAktePrijs(dossier.isInternationaleAkte()
                     ? InternationaleAkteTarief.prijsOp(dossier.getIngediendOp().toLocalDate())
                     : null);
+        }
+        if (voor != null) {
+            DossierSamenvattingDto na = marriageIntakeService.findByDossierId(dossierId);
+            voegBetaalmutatieToeVoorMeerprijs(dossier, voor, na, nieuweExtras(voor, na));
         }
     }
 

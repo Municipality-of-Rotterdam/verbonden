@@ -11,7 +11,7 @@ import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.Trouwb
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeUpdatePage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.ExtrasPage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.ControlerenPage;
-import nl.rotterdam.verbonden.core.features.marriage_intake.ui.BetalingPage;
+import nl.rotterdam.verbonden.core.features.marriage_intake.ui.BetalingRetourPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsUpdatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
@@ -27,6 +27,8 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierCer
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierCreatePage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierDetailPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierExtrasUpdatePage;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BetaalmutatieCreatePage;
+import nl.rotterdam.verbonden.core.features.betaling_administration.ui.BetalingAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierJsonResourceReference;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierMailDetailPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierGetuigenUpdatePage;
@@ -54,6 +56,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.ui.MarriageIntakePag
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeCreatePage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeUpdatePage;
+import nl.rotterdam.verbonden.core.identity.AdapterPageMount;
 import nl.rotterdam.verbonden.core.identity.BurgerLoginPageMount;
 import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
 import com.giffing.wicket.spring.boot.starter.app.WicketBootStandardWebApplication;
@@ -82,6 +85,7 @@ import static org.apache.wicket.csp.CSPDirectiveSrcValue.SELF;
 public class WicketApplication extends WicketBootStandardWebApplication {
 
     private final List<BurgerLoginPageMount> burgerLoginPageMounts;
+    private final ObjectProvider<AdapterPageMount> adapterPageMounts;
     private final String beheerLogoutUrl;
     private final String burgerLogoutUrl;
     private final String mijnLoketUrl;
@@ -89,12 +93,14 @@ public class WicketApplication extends WicketBootStandardWebApplication {
     private final CurrentUserProvider currentUserProvider;
 
     public WicketApplication(List<BurgerLoginPageMount> burgerLoginPageMounts,
+                             ObjectProvider<AdapterPageMount> adapterPageMounts,
                              @Value("${verbonden.logout.beheer-url}") String beheerLogoutUrl,
                              @Value("${verbonden.logout.burger-url}") String burgerLogoutUrl,
                              @Value("${verbonden.mijn-loket-url:/mijnloket}") String mijnLoketUrl,
                              ObjectProvider<WicketSessionFactory> sessionFactoryProvider,
                              CurrentUserProvider currentUserProvider) {
         this.burgerLoginPageMounts = burgerLoginPageMounts;
+        this.adapterPageMounts = adapterPageMounts;
         this.beheerLogoutUrl = beheerLogoutUrl;
         this.burgerLogoutUrl = burgerLogoutUrl;
         this.mijnLoketUrl = mijnLoketUrl;
@@ -185,6 +191,8 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         for (BurgerLoginPageMount mount : burgerLoginPageMounts) {
             mountPage(mount.getPath(), mount.getPageClass());
         }
+        // Optioneel: alleen remote-local biedt nu zulke pagina's aan
+        adapterPageMounts.orderedStream().forEach(mount -> mountPage(mount.getPath(), mount.getPageClass()));
         mountPage("/error", BurgerErrorPage.class);
         mountPage("/beheer/huwelijkstypen", MarriageTypeAdministrationPage.class);
         mountPage("/beheer/huwelijkstypen/nieuw", MarriageTypeCreatePage.class);
@@ -207,7 +215,7 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/mijn-dag/${dossierId}/de-getuigen", DeGetuigenPage.class);
         mountPage("/mijn-dag/${dossierId}/extras", ExtrasPage.class);
         mountPage("/mijn-dag/${dossierId}/controleren", ControlerenPage.class);
-        mountPage("/mijn-dag/${dossierId}/betalen", BetalingPage.class);
+        mountPage("/mijn-dag/${dossierId}/betaling-retour", BetalingRetourPage.class);
         mountPage("/mijn-dag/${dossierId}/aanvraag", AanvraagStatusPage.class);
         mountPage("/beheer/dossiers", DossierAdministrationPage.class);
         mountPage("/beheer/dossiers/nieuw", DossierCreatePage.class);
@@ -218,6 +226,8 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/beheer/dossiers/${dossierId}/getuigen", DossierGetuigenUpdatePage.class);
         mountPage("/beheer/dossiers/${dossierId}/extras", DossierExtrasUpdatePage.class);
         mountPage("/beheer/dossiers/${dossierId}/mails/${mailId}", DossierMailDetailPage.class);
+        mountPage("/beheer/dossiers/${dossierId}/betaalmutaties/nieuw", BetaalmutatieCreatePage.class);
+        mountPage("/beheer/betalingen", BetalingAdministrationPage.class);
         mountResource("/beheer/dossiers/${dossierId}/json", new DossierJsonResourceReference());
         mountPage("/beheer/extras", TrouwboekjeAdministrationPage.class);
         mountPage("/beheer/extras/nieuw", TrouwboekjeCreatePage.class);

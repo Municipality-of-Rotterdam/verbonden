@@ -49,7 +49,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
-import java.util.UUID;
 
 @Service
 class MarriageIntakeServiceImpl implements MarriageIntakeService {
@@ -491,6 +490,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public void delete(UUID dossierId) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         afspraakRepository.deleteByDossier_Id(dossier.getId());
+        getuigenRepository.deleteByDossier_Id(dossier.getId());
         dossierRepository.delete(dossier);
     }
 

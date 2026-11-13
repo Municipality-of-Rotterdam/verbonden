@@ -127,6 +127,70 @@
     </section>
 
     <section class="rd-dossier-sectie">
+        <h2>Betalingen</h2>
+        <div wicket:id="teVeelBetaald"></div>
+        <table class="utrecht-table">
+            <thead class="utrecht-table__header">
+            <tr class="utrecht-table__row">
+                <th class="utrecht-table__header-cell">Gestart op</th>
+                <th class="utrecht-table__header-cell">Waarvoor</th>
+                <th class="utrecht-table__header-cell">Bedrag</th>
+                <th class="utrecht-table__header-cell">Status</th>
+                <th class="utrecht-table__header-cell">Afgerond op</th>
+                <th class="utrecht-table__header-cell">Betaald door (BSN)</th>
+                <th class="utrecht-table__header-cell">Betalingskenmerk</th>
+            </tr>
+            </thead>
+            <tbody class="utrecht-table__body">
+            <tr wicket:id="betalingen" class="utrecht-table__row">
+                <td class="utrecht-table__cell" wicket:id="gestartOp">-</td>
+                <td class="utrecht-table__cell" wicket:id="waarvoor">Aanvraag</td>
+                <td class="utrecht-table__cell" wicket:id="bedrag">-</td>
+                <td class="utrecht-table__cell" wicket:id="status">-</td>
+                <td class="utrecht-table__cell" wicket:id="afgerondOp">-</td>
+                <td class="utrecht-table__cell" wicket:id="betaler">-</td>
+                <td class="utrecht-table__cell" wicket:id="kenmerk">-</td>
+            </tr>
+            </tbody>
+        </table>
+        <p wicket:id="geenBetalingen"></p>
+    </section>
+
+    <section class="rd-dossier-sectie">
+        <div class="d-flex gap-3 align-items-baseline">
+            <h2>Betaalmutaties</h2>
+            <a wicket:id="betaalmutatieToevoegen">Toevoegen</a>
+        </div>
+        <p>Een bedrag dat het paar na het indienen nog online moet betalen, bijvoorbeeld voor een bijbesteld
+            trouwboekje. Het paar ziet het als "Te betalen" als het inlogt.</p>
+        <table class="utrecht-table">
+            <thead class="utrecht-table__header">
+            <tr class="utrecht-table__row">
+                <th class="utrecht-table__header-cell">Omschrijving</th>
+                <th class="utrecht-table__header-cell">Bedrag</th>
+                <th class="utrecht-table__header-cell">Status</th>
+                <th class="utrecht-table__header-cell">Toegevoegd</th>
+                <th class="utrecht-table__header-cell"></th>
+            </tr>
+            </thead>
+            <tbody class="utrecht-table__body">
+            <tr wicket:id="betaalmutaties" class="utrecht-table__row">
+                <td class="utrecht-table__cell" wicket:id="omschrijving">-</td>
+                <td class="utrecht-table__cell" wicket:id="bedrag">-</td>
+                <td class="utrecht-table__cell" wicket:id="status">-</td>
+                <td class="utrecht-table__cell" wicket:id="aangemaakt">-</td>
+                <td class="utrecht-table__cell">
+                    <form wicket:id="verwijderForm">
+                        <button wicket:id="verwijderen" type="submit"></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p wicket:id="geenBetaalmutaties"></p>
+    </section>
+
+    <section class="rd-dossier-sectie">
         <h2>Bestanden</h2>
         <table class="utrecht-table">
             <thead class="utrecht-table__header">
