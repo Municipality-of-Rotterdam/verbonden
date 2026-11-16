@@ -137,6 +137,7 @@ public class MarriageIntakePage extends IntakeBasePage {
         form.add(taalGroup);
         RadioGroup<CeremonieTaal> taalRadioGroup = taalGroup.getRadioGroup();
         taalRadioGroup.setRequired(true);
+        taalRadioGroup.setLabel(new ResourceModel("intake.taal.veldnaam"));
         taalGroup.add(new Label("taalToelichting", new ResourceModel("intake.taal.toelichting.html"))
                 .setEscapeModelStrings(false),
                 new RdRadioButton<>("nederlands", Model.of(CeremonieTaal.NEDERLANDS), taalRadioGroup),
