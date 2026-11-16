@@ -64,11 +64,16 @@ class DeDagPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990007", roles = "BURGER")
-    void kleineCeremonie_introNoemtDatJullieAlleenDeDatumKiezen() {
+    void kleineCeremonie_introNoemtDeGratisCeremonieEnDeDagKaarten() {
         startPage(maakDossier(CeremonieSoort.KLEIN));
 
-        tester.assertContains("Daarbij kiest u alleen de datum");
-        tester.assertContainsNot("Begin bij het onderdeel dat u het belangrijkst vindt");
+        tester.assertContains("Jullie hebben gekozen voor een gratis ceremonie.");
+        tester.assertContains("Die is altijd op maandagmorgen in de Felicitatiezaal van het stadhuis.");
+        tester.assertContains("De trouwambtenaar kunnen jullie niet zelf kiezen.");
+        tester.assertContains("Kies hieronder een datum voor de ceremonie. Vul daarna jullie gegevens in.");
+        tester.assertContains("Kies jullie datum");
+        tester.assertContains("Kies jullie trouwambtenaar");
+        tester.assertContainsNot("kleine ceremonie");
     }
 
     @Test

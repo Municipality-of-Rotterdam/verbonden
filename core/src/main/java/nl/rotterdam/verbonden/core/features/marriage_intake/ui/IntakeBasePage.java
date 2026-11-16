@@ -177,7 +177,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         stepQuestion.setVisible(stepQuestionModel != null);
         stepDetails.add(new Label("stepHeading", getStepHeadingModel()),
                 stepQuestion,
-                new Label("stepIntro", getStepIntroModel()));
+                new Label("stepIntro", getStepIntroModel()).setEscapeModelStrings(false));
 
         pageBody.add(
                 intakeHeader,

@@ -1,0 +1,18 @@
+<wicket:extend>
+
+<div class="container py-4">
+
+    <h2 class="utrecht-heading-2">Betalen (mock)</h2>
+    <p class="utrecht-paragraph">Dit is een testomgeving. Er wordt niet echt betaald.
+        Betalingskenmerk: <span wicket:id="kenmerk"></span></p>
+
+    <ul class="utrecht-unordered-list">
+        <li><a wicket:id="gelukt">Betaling gelukt</a></li>
+        <li><a wicket:id="mislukt">Betaling mislukt of afgebroken</a></li>
+        <li><a wicket:id="vertraagd">Bank meldt de uitslag pas na 10 seconden (gelukt)</a></li>
+        <li><a wicket:id="langzaam">Langzame bank: uitslag pas na 3 minuten (gelukt)</a></li>
+    </ul>
+
+</div>
+
+</wicket:extend>

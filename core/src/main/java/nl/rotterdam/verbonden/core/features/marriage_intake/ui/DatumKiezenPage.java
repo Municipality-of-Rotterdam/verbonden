@@ -10,6 +10,7 @@ import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.date_picker.RdDatePicker;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -141,5 +142,23 @@ public class DatumKiezenPage extends BurgerBasePage {
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
         response.render(MARRIAGE_INTAKE_CSS);
+        response.render(OnDomReadyHeaderItem.forScript("""
+                const datePicker = document.querySelector("rods-date-picker");
+                if (datePicker) {
+                    datePicker.i18n = {
+                        ...datePicker.i18n,
+                        nl: {
+                            ...datePicker.i18n.nl,
+                            afspraakLocale: "Uw ceremonie is op:",
+                            chooseDatumLabelLocale: "Kies een datum voor uw ceremonie.",
+                            descriptionLocale: "U kunt alleen kiezen uit de beschikbare dagen. De beschikbare dagen zijn groen in de kalender.",
+                            selectLocale: "Kies een datum voor uw ceremonie.",
+                            selectTimeLocale: "Kies hoe laat uw ceremonie moet beginnen.",
+                            timeDescLocale: "Tijden waaruit u kunt kiezen:",
+                            confirmLocale: "Deze datum en tijd bevestigen"
+                        }
+                    };
+                }
+                """));
     }
 }
