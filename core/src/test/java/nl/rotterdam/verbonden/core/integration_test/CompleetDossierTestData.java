@@ -1,5 +1,6 @@
 package nl.rotterdam.verbonden.core.integration_test;
 
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.features.location_administration.application.LocationAdministrationService;
@@ -70,6 +71,15 @@ public class CompleetDossierTestData {
         marriageIntakeService.slaGetuigenOp(dossierId, List.of(
                 new SaveGetuigenDto(1, "Kwik van Willegenburgh"),
                 new SaveGetuigenDto(2, "Kwek van Willegenburgh")));
+        return dossierId;
+    }
+
+    /**
+     * Een compleet dossier waarvoor betaald moet worden: een klein huwelijk is gratis, de internationale akte niet.
+     */
+    public UUID maakCompleetBetaaldDossier() {
+        UUID dossierId = maakCompleetDossier();
+        marriageIntakeService.slaExtrasOp(dossierId, new SaveExtrasDto(false, false, null, true));
         return dossierId;
     }
 

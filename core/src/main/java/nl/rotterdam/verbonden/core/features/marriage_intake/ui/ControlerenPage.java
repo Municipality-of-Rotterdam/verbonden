@@ -1,6 +1,12 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.application.OnlineBetalenService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BetalingLooptAlException;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BetalingStartResultaat;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
+import nl.rotterdam.verbonden.core.online_betalen.OnlineBetalenNietBeschikbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.OntbrekendOnderdeel;
@@ -21,8 +27,11 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.request.flow.RedirectToUrlException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wicketstuff.minis.behavior.EnabledModelBehavior;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
@@ -42,8 +51,13 @@ public class ControlerenPage extends IntakeBasePage {
     private static final DateTimeFormatter DATUM_FORMAT =
             DateTimeFormatter.ofPattern("d MMMM yyyy 'om' HH:mm", Locale.forLanguageTag("nl-NL"));
 
+    private static final Logger LOG = LoggerFactory.getLogger(ControlerenPage.class);
+
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
+
+    @SpringBean
+    private OnlineBetalenService onlineBetalenService;
 
     private final IModel<DossierSamenvattingDto> dossierModel =
             LoadableDetachableModel.of(() -> marriageIntakeService.findByDossierId(dossierId));
@@ -217,15 +231,50 @@ public class ControlerenPage extends IntakeBasePage {
         protected void onInitialize() {
             super.onInitialize();
             add(
-                    new RdButton("bevestigButton", new ResourceModel("controleren.bevestig")) {
+                    new RdButton("bevestigButton", dossierModel.map(dossier ->
+                            getString(moetBetalen(dossier) ? "controleren.bevestig.betalen" : "controleren.bevestig.indienen"))) {
                         @Override
                         public void onSubmit() {
-                            setResponsePage(BetalingPage.class, parameters());
+                            bevestigEnBetaal();
                         }
 
                     }.add(new EnabledModelBehavior(compleetModel)),
                     new NogNietCompleetHint(compleetModel)
             );
+        }
+    }
+
+    private static boolean moetBetalen(DossierSamenvattingDto dossier) {
+        return dossier.totalPrijs() != null && dossier.totalPrijs().isPositive();
+    }
+
+    /**
+     * Start de betaling: de burger gaat meteen naar de betaalprovider en komt daarna terug op de
+     * {@link BetalingRetourPage}. Kost het dossier niets, dan is het meteen ingediend.
+     */
+    private void bevestigEnBetaal() {
+        BetalingStartResultaat resultaat;
+        try {
+            resultaat = onlineBetalenService.startBetaling(dossierId, getCurrentBsn(), BetalingRetourUrl.voor(dossierId));
+        } catch (DossierNietWijzigbaarException e) {
+            // De andere partner heeft het dossier al ingediend
+            AanvraagStatusPage.respond(dossierId);
+            return;
+        } catch (DossierNietCompleetException e) {
+            setResponsePage(ControlerenPage.class, parameters());
+            return;
+        } catch (BetalingLooptAlException e) {
+            // Niet nog eens laten betalen: wacht op de uitslag van de bank
+            setResponsePage(BetalingRetourPage.class, parameters());
+            return;
+        } catch (OnlineBetalenNietBeschikbaarException e) {
+            LOG.warn("Betaling voor dossier {} kon niet starten", dossierId, e);
+            setResponsePage(naMislukteBetaling(dossierId));
+            return;
+        }
+        switch (resultaat) {
+            case BetalingStartResultaat.NaarBetaalprovider naar -> throw new RedirectToUrlException(naar.redirectUrl());
+            case BetalingStartResultaat.IngediendZonderBetaling ignored -> AanvraagStatusPage.respond(dossierId);
         }
     }
 

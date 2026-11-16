@@ -6,15 +6,19 @@
             <!-- Ringen uitwisselen -->
             <div wicket:id="ringenSection">
                 <h2 class="rd-extra-sectie__heading">
-                    <wicket:message key="extras.ringen.heading">Ringen uitwisselen tijdens ceremonie</wicket:message>
+                    <wicket:message key="extras.ringen.heading">Ringen uitwisselen</wicket:message>
                 </h2>
                 <p>
-                    <wicket:message key="extras.ringen.intro">Wilt u elkaar tijdens de ceremonie een ring omdoen?</wicket:message>
+                    <wicket:message key="extras.ringen.intro">Wilt u tijdens de ceremonie een ring bij elkaar omdoen?</wicket:message>
                 </p>
-                <div class="rd-extra-keuze-item d-flex align-items-center gap-2">
+                <div wicket:id="ringenUitwisselenGroup" class="rd-extra-keuze-item d-flex align-items-center gap-2">
                     <label>
-                        <input type="checkbox" wicket:id="ringenUitwisselenCheckbox"/>
-                        <wicket:message key="extras.ringen.label">Ringen uitwisselen</wicket:message>
+                        <input type="radio" wicket:id="ringenUitwisselenJa"/>
+                        <wicket:message key="extras.ringen.ja">Ja</wicket:message>
+                    </label>
+                    <label>
+                        <input type="radio" wicket:id="ringenUitwisselenNee"/>
+                        <wicket:message key="extras.ringen.nee">Nee</wicket:message>
                     </label>
                 </div>
             </div>

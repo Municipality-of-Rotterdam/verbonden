@@ -2,12 +2,9 @@ package nl.rotterdam.verbonden.core.features.babs_administration.ui;
 
 import nl.rotterdam.verbonden.core.administration_common.AdministrationBasePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.application.BabsAdministrationService;
-import nl.rotterdam.verbonden.core.features.babs_administration.application.BabsImportService;
-import nl.rotterdam.verbonden.core.features.babs_administration.domain.BabsImportResult;
 import nl.rotterdam.verbonden.core.features.babs_administration.domain.ListBabsDto;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
-import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
 import nl.rotterdam.nl_design_system.wicket.components.icon_button.RdIconAjaxButtonBorder;
 import nl.rotterdam.nl_design_system.wicket.components.table.RdDataTable;
 import org.apache.wicket.AttributeModifier;
@@ -45,9 +42,6 @@ public class BabsAdministrationPage extends AdministrationBasePage {
     @SpringBean
     private BabsAdministrationService babsAdministrationService;
 
-    @SpringBean
-    private BabsImportService babsImportService;
-
     public BabsAdministrationPage() {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         feedback.setOutputMarkupId(true);
@@ -55,29 +49,6 @@ public class BabsAdministrationPage extends AdministrationBasePage {
 
         pageBody.add(new BookmarkablePageLink<>("nieuwBabsLink", BabsCreatePage.class)
                 .setVisible(magOpenen(BabsCreatePage.class)));
-
-        // Importeren en (in)actief maken is beheer van BABS, net als BabsUpdatePage; niet voor een BABS zelf
-        Form<?> importForm = new Form<>("importForm");
-        importForm.setVisible(magOpenen(BabsUpdatePage.class));
-        importForm.add(new RdAjaxButton("importeerButton") {
-            @Override
-            protected void onSubmit(AjaxRequestTarget target) {
-                BabsImportResult result = babsImportService.importeerVanRotterdam();
-                if (result.errors() == 0) {
-                    success("Import voltooid: " + result.imported() + " BABS geïmporteerd.");
-                } else {
-                    warn("Import klaar: " + result.imported() + " geïmporteerd, "
-                            + result.errors() + " fouten.");
-                }
-                target.add(feedback);
-            }
-
-            @Override
-            protected void onError(AjaxRequestTarget target) {
-                target.add(feedback);
-            }
-        });
-        pageBody.add(importForm);
 
         pageBody.add(buildBabsTable());
     }
