@@ -39,25 +39,31 @@ class TaalEnAantalBezoekersIntegrationTest {
         UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
 
         marriageIntakeService.slaTaalOp(dossierId, CeremonieTaal.FRANS);
-        marriageIntakeService.slaAantalBezoekersOp(dossierId, 3);
+        marriageIntakeService.slaAantalBezoekersOp(dossierId, 5);
 
         var dossier = marriageIntakeService.findByDossierId(dossierId);
         assertThat(dossier.taal()).isEqualTo(CeremonieTaal.FRANS);
-        assertThat(dossier.aantalBezoekers()).isEqualTo(3);
+        assertThat(dossier.aantalBezoekers()).isEqualTo(5);
         assertThat(dossier.ontbrekendeOnderdelen())
                 .doesNotContain(OntbrekendOnderdeel.TAAL, OntbrekendOnderdeel.AANTAL_BEZOEKERS);
     }
 
     @ParameterizedTest(name = "{0}: {1} bezoekers toegestaan = {2}")
     @CsvSource({
+            "KLEIN, 3, false",
             "KLEIN, 4, true",
-            "KLEIN, 5, false",
+            "KLEIN, 8, true",
+            "KLEIN, 9, false",
+            "MIDDELGROOT, 5, false",
+            "MIDDELGROOT, 6, true",
             "MIDDELGROOT, 16, true",
             "MIDDELGROOT, 17, false",
+            "GROOT, 5, false",
+            "GROOT, 6, true",
             "GROOT, 100, true",
             "GROOT, 101, false",
             "GROOT, -1, false"})
-    void aantalBezoekers_isBeperktDoorHetMaximumVanDeCeremonie(CeremonieSoort soort, int aantal, boolean toegestaan) {
+    void aantalBezoekers_isBeperktDoorHetMinimumEnMaximumVanDeCeremonie(CeremonieSoort soort, int aantal, boolean toegestaan) {
         UUID dossierId = maakDossier(soort);
 
         if (toegestaan) {
@@ -76,6 +82,17 @@ class TaalEnAantalBezoekersIntegrationTest {
 
         marriageIntakeService.updateIntake(dossierId,
                 new ChangeIntakeDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null));
+
+        assertThat(marriageIntakeService.findByDossierId(dossierId).aantalBezoekers()).isNull();
+    }
+
+    @Test
+    void anderCeremonie_latHetTeKleineAantalBezoekersVervallen() {
+        UUID dossierId = maakDossier(CeremonieSoort.KLEIN);
+        marriageIntakeService.slaAantalBezoekersOp(dossierId, 4);
+
+        marriageIntakeService.updateIntake(dossierId,
+                new ChangeIntakeDto(RegistratieType.HUWELIJK, CeremonieSoort.MIDDELGROOT, null));
 
         assertThat(marriageIntakeService.findByDossierId(dossierId).aantalBezoekers()).isNull();
     }

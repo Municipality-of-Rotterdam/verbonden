@@ -64,7 +64,7 @@ public class DossierCeremonieUpdatePage extends DossierBeheerBasePage {
                     new RdFormFieldTextInput<>("aantalBezoekers",
                             LambdaModel.of(model, CeremonieFormDto::getAantalBezoekers, CeremonieFormDto::setAantalBezoekers),
                             Model.of("Aantal bezoekers"),
-                            Model.of("Maximaal 4 bij een klein en 16 bij een middelgroot huwelijk en bij een groot huwelijk is het maximum 100"))
+                            Model.of("Minimaal 4 bij een klein en 6 bij een middelgroot of groot huwelijk. Maximaal 8 bij een klein, 16 bij een middelgroot en 100 bij een groot huwelijk"))
                             .setHtmlInputType("number")
                             .setModelType(Integer.class)
                             .setRequired(true),
@@ -75,9 +75,10 @@ public class DossierCeremonieUpdatePage extends DossierBeheerBasePage {
         @Override
         protected void onSubmit() {
             CeremonieFormDto f = getModelObject();
-            if (f.getAantalBezoekers() < 0 || f.getAantalBezoekers() > f.getCeremonieSoort().getMaxAantalBezoekers()) {
-                error( "Bij een " + f.getCeremonieSoort().getLabel().toLowerCase() + " huwelijk mogen maximaal "
-                        + f.getCeremonieSoort().getMaxAantalBezoekers() + " bezoekers komen.");
+            if (f.getAantalBezoekers() < f.getCeremonieSoort().getMinAantalBezoekers() || f.getAantalBezoekers() > f.getCeremonieSoort().getMaxAantalBezoekers()) {
+                error( "Bij een " + f.getCeremonieSoort().getLabel().toLowerCase() + " huwelijk komen minimaal "
+                        + f.getCeremonieSoort().getMinAantalBezoekers() + " en maximaal "
+                        + f.getCeremonieSoort().getMaxAantalBezoekers() + " bezoekers.");
                 return;
             }
             dossierAdministrationService.updateCeremonie(dossierId,

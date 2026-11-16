@@ -2,9 +2,11 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.domain;
 
 public enum CeremonieSoort {
 
-    KLEIN("Klein", 2, 4),
+    KLEIN("Klein", 2, 8),
     MIDDELGROOT("Middelgroot", 4, 16),
     GROOT("Groot", 4, 100);
+
+    private static final int AANTAL_PARTNERS = 2;
 
     private final String label;
     private final int aantalGetuigen;
@@ -25,6 +27,13 @@ public enum CeremonieSoort {
      */
     public int getAantalGetuigen() {
         return aantalGetuigen;
+    }
+
+    /**
+     * Het minimale aantal bezoekers: beide partners en de getuigen tellen mee.
+     */
+    public int getMinAantalBezoekers() {
+        return AANTAL_PARTNERS + aantalGetuigen;
     }
 
     /**

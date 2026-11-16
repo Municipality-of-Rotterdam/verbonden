@@ -154,7 +154,7 @@ class AutomatischeBetaalmutatieIntegrationTest {
         Bedrag voor = dossierAdministrationService.findDetail(dossierId).totaalPrijs();
 
         dossierAdministrationService.updateCeremonie(dossierId,
-                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.MIDDELGROOT, CeremonieTaal.NEDERLANDS, 4));
+                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.MIDDELGROOT, CeremonieTaal.NEDERLANDS, 6));
 
         Bedrag na = dossierAdministrationService.findDetail(dossierId).totaalPrijs();
         assertThat(na.isPositive()).isTrue();

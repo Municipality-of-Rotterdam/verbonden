@@ -245,7 +245,7 @@ public class HuwelijksDossierEntity {
 
     /**
      * Wijzigt het soort registratie en de ceremonie. Muziek kan alleen bij een grote ceremonie. Een eerder
-     * opgegeven aantal bezoekers vervalt wanneer het niet binnen het maximum van de nieuwe ceremonie past.
+     * opgegeven aantal bezoekers vervalt wanneer het niet binnen de grenzen van de nieuwe ceremonie past.
      */
     public void wijzigCeremonie(RegistratieType registratieType, CeremonieSoort ceremonieSoort,
                                 TrouwlocatieEntity locatie) {
@@ -255,7 +255,8 @@ public class HuwelijksDossierEntity {
         if (ceremonieSoort != CeremonieSoort.GROOT) {
             this.muziek = false;
         }
-        if (aantalBezoekers != null && aantalBezoekers > ceremonieSoort.getMaxAantalBezoekers()) {
+        if (aantalBezoekers != null && (aantalBezoekers < ceremonieSoort.getMinAantalBezoekers()
+                || aantalBezoekers > ceremonieSoort.getMaxAantalBezoekers())) {
             this.aantalBezoekers = null;
         }
     }
@@ -275,10 +276,10 @@ public class HuwelijksDossierEntity {
     /**
      * Legt het aantal bezoekers vast.
      *
-     * @throws IllegalArgumentException wanneer het aantal negatief is of boven het maximum van de ceremonie ligt
+     * @throws IllegalArgumentException wanneer het aantal buiten het minimum en maximum van de ceremonie ligt
      */
     public void wijzigAantalBezoekers(int aantalBezoekers) {
-        if (aantalBezoekers < 0 || aantalBezoekers > ceremonieSoort.getMaxAantalBezoekers()) {
+        if (aantalBezoekers < ceremonieSoort.getMinAantalBezoekers() || aantalBezoekers > ceremonieSoort.getMaxAantalBezoekers()) {
             throw new IllegalArgumentException("Aantal bezoekers " + aantalBezoekers
                     + " is niet toegestaan bij ceremonie " + ceremonieSoort);
         }

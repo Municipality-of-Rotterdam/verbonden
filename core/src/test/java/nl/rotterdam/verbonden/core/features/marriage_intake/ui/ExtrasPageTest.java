@@ -12,10 +12,13 @@ import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.Cr
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.visit.IVisit;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
@@ -135,7 +138,7 @@ class ExtrasPageTest extends BaseWicketTest {
 
     @Test
     @WithMockUser(username = "999990020")
-    void aantalBezoekersToontHetMaximumVanDeCeremonie() {
+    void aantalBezoekersToontMinimumEnMaximumVanDeCeremonie() {
         UUID dossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
                         new BurgerServiceNummer("999990020")));
@@ -143,8 +146,40 @@ class ExtrasPageTest extends BaseWicketTest {
         tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
 
         assertThat(tester.getLastResponseAsString())
-                .contains("U mag met maximaal 4 bezoekers komen, inclusief beide partners en de getuigen.")
+                .contains("Het aantal bezoekers is minimaal 4 en maximaal 8. Beide partners en de getuigen tellen mee.")
                 .doesNotContain("{0}");
+    }
+
+    @ParameterizedTest(name = "{0}: {1} bezoekers geldig = {2}")
+    @CsvSource({
+            "KLEIN, 3, false",
+            "KLEIN, 4, true",
+            "KLEIN, 8, true",
+            "KLEIN, 9, false",
+            "MIDDELGROOT, 5, false",
+            "MIDDELGROOT, 6, true",
+            "MIDDELGROOT, 16, true",
+            "MIDDELGROOT, 17, false",
+            "GROOT, 5, false",
+            "GROOT, 6, true"})
+    @WithMockUser(username = "999990007")
+    void aantalBezoekersValideertMinimumEnMaximumVanDeCeremonie(CeremonieSoort soort, int aantal, boolean geldig) {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, soort, null,
+                        new BurgerServiceNummer("999990007")));
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        TextField<?> veld = tester.getLastRenderedPage().visitChildren(TextField.class,
+                (TextField<?> tf, IVisit<TextField<?>> visit) -> {
+                    if (tf.getInputName().toLowerCase().contains("aantalbezoekers")) {
+                        visit.stop(tf);
+                    }
+                });
+        tester.getRequest().getPostParameters().setParameterValue(veld.getInputName(), String.valueOf(aantal));
+        veld.inputChanged();
+        veld.validate();
+
+        assertThat(veld.isValid()).isEqualTo(geldig);
     }
 
     private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, BurgerServiceNummer bsn) {
