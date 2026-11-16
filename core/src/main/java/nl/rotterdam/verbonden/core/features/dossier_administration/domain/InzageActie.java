@@ -9,5 +9,8 @@ public enum InzageActie {
     DOSSIER_BEKEKEN,
 
     /** Een aan het dossier toegevoegd bestand gedownload. */
-    BESTAND_GEDOWNLOAD
+    BESTAND_GEDOWNLOAD,
+
+    /** De inhoud van een aan de partners verstuurde e-mail bekeken. */
+    EMAIL_BEKEKEN
 }

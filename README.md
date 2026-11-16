@@ -10,6 +10,7 @@ Deze codebase bestaat uit de volgende features:
 - Beheer van Buitengewoon Ambtenaren van de Burgerlijke Stand (BABS)
 - Beheren van Gemeentelijke locaties
 - Beheren van dossiers
+- Online betalen bij het indienen, en van latere wijzigingen (betaalmutaties)
 
 Dit is een proof-of-concept: de functionaliteit is nog incompleet en wordt
 actief doorontwikkeld. Zie [publiccode.yml](publiccode.yml) voor de
@@ -24,6 +25,7 @@ Dit project heeft de status: **development** (proof-of-concept). Zie
 
 - [Applicatie-architectuur](docs/applicatie-architectuur.md)
 - [Beoogde koppelingen](docs/beoogde-koppelingen.md)
+- [Online betalen](docs/online-betalen.md)
 - [Checklist organisatorische stappen open source publicatie](docs/open-source-publicatie-checklist.md)
 
 ## Modules
@@ -71,6 +73,17 @@ een eventuele lokale PostgreSQL-installatie te vermijden).
 | Database | `verbonden` |
 | Gebruiker | `verbonden` |
 | Wachtwoord | `verbonden` |
+
+Dezelfde Compose-opzet start ook **Mailpit**, een lokale mailserver die alle e-mail opvangt
+(bijvoorbeeld de bevestigingsmail na het indienen van een aanvraag). SMTP draait op poort `1025`;
+de ontvangen e-mails bekijkt u op <http://localhost:8025>.
+
+De mailserver en de afzender stelt u in met `spring.mail.*` en `verbonden.mail.*` in
+`app-local/src/main/resources/application.properties`. Daar staan ook de instellingen voor het opnieuw
+proberen als verzenden mislukt. De SMTP-timeouts staan standaard op 10 seconden (`SmtpTimeoutConfig`). Elke
+partner krijgt een eigen e-mail. E-mails worden met inhoud, ontvanger en elke verzendpoging bij het dossier
+vastgelegd en zijn in het dossierbeheer te bekijken. De HTML-templates staan in
+`core/src/main/resources/mail-templates`.
 
 Stop de database later met:
 

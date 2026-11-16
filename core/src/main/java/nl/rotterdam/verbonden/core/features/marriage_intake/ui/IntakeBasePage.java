@@ -168,7 +168,7 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         WebMarkupContainer stepDetails = new WebMarkupContainer("stepDetails");
         stepDetails.setVisible(intakeStepLayout);
         stepDetails.add(new Label("stepHeading", getStepHeadingModel()),
-                new Label("stepIntro", getStepIntroModel()));
+                new Label("stepIntro", getStepIntroModel()).setEscapeModelStrings(false));
 
         pageBody.add(
                 intakeHeader,
