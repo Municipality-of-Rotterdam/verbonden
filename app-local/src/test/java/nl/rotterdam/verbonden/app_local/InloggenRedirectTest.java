@@ -4,6 +4,7 @@ import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.net.CookieManager;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * inloggen op die link terugkomen en niet op de startpagina.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 @AutoConfigureEmbeddedDatabase(provider = EMBEDDED)
 class InloggenRedirectTest {
 
