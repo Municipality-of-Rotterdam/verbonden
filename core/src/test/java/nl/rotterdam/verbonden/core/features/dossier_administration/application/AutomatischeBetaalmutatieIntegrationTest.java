@@ -9,6 +9,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.application.Marriage
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.OnlineBetalenService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BetaaloverzichtDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveExtrasDto;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.application.TrouwboekjeAdministrationService;
@@ -153,7 +154,7 @@ class AutomatischeBetaalmutatieIntegrationTest {
         Bedrag voor = dossierAdministrationService.findDetail(dossierId).totaalPrijs();
 
         dossierAdministrationService.updateCeremonie(dossierId,
-                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.MIDDELGROOT));
+                new ChangeCeremonieDto(RegistratieType.HUWELIJK, CeremonieSoort.MIDDELGROOT, CeremonieTaal.NEDERLANDS, 4));
 
         Bedrag na = dossierAdministrationService.findDetail(dossierId).totaalPrijs();
         assertThat(na.isPositive()).isTrue();
