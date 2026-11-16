@@ -6,6 +6,7 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePage;
+import nl.rotterdam.verbonden.core.features.betaling_administration.ui.BetalingAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
@@ -143,7 +144,6 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
         tester.startPage(BabsAdministrationPage.class);
 
         tester.assertInvisible(pad("nieuwBabsLink"));
-        tester.assertInvisible(pad("importForm"));
         assertThat(tester.getLastResponseAsString()).doesNotContain("Acties");
         assertThat(menuItems()).containsExactly("BABS");
     }
@@ -156,7 +156,6 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
         tester.startPage(BabsAdministrationPage.class);
 
         tester.assertVisible(pad("nieuwBabsLink"));
-        tester.assertVisible(pad("importForm"));
         assertThat(tester.getLastResponseAsString()).contains("Acties");
 
         List<String> verwachteMenuItems = Stream.of(
@@ -164,6 +163,7 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
                         Map.entry("Trouwlocaties", LocationAdministrationPage.class),
                         Map.entry("Huwelijkstypen", MarriageTypeAdministrationPage.class),
                         Map.entry("Dossiers", DossierAdministrationPage.class),
+                        Map.entry("Betalingen", BetalingAdministrationPage.class),
                         Map.entry("Trouwboekjes", TrouwboekjeAdministrationPage.class))
                 .filter(item -> verwachtToegang(item.getValue(), rol))
                 .map(Map.Entry::getKey)

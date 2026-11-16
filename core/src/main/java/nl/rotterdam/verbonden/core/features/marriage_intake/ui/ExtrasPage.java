@@ -9,11 +9,14 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKe
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.Radio;
+import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
@@ -137,16 +140,18 @@ public class ExtrasPage extends IntakeBasePage {
 
             // --- Ringen uitwisselen ---
             WebMarkupContainer ringenSection = new WebMarkupContainer("ringenSection");
-            CheckBox ringenCheckbox = new CheckBox("ringenUitwisselenCheckbox",
+            RadioGroup<Boolean> ringenUitwisselenGroup = new RadioGroup<>("ringenUitwisselenGroup",
                     LambdaModel.of(model, ExtrasFormDto::isRingenUitwisselen, ExtrasFormDto::setRingenUitwisselen));
-            ringenCheckbox.add(new AjaxFormComponentUpdatingBehavior("change") {
+            ringenUitwisselenGroup.add(new Radio<>("ringenUitwisselenJa", Model.of(true), ringenUitwisselenGroup),
+                    new Radio<>("ringenUitwisselenNee", Model.of(false), ringenUitwisselenGroup));
+            ringenUitwisselenGroup.add(new AjaxFormChoiceComponentUpdatingBehavior() {
                 @Override
                 protected void onUpdate(AjaxRequestTarget target) {
                     slaOp();
                     target.add(keuzesSidebar);
                 }
             });
-            ringenSection.add(ringenCheckbox);
+            ringenSection.add(ringenUitwisselenGroup);
 
             // --- Muziek ---
             WebMarkupContainer muziekSection = new WebMarkupContainer("muziekSection") {

@@ -3,6 +3,7 @@ package nl.rotterdam.verbonden.core.administration_common;
 import de.agilecoders.wicket.webjars.request.resource.WebjarsCssResourceReference;
 import nl.rotterdam.verbonden.core.WicketApplication;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
+import nl.rotterdam.verbonden.core.features.betaling_administration.ui.BetalingAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
@@ -64,6 +65,7 @@ public abstract class AdministrationBasePage extends WebPage {
             new NavigationItem("Trouwlocaties", RotterdamIconType.LOCATION, LocationAdministrationPage.class),
             new NavigationItem("Huwelijkstypen", RotterdamIconType.RING, MarriageTypeAdministrationPage.class),
             new NavigationItem("Dossiers", RotterdamIconType.DOCUMENT, DossierAdministrationPage.class),
+            new NavigationItem("Betalingen", RotterdamIconType.MONEY, BetalingAdministrationPage.class),
             new NavigationItem("Trouwboekjes", RotterdamIconType.FILE, TrouwboekjeAdministrationPage.class)
     );
 

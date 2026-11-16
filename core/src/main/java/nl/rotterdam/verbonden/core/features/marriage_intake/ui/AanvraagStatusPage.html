@@ -9,6 +9,24 @@
         </div>
     </section>
 
+    <div wicket:id="betalingMislukt"></div>
+
+    <section wicket:id="teBetalen" class="rd-aanvraag-vervolg" aria-labelledby="tebetalen-heading">
+        <h2 id="tebetalen-heading" class="rd-aanvraag-vervolg__titel">
+            <wicket:message key="aanvraag.status.tebetalen.titel">Te betalen</wicket:message>
+        </h2>
+        <p><wicket:message key="aanvraag.status.tebetalen.tekst">U moet nog iets betalen. Dat kan hier online.</wicket:message></p>
+        <ul class="utrecht-unordered-list">
+            <li wicket:id="mutaties" class="utrecht-unordered-list__item">
+                <span wicket:id="omschrijving">Trouwboekje</span>: <strong wicket:id="bedrag">&euro; 40,00</strong>
+                <form wicket:id="betalenForm">
+                    <button wicket:id="betalen" type="submit"></button>
+                </form>
+                <p wicket:id="inBehandeling">Uw betaling is in behandeling.</p>
+            </li>
+        </ul>
+    </section>
+
     <section wicket:id="vervolg" class="rd-aanvraag-vervolg" aria-labelledby="vervolg-heading">
         <h2 id="vervolg-heading" class="rd-aanvraag-vervolg__titel">
             <wicket:message key="aanvraag.status.vervolg.titel">Wat gebeurt er nu?</wicket:message>
@@ -23,17 +41,13 @@
                     <wicket:message key="aanvraag.status.stap.ingediend.tekst">Uw keuzes zijn definitief vastgelegd.</wicket:message>
                 </span>
             </li>
+            <li wicket:id="stapBetaling" class="rd-aanvraag-stap">
+                <span wicket:id="betalingTitel" class="rd-aanvraag-stap__titel">Betaling gelukt</span>
+                <span wicket:id="betalingTekst" class="rd-aanvraag-stap__tekst">Wij hebben uw betaling ontvangen.</span>
+            </li>
             <li wicket:id="stapBeoordeling" class="rd-aanvraag-stap">
                 <span wicket:id="beoordelingTitel" class="rd-aanvraag-stap__titel">In behandeling</span>
                 <span wicket:id="beoordelingTekst" class="rd-aanvraag-stap__tekst">De gemeente controleert uw aanvraag.</span>
-            </li>
-            <li wicket:id="stapFactuur" class="rd-aanvraag-stap">
-                <span class="rd-aanvraag-stap__titel">
-                    <wicket:message key="aanvraag.status.stap.factuur.titel">Factuur</wicket:message>
-                </span>
-                <span class="rd-aanvraag-stap__tekst">
-                    <wicket:message key="aanvraag.status.stap.factuur.tekst">Rotterdam stuurt u een factuur voor de kosten.</wicket:message>
-                </span>
             </li>
             <li wicket:id="stapDeDag" class="rd-aanvraag-stap">
                 <span class="rd-aanvraag-stap__titel">

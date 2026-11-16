@@ -11,6 +11,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierIngediendEvent;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
@@ -39,6 +40,7 @@ import nl.rotterdam.verbonden.core.persistence.MarriageTypeEntity;
 import nl.rotterdam.verbonden.core.persistence.MarriageTypeLocationEntity;
 import nl.rotterdam.verbonden.core.persistence.TrouwlocatieEntity;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +50,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
-import java.util.UUID;
 
 @Service
 class MarriageIntakeServiceImpl implements MarriageIntakeService {
@@ -63,6 +64,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final TrouwboekjeRepository trouwboekjeRepository;
     private final PersonLookupService personLookupService;
     private final Clock clock;
+    private final ApplicationEventPublisher eventPublisher;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
                               LocatieRepository locatieRepository,
@@ -73,7 +75,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               GetuigenRepository getuigenRepository,
                               TrouwboekjeRepository trouwboekjeRepository,
                               PersonLookupService personLookupService,
-                              Clock clock) {
+                              Clock clock,
+                              ApplicationEventPublisher eventPublisher) {
         this.dossierRepository = dossierRepository;
         this.locatieRepository = locatieRepository;
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
@@ -84,6 +87,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         this.trouwboekjeRepository = trouwboekjeRepository;
         this.personLookupService = personLookupService;
         this.clock = clock;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -317,6 +321,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         dossier.setInternationaleAktePrijs(dossier.isInternationaleAkte()
                 ? InternationaleAkteTarief.prijsOp(ingediendOp.toLocalDate())
                 : null);
+        eventPublisher.publishEvent(new DossierIngediendEvent(dossierId));
     }
 
     @Override
@@ -506,6 +511,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public void delete(UUID dossierId) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         afspraakRepository.deleteByDossier_Id(dossier.getId());
+        getuigenRepository.deleteByDossier_Id(dossier.getId());
         dossierRepository.delete(dossier);
     }
 

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wij hebben uw aanvraag ontvangen</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f3f3;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f3f3;">
+    <tr>
+        <td align="center" style="padding:24px 12px;">
+            <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+                   style="max-width:600px;width:100%;background-color:#ffffff;">
+                <tr>
+                    <td style="background-color:#00811f;padding:20px 24px;color:#ffffff;font-size:20px;font-weight:bold;">
+                        Gemeente Rotterdam
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:24px;font-size:16px;line-height:24px;">
+                        <h1 style="margin:0 0 16px 0;font-size:24px;line-height:32px;">Wij hebben uw aanvraag ontvangen</h1>
+                        <p style="margin:0 0 16px 0;">Beste {{aanhef}},</p>
+                        <p style="margin:0 0 16px 0;">
+                            Bedankt voor uw aanvraag. Hieronder ziet u nog een keer wat u heeft gekozen.
+                            Hierna leest u hoe het verder gaat.
+                        </p>
+
+                        <h2 style="margin:24px 0 8px 0;font-size:18px;">Uw keuze</h2>
+                        <table role="presentation" width="100%" cellpadding="4" cellspacing="0">
+                            <tr>
+                                <td style="width:40%;color:#555555;">Wat u wilt regelen</td>
+                                <td>{{registratieType}}</td>
+                            </tr>
+                            <tr>
+                                <td style="color:#555555;">Soort ceremonie</td>
+                                <td>{{ceremonieSoort}}</td>
+                            </tr>
+                            {{#ceremoniePrijs}}
+                            <tr>
+                                <td style="color:#555555;">Kosten ceremonie</td>
+                                <td>{{ceremoniePrijs}}</td>
+                            </tr>
+                            {{/ceremoniePrijs}}
+                            {{#datum}}
+                            <tr>
+                                <td style="color:#555555;">Datum en tijd</td>
+                                <td>{{datum}} om {{tijd}}</td>
+                            </tr>
+                            {{/datum}}
+                            {{#locatie}}
+                            <tr>
+                                <td style="color:#555555;">Locatie</td>
+                                <td>{{locatie}}</td>
+                            </tr>
+                            {{/locatie}}
+                        </table>
+
+                        <h2 style="margin:24px 0 8px 0;font-size:18px;">Uw namen</h2>
+                        <ul style="margin:0;padding-left:20px;">
+                            {{#partners}}
+                            <li>{{naam}}</li>
+                            {{/partners}}
+                        </ul>
+
+                        <h2 style="margin:24px 0 8px 0;font-size:18px;">Getuigen</h2>
+                        <ul style="margin:0;padding-left:20px;">
+                            {{#getuigen}}
+                            <li>{{naam}}</li>
+                            {{/getuigen}}
+                        </ul>
+
+                        <h2 style="margin:24px 0 8px 0;font-size:18px;">Extra's</h2>
+                        {{^extras}}
+                        <p style="margin:0;">U heeft geen extra's gekozen.</p>
+                        {{/extras}}
+                        <ul style="margin:0;padding-left:20px;">
+                            {{#extras}}
+                            <li>{{naam}}{{#prijs}} ({{prijs}}){{/prijs}}</li>
+                            {{/extras}}
+                        </ul>
+
+                        {{#totaalPrijs}}
+                        <p style="margin:24px 0 0 0;font-weight:bold;">Totaal: {{totaalPrijs}}</p>
+                        {{/totaalPrijs}}
+
+                        <h2 style="margin:32px 0 8px 0;font-size:18px;">Wat gebeurt er nu?</h2>
+                        <ol style="margin:0;padding-left:20px;">
+                            <li style="margin-bottom:8px;"><strong>Uw aanvraag is ingediend.</strong>
+                                Uw keuzes zijn vastgelegd. U kunt ze zelf niet meer wijzigen.</li>
+                            <li style="margin-bottom:8px;"><strong>De gemeente controleert uw aanvraag.</strong>
+                                U hoort van ons als de aanvraag is beoordeeld.</li>
+                            <li style="margin-bottom:8px;"><strong>U krijgt een factuur.</strong>
+                                Rotterdam stuurt u een factuur voor de kosten.</li>
+                            <li style="margin-bottom:8px;"><strong>Uw dag.</strong>
+                                Wij zien u graag op de dag van uw ceremonie.</li>
+                        </ol>
+
+                        <p style="margin:24px 0 0 0;">
+                            Wilt u iets wijzigen of heeft u een vraag? Neem dan contact met ons op.
+                        </p>
+                        <p style="margin:16px 0 0 0;">Met vriendelijke groet,<br>Gemeente Rotterdam</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:16px 24px;background-color:#f3f3f3;font-size:12px;color:#555555;">
+                        U kunt niet antwoorden op deze e-mail.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
