@@ -23,10 +23,12 @@ public enum IntakeStep {
 
     public static Class<? extends Page> pageVoor(OntbrekendOnderdeel onderdeel) {
         return switch (onderdeel) {
+            case TAAL -> MIJN_DAG.pageClass;
             case DATUM -> DatumKiezenPage.class;
             case LOCATIE -> DE_DAG.pageClass;
             case PARTNER_GEKOPPELD, ACHTERNAMEN -> JULLIE_GEGEVENS.pageClass;
             case GETUIGEN -> DE_GETUIGEN.pageClass;
+            case AANTAL_BEZOEKERS -> EXTRAS.pageClass;
         };
     }
 }

@@ -160,6 +160,8 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                 dossier.getIngediendOp(),
                 dossier.getRegistratieType(),
                 dossier.getCeremonieSoort(),
+                dossier.getTaal(),
+                dossier.getAantalBezoekers(),
                 samenvatting.huwelijksLocatie(),
                 samenvatting.datumTijdHuwelijk(),
                 samenvatting.prijs(),
@@ -332,6 +334,8 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         DossierSamenvattingDto voor = samenvattingVoorMeerprijs(dossier);
         dossier.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), locatieVoor(dto.ceremonieSoort()));
+        dossier.wijzigTaal(dto.taal());
+        dossier.wijzigAantalBezoekers(dto.aantalBezoekers());
         if (voor != null) {
             voegBetaalmutatieToeVoorMeerprijs(dossier, voor, marriageIntakeService.findByDossierId(dossierId),
                     "Ceremonie gewijzigd naar " + dto.ceremonieSoort().getLabel().toLowerCase());

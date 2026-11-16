@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.application;
 
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
@@ -35,6 +36,18 @@ public interface MarriageIntakeService {
     UUID create(CreateDossierDto dto);
 
     void updateIntake(UUID dossierId, ChangeIntakeDto dto);
+
+    /**
+     * Legt de taal vast waarin de ceremonie plaatsvindt.
+     */
+    void slaTaalOp(UUID dossierId, CeremonieTaal taal);
+
+    /**
+     * Legt het aantal bezoekers vast.
+     *
+     * @throws IllegalArgumentException wanneer het aantal negatief is of boven het maximum van de ceremonie ligt
+     */
+    void slaAantalBezoekersOp(UUID dossierId, int aantalBezoekers);
 
     /**
      * Returns the UUID of the active dossier (see {@link DossierStatus#ACTIEF}) in which the given BSN appears

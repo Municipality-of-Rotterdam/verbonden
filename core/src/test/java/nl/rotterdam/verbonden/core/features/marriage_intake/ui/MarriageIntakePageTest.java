@@ -1,6 +1,8 @@
 package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
+import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.util.visit.IVisit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.http.client.HttpRedirects;
@@ -38,7 +40,7 @@ class MarriageIntakePageTest extends BaseWicketTest {
                 .contains("rd-intake-content--unbordered")
                 .contains("rd-intake-step-layout--first-step")
                 .contains("rd-ceremonie-kaart");
-        assertThat(html.split("class=\"rd-card", -1)).hasSize(3);
+        assertThat(html.split("class=\"rd-card", -1)).hasSize(4);
     }
 
     /**
@@ -80,6 +82,24 @@ class MarriageIntakePageTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString())
                 .containsPattern("Gefeliciteerd!\\s*<br/>\\s*Hier doen jullie")
                 .containsPattern("ceremonie\\.\\s*<br/>\\s*Zoiets doet u");
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void zonderTaalToontEenBegrijpelijkeMelding() {
+        tester.startPage(MarriageIntakePage.class);
+
+        RadioGroup<?> taalRadioGroup = tester.getLastRenderedPage().visitChildren(RadioGroup.class,
+                (RadioGroup<?> group, IVisit<RadioGroup<?>> visit) -> {
+                    if ("taalGroup".equals(group.getParent().getId())) {
+                        visit.stop(group);
+                    }
+                });
+        taalRadioGroup.inputChanged();
+        taalRadioGroup.validate();
+
+        assertThat(taalRadioGroup.getFeedbackMessages().first().getMessage().toString())
+                .isEqualTo("Kies de taal van de ceremonie.");
     }
 
     /**

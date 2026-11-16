@@ -10,13 +10,15 @@ public class ExtrasFormDto implements Serializable {
     private boolean muziek;
     private Long trouwboekjeId;
     private boolean internationaleAkte;
+    private Integer aantalBezoekers;
 
-    public static ExtrasFormDto vanSelecties(SaveExtrasDto dto) {
+    public static ExtrasFormDto vanSelecties(SaveExtrasDto dto, Integer aantalBezoekers) {
         ExtrasFormDto form = new ExtrasFormDto();
         form.setRingenUitwisselen(dto.ringenUitwisselen());
         form.setMuziek(dto.muziek());
         form.setTrouwboekjeId(dto.trouwboekjeId());
         form.setInternationaleAkte(dto.internationaleAkte());
+        form.setAantalBezoekers(aantalBezoekers);
         return form;
     }
 
@@ -50,5 +52,13 @@ public class ExtrasFormDto implements Serializable {
 
     public void setInternationaleAkte(boolean internationaleAkte) {
         this.internationaleAkte = internationaleAkte;
+    }
+
+    public Integer getAantalBezoekers() {
+        return aantalBezoekers;
+    }
+
+    public void setAantalBezoekers(Integer aantalBezoekers) {
+        this.aantalBezoekers = aantalBezoekers;
     }
 }

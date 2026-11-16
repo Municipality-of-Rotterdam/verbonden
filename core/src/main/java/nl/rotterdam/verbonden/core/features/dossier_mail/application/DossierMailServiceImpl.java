@@ -330,6 +330,8 @@ class DossierMailServiceImpl implements DossierMailService {
                         aanhef -> aanhef.isBlank() ? "aanvrager" : aanhef)));
         waarden.put("registratieType", dossier.registratieType().getLabel());
         waarden.put("ceremonieSoort", dossier.ceremonieSoort().getLabel());
+        waarden.put("taal", dossier.taal() != null ? dossier.taal().getLabel() : null);
+        waarden.put("aantalBezoekers", dossier.aantalBezoekers() != null ? String.valueOf(dossier.aantalBezoekers()) : null);
         waarden.put("ceremoniePrijs", dossier.prijs() != null ? dossier.prijs().format() : null);
         waarden.put("datum", dossier.datumTijdHuwelijk() != null ? dossier.datumTijdHuwelijk().format(DATUM_FORMAT) : null);
         waarden.put("tijd", dossier.datumTijdHuwelijk() != null ? dossier.datumTijdHuwelijk().format(TIJD_FORMAT) : null);

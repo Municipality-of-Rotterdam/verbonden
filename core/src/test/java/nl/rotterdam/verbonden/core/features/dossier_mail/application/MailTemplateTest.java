@@ -61,6 +61,14 @@ class MailTemplateTest {
     }
 
     @Test
+    void render_toontTaalEnAantalBezoekers() {
+        String html = MailTemplate.laad("bevestiging-indiening.html").render(waarden("Jan en Piet"));
+
+        assertThat(html).contains("Taal van de ceremonie").contains("Nederlands")
+                .contains("Aantal bezoekers");
+    }
+
+    @Test
     void laad_onbekendeTemplate_geeftEenFout() {
         assertThatThrownBy(() -> MailTemplate.laad("bestaat-niet.html"))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -71,6 +79,8 @@ class MailTemplateTest {
         waarden.put("aanhef", aanhef);
         waarden.put("registratieType", "Huwelijk");
         waarden.put("ceremonieSoort", "Klein");
+        waarden.put("taal", "Nederlands");
+        waarden.put("aantalBezoekers", "0");
         waarden.put("ceremoniePrijs", "€ 100,00");
         waarden.put("datum", "1 januari 2027");
         waarden.put("tijd", "09:00");

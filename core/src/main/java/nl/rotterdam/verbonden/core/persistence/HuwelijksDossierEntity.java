@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 
@@ -39,6 +40,13 @@ public class HuwelijksDossierEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "ceremonie_soort", nullable = false)
     private CeremonieSoort ceremonieSoort;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "taal")
+    private CeremonieTaal taal;
+
+    @Column(name = "aantal_bezoekers")
+    private Integer aantalBezoekers;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locatie_id")
@@ -236,7 +244,8 @@ public class HuwelijksDossierEntity {
     }
 
     /**
-     * Wijzigt het soort registratie en de ceremonie. Muziek kan alleen bij een grote ceremonie.
+     * Wijzigt het soort registratie en de ceremonie. Muziek kan alleen bij een grote ceremonie. Een eerder
+     * opgegeven aantal bezoekers vervalt wanneer het niet binnen de grenzen van de nieuwe ceremonie past.
      */
     public void wijzigCeremonie(RegistratieType registratieType, CeremonieSoort ceremonieSoort,
                                 TrouwlocatieEntity locatie) {
@@ -246,6 +255,35 @@ public class HuwelijksDossierEntity {
         if (ceremonieSoort != CeremonieSoort.GROOT) {
             this.muziek = false;
         }
+        if (aantalBezoekers != null && (aantalBezoekers < ceremonieSoort.getMinAantalBezoekers()
+                || aantalBezoekers > ceremonieSoort.getMaxAantalBezoekers())) {
+            this.aantalBezoekers = null;
+        }
+    }
+
+    public CeremonieTaal getTaal() {
+        return taal;
+    }
+
+    public void wijzigTaal(CeremonieTaal taal) {
+        this.taal = taal;
+    }
+
+    public Integer getAantalBezoekers() {
+        return aantalBezoekers;
+    }
+
+    /**
+     * Legt het aantal bezoekers vast.
+     *
+     * @throws IllegalArgumentException wanneer het aantal buiten het minimum en maximum van de ceremonie ligt
+     */
+    public void wijzigAantalBezoekers(int aantalBezoekers) {
+        if (aantalBezoekers < ceremonieSoort.getMinAantalBezoekers() || aantalBezoekers > ceremonieSoort.getMaxAantalBezoekers()) {
+            throw new IllegalArgumentException("Aantal bezoekers " + aantalBezoekers
+                    + " is niet toegestaan bij ceremonie " + ceremonieSoort);
+        }
+        this.aantalBezoekers = aantalBezoekers;
     }
 
     /**
