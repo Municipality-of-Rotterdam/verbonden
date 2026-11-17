@@ -34,6 +34,9 @@ class ExtrasPageTest extends BaseWicketTest {
     private static final String INTERNATIONALE_AKTE_INTRO =
             "Gaat u de huwelijksakte in het buitenland gebruiken? Kies dan voor een internationaal uittreksel. Dat is een korte versie van uw huwelijksakte. Er staat uitleg bij in 10 talen: Nederlands, Engels, Frans, Duits, Spaans, Grieks, Italiaans, Portugees, Turks en Servo-Kroatisch.";
 
+    private static final String PAGE_BODY = "pageLayout:pageLayout_body:pageBody:pageBody_body";
+    private static final String FORM_PAD = PAGE_BODY + ":extrasForm";
+
     @Autowired
     private MarriageIntakeService marriageIntakeService;
 
@@ -180,6 +183,51 @@ class ExtrasPageTest extends BaseWicketTest {
         veld.validate();
 
         assertThat(veld.isValid()).isEqualTo(geldig);
+    }
+
+    @ParameterizedTest(name = "aantal bezoekers \"{0}\" blokkeert de volgende stap")
+    @CsvSource(value = {"''", "3", "9", "abc"})
+    @WithMockUser(username = "999990007")
+    void volgendeStapBlijftOpExtrasZonderGeldigAantalBezoekers(String aantal) {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990007")));
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        klikVolgendeStapMetAantalBezoekers(aantal);
+
+        tester.assertRenderedPage(ExtrasPage.class);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).aantalBezoekers()).isNull();
+        assertThat(marriageIntakeService.findByDossierId(dossierId).extrasDoorlopen()).isFalse();
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void volgendeStapSlaatGeldigAantalBezoekersOpEnGaatNaarControleren() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990007")));
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        klikVolgendeStapMetAantalBezoekers("5");
+
+        tester.assertRenderedPage(ControlerenPage.class);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).aantalBezoekers()).isEqualTo(5);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).extrasDoorlopen()).isTrue();
+    }
+
+    private void klikVolgendeStapMetAantalBezoekers(String aantal) {
+        TextField<?> veld = tester.getLastRenderedPage().visitChildren(TextField.class,
+                (TextField<?> tf, IVisit<TextField<?>> visit) -> {
+                    if (tf.getInputName().toLowerCase().contains("aantalbezoekers")) {
+                        visit.stop(tf);
+                    }
+                });
+        FormTester formTester = tester.newFormTester(FORM_PAD, false);
+        formTester.setValue(veld, aantal);
+        // Zoals een browser: anders weigert Wicket's CSRF-bescherming de POST.
+        tester.getRequest().setHeader("Origin", "http://localhost");
+        formTester.submitLink(PAGE_BODY + ":volgendeStapContainer:volgendeStap", true);
     }
 
     private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, BurgerServiceNummer bsn) {

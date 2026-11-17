@@ -13,10 +13,12 @@ import org.apache.wicket.ajax.form.AjaxFormChoiceComponentUpdatingBehavior;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.model.IModel;
@@ -40,6 +42,8 @@ public class ExtrasPage extends IntakeBasePage {
 
     @SpringBean
     private MarriageIntakeService marriageIntakeService;
+
+    private ExtrasForm extrasForm;
 
     @Override
     protected IntakeStep getActiveStep() {
@@ -87,7 +91,28 @@ public class ExtrasPage extends IntakeBasePage {
         boolean isGroot = dossier.ceremonieSoort() == CeremonieSoort.GROOT;
         boolean isHuwelijk = dossier.registratieType() == RegistratieType.HUWELIJK;
 
-        pageBody.add(new ExtrasForm("extrasForm", selecties, dossier, isGroot, isHuwelijk));
+        extrasForm = new ExtrasForm("extrasForm", selecties, dossier, isGroot, isHuwelijk);
+        pageBody.add(extrasForm);
+    }
+
+    /**
+     * 'Volgende stap' staat buiten het formulier, maar verstuurt het wel. Zo kan de burger pas verder
+     * als het verplichte aantal bezoekers geldig is ingevuld.
+     */
+    @Override
+    protected AbstractLink newVolgendeStapLink(String id, IntakeStep targetStep) {
+        return new SubmitLink(id) {
+            @Override
+            public Form<?> getForm() {
+                return extrasForm;
+            }
+
+            @Override
+            public void onAfterSubmit() {
+                marriageIntakeService.markeerExtrasDoorlopen(dossierId);
+                gaNaarStap(targetStep);
+            }
+        };
     }
 
     private class ExtrasForm extends Form<ExtrasFormDto> {
@@ -266,10 +291,7 @@ public class ExtrasPage extends IntakeBasePage {
         @Override
         protected void onSubmit() {
             slaOp();
-            Integer aantalBezoekers = getModelObject().getAantalBezoekers();
-            if (aantalBezoekers != null) {
-                marriageIntakeService.slaAantalBezoekersOp(dossierId, aantalBezoekers);
-            }
+            marriageIntakeService.slaAantalBezoekersOp(dossierId, getModelObject().getAantalBezoekers());
             setResponsePage(ExtrasPage.class, makeDossierPageParameters(dossierId));
         }
 

@@ -18,6 +18,7 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.LoadableDetachableModel;
@@ -182,8 +183,10 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         pageBody.add(
                 intakeHeader,
                 stepDetails,
-                createNavigationContainer("vorigeStapContainer", "vorigeStap", vorigeStap(), "intake.button.vorige"),
-                createNavigationContainer("volgendeStapContainer", "volgendeStap", volgendeStap(), "intake.button.volgende")
+                createNavigationContainer("vorigeStapContainer", createNavigationLink("vorigeStap", vorigeStap()),
+                        vorigeStap(), "intake.button.vorige"),
+                createNavigationContainer("volgendeStapContainer", newVolgendeStapLink("volgendeStap", volgendeStap()),
+                        volgendeStap(), "intake.button.volgende")
         );
 
         keuzesSidebar = new IntakeSidebarPanel("keuzesSidebar", getSidebarDossierModel(),
@@ -191,23 +194,34 @@ public abstract class IntakeBasePage extends BurgerBasePage {
         pageBody.add(keuzesSidebar);
     }
 
-    private WebMarkupContainer createNavigationContainer(String id, String linkId, IntakeStep targetStep, String labelKey) {
+    private WebMarkupContainer createNavigationContainer(String id, AbstractLink link, IntakeStep targetStep, String labelKey) {
         WebMarkupContainer container = new WebMarkupContainer(id);
         container.setVisible(hasIntakeStepLayout() && hasStepNavigation() && targetStep != null);
-        container.add(createNavigationLink(linkId, targetStep, labelKey));
+        link.add(new Label("label", new ResourceModel(labelKey)));
+        container.add(link);
         return container;
     }
 
-    private Link<Void> createNavigationLink(String id, IntakeStep targetStep, String labelKey) {
-        Link<Void> link = new Link<>(id) {
+    /**
+     * Maakt de link 'Volgende stap'. Override dit op een pagina met verplichte velden, zodat de link
+     * het formulier eerst valideert (bijv. met een {@link org.apache.wicket.markup.html.form.SubmitLink})
+     * en pas daarna {@link #gaNaarStap(IntakeStep)} aanroept.
+     */
+    protected AbstractLink newVolgendeStapLink(String id, IntakeStep targetStep) {
+        return createNavigationLink(id, targetStep);
+    }
+
+    protected void gaNaarStap(IntakeStep targetStep) {
+        if (dossierId != null && targetStep != null) {
+            setResponsePage(targetStep.pageClass(), makeDossierPageParameters(dossierId));
+        }
+    }
+
+    private Link<Void> createNavigationLink(String id, IntakeStep targetStep) {
+        return new Link<>(id) {
             @Override
             public void onClick() {
-                if (dossierId != null) {
-                    if (getActiveStep() == IntakeStep.EXTRAS && targetStep == IntakeStep.CONTROLEREN) {
-                        marriageIntakeService.markeerExtrasDoorlopen(dossierId);
-                    }
-                    setResponsePage(targetStep.pageClass(), makeDossierPageParameters(dossierId));
-                }
+                gaNaarStap(targetStep);
             }
 
             @Override
@@ -216,8 +230,6 @@ public abstract class IntakeBasePage extends BurgerBasePage {
                 setEnabled(dossierId != null && targetStep != null);
             }
         };
-        link.add(new Label("label", new ResourceModel(labelKey)));
-        return link;
     }
 
     private IntakeStep vorigeStap() {
