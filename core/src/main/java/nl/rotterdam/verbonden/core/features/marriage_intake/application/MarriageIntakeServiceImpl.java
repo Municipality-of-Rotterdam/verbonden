@@ -250,8 +250,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             extraItems.add(new SidebarExtraItemDto("Muziek", null));
         }
         if (e.getTrouwboekje() != null) {
+            String trouwboekjeNaam = e.getTrouwboekje().getNaam();
             extraItems.add(new SidebarExtraItemDto(
-                    "Trouwboekje " + e.getTrouwboekje().getNaam().toLowerCase(Locale.ROOT),
+                    trouwboekjeNaam == null || trouwboekjeNaam.isBlank() ? "Trouwboekje" : trouwboekjeNaam,
                     e.getTrouwboekje().getPrijs()));
         }
         if (e.isInternationaleAkte()) {
