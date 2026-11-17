@@ -6,10 +6,12 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsCreatePage;
+import nl.rotterdam.verbonden.core.features.betaling_administration.ui.BetalingAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.verbonden.core.features.location_administration.ui.LocationAdministrationPage;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.ui.MarriageTypeAdministrationPage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
+import nl.rotterdam.verbonden.core.features.trouwlijst_administration.ui.TrouwlijstAdministrationPage;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
@@ -143,7 +145,6 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
         tester.startPage(BabsAdministrationPage.class);
 
         tester.assertInvisible(pad("nieuwBabsLink"));
-        tester.assertInvisible(pad("importForm"));
         assertThat(tester.getLastResponseAsString()).doesNotContain("Acties");
         assertThat(menuItems()).containsExactly("BABS");
     }
@@ -156,7 +157,6 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
         tester.startPage(BabsAdministrationPage.class);
 
         tester.assertVisible(pad("nieuwBabsLink"));
-        tester.assertVisible(pad("importForm"));
         assertThat(tester.getLastResponseAsString()).contains("Acties");
 
         List<String> verwachteMenuItems = Stream.of(
@@ -164,7 +164,9 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
                         Map.entry("Trouwlocaties", LocationAdministrationPage.class),
                         Map.entry("Huwelijkstypen", MarriageTypeAdministrationPage.class),
                         Map.entry("Dossiers", DossierAdministrationPage.class),
-                        Map.entry("Trouwboekjes", TrouwboekjeAdministrationPage.class))
+                        Map.entry("Betalingen", BetalingAdministrationPage.class),
+                        Map.entry("Trouwboekjes", TrouwboekjeAdministrationPage.class),
+                        Map.entry("Trouwlijst", TrouwlijstAdministrationPage.class))
                 .filter(item -> verwachtToegang(item.getValue(), rol))
                 .map(Map.Entry::getKey)
                 .toList();
@@ -245,6 +247,9 @@ class AdministrationAutorisatieTest extends BaseWicketTest {
         }
         if (STAMGEGEVENS_PACKAGES.contains(pagina.getPackageName())) {
             return rol.equals(Roles.BEHEER) || rol.equals(Roles.SUPERUSER);
+        }
+        if (pagina == TrouwlijstAdministrationPage.class) {
+            return rol.equals(Roles.BEHEER) || rol.equals(Roles.SUPERUSER) || rol.equals(Roles.PLANNER);
         }
         return !rol.equals(Roles.BABS);
     }

@@ -15,6 +15,11 @@ De applicatie koppelt met Haal Centraal om voor de met DigiD ingelogde gebruiker
 De applicatie verstuurt e-mails, bijvoorbeeld naar dossierbeheerders wanneer actie nodig is.
 Hiervoor wordt een koppeling met een SMTP-server via een beveiligde verbinding gerealiseerd.
 
+## Betaalprovider
+
+Het paar betaalt online bij het indienen van de aanvraag. De gemeente koppelt hiervoor haar eigen betaalprovider
+via het koppelvlak `online_betalen` in `core`. Zie [Online betalen](online-betalen.md).
+
 ## Zaaksysteem
 
 Voor een dossier wordt een zaak aangemaakt in een lopend zaaksysteem.

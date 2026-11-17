@@ -5,6 +5,7 @@ import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 
@@ -40,13 +41,28 @@ public class HuwelijksDossierEntity {
     @Column(name = "ceremonie_soort", nullable = false)
     private CeremonieSoort ceremonieSoort;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "taal")
+    private CeremonieTaal taal;
+
+    @Column(name = "aantal_bezoekers")
+    private Integer aantalBezoekers;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "locatie_id")
     private TrouwlocatieEntity locatie;
 
     @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("volgorde ASC")
-    private List<HuwelijksDossiersPartnerEntity> partners = new ArrayList<>();
+    private final List<HuwelijksDossiersPartnerEntity> partners = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    private List<BetalingEntity> betalingen = new ArrayList<>();
+
+    @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
+    private final List<BetaalmutatieEntity> betaalmutaties = new ArrayList<>();
 
     @Column(name = "ringen_uitwisselen", nullable = false)
     private boolean ringenUitwisselen = false;
@@ -166,7 +182,70 @@ public class HuwelijksDossierEntity {
     }
 
     /**
-     * Wijzigt het soort registratie en de ceremonie. Muziek kan alleen bij een grote ceremonie.
+     * Start een betaalpoging voor de aanvraag zelf.
+     */
+    public BetalingEntity startRegistratieBetaling(String betalingskenmerk, Bedrag bedrag,
+                                                   BurgerServiceNummer betalerBsn, LocalDateTime gestartOp) {
+        return voegBetalingToe(new BetalingEntity(this, null, betalingskenmerk, bedrag, betalerBsn, gestartOp));
+    }
+
+    /**
+     * Start een betaalpoging voor een betaalmutatie van dit dossier.
+     */
+    public BetalingEntity startMutatieBetaling(BetaalmutatieEntity betaalmutatie, String betalingskenmerk,
+                                               BurgerServiceNummer betalerBsn, LocalDateTime gestartOp) {
+        if (!betaalmutatie.getDossier().getId().equals(id)) {
+            throw new IllegalArgumentException("Betaalmutatie " + betaalmutatie.getId() + " hoort niet bij dossier " + uuid);
+        }
+        return voegBetalingToe(new BetalingEntity(this, betaalmutatie, betalingskenmerk, betaalmutatie.getBedrag(),
+                betalerBsn, gestartOp));
+    }
+
+    private BetalingEntity voegBetalingToe(BetalingEntity betaling) {
+        betalingen.add(betaling);
+        return betaling;
+    }
+
+    public List<BetalingEntity> getBetalingen() {
+        return betalingen;
+    }
+
+    /**
+     * Voegt een bedrag toe dat het paar nog moet betalen.
+     *
+     * @param prijswijziging of het bedrag het verschil is doordat het dossier duurder werd (zit dan in de
+     *                       totaalprijs), of een handmatige mutatie bovenop de totaalprijs
+     */
+    public BetaalmutatieEntity voegBetaalmutatieToe(String omschrijving, Bedrag bedrag, boolean prijswijziging,
+                                                    String aangemaaktDoor, LocalDateTime aangemaaktOp) {
+        BetaalmutatieEntity mutatie = new BetaalmutatieEntity(this, omschrijving, bedrag, prijswijziging,
+                aangemaaktDoor, aangemaaktOp);
+        betaalmutaties.add(mutatie);
+        return mutatie;
+    }
+
+    public List<BetaalmutatieEntity> getBetaalmutaties() {
+        return betaalmutaties;
+    }
+
+    /**
+     * Verwijdert een betaalmutatie waarvoor nog geen betaling is gestart.
+     *
+     * @throws IllegalStateException wanneer er al een betaling voor de mutatie is gestart
+     */
+    public void verwijderBetaalmutatie(long betaalmutatieId) {
+        if (betalingen.stream().anyMatch(b -> b.getBetaalmutatie() != null
+                && b.getBetaalmutatie().getId() == betaalmutatieId)) {
+            throw new IllegalStateException("Voor betaalmutatie " + betaalmutatieId + " is al een betaling gestart");
+        }
+        if (!betaalmutaties.removeIf(m -> m.getId() == betaalmutatieId)) {
+            throw new IllegalArgumentException("Betaalmutatie " + betaalmutatieId + " hoort niet bij dossier " + uuid);
+        }
+    }
+
+    /**
+     * Wijzigt het soort registratie en de ceremonie. Muziek kan alleen bij een grote ceremonie. Een eerder
+     * opgegeven aantal bezoekers vervalt wanneer het niet binnen de grenzen van de nieuwe ceremonie past.
      */
     public void wijzigCeremonie(RegistratieType registratieType, CeremonieSoort ceremonieSoort,
                                 TrouwlocatieEntity locatie) {
@@ -176,6 +255,35 @@ public class HuwelijksDossierEntity {
         if (ceremonieSoort != CeremonieSoort.GROOT) {
             this.muziek = false;
         }
+        if (aantalBezoekers != null && (aantalBezoekers < ceremonieSoort.getMinAantalBezoekers()
+                || aantalBezoekers > ceremonieSoort.getMaxAantalBezoekers())) {
+            this.aantalBezoekers = null;
+        }
+    }
+
+    public CeremonieTaal getTaal() {
+        return taal;
+    }
+
+    public void wijzigTaal(CeremonieTaal taal) {
+        this.taal = taal;
+    }
+
+    public Integer getAantalBezoekers() {
+        return aantalBezoekers;
+    }
+
+    /**
+     * Legt het aantal bezoekers vast.
+     *
+     * @throws IllegalArgumentException wanneer het aantal buiten het minimum en maximum van de ceremonie ligt
+     */
+    public void wijzigAantalBezoekers(int aantalBezoekers) {
+        if (aantalBezoekers < ceremonieSoort.getMinAantalBezoekers() || aantalBezoekers > ceremonieSoort.getMaxAantalBezoekers()) {
+            throw new IllegalArgumentException("Aantal bezoekers " + aantalBezoekers
+                    + " is niet toegestaan bij ceremonie " + ceremonieSoort);
+        }
+        this.aantalBezoekers = aantalBezoekers;
     }
 
     /**

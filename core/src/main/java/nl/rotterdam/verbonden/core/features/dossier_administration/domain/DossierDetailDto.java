@@ -1,7 +1,9 @@
 package nl.rotterdam.verbonden.core.features.dossier_administration.domain;
 
+import nl.rotterdam.verbonden.core.features.betaling_administration.domain.ListBetalingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
@@ -20,6 +22,10 @@ import java.util.UUID;
  * @param extras         de gekozen extra's met hun prijs, voor de weergave
  * @param extraKeuzes    dezelfde keuzes, als uitgangspunt om ze te wijzigen
  * @param compleet       of alles is ingevuld wat nodig is om het dossier in te dienen
+ * @param betalingen     alle online betaalpogingen, oudste eerst
+ * @param betaalmutaties bedragen die na het indienen nog betaald moeten worden of zijn
+ * @param teVeelBetaald  hoeveel er meer betaald of te betalen is dan het dossier nu kost, bijvoorbeeld na het
+ *                       schrappen van een extra; {@code null} als dat niet zo is. Terugbetalen gaat buiten Verbonden om.
  */
 public record DossierDetailDto(
         UUID dossierId,
@@ -30,6 +36,8 @@ public record DossierDetailDto(
         LocalDateTime ingediendOp,
         RegistratieType registratieType,
         CeremonieSoort ceremonieSoort,
+        CeremonieTaal taal,
+        Integer aantalBezoekers,
         String locatieNaam,
         LocalDateTime datumTijdHuwelijk,
         Bedrag ceremoniePrijs,
@@ -39,6 +47,9 @@ public record DossierDetailDto(
         ChangeExtrasDto extraKeuzes,
         Bedrag totaalPrijs,
         boolean compleet,
-        List<ListDossierBestandDto> bestanden
+        List<ListDossierBestandDto> bestanden,
+        List<ListBetalingDto> betalingen,
+        List<ListBetaalmutatieDto> betaalmutaties,
+        Bedrag teVeelBetaald
 ) implements Serializable {
 }

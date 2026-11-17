@@ -7,9 +7,11 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraI
 import nl.rotterdam.verbonden.core.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.ChangeIntakeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccessOutcome;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierIngediendEvent;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenvattingDto;
@@ -38,6 +40,7 @@ import nl.rotterdam.verbonden.core.persistence.MarriageTypeEntity;
 import nl.rotterdam.verbonden.core.persistence.MarriageTypeLocationEntity;
 import nl.rotterdam.verbonden.core.persistence.TrouwlocatieEntity;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +50,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
-import java.util.UUID;
 
 @Service
 class MarriageIntakeServiceImpl implements MarriageIntakeService {
@@ -62,6 +64,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     private final TrouwboekjeRepository trouwboekjeRepository;
     private final PersonLookupService personLookupService;
     private final Clock clock;
+    private final ApplicationEventPublisher eventPublisher;
 
     MarriageIntakeServiceImpl(DossierRepository dossierRepository,
                               LocatieRepository locatieRepository,
@@ -72,7 +75,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
                               GetuigenRepository getuigenRepository,
                               TrouwboekjeRepository trouwboekjeRepository,
                               PersonLookupService personLookupService,
-                              Clock clock) {
+                              Clock clock,
+                              ApplicationEventPublisher eventPublisher) {
         this.dossierRepository = dossierRepository;
         this.locatieRepository = locatieRepository;
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
@@ -83,6 +87,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         this.trouwboekjeRepository = trouwboekjeRepository;
         this.personLookupService = personLookupService;
         this.clock = clock;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -166,6 +171,18 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         e.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), dto.locatieId() != null
                 ? locatieRepository.findById(dto.locatieId()).orElse(null)
                 : null);
+    }
+
+    @Override
+    @Transactional
+    public void slaTaalOp(UUID dossierId, CeremonieTaal taal) {
+        getWijzigbaarDossier(dossierId).wijzigTaal(taal);
+    }
+
+    @Override
+    @Transactional
+    public void slaAantalBezoekersOp(UUID dossierId, int aantalBezoekers) {
+        getWijzigbaarDossier(dossierId).wijzigAantalBezoekers(aantalBezoekers);
     }
 
     @Override
@@ -269,6 +286,8 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         return new DossierSamenvattingDto(
                 e.getUuid(),
                 e.getRegistratieType(),
+                e.getTaal(),
+                e.getAantalBezoekers(),
                 e.getCeremonieSoort(),
                 prijs,
                 datumTijdHuwelijk,
@@ -305,6 +324,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         dossier.setInternationaleAktePrijs(dossier.isInternationaleAkte()
                 ? InternationaleAkteTarief.prijsOp(ingediendOp.toLocalDate())
                 : null);
+        eventPublisher.publishEvent(new DossierIngediendEvent(dossierId));
     }
 
     @Override
@@ -323,11 +343,14 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     }
 
     /**
-     * Een dossier is compleet wanneer datum en locatie gekozen zijn, beide partners hun achternaam
-     * hebben gekozen en alle vereiste getuigen zijn ingevuld.
+     * Een dossier is compleet wanneer de taal, datum en locatie gekozen zijn, beide partners hun achternaam
+     * hebben gekozen en alle vereiste getuigen en het aantal bezoekers zijn ingevuld.
      */
     private List<OntbrekendOnderdeel> ontbrekendeOnderdelen(HuwelijksDossierEntity dossier) {
         List<OntbrekendOnderdeel> ontbrekend = new ArrayList<>();
+        if (dossier.getTaal() == null) {
+            ontbrekend.add(OntbrekendOnderdeel.TAAL);
+        }
         if (findDatumTijdHuwelijk(dossier) == null) {
             ontbrekend.add(OntbrekendOnderdeel.DATUM);
         }
@@ -342,6 +365,9 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         }
         if (getuigenRepository.countByDossier_IdAndNaamIsNotNull(dossier.getId()) < vereistAantalGetuigen(dossier)) {
             ontbrekend.add(OntbrekendOnderdeel.GETUIGEN);
+        }
+        if (dossier.getAantalBezoekers() == null) {
+            ontbrekend.add(OntbrekendOnderdeel.AANTAL_BEZOEKERS);
         }
         return List.copyOf(ontbrekend);
     }
@@ -488,6 +514,7 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
     public void delete(UUID dossierId) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         afspraakRepository.deleteByDossier_Id(dossier.getId());
+        getuigenRepository.deleteByDossier_Id(dossier.getId());
         dossierRepository.delete(dossier);
     }
 

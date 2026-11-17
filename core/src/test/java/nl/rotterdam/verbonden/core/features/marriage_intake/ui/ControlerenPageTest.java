@@ -4,6 +4,7 @@ import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import org.apache.wicket.util.tester.TagTester;
 import org.junit.jupiter.api.Test;
+import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,9 @@ class ControlerenPageTest extends BaseWicketTest {
 
     @Autowired
     private CompleetDossierTestData testData;
+
+    @Autowired
+    private MarriageIntakeService marriageIntakeService;
 
     @Test
     @WithMockUser(username = "999990020")
@@ -63,6 +67,7 @@ class ControlerenPageTest extends BaseWicketTest {
         tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
         assertThat(statusIcoon(IntakeStep.EXTRAS).getAttribute("class")).contains("rd-status-icon--upcoming");
 
+        marriageIntakeService.slaAantalBezoekersOp(dossierId, 4);
         tester.startPage(ExtrasPage.class, makeDossierPageParameters(dossierId));
         click("volgendeStapContainer:volgendeStap");
         tester.assertRenderedPage(ControlerenPage.class);
@@ -70,6 +75,18 @@ class ControlerenPageTest extends BaseWicketTest {
         // Een nieuwe request zonder extra URL-parameters: de voortgang komt uit het dossier
         tester.startPage(DeDagPage.class, makeDossierPageParameters(dossierId));
         assertThat(statusIcoon(IntakeStep.EXTRAS).getAttribute("class")).contains("rd-status-icon--complete");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void samenvattingToontTaalEnAantalBezoekers() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("Taal van de ceremonie")
+                .contains("Nederlands")
+                .contains("Aantal bezoekers");
     }
 
     @Test

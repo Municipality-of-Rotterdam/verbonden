@@ -3,6 +3,7 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
@@ -146,6 +147,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
     void sidebarToontStatusPerStapMetAndereMarkeringVoorHuidigeStap() {
         createdDossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
+        marriageIntakeService.slaTaalOp(createdDossierId, CeremonieTaal.NEDERLANDS);
 
         PageParameters params = new PageParameters();
         params.add("dossierId", createdDossierId.toString());
