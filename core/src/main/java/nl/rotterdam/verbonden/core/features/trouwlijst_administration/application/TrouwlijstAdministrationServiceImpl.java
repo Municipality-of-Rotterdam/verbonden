@@ -1,13 +1,13 @@
 package nl.rotterdam.verbonden.core.features.trouwlijst_administration.application;
 
 import nl.rotterdam.verbonden.core.features.trouwlijst_administration.domain.ListTrouwlijstDossierDto;
+import nl.rotterdam.verbonden.core.features.trouwlijst_administration.domain.TrouwlijstAfspraakDto;
 import nl.rotterdam.verbonden.core.features.trouwlijst_administration.domain.TrouwlijstPartnerDto;
 import nl.rotterdam.verbonden.core.features.trouwlijst_administration.domain.TrouwlijstWeekDto;
 import nl.rotterdam.verbonden.core.features.trouwlijst_administration.repository.TrouwlijstRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
-import nl.rotterdam.verbonden.core.persistence.AfspraakEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,19 +59,18 @@ class TrouwlijstAdministrationServiceImpl implements TrouwlijstAdministrationSer
         return excelExporter.exporteer(findBevestigdeDossiers(van, tot));
     }
 
-    private ListTrouwlijstDossierDto toDto(AfspraakEntity afspraak) {
-        var dossier = afspraak.getDossier();
-        List<TrouwlijstPartnerDto> partners = marriageIntakeService.findPartnerGegevens(dossier.getUuid()).stream()
+    private ListTrouwlijstDossierDto toDto(TrouwlijstAfspraakDto afspraak) {
+        List<TrouwlijstPartnerDto> partners = marriageIntakeService.findPartnerGegevens(afspraak.dossierId()).stream()
                 .map(TrouwlijstAdministrationServiceImpl::toPartnerDto)
                 .toList();
         return new ListTrouwlijstDossierDto(
-                dossier.getUuid(),
-                afspraak.getDatum(),
-                afspraak.getStartTijd(),
-                afspraak.getLocatie().getNaam(),
+                afspraak.dossierId(),
+                afspraak.datum(),
+                afspraak.startTijd(),
+                afspraak.locatie(),
                 null,
-                dossier.getRegistratieType(),
-                dossier.getCeremonieSoort(),
+                afspraak.registratieType(),
+                afspraak.ceremonieSoort(),
                 partners,
                 null);
     }

@@ -31,6 +31,7 @@ Elke feature-package bevat de volgende sub-packages:
     - `update`-methoden retourneren `void`.
     - `delete`- en toggle-methoden accepteren de primaire sleutel als primitief (`long id`, niet `Long id`).
     - **Gebruik altijd primitieven** (`long`, `int`, `boolean`, …) in plaats van wrapper-typen (`Long`, `Integer`, `Boolean`, …) waar dat mogelijk is — dit geldt voor methode-parameters én retourtypen in services én repositories.
+- Repository-methoden die een lijst teruggeven, geven nooit Entity-klassen terug maar DTO's of projecties (bijv. via een JPQL `SELECT new ...`-constructor-expressie). Een Entity haalt meer data op dan nodig is en kan bij het omzetten naar een DTO lazy relaties inladen.
 - Een lijstweergave haalt wat ze per rij nodig heeft in dezelfde query op (`@EntityGraph` of `join fetch` op de repository-methode), zodat het aantal queries gelijk blijft bij meer rijen.
 
 ### Bijwerkingen en externe systemen
