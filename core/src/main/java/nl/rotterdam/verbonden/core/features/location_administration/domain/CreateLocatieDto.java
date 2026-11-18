@@ -4,6 +4,7 @@ public record CreateLocatieDto(
         String naam,
         String fotoUrl,
         String omschrijving,
-        String detailUrl
+        String detailUrl,
+        boolean vrijeLocatie
 ) {
 }

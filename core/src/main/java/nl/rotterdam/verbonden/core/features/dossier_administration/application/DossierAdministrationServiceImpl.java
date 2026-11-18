@@ -18,6 +18,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Detail
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerHeeftAlDossierException;
@@ -37,9 +38,11 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraI
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.GetuigenRepository;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
+import nl.rotterdam.verbonden.core.features.location_administration.repository.LocatieRepository;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.repository.TrouwboekjeRepository;
 import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
 import nl.rotterdam.verbonden.core.identity.PersonLookupService;
@@ -81,6 +84,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     private final DossierMailRepository dossierMailRepository;
     private final GetuigenRepository getuigenRepository;
     private final MarriageTypeLocationRepository marriageTypeLocationRepository;
+    private final LocatieRepository locatieRepository;
     private final TrouwboekjeRepository trouwboekjeRepository;
     private final MarriageIntakeService marriageIntakeService;
     private final AfspraakPlanningService afspraakPlanningService;
@@ -95,6 +99,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                                      DossierMailRepository dossierMailRepository,
                                      GetuigenRepository getuigenRepository,
                                      MarriageTypeLocationRepository marriageTypeLocationRepository,
+                                     LocatieRepository locatieRepository,
                                      TrouwboekjeRepository trouwboekjeRepository,
                                      MarriageIntakeService marriageIntakeService,
                                      AfspraakPlanningService afspraakPlanningService,
@@ -108,6 +113,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         this.dossierMailRepository = dossierMailRepository;
         this.getuigenRepository = getuigenRepository;
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
+        this.locatieRepository = locatieRepository;
         this.trouwboekjeRepository = trouwboekjeRepository;
         this.marriageIntakeService = marriageIntakeService;
         this.afspraakPlanningService = afspraakPlanningService;
@@ -163,6 +169,12 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                 dossier.getTaal(),
                 dossier.getAantalBezoekers(),
                 samenvatting.huwelijksLocatie(),
+                dossier.getVrijeTrouwlocatie() == null ? null : new VrijeTrouwlocatieDto(
+                        dossier.getVrijeTrouwlocatie().getNaam(),
+                        dossier.getVrijeTrouwlocatie().getAdres(),
+                        dossier.getVrijeTrouwlocatie().getTelefoonnummer(),
+                        dossier.getVrijeTrouwlocatie().getContactpersoon(),
+                        dossier.getVrijeTrouwlocatie().isGoedgekeurd()),
                 samenvatting.datumTijdHuwelijk(),
                 samenvatting.prijs(),
                 partners,
@@ -276,7 +288,29 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
 
         String medewerker = medewerker();
         HuwelijksDossierEntity dossier = new HuwelijksDossierEntity(dto.kanaal(), medewerker);
-        dossier.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), locatieVoor(dto.ceremonieSoort()));
+        boolean vrijeLocatieIngevuld = !isLeeg(dto.vrijeLocatieNaam()) || !isLeeg(dto.vrijeLocatieAdres())
+                || dto.vrijeLocatieTelefoonnummer() != null || !isLeeg(dto.vrijeLocatieContactpersoon());
+        if (dto.ceremonieSoort() == CeremonieSoort.GROOT && dto.locatieId() == null) {
+            throw new IllegalArgumentException("Kies een trouwlocatie voor een grote ceremonie");
+        }
+        TrouwlocatieEntity locatie = dto.locatieId() == null
+                ? locatieVoor(dto.ceremonieSoort())
+                : locatieRepository.findById(dto.locatieId())
+                        .orElseThrow(() -> new IllegalArgumentException("Trouwlocatie niet gevonden: " + dto.locatieId()));
+        boolean vrijeLocatie = locatie != null && locatie.isVrijeLocatie();
+        if (vrijeLocatie && dto.ceremonieSoort() != CeremonieSoort.GROOT) {
+            throw new IllegalArgumentException("Een vrije trouwlocatie is alleen mogelijk bij een grote ceremonie");
+        }
+        if (vrijeLocatie != vrijeLocatieIngevuld) {
+            throw new IllegalArgumentException(vrijeLocatie
+                    ? "Vul de verplichte gegevens van de vrije trouwlocatie in"
+                    : "Vul alleen gegevens van een vrije trouwlocatie in bij de vrije locatie");
+        }
+        dossier.wijzigCeremonie(dto.registratieType(), dto.ceremonieSoort(), locatie);
+        if (vrijeLocatie) {
+            dossier.kiesVrijeTrouwlocatie(locatie, dto.vrijeLocatieNaam(), dto.vrijeLocatieAdres(),
+                    dto.vrijeLocatieTelefoonnummer(), dto.vrijeLocatieContactpersoon());
+        }
         dossier.voegPartnerToe(dto.bsnPartner1(), medewerker);
         if (partner2HeeftBsn) {
             dossier.voegPartnerToe(dto.bsnPartner2(), medewerker);
@@ -379,6 +413,16 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                 .map(SidebarExtraItemDto::naam)
                 .collect(Collectors.joining(", "));
         return nieuw.isEmpty() ? "Extra's gewijzigd" : nieuw;
+    }
+
+    @Override
+    @Transactional
+    public void keurVrijeTrouwlocatieGoed(UUID dossierId) {
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        if (dossier.getVrijeTrouwlocatie() == null) {
+            throw new IllegalStateException("Dit dossier heeft geen vrije trouwlocatie");
+        }
+        dossier.getVrijeTrouwlocatie().keurGoed();
     }
 
     @Override

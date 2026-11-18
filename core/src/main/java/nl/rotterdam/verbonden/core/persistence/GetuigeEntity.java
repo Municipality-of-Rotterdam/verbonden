@@ -3,7 +3,7 @@ package nl.rotterdam.verbonden.core.persistence;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "huwelijksdossiers_getuigen")
+@Table(name = "dossier_getuigen")
 public class GetuigeEntity {
 
     @Id

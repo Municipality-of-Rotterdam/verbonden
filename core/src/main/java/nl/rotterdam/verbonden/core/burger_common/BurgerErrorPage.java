@@ -52,7 +52,7 @@ public class BurgerErrorPage extends BurgerBasePage {
         Throwable cause = ServletErrorAttributes.resolveException();
         String technicalMessage = ServletErrorAttributes.resolveTechnicalMessage();
         if (errorCode >= 400 && errorCode < 500) {
-            log.warn("Error page displayed [{} {}] {}", errorCode, errorMessage, technicalMessage, cause);
+            log.warn("Error page displayed [{} {}] {} {}", errorCode, errorMessage, technicalMessage, getRequest().getClientUrl(), cause);
         } else {
             log.error("Error page displayed [{} {}] {}", errorCode, errorMessage, technicalMessage, cause);
         }

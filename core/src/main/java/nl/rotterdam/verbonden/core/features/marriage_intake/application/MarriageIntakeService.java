@@ -15,7 +15,12 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.IntakeMarriageTypeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveVrijeTrouwlocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
+
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.BeschikbareLocatieDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +41,16 @@ public interface MarriageIntakeService {
     UUID create(CreateDossierDto dto);
 
     void updateIntake(UUID dossierId, ChangeIntakeDto dto);
+
+    List<ListLocatieDto> findLocaties();
+
+    List<BeschikbareLocatieDto> findBeschikbareLocaties(UUID dossierId);
+
+    void kiesLocatie(UUID dossierId, long locatieId);
+
+    void slaVrijeTrouwlocatieOp(UUID dossierId, SaveVrijeTrouwlocatieDto dto);
+
+    Optional<VrijeTrouwlocatieDto> findVrijeTrouwlocatie(UUID dossierId);
 
     /**
      * Legt de taal vast waarin de ceremonie plaatsvindt.
