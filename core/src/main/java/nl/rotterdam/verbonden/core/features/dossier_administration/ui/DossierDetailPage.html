@@ -233,6 +233,23 @@
     </section>
 
     <section class="rd-dossier-sectie">
+        <h2>Notities</h2>
+        <div wicket:id="notities" class="mb-3">
+            <p><strong wicket:id="auteur">Medewerker (gebruikersnaam)</strong> -
+                <span wicket:id="aangemaakt">01-01-2026 10:00</span></p>
+            <p wicket:id="tekst">Notitietekst</p>
+        </div>
+        <p wicket:id="geenNotities"></p>
+        <h3>Notitie toevoegen</h3>
+        <form wicket:id="notitieToevoegenForm" class="d-flex flex-column gap-3">
+            <div wicket:id="notitie"></div>
+            <div>
+                <button wicket:id="toevoegen" type="submit"></button>
+            </div>
+        </form>
+    </section>
+
+    <section class="rd-dossier-sectie">
         <h2>E-mails</h2>
         <table class="utrecht-table">
             <thead class="utrecht-table__header">
