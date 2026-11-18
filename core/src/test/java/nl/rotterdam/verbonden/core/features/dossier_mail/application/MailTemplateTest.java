@@ -37,6 +37,13 @@ class MailTemplateTest {
     }
 
     @Test
+    void render_toontGekozenNaamAlleenAlsErEenIs() {
+        String html = MailTemplate.laad("bevestiging-indiening.html").render(waarden("Jan en Piet"));
+
+        assertThat(html).contains("<li>Jan<br>Gekozen naam: Jan Jansen</li>").contains("<li>Piet</li>");
+    }
+
+    @Test
     void render_zonderExtras_toontDatErGeenExtrasZijn() {
         String html = MailTemplate.laad("bevestiging-indiening.html").render(waarden("Jan en Piet"));
 
@@ -74,6 +81,13 @@ class MailTemplateTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    private static Map<String, Object> partner(String naam, String gekozenNaam) {
+        Map<String, Object> partner = new HashMap<>();
+        partner.put("naam", naam);
+        partner.put("gekozenNaam", gekozenNaam);
+        return partner;
+    }
+
     private static Map<String, Object> waarden(String aanhef) {
         Map<String, Object> waarden = new HashMap<>();
         waarden.put("aanhef", aanhef);
@@ -85,7 +99,7 @@ class MailTemplateTest {
         waarden.put("datum", "1 januari 2027");
         waarden.put("tijd", "09:00");
         waarden.put("locatie", "Stadhuis");
-        waarden.put("partners", List.of(Map.of("naam", "Jan"), Map.of("naam", "Piet")));
+        waarden.put("partners", List.of(partner("Jan", "Jan Jansen"), partner("Piet", null)));
         waarden.put("getuigen", List.of(Map.of("naam", "Kwik"), Map.of("naam", "Kwek")));
         waarden.put("extras", List.of());
         waarden.put("totaalPrijs", "€ 100,00");
