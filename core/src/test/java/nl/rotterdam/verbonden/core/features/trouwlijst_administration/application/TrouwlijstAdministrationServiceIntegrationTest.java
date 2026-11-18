@@ -92,6 +92,10 @@ class TrouwlijstAdministrationServiceIntegrationTest {
             assertThat(dto.dossierId()).isEqualTo(dossierId);
             assertThat(dto.datum()).isEqualTo(trouwdatum);
             assertThat(dto.partners()).hasSize(2);
+            assertThat(dto.partners()).extracting(partner -> partner.naam())
+                    .containsExactlyElementsOf(marriageIntakeService.findPartnerGegevens(dossierId).stream()
+                            .map(partner -> partner.voornamen() + " " + partner.achternaam())
+                            .toList());
         });
         assertThat(trouwlijstAdministrationService.findBevestigdeDossiers(
                 maandag.plusWeeks(1), maandag.plusWeeks(1).plusDays(6))).isEmpty();

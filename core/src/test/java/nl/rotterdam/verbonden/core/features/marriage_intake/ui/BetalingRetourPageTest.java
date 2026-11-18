@@ -231,6 +231,8 @@ class BetalingRetourPageTest extends BaseWicketTest {
         tester.assertRenderedPage(AanvraagStatusPage.class);
         tester.assertVisible(PAGE_BODY + ":betalingMislukt");
         tester.assertVisible(PAGE_BODY + ":teBetalen");
+        tester.assertContains("Internationale akte");
+        tester.assertContains("17,80");
     }
 
     @Test

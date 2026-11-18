@@ -21,6 +21,13 @@ class TrouwlijstAdministrationPageTest extends BaseWicketTest {
     }
 
     @Test
+    void weekkeuzeToontHetWeeknummer() {
+        tester.startPage(TrouwlijstAdministrationPage.class);
+
+        assertThat(tester.getLastResponseAsString()).containsPattern("<option[^>]*>Week \\d+:");
+    }
+
+    @Test
     void naWeekkeuzeToontDeExportknop() {
         tester.startPage(TrouwlijstAdministrationPage.class);
         String weekVeld = veld("filterForm", "input");

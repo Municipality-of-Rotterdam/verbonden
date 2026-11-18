@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -159,7 +160,8 @@ public class TrouwlijstAdministrationPage extends AdministrationBasePage {
         RdFormFieldWeekSelect(String id) {
             super(id, weekModel, Model.of("Week"), wekenModel,
                     new LambdaChoiceRenderer<>(
-                            week -> week.van().format(DATUM_FORMATTER) + " t/m " + week.tot().format(DATUM_FORMATTER),
+                            week -> "Week " + week.van().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR) + ": "
+                                    + week.van().format(DATUM_FORMATTER) + " t/m " + week.tot().format(DATUM_FORMATTER),
                             week -> week.van().toString()));
             setRequired(true);
         }
