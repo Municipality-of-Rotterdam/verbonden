@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import org.apache.wicket.util.tester.TagTester;
 import org.junit.jupiter.api.Test;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
@@ -100,6 +101,26 @@ class ControlerenPageTest extends BaseWicketTest {
         String samenvatting = TagTester.createTagByAttribute(html, "class", "rd-controleer-kaart").getValue();
         assertThat(samenvatting).contains("rd-controleer-totaal").doesNotContain("rd-controleer-bevestigen");
         assertThat(TagTester.createTagByAttribute(html, "class", "rd-controleer-bevestigen")).isNotNull();
+    }
+
+    @Test
+    void naamkeuzeVoegtEigenAchternaamNietDubbelToe() {
+        PartnerGegevensDto partner1 = partner("Rosa", "van Rozen", "van Rozen - van Mooije");
+        PartnerGegevensDto partner2 = partner("Sabina Ellen", "van Mooije", "van Mooije - van Rozen");
+
+        assertThat(ControlerenPage.naamkeuze(partner1)).isEqualTo("Rosa van Rozen - van Mooije");
+        assertThat(ControlerenPage.naamkeuze(partner2)).isEqualTo("Sabina Ellen van Mooije - van Rozen");
+    }
+
+    @Test
+    void naamkeuzeMetAlleenEigenAchternaamToontGeenDubbeleAchternaam() {
+        assertThat(ControlerenPage.naamkeuze(partner("Rosa", "van Rozen", "van Rozen")))
+                .isEqualTo("Rosa van Rozen");
+    }
+
+    private static PartnerGegevensDto partner(String voornamen, String achternaam, String gekozenAchternaam) {
+        return new PartnerGegevensDto(1, null, null, achternaam, voornamen, null,
+                null, null, null, null, null, gekozenAchternaam, 0);
     }
 
     private void click(String linkId) {

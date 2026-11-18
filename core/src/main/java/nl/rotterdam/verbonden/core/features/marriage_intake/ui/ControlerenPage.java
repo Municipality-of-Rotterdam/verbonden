@@ -36,6 +36,7 @@ import org.wicketstuff.minis.behavior.EnabledModelBehavior;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -213,15 +214,20 @@ public class ControlerenPage extends IntakeBasePage {
         return makeDossierPageParameters(dossierId);
     }
 
-    private String naamkeuze(PartnerGegevensDto partner) {
+    static String naamkeuze(PartnerGegevensDto partner) {
         String naam = Stream.of(partner.voornamen(), partner.achternaam())
                 .filter(Objects::nonNull)
                 .filter(waarde -> !waarde.isBlank())
                 .collect(Collectors.joining(" "));
-        return Optional.ofNullable(partner.gekozenAchternaam())
+        String gekozenAchternaam = Optional.ofNullable(partner.gekozenAchternaam())
                 .filter(gekozen -> !gekozen.isBlank())
-                .map(gekozen -> naam + " - " + gekozen)
-                .orElse(naam);
+                .map(gekozen -> {
+                    List<String> achternamen = new ArrayList<>(List.of(gekozen.split(" - ")));
+                    achternamen.remove(partner.achternaam());
+                    return String.join(" - ", achternamen);
+                })
+                .orElse("");
+        return gekozenAchternaam.isBlank() ? naam : naam + " - " + gekozenAchternaam;
     }
 
     private class BevestigForm extends Form<Void> {
