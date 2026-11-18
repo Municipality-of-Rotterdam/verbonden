@@ -72,7 +72,8 @@ class TrouwlijstAdministrationServiceImpl implements TrouwlijstAdministrationSer
                 afspraak.registratieType(),
                 afspraak.ceremonieSoort(),
                 partners,
-                null);
+                afspraak.taal() != null ? afspraak.taal().getLabel() : null,
+                afspraak.aantalBezoekers());
     }
 
     private static TrouwlijstPartnerDto toPartnerDto(PartnerGegevensDto partner) {
