@@ -12,10 +12,13 @@ import nl.rotterdam.verbonden.core.features.trouwboekje_administration.domain.Cr
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.visit.IVisit;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +34,33 @@ class ExtrasPageTest extends BaseWicketTest {
     private static final String INTERNATIONALE_AKTE_INTRO =
             "Gaat u de huwelijksakte in het buitenland gebruiken? Kies dan voor een internationaal uittreksel. Dat is een korte versie van uw huwelijksakte. Er staat uitleg bij in 10 talen: Nederlands, Engels, Frans, Duits, Spaans, Grieks, Italiaans, Portugees, Turks en Servo-Kroatisch.";
 
+    private static final String PAGE_BODY = "pageLayout:pageLayout_body:pageBody:pageBody_body";
+    private static final String FORM_PAD = PAGE_BODY + ":extrasForm";
+
     @Autowired
     private MarriageIntakeService marriageIntakeService;
 
     @Autowired
     private TrouwboekjeAdministrationService trouwboekjeAdministrationService;
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void ringenUitwisselenToontDeJaEnNeeKeuzes() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990007")));
+
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        String html = tester.getLastResponseAsString();
+        assertThat(html)
+                .contains("Ringen uitwisselen")
+                .contains("Wilt u tijdens de ceremonie een ring bij elkaar omdoen?")
+                .contains("Ja")
+                .contains("Nee")
+                .contains("type=\"radio\"");
+        assertThat(html).doesNotContain("Ringen uitwisselen tijdens ceremonie");
+    }
 
     @Test
     @WithMockUser(username = "999990007")
@@ -105,13 +130,104 @@ class ExtrasPageTest extends BaseWicketTest {
         tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
 
         String html = tester.getLastResponseAsString();
-        assertThat(html.split("rd-extra-sectie card mb-4 p-4", -1)).hasSize(4);
+        assertThat(html.split("rd-extra-sectie card mb-4 p-4", -1)).hasSize(5);
         assertThat(html).contains("rd-intake-content--unbordered");
         assertThat(html.indexOf("Volgende stap"))
                 .isGreaterThan(html.lastIndexOf("rd-extra-sectie card mb-4 p-4"));
         assertThat(html)
                 .contains("rd-trouwboekje-keuzes")
                 .contains("rd-extra-keuze-item d-flex align-items-center justify-content-between flex-wrap gap-2");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void aantalBezoekersToontMinimumEnMaximumVanDeCeremonie() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990020")));
+
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("Het aantal bezoekers is minimaal 4 en maximaal 8. Beide partners en de getuigen tellen mee.")
+                .doesNotContain("{0}");
+    }
+
+    @ParameterizedTest(name = "{0}: {1} bezoekers geldig = {2}")
+    @CsvSource({
+            "KLEIN, 3, false",
+            "KLEIN, 4, true",
+            "KLEIN, 8, true",
+            "KLEIN, 9, false",
+            "MIDDELGROOT, 5, false",
+            "MIDDELGROOT, 6, true",
+            "MIDDELGROOT, 16, true",
+            "MIDDELGROOT, 17, false",
+            "GROOT, 5, false",
+            "GROOT, 6, true"})
+    @WithMockUser(username = "999990007")
+    void aantalBezoekersValideertMinimumEnMaximumVanDeCeremonie(CeremonieSoort soort, int aantal, boolean geldig) {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, soort, null,
+                        new BurgerServiceNummer("999990007")));
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        TextField<?> veld = tester.getLastRenderedPage().visitChildren(TextField.class,
+                (TextField<?> tf, IVisit<TextField<?>> visit) -> {
+                    if (tf.getInputName().toLowerCase().contains("aantalbezoekers")) {
+                        visit.stop(tf);
+                    }
+                });
+        tester.getRequest().getPostParameters().setParameterValue(veld.getInputName(), String.valueOf(aantal));
+        veld.inputChanged();
+        veld.validate();
+
+        assertThat(veld.isValid()).isEqualTo(geldig);
+    }
+
+    @ParameterizedTest(name = "aantal bezoekers \"{0}\" blokkeert de volgende stap")
+    @CsvSource(value = {"''", "3", "9", "abc"})
+    @WithMockUser(username = "999990007")
+    void volgendeStapBlijftOpExtrasZonderGeldigAantalBezoekers(String aantal) {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990007")));
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        klikVolgendeStapMetAantalBezoekers(aantal);
+
+        tester.assertRenderedPage(ExtrasPage.class);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).aantalBezoekers()).isNull();
+        assertThat(marriageIntakeService.findByDossierId(dossierId).extrasDoorlopen()).isFalse();
+    }
+
+    @Test
+    @WithMockUser(username = "999990007")
+    void volgendeStapSlaatGeldigAantalBezoekersOpEnGaatNaarControleren() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null,
+                        new BurgerServiceNummer("999990007")));
+        tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        klikVolgendeStapMetAantalBezoekers("5");
+
+        tester.assertRenderedPage(ControlerenPage.class);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).aantalBezoekers()).isEqualTo(5);
+        assertThat(marriageIntakeService.findByDossierId(dossierId).extrasDoorlopen()).isTrue();
+    }
+
+    private void klikVolgendeStapMetAantalBezoekers(String aantal) {
+        TextField<?> veld = tester.getLastRenderedPage().visitChildren(TextField.class,
+                (TextField<?> tf, IVisit<TextField<?>> visit) -> {
+                    if (tf.getInputName().toLowerCase().contains("aantalbezoekers")) {
+                        visit.stop(tf);
+                    }
+                });
+        FormTester formTester = tester.newFormTester(FORM_PAD, false);
+        formTester.setValue(veld, aantal);
+        // Zoals een browser: anders weigert Wicket's CSRF-bescherming de POST.
+        tester.getRequest().setHeader("Origin", "http://localhost");
+        formTester.submitLink(PAGE_BODY + ":volgendeStapContainer:volgendeStap", true);
     }
 
     private void assertInternationaleAkteZichtbaarVoor(CeremonieSoort ceremonieSoort, BurgerServiceNummer bsn) {

@@ -70,6 +70,14 @@ class DatumKiezenPageTest extends BaseWicketTest {
         String response = tester.getLastResponseAsString();
         assertThat(response).contains("rods-date-picker");
         assertThat(response).contains("utrecht-button");
+        assertThat(response)
+                .contains("Datum en tijd")
+                .contains("Kies een datum voor uw ceremonie.")
+                .contains("U kunt alleen kiezen uit de beschikbare dagen. De beschikbare dagen zijn groen in de kalender.")
+                .contains("Kies hoe laat uw ceremonie moet beginnen.")
+                .contains("Tijden waaruit u kunt kiezen:")
+                .contains("Uw ceremonie is op:")
+                .contains("Deze datum en tijd bevestigen");
     }
 
     @Test

@@ -1,23 +1,7 @@
 #
-# Start up an Postgress Database server in podman under Windows.
-#
-# Note: All of the following is NOT VALID when using the per-app VPN.
-#
-# The image is 4.8 GB.  If download hangs or is too slow
-# to complete, consider setting environment of the podman
-# host as follows:
-#
-#     wsl --shutdown
-#     $env:NO_PROXY="artifactory.ontwikkel.rotterdam.nl"
-#     $env:http_proxy="http://proxy.ontwikkel.rotterdam.nl:8080/"
-#     $env:https_proxy="http://proxy.ontwikkel.rotterdam.nl:8080/"
-#
-# and use correct IP address (some DNS servers have broken address)
-#
-#     172.16.140.5 artifactory.ontwikkel.rotterdam.nl
+# Start up an Postgress Database server and a mailpit server in podman under Windows.
 #
 #podman machine start
-
 podman run -d `
     --tls-verify=false `
     -p 127.0.0.1:5433:5432 `
@@ -28,4 +12,11 @@ podman run -d `
     -v pg2_data:/var/lib/postgresql `
     -v ./docker/postgres:/docker-entrypoint-initdb.d `
     "postgres:18"
+
+podman run -d `
+    --tls-verify=false `
+    -p 127.0.0.1:1025:1025 `
+    -p 127.0.0.1:8025:8025 `
+    --name verbonden-mailpit `
+    "axllent/mailpit:latest"
 

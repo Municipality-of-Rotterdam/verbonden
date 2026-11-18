@@ -19,6 +19,10 @@
                 <span><wicket:message key="controleren.ceremonie">Ceremonie</wicket:message></span>
                 <strong><span wicket:id="ceremonieSoort">Klein</span> <span wicket:id="ceremoniePrijsContainer" class="rd-controleer-prijs">&#x20AC;&nbsp;<span wicket:id="ceremoniePrijs"></span></span></strong>
             </div>
+            <div wicket:id="taalRij" class="rd-controleer-rij">
+                <span><wicket:message key="controleren.taal">Taal van de ceremonie</wicket:message></span>
+                <strong wicket:id="taal"></strong>
+            </div>
             <div wicket:id="datumRij" class="rd-controleer-rij">
                 <span><wicket:message key="controleren.datum">Datum</wicket:message></span>
                 <strong wicket:id="datum"></strong>
@@ -55,6 +59,10 @@
             <div class="rd-controleer-sectie__kop">
                 <h3><wicket:message key="controleren.extras">Extra opties</wicket:message></h3>
                 <a wicket:id="wijzigExtras"><wicket:message key="controleren.aanpassen">Aanpassen</wicket:message></a>
+            </div>
+            <div wicket:id="bezoekersRij" class="rd-controleer-rij">
+                <span><wicket:message key="controleren.bezoekers">Aantal bezoekers</wicket:message></span>
+                <strong wicket:id="aantalBezoekers"></strong>
             </div>
             <p wicket:id="geenExtras" class="rd-keuzes-empty">
                 <wicket:message key="intake.sidebar.extras.nogniet">Nog geen extra's gekozen</wicket:message>

@@ -158,6 +158,8 @@ public class SecurityConfig {
                         // Afbeeldingen van trouwboekjes: ook zichtbaar in beheer, voor medewerkers zonder ROLE_BURGER
                         .requestMatchers("/trouwboekjes/**").permitAll()
                         .requestMatchers("/trouwlocaties/**").permitAll()
+                        // Statische afbeeldingen (o.a. het logo in het beheermenu)
+                        .requestMatchers("/images/**").permitAll()
                         .requestMatchers("/actuator", "/actuator/**").permitAll()
                         .anyRequest().hasRole("BURGER")
                 )

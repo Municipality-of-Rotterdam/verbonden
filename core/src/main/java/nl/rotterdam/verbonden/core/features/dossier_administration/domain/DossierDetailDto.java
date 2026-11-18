@@ -3,6 +3,7 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.domain;
 import nl.rotterdam.verbonden.core.features.betaling_administration.domain.ListBetalingDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
@@ -36,6 +37,8 @@ public record DossierDetailDto(
         LocalDateTime ingediendOp,
         RegistratieType registratieType,
         CeremonieSoort ceremonieSoort,
+        CeremonieTaal taal,
+        Integer aantalBezoekers,
         String locatieNaam,
         VrijeTrouwlocatieDto vrijeTrouwlocatie,
         LocalDateTime datumTijdHuwelijk,

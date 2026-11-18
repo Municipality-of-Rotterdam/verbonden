@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.burger_common.BurgerPageExpiredPage;
 import nl.rotterdam.verbonden.core.domain.PersonFullName;
 import nl.rotterdam.verbonden.core.error_common.VerbondenExceptionMapper;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeAdministrationPage;
+import nl.rotterdam.verbonden.core.features.trouwlijst_administration.ui.TrouwlijstAdministrationPage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeCreatePage;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.ui.TrouwboekjeUpdatePage;
 import nl.rotterdam.verbonden.core.features.marriage_intake.ui.ExtrasPage;
@@ -30,6 +31,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierExt
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BetaalmutatieCreatePage;
 import nl.rotterdam.verbonden.core.features.betaling_administration.ui.BetalingAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierJsonResourceReference;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierMailDetailPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierGetuigenUpdatePage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierPartnerUpdatePage;
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.PersonFullNameWicketConverter;
@@ -224,9 +226,11 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         mountPage("/beheer/dossiers/${dossierId}/partners/${volgorde}", DossierPartnerUpdatePage.class);
         mountPage("/beheer/dossiers/${dossierId}/getuigen", DossierGetuigenUpdatePage.class);
         mountPage("/beheer/dossiers/${dossierId}/extras", DossierExtrasUpdatePage.class);
+        mountPage("/beheer/dossiers/${dossierId}/mails/${mailId}", DossierMailDetailPage.class);
         mountPage("/beheer/dossiers/${dossierId}/betaalmutaties/nieuw", BetaalmutatieCreatePage.class);
         mountPage("/beheer/betalingen", BetalingAdministrationPage.class);
         mountResource("/beheer/dossiers/${dossierId}/json", new DossierJsonResourceReference());
+        mountPage("/beheer/trouwlijst", TrouwlijstAdministrationPage.class);
         mountPage("/beheer/extras", TrouwboekjeAdministrationPage.class);
         mountPage("/beheer/extras/nieuw", TrouwboekjeCreatePage.class);
         mountPage("/beheer/extras/${id}", TrouwboekjeUpdatePage.class);

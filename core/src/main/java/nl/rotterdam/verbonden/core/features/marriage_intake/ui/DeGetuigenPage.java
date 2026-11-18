@@ -50,6 +50,11 @@ public class DeGetuigenPage extends IntakeBasePage {
     }
 
     @Override
+    protected IModel<String> getStepQuestionModel() {
+        return new ResourceModel("de.getuigen.heading");
+    }
+
+    @Override
     protected IModel<String> getStepIntroModel() {
         return new ResourceModel("de.getuigen.intro");
     }

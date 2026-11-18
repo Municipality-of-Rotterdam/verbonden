@@ -3,6 +3,7 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CreateDossierDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
@@ -134,11 +135,11 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.startPage(DeGetuigenPage.class, params);
         tester.assertVisible(SIDEBAR + "partnerHerinnering");
         String html = tester.getLastResponseAsString();
-        assertThat(html).contains("Uw partner doet nog niet mee.")
+        assertThat(html).contains("Uw partner moet inloggen met een eigen DigiD.")
                 .doesNotContain("partnerUitnodigenLink");
         int sidebarStart = html.indexOf("rd-keuzes-panel");
-        assertThat(html.indexOf("Uw partner doet nog niet mee.", sidebarStart))
-                .isLessThan(html.indexOf("De getuigen", sidebarStart));
+        assertThat(html.indexOf("Uw partner moet inloggen met een eigen DigiD.", sidebarStart))
+                .isLessThan(html.indexOf("Jullie getuigen", sidebarStart));
     }
 
     @Test
@@ -146,6 +147,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
     void sidebarToontStatusPerStapMetAndereMarkeringVoorHuidigeStap() {
         createdDossierId = marriageIntakeService.create(
                 new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.GROOT, null, new BurgerServiceNummer("999990007")));
+        marriageIntakeService.slaTaalOp(createdDossierId, CeremonieTaal.NEDERLANDS);
 
         PageParameters params = new PageParameters();
         params.add("dossierId", createdDossierId.toString());
@@ -174,8 +176,8 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.assertVisible(SIDEBAR + "geenGegevens");
         tester.assertVisible(SIDEBAR + "geenGetuigen");
         assertThat(tester.getLastResponseAsString())
-                .contains("Nog geen gegevens ingevuld")
-                .contains("Nog geen getuigen ingevuld");
+                .contains("Jullie gegevens invullen")
+                .contains("Jullie getuigen doorgeven");
     }
 
     @Test
