@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.babs_administration.ui;
 
 import nl.rotterdam.verbonden.core.domain.PersonFullName;
+import nl.rotterdam.verbonden.core.domain.PersonFullNameInvalidException;
 import nl.rotterdam.verbonden.core.domain.PersonFullNameTooLongException;
 import nl.rotterdam.verbonden.core.domain.PersonFullNameTooShortException;
 import org.apache.wicket.util.convert.ConversionException;
@@ -18,6 +19,10 @@ public class PersonFullNameWicketConverter implements IConverter<PersonFullName>
         }
         try {
             return new PersonFullName(value);
+        } catch (PersonFullNameInvalidException e) {
+            throw new ConversionException("Gebruik alleen letters, spaties, punten, apostroffen of streepjes.")
+                    .setResourceKey("PersonFullName.invalid")
+                    .setLocale(locale);
         } catch (PersonFullNameTooShortException e) {
             throw new ConversionException("Naam moet minimaal 5 tekens bevatten")
                     .setResourceKey("PersonFullName.tooShort")

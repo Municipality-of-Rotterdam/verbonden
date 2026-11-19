@@ -35,7 +35,7 @@ class VerbondenApplicationTests {
         HttpRequest request = HttpRequest.newBuilder(
                         URI.create("http://localhost:" + port + "/mijn-dag/" + UUID.randomUUID()))
                 .build();
-        HttpResponse<Void> response = HttpClient.newHttpClient()
+        HttpResponse<Void> response = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build()
                 .send(request, HttpResponse.BodyHandlers.discarding());
 
         assertThat(response.headers().allValues("Set-Cookie"))

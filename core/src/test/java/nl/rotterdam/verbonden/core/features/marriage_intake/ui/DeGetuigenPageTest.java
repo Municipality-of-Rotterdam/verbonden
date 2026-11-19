@@ -251,6 +251,38 @@ class DeGetuigenPageTest extends BaseWicketTest {
                 .containsExactly("Jan Jansen");
     }
 
+    @Test
+    @WithMockUser(username = "999990202")
+    void getuigeOpslaanViaAjax_toontFoutBijOngeldigeTekens() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990202")));
+        tester.startPage(DeGetuigenPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        FormComponent<?> naam = naamveldVanGetuige(1);
+        tester.getRequest().getPostParameters().setParameterValue(naam.getInputName(), "<script>");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        tester.executeBehavior(naam.getBehaviors(AjaxFormComponentUpdatingBehavior.class).getFirst());
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("Gebruik alleen letters, spaties, punten, apostroffen of streepjes.")
+                .doesNotContain("<script>");
+        assertThat(marriageIntakeService.findGetuigen(dossierId)).isEmpty();
+    }
+
+    @Test
+    @WithMockUser(username = "999990202")
+    void sidebarEscapetOngeldigeTekensUitBestaandeGetuigennaam() {
+        UUID dossierId = marriageIntakeService.create(
+                new CreateDossierDto(RegistratieType.HUWELIJK, CeremonieSoort.KLEIN, null, new BurgerServiceNummer("999990202")));
+        marriageIntakeService.slaGetuigeOp(dossierId, new SaveGetuigenDto(1, "<script>"));
+
+        tester.startPage(DeGetuigenPage.class, new PageParameters().add("dossierId", dossierId.toString()));
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("&lt;script&gt;")
+                .doesNotContain("<script>");
+    }
+
     /**
      * De markup van een component in het laatste Ajax-antwoord.
      */
