@@ -8,6 +8,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Change
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangePartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBijlageType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailPartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
@@ -223,11 +224,14 @@ class DossierBeheerIntegrationTest {
         byte[] pdf = "%PDF-1.7 paspoort".getBytes(StandardCharsets.US_ASCII);
 
         long bestandId = dossierAdministrationService.createBestand(dossierId,
-                new CreateDossierBestandDto("C:\\Scans\\paspoort.pdf", pdf));
+                new CreateDossierBestandDto("C:\\Scans\\paspoort.pdf", DossierBijlageType.GETUIGENLEGITIMATIE,
+                        "Paspoort van de getuige", pdf));
 
         assertThat(dossierAdministrationService.findDetail(dossierId).bestanden()).singleElement().satisfies(b -> {
             assertThat(b.bestandsnaam()).isEqualTo("paspoort.pdf");
             assertThat(b.bestandType()).isEqualTo(DossierBestandType.PDF);
+            assertThat(b.bijlageType()).isEqualTo(DossierBijlageType.GETUIGENLEGITIMATIE);
+            assertThat(b.opmerking()).isEqualTo("Paspoort van de getuige");
             assertThat(b.toegevoegdDoor()).isEqualTo("medewerker");
         });
 
@@ -245,11 +249,13 @@ class DossierBeheerIntegrationTest {
         UUID dossierId = testData.maakConceptDossier();
 
         assertThatThrownBy(() -> dossierAdministrationService.createBestand(dossierId,
-                new CreateDossierBestandDto("programma.exe", "MZ".getBytes(StandardCharsets.US_ASCII))))
+                new CreateDossierBestandDto("programma.exe", DossierBijlageType.OVERIGE, null,
+                        "MZ".getBytes(StandardCharsets.US_ASCII))))
                 .isInstanceOf(BestandNietToegestaanException.class)
                 .hasMessageContaining("niet toegestaan");
         assertThatThrownBy(() -> dossierAdministrationService.createBestand(dossierId,
-                new CreateDossierBestandDto("hernoemd.pdf", "PK\u0003\u0004".getBytes(StandardCharsets.ISO_8859_1))))
+                new CreateDossierBestandDto("hernoemd.pdf", DossierBijlageType.OVERIGE, null,
+                        "PK\u0003\u0004".getBytes(StandardCharsets.ISO_8859_1))))
                 .isInstanceOf(BestandNietToegestaanException.class)
                 .hasMessageContaining("past niet bij de extensie");
     }
@@ -258,7 +264,8 @@ class DossierBeheerIntegrationTest {
     void bestand_vanAnderDossier_kanNietWordenOpgevraagd() {
         UUID dossierId = testData.maakConceptDossier();
         long bestandId = dossierAdministrationService.createBestand(dossierId,
-                new CreateDossierBestandDto("paspoort.pdf", "%PDF-1.7".getBytes(StandardCharsets.US_ASCII)));
+                new CreateDossierBestandDto("paspoort.pdf", DossierBijlageType.OVERIGE, null,
+                        "%PDF-1.7".getBytes(StandardCharsets.US_ASCII)));
         UUID anderDossier = maakDossierMetPartnerZonderBsn();
 
         assertThatThrownBy(() -> dossierAdministrationService.findBestand(anderDossier, bestandId))

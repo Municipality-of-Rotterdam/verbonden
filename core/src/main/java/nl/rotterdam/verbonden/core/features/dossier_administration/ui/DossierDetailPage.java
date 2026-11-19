@@ -9,9 +9,11 @@ import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.verbonden.core.administration_common.RdFormFieldFileUpload;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailPartnerDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBijlageType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierBestandDto;
@@ -24,8 +26,9 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraI
 import nl.rotterdam.verbonden.core.domain.Bedrag;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.upload.FileUpload;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.markup.html.list.ListItem;
@@ -34,6 +37,7 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.util.ListModel;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
@@ -348,6 +352,8 @@ public class DossierDetailPage extends DossierBeheerBasePage {
 
             item.add(
                     download,
+                    new Label("bijlageType", bestand.bijlageType().getLabel()),
+                    new Label("opmerking", tekst(bestand.opmerking())),
                     new Label("grootte", Bytes.bytes(bestand.grootte()).toString(NEDERLAND)),
                     new Label("toegevoegd", bestand.toegevoegdDoor() + ", " + datumTijd(bestand.toegevoegdOp())),
                     verwijderForm
@@ -390,6 +396,8 @@ public class DossierDetailPage extends DossierBeheerBasePage {
 
         private final IModel<List<FileUpload>> uploads = new ListModel<>();
         private RdFormFieldFileUpload bestand;
+        private DropDownChoice<DossierBijlageType> bijlageType;
+        private RdFormFieldTextArea<String> opmerking;
 
         BestandToevoegenForm(String id) {
             super(id);
@@ -406,8 +414,24 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                     .collect(Collectors.joining(","));
             bestand = new RdFormFieldFileUpload("bestand", uploads, Model.of("Bestand"));
             bestand.withInput(input -> input.add(AttributeModifier.replace("accept", extensies)));
+            bijlageType = new DropDownChoice<>("bijlageType", Model.of(), List.of(DossierBijlageType.values()),
+                    new IChoiceRenderer<>() {
+                        @Override
+                        public Object getDisplayValue(DossierBijlageType object) {
+                            return object.getLabel();
+                        }
+
+                        @Override
+                        public String getIdValue(DossierBijlageType object, int index) {
+                            return Integer.toString(index);
+                        }
+                    });
+            bijlageType.setLabel(Model.of("Type bijlage")).setRequired(true);
+            opmerking = new RdFormFieldTextArea<>("opmerking", Model.of(""), Model.of("Opmerking"));
             add(
                     bestand,
+                    bijlageType,
+                    opmerking,
                     new Label("toegestaan", "Documenten en afbeeldingen ("
                             + String.join(", ", DossierBestandType.alleExtensies()) + "), maximaal "
                             + DossierBestandType.MAX_GROOTTE / (1024 * 1024) + " MB."),
@@ -424,7 +448,8 @@ public class DossierDetailPage extends DossierBeheerBasePage {
             }
             try {
                 dossierAdministrationService.createBestand(dossierId,
-                        new CreateDossierBestandDto(upload.getClientFileName(), upload.getBytes()));
+                        new CreateDossierBestandDto(upload.getClientFileName(), bijlageType.getModelObject(),
+                                opmerking.getModelObject(), upload.getBytes()));
                 naarDetailPagina();
             } catch (BestandNietToegestaanException e) {
                 error(e.getMessage());

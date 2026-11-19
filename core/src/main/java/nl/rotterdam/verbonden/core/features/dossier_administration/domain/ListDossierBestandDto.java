@@ -7,6 +7,8 @@ public record ListDossierBestandDto(
         long id,
         String bestandsnaam,
         DossierBestandType bestandType,
+        DossierBijlageType bijlageType,
+        String opmerking,
         long grootte,
         String toegevoegdDoor,
         LocalDateTime toegevoegdOp

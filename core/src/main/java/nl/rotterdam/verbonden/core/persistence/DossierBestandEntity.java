@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.persistence;
 
 import jakarta.persistence.*;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBijlageType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,13 @@ public class DossierBestandEntity {
     @Column(name = "bestand_type", nullable = false, updatable = false)
     private DossierBestandType bestandType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "bijlage_type", nullable = false, updatable = false)
+    private DossierBijlageType bijlageType;
+
+    @Column(name = "opmerking", updatable = false)
+    private String opmerking;
+
     @Column(name = "grootte", nullable = false, updatable = false)
     private long grootte;
 
@@ -43,10 +51,12 @@ public class DossierBestandEntity {
     }
 
     public DossierBestandEntity(HuwelijksDossierEntity dossier, String bestandsnaam, DossierBestandType bestandType,
-                                byte[] inhoud, String toegevoegdDoor) {
+                                DossierBijlageType bijlageType, String opmerking, byte[] inhoud, String toegevoegdDoor) {
         this.dossier = dossier;
         this.bestandsnaam = bestandsnaam;
         this.bestandType = bestandType;
+        this.bijlageType = bijlageType;
+        this.opmerking = opmerking;
         this.grootte = inhoud.length;
         this.inhoud = inhoud;
         this.toegevoegdDoor = toegevoegdDoor;
@@ -63,6 +73,14 @@ public class DossierBestandEntity {
 
     public DossierBestandType getBestandType() {
         return bestandType;
+    }
+
+    public DossierBijlageType getBijlageType() {
+        return bijlageType;
+    }
+
+    public String getOpmerking() {
+        return opmerking;
     }
 
     public byte[] getInhoud() {
