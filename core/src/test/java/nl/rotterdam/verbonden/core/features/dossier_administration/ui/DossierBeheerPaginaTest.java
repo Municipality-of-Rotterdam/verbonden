@@ -128,6 +128,8 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
         FormTester form = formTester("bestandToevoegenForm");
+        form.select(veld("bestandToevoegenForm", "bijlageType"), 0);
+        form.setValue(veld("bestandToevoegenForm", "opmerking"), "Legitimatie van de getuige");
         form.setFile(veld("bestandToevoegenForm", "bestand"), new File(pdf.toFile()), "application/pdf");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         form.submit(veld("bestandToevoegenForm", "toevoegen"));
@@ -147,6 +149,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
         FormTester form = formTester("bestandToevoegenForm");
+        form.select(veld("bestandToevoegenForm", "bijlageType"), 0);
         form.setFile(veld("bestandToevoegenForm", "bestand"), new File(exe.toFile()), "application/octet-stream");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         form.submit(veld("bestandToevoegenForm", "toevoegen"));

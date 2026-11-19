@@ -200,6 +200,8 @@
             <thead class="utrecht-table__header">
             <tr class="utrecht-table__row">
                 <th class="utrecht-table__header-cell">Bestand</th>
+                <th class="utrecht-table__header-cell">Type</th>
+                <th class="utrecht-table__header-cell">Opmerking</th>
                 <th class="utrecht-table__header-cell">Grootte</th>
                 <th class="utrecht-table__header-cell">Toegevoegd</th>
                 <th class="utrecht-table__header-cell"></th>
@@ -208,6 +210,8 @@
             <tbody class="utrecht-table__body">
             <tr wicket:id="bestanden" class="utrecht-table__row">
                 <td class="utrecht-table__cell"><a wicket:id="download"><span wicket:id="bestandsnaam">bestand.pdf</span></a></td>
+                <td class="utrecht-table__cell" wicket:id="bijlageType">Overige</td>
+                <td class="utrecht-table__cell" wicket:id="opmerking">-</td>
                 <td class="utrecht-table__cell" wicket:id="grootte">1 KB</td>
                 <td class="utrecht-table__cell" wicket:id="toegevoegd">-</td>
                 <td class="utrecht-table__cell">
@@ -225,6 +229,8 @@
             <div wicket:id="bestand">
                 <input wicket:id="input" type="file"/>
             </div>
+            <div wicket:id="bijlageType"></div>
+            <div wicket:id="opmerking"></div>
             <p wicket:id="toegestaan"></p>
             <div>
                 <button wicket:id="toevoegen" type="submit"></button>
