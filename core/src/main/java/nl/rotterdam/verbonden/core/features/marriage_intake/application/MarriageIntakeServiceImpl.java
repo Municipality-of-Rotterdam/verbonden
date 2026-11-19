@@ -267,7 +267,10 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
             extraItems.add(new SidebarExtraItemDto("Muziek", null));
         }
         if (e.getTrouwboekje() != null) {
-            extraItems.add(new SidebarExtraItemDto(e.getTrouwboekje().getNaam(), e.getTrouwboekje().getPrijs()));
+            String trouwboekjeNaam = e.getTrouwboekje().getNaam();
+            extraItems.add(new SidebarExtraItemDto(
+                    formatTrouwboekjeNaam(trouwboekjeNaam),
+                    e.getTrouwboekje().getPrijs()));
         }
         if (e.isInternationaleAkte()) {
             extraItems.add(new SidebarExtraItemDto("Internationale huwelijksakte", internationaleAktePrijs(e)));
@@ -383,6 +386,17 @@ class MarriageIntakeServiceImpl implements MarriageIntakeService {
         return (int) dossier.getPartners().stream()
                 .filter(p -> p.getGekozenAchternaam() != null)
                 .count();
+    }
+
+    private static String formatTrouwboekjeNaam(String naam) {
+        if (naam == null || naam.isBlank()) {
+            return "Trouwboekje";
+        }
+        String schoonNaam = naam.trim();
+        if (schoonNaam.toLowerCase(Locale.ROOT).contains("trouwboekje")) {
+            return schoonNaam;
+        }
+        return "Trouwboekje " + schoonNaam.toLowerCase(Locale.ROOT);
     }
 
     @Override
