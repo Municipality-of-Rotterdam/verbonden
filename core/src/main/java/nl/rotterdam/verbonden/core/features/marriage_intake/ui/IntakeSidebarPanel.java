@@ -204,7 +204,7 @@ public class IntakeSidebarPanel extends GenericPanel<DossierSamenvattingDto> {
                 new ListView<>("getuigenNamen", getuigenNamenModel) {
                     @Override
                     protected void populateItem(ListItem<String> item) {
-                        item.add(new Label("getuigeNaam", item.getModel()).setEscapeModelStrings(true));
+                        item.add(new Label("getuigeNaam", item.getModel()));
                     }
                 }
         );
