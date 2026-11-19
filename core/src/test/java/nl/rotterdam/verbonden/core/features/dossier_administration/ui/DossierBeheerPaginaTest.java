@@ -137,8 +137,14 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         tester.assertRenderedPage(DossierDetailPage.class);
         assertThat(dossierAdministrationService.findDetail(dossierId).bestanden())
                 .singleElement()
-                .satisfies(b -> assertThat(b.bestandsnaam()).isEqualTo("paspoort.pdf"));
-        assertThat(tester.getLastResponseAsString()).contains("paspoort.pdf");
+                .satisfies(b -> {
+                    assertThat(b.bestandsnaam()).isEqualTo("paspoort.pdf");
+                    assertThat(b.opmerking()).isEqualTo("Legitimatie van de getuige");
+                });
+        assertThat(tester.getLastResponseAsString())
+                .contains("paspoort.pdf")
+                .contains("Getuigenlegitimatie")
+                .contains("Legitimatie van de getuige");
     }
 
     @Test

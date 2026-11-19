@@ -230,6 +230,8 @@ class DossierBeheerIntegrationTest {
         assertThat(dossierAdministrationService.findDetail(dossierId).bestanden()).singleElement().satisfies(b -> {
             assertThat(b.bestandsnaam()).isEqualTo("paspoort.pdf");
             assertThat(b.bestandType()).isEqualTo(DossierBestandType.PDF);
+            assertThat(b.bijlageType()).isEqualTo(DossierBijlageType.GETUIGENLEGITIMATIE);
+            assertThat(b.opmerking()).isEqualTo("Paspoort van de getuige");
             assertThat(b.toegevoegdDoor()).isEqualTo("medewerker");
         });
 
