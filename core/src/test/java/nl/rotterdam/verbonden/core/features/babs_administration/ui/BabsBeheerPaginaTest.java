@@ -77,12 +77,12 @@ class BabsBeheerPaginaTest extends BaseWicketTest {
         tester.startPage(BabsCreatePage.class);
 
         FormTester form = formTester("babsForm");
-        form.setValue(veld("babsForm", "naam"), "Jan");
+        form.setValue(veld("babsForm", "naam"), "J");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         form.submit(veld("babsForm", "opslaan"));
 
         tester.assertRenderedPage(BabsCreatePage.class);
-        assertThat(tester.getLastResponseAsString()).contains("Naam is korter dan 5 tekens");
+        assertThat(tester.getLastResponseAsString()).contains("Naam is korter dan 2 tekens");
         assertThat(babsAdministrationService.count()).isEqualTo(aantalVoor);
     }
 

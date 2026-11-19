@@ -264,7 +264,7 @@ class DeGetuigenPageTest extends BaseWicketTest {
         tester.executeBehavior(naam.getBehaviors(AjaxFormComponentUpdatingBehavior.class).getFirst());
 
         assertThat(tester.getLastResponseAsString())
-                .contains("Gebruik alleen letters, spaties, punten, apostroffen of streepjes.")
+                .contains("Gebruik minstens één letter, en verder alleen spaties, punten, apostroffen of streepjes.")
                 .doesNotContain("<script>");
         assertThat(marriageIntakeService.findGetuigen(dossierId)).isEmpty();
     }
