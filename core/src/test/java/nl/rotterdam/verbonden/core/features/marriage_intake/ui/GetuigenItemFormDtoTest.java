@@ -61,7 +61,7 @@ class GetuigenItemFormDtoTest {
 
     @Test
     void vanGetuigen_negerteTeKorteNaam() {
-        List<GetuigeDto> bestaande = List.of(new GetuigeDto(1, "Jan"));
+        List<GetuigeDto> bestaande = List.of(new GetuigeDto(1, "J"));
 
         List<GetuigenItemFormDto> items = GetuigenItemFormDto.vanGetuigen(1, bestaande);
 

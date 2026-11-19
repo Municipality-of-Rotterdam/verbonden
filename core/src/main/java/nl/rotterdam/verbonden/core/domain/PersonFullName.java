@@ -10,15 +10,18 @@ import static java.util.Objects.requireNonNull;
  */
 public record PersonFullName(String value) implements ValueHolder<String>, Serializable {
 
-    public static final int MINIMUM_LENGTH = 5;
+    public static final int MINIMUM_LENGTH = 2;
     public static final int MAXIMUM_LENGTH = 80;
-    private static final Pattern VALID_NAME = Pattern.compile("[\\p{L} .'-]+");
+    // Letters en combinerende tekens (zoals Arabische klinkertekens) uit elk schrift, plus spatie, punt,
+    // apostrof (ook ’ zoals in O’Connor) en streepje.
+    private static final Pattern VALID_NAME = Pattern.compile("[\\p{L}\\p{M} .'’-]+");
+    private static final Pattern LETTER = Pattern.compile("\\p{L}");
 
     public PersonFullName {
         requireNonNull(value, "Naam mag niet null zijn");
         value = value.trim();
 
-        if (!value.isEmpty() && !VALID_NAME.matcher(value).matches()) {
+        if (!value.isEmpty() && (!VALID_NAME.matcher(value).matches() || !LETTER.matcher(value).find())) {
             throw new PersonFullNameInvalidException(value);
         }
         if (value.length() < MINIMUM_LENGTH) {

@@ -20,11 +20,11 @@ public class PersonFullNameWicketConverter implements IConverter<PersonFullName>
         try {
             return new PersonFullName(value);
         } catch (PersonFullNameInvalidException e) {
-            throw new ConversionException("Gebruik alleen letters, spaties, punten, apostroffen of streepjes.")
+            throw new ConversionException("Gebruik minstens één letter, en verder alleen spaties, punten, apostroffen of streepjes.")
                     .setResourceKey("PersonFullName.invalid")
                     .setLocale(locale);
         } catch (PersonFullNameTooShortException e) {
-            throw new ConversionException("Naam moet minimaal 5 tekens bevatten")
+            throw new ConversionException("Naam moet minimaal " + PersonFullName.MINIMUM_LENGTH + " tekens bevatten")
                     .setResourceKey("PersonFullName.tooShort")
                     .setVariable("min", PersonFullName.MINIMUM_LENGTH)
                     .setLocale(locale);
