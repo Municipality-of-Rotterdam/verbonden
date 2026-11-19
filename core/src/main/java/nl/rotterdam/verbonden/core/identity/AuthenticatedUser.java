@@ -11,6 +11,10 @@ public interface AuthenticatedUser {
 
     String getUserId();
 
+    default String getDisplayName() {
+        return getUserId();
+    }
+
     Set<String> getRoles();
 
     default boolean hasRole(String role) {
