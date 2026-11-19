@@ -35,6 +35,7 @@ class PersonFullNameTest {
             "山田 太郎",        // Japans, kanji
             "やまだ はなこ",    // Japans, hiragana
             "スズキ イチロー",  // Japans, katakana
+            "ジョン・スミス",   // Japans, westerse naam met middenpunt
     })
     void constructor_staatNamenInAndereSchriftenToe(String naam) {
         assertThat(new PersonFullName(naam).getValue()).isEqualTo(naam);
@@ -47,7 +48,7 @@ class PersonFullNameTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"--", "...", "' '", "- . ’"})
+    @ValueSource(strings = {"--", "...", "' '", "- . ’", "・"})
     void constructor_weigertNaamZonderLetter(String naam) {
         assertThatThrownBy(() -> new PersonFullName(naam))
                 .isInstanceOf(PersonFullNameInvalidException.class);

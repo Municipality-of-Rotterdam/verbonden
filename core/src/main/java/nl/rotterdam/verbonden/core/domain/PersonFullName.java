@@ -13,8 +13,8 @@ public record PersonFullName(String value) implements ValueHolder<String>, Seria
     public static final int MINIMUM_LENGTH = 2;
     public static final int MAXIMUM_LENGTH = 80;
     // Letters en combinerende tekens (zoals Arabische klinkertekens) uit elk schrift, plus spatie, punt,
-    // apostrof (ook ’ zoals in O’Connor) en streepje.
-    private static final Pattern VALID_NAME = Pattern.compile("[\\p{L}\\p{M} .'’-]+");
+    // apostrof (ook ’ zoals in O’Connor), streepje en het Japanse middenpunt (zoals in ジョン・スミス).
+    private static final Pattern VALID_NAME = Pattern.compile("[\\p{L}\\p{M} .'’・-]+");
     private static final Pattern LETTER = Pattern.compile("\\p{L}");
 
     public PersonFullName {
