@@ -38,10 +38,16 @@
                 <h3><wicket:message key="controleren.jullie.gegevens">Uw gegevens</wicket:message></h3>
                 <a wicket:id="wijzigGegevens"><wicket:message key="controleren.aanpassen">Aanpassen</wicket:message></a>
             </div>
-            <div wicket:id="partners" class="rd-controleer-rij">
-                <span><wicket:message key="controleren.naamkeuze">Naamkeuze</wicket:message></span>
-                <strong wicket:id="naamkeuze"></strong>
-            </div>
+            <wicket:container wicket:id="partners">
+                <div class="rd-controleer-rij">
+                    <span><wicket:message key="controleren.naam">Naam</wicket:message></span>
+                    <strong wicket:id="naam"></strong>
+                </div>
+                <div wicket:id="gekozenNaamRij" class="rd-controleer-rij">
+                    <span><wicket:message key="controleren.gekozen.naam">Gekozen naam</wicket:message></span>
+                    <strong wicket:id="gekozenNaam"></strong>
+                </div>
+            </wicket:container>
         </section>
 
         <section class="rd-controleer-sectie">

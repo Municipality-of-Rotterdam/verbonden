@@ -2,7 +2,6 @@ package nl.rotterdam.verbonden.core.features.marriage_intake.ui;
 
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import org.apache.wicket.util.tester.TagTester;
 import org.junit.jupiter.api.Test;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
@@ -104,23 +103,29 @@ class ControlerenPageTest extends BaseWicketTest {
     }
 
     @Test
-    void naamkeuzeVoegtEigenAchternaamNietDubbelToe() {
-        PartnerGegevensDto partner1 = partner("Rosa", "van Rozen", "van Rozen - van Mooije");
-        PartnerGegevensDto partner2 = partner("Sabina Ellen", "van Mooije", "van Mooije - van Rozen");
+    @WithMockUser(username = "999990020")
+    void toontDeEigenNaamEnDeGekozenNaamInDeGekozenVolgorde() {
+        UUID dossierId = testData.maakCompleetDossier();
+        marriageIntakeService.slaPartnerGegevensOp(dossierId, 1, "Dëhlano - Jansen");
 
-        assertThat(ControlerenPage.naamkeuze(partner1)).isEqualTo("Rosa van Rozen - van Mooije");
-        assertThat(ControlerenPage.naamkeuze(partner2)).isEqualTo("Sabina Ellen van Mooije - van Rozen");
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        assertThat(tester.getLastResponseAsString())
+                .containsPattern(">Pieter Jansen</strong>")
+                .containsPattern(">Pieter Dëhlano - Jansen</strong>")
+                .doesNotContain("Pieter Jansen - ");
     }
 
     @Test
-    void naamkeuzeMetAlleenEigenAchternaamToontGeenDubbeleAchternaam() {
-        assertThat(ControlerenPage.naamkeuze(partner("Rosa", "van Rozen", "van Rozen")))
-                .isEqualTo("Rosa van Rozen");
-    }
+    @WithMockUser(username = "999990020")
+    void zonderKeuzeGeenGekozenNaam() {
+        UUID dossierId = testData.maakConceptDossier();
 
-    private static PartnerGegevensDto partner(String voornamen, String achternaam, String gekozenAchternaam) {
-        return new PartnerGegevensDto(1, null, null, achternaam, voornamen, null,
-                null, null, null, null, null, gekozenAchternaam, 0);
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        assertThat(tester.getLastResponseAsString())
+                .containsPattern(">Pieter Jansen</strong>")
+                .doesNotContain("Gekozen naam");
     }
 
     private void click(String linkId) {

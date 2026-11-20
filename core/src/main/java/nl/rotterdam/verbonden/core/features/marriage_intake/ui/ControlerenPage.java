@@ -36,7 +36,6 @@ import org.wicketstuff.minis.behavior.EnabledModelBehavior;
 import org.wicketstuff.minis.behavior.VisibleModelBehavior;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -154,7 +153,13 @@ public class ControlerenPage extends IntakeBasePage {
                 new ListView<>("partners", partnerGegevensModel()) {
                     @Override
                     protected void populateItem(ListItem<PartnerGegevensDto> item) {
-                        item.add(new Label("naamkeuze", naamkeuze(item.getModelObject())));
+                        PartnerGegevensDto partner = item.getModelObject();
+                        String gekozenNaam = gekozenNaam(partner);
+                        item.add(
+                                new Label("naam", naam(partner.voornamen(), partner.achternaam())),
+                                new WebMarkupContainer("gekozenNaamRij")
+                                        .add(new Label("gekozenNaam", gekozenNaam))
+                                        .setVisible(gekozenNaam != null));
                     }
                 },
                 new ListView<>("getuigen", getuigenModel()) {
@@ -214,20 +219,23 @@ public class ControlerenPage extends IntakeBasePage {
         return makeDossierPageParameters(dossierId);
     }
 
-    static String naamkeuze(PartnerGegevensDto partner) {
-        String naam = Stream.of(partner.voornamen(), partner.achternaam())
-                .filter(Objects::nonNull)
-                .filter(waarde -> !waarde.isBlank())
-                .collect(Collectors.joining(" "));
-        String gekozenAchternaam = Optional.ofNullable(partner.gekozenAchternaam())
+    /**
+     * De voornamen met de gekozen achternaam, die al de volledige keuze is (bijvoorbeeld "Dëhlano - Jansen");
+     * {@code null} zonder keuze.
+     */
+    private static String gekozenNaam(PartnerGegevensDto partner) {
+        return Optional.ofNullable(partner.gekozenAchternaam())
                 .filter(gekozen -> !gekozen.isBlank())
-                .map(gekozen -> {
-                    List<String> achternamen = new ArrayList<>(List.of(gekozen.split(" - ")));
-                    achternamen.remove(partner.achternaam());
-                    return String.join(" - ", achternamen);
-                })
-                .orElse("");
-        return gekozenAchternaam.isBlank() ? naam : naam + " - " + gekozenAchternaam;
+                .map(gekozen -> naam(partner.voornamen(), gekozen))
+                .orElse(null);
+    }
+
+    /** De niet-lege delen van een naam, gescheiden door een spatie. */
+    private static String naam(String... delen) {
+        return Stream.of(delen)
+                .filter(Objects::nonNull)
+                .filter(deel -> !deel.isBlank())
+                .collect(Collectors.joining(" "));
     }
 
     private class BevestigForm extends Form<Void> {
