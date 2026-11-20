@@ -15,7 +15,7 @@ public interface TrouwlijstRepository extends Repository<AfspraakEntity, Long> {
 
     @Query("""
             SELECT new nl.rotterdam.verbonden.core.features.trouwlijst_administration.domain.TrouwlijstAfspraakDto(
-                d.uuid, a.datum, a.startTijd, l.naam, d.registratieType, d.ceremonieSoort)
+                d.uuid, a.datum, a.startTijd, l.naam, d.registratieType, d.ceremonieSoort, d.taal, d.aantalBezoekers)
             FROM AfspraakEntity a
             JOIN a.locatie l
             JOIN a.dossier d

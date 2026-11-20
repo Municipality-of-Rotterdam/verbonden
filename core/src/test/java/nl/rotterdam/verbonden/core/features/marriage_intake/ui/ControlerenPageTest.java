@@ -102,6 +102,32 @@ class ControlerenPageTest extends BaseWicketTest {
         assertThat(TagTester.createTagByAttribute(html, "class", "rd-controleer-bevestigen")).isNotNull();
     }
 
+    @Test
+    @WithMockUser(username = "999990020")
+    void toontDeEigenNaamEnDeGekozenNaamInDeGekozenVolgorde() {
+        UUID dossierId = testData.maakCompleetDossier();
+        marriageIntakeService.slaPartnerGegevensOp(dossierId, 1, "Dëhlano - Jansen");
+
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        assertThat(tester.getLastResponseAsString())
+                .containsPattern(">Pieter Jansen</strong>")
+                .containsPattern(">Pieter Dëhlano - Jansen</strong>")
+                .doesNotContain("Pieter Jansen - ");
+    }
+
+    @Test
+    @WithMockUser(username = "999990020")
+    void zonderKeuzeGeenGekozenNaam() {
+        UUID dossierId = testData.maakConceptDossier();
+
+        tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
+
+        assertThat(tester.getLastResponseAsString())
+                .containsPattern(">Pieter Jansen</strong>")
+                .doesNotContain("Gekozen naam");
+    }
+
     private void click(String linkId) {
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         tester.addRequestHeader("sec-fetch-mode", "navigate");

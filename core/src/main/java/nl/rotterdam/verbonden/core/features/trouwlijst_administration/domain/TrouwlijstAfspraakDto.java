@@ -1,6 +1,7 @@
 package nl.rotterdam.verbonden.core.features.trouwlijst_administration.domain;
 
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 
 import java.time.LocalDate;
@@ -16,6 +17,8 @@ public record TrouwlijstAfspraakDto(
         LocalTime startTijd,
         String locatie,
         RegistratieType registratieType,
-        CeremonieSoort ceremonieSoort
+        CeremonieSoort ceremonieSoort,
+        CeremonieTaal taal,
+        Integer aantalBezoekers
 ) {
 }

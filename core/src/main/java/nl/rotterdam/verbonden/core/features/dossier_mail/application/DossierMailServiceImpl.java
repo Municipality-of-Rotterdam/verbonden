@@ -312,7 +312,14 @@ class DossierMailServiceImpl implements DossierMailService {
                                                           List<PartnerGegevensDto> partners,
                                                           List<GetuigeDto> getuigen) {
         List<Map<String, Object>> partnerNamen = partners.stream()
-                .map(partner -> Map.<String, Object>of("naam", naamkeuze(partner)))
+                .map(partner -> {
+                    Map<String, Object> partnerNaam = new HashMap<>();
+                    partnerNaam.put("naam", naam(partner.voornamen(), partner.achternaam()));
+                    partnerNaam.put("gekozenNaam", partner.gekozenAchternaam() != null
+                            && !partner.gekozenAchternaam().isBlank()
+                            ? naam(partner.voornamen(), partner.gekozenAchternaam()) : null);
+                    return partnerNaam;
+                })
                 .toList();
         List<Map<String, Object>> extras = new ArrayList<>();
         for (SidebarExtraItemDto extra : dossier.extras() == null ? List.<SidebarExtraItemDto>of() : dossier.extras()) {
@@ -341,15 +348,6 @@ class DossierMailServiceImpl implements DossierMailService {
         waarden.put("extras", extras);
         waarden.put("totaalPrijs", dossier.totalPrijs() != null ? dossier.totalPrijs().format() : null);
         return waarden;
-    }
-
-    /**
-     * De voornamen met de gekozen achternaam, die al de volledige keuze is (bijvoorbeeld "Jansen - Dëhlano");
-     * zonder keuze de achternaam uit de BRP.
-     */
-    private static String naamkeuze(PartnerGegevensDto partner) {
-        boolean heeftKeuze = partner.gekozenAchternaam() != null && !partner.gekozenAchternaam().isBlank();
-        return naam(partner.voornamen(), heeftKeuze ? partner.gekozenAchternaam() : partner.achternaam());
     }
 
     /** De niet-lege delen van een naam, gescheiden door een spatie. */

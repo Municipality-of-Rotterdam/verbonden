@@ -33,7 +33,7 @@ class TrouwlijstExcelExporter {
     private static final DateTimeFormatter TIJD_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     private static final List<String> KOLOMKOPPEN = List.of(
             "ABS", "Soort", "Ceremonie", "Tijd", "Partner 1", "Partner 2", "Tel. privé 1", "Tel. privé 2",
-            "E-mail 1", "E-mail 2", "Taal");
+            "E-mail 1", "E-mail 2", "Taal", "Aantal bezoekers");
 
     byte[] exporteer(List<ListTrouwlijstDossierDto> dossiers) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -98,7 +98,8 @@ class TrouwlijstExcelExporter {
                 tekst(partner2 != null ? partner2.telefoonnummer() : null),
                 tekst(partner1 != null ? partner1.emailadres() : null),
                 tekst(partner2 != null ? partner2.emailadres() : null),
-                tekst(dossier.taal()));
+                tekst(dossier.taal()),
+                dossier.aantalBezoekers() != null ? dossier.aantalBezoekers().toString() : "");
         for (int i = 0; i < waarden.size(); i++) {
             rij.createCell(i).setCellValue(waarden.get(i));
         }

@@ -72,14 +72,13 @@ class TrouwlijstAdministrationServiceImpl implements TrouwlijstAdministrationSer
                 afspraak.registratieType(),
                 afspraak.ceremonieSoort(),
                 partners,
-                null);
+                afspraak.taal() != null ? afspraak.taal().getLabel() : null,
+                afspraak.aantalBezoekers());
     }
 
     private static TrouwlijstPartnerDto toPartnerDto(PartnerGegevensDto partner) {
-        String achternaam = partner.gekozenAchternaam() != null && !partner.gekozenAchternaam().isBlank()
-                ? partner.gekozenAchternaam() : partner.achternaam();
         String naam = ((partner.voornamen() != null ? partner.voornamen() : "") + " "
-                + (achternaam != null ? achternaam : "")).trim();
+                + (partner.achternaam() != null ? partner.achternaam() : "")).trim();
         return new TrouwlijstPartnerDto(naam,
                 partner.emailadres() != null ? partner.emailadres().getValue() : null,
                 partner.telefoonnummer() != null ? partner.telefoonnummer().getValue() : null);

@@ -25,6 +25,7 @@ public record ListTrouwlijstDossierDto(
         RegistratieType registratieType,
         CeremonieSoort ceremonieSoort,
         List<TrouwlijstPartnerDto> partners,
-        String taal
+        String taal,
+        Integer aantalBezoekers
 ) implements Serializable {
 }

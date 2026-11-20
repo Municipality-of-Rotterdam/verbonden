@@ -13,6 +13,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.repository.Do
 import nl.rotterdam.verbonden.core.features.dossier_mail.domain.DossierMailPogingStatus;
 import nl.rotterdam.verbonden.core.features.dossier_mail.domain.DossierMailStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import nl.rotterdam.verbonden.core.integration_test.InstelbareKlok;
@@ -91,11 +92,16 @@ class DossierMailIntegrationTest {
         });
 
         DossierMailDto detail = dossierAdministrationService.findMail(dossierId, mails.getFirst().id());
+        var partners = marriageIntakeService.findPartnerGegevens(dossierId);
         assertThat(detail.afzender()).isEqualTo("Gemeente Rotterdam <noreply@rotterdam.nl>");
         assertThat(detail.inhoud())
                 .contains("Kwik van Willegenburgh", "Kwek van Willegenburgh", "Klein", "Wat gebeurt er nu?")
-                .contains("<li>" + naamMetKeuze(dossierId, 1) + "</li>", "<li>" + naamMetKeuze(dossierId, 2) + "</li>")
-                .doesNotContain("Jansen - Jansen")
+                .contains("Beste " + eigenNaam(partners.get(0)) + " en " + eigenNaam(partners.get(1)) + ",")
+                .contains("<li>" + eigenNaam(partners.get(0)) + "<br>Gekozen naam: "
+                                + naamMetKeuze(dossierId, 1) + "</li>",
+                        "<li>" + eigenNaam(partners.get(1)) + "<br>Gekozen naam: "
+                                + naamMetKeuze(dossierId, 2) + "</li>")
+                .doesNotContain("Beste " + naamMetKeuze(dossierId, 2))
                 .doesNotContain("{{");
         assertThat(mailSender.berichten()).isEmpty();
     }
@@ -247,6 +253,10 @@ class DossierMailIntegrationTest {
         var partner = marriageIntakeService.findPartnerGegevens(dossierId).stream()
                 .filter(p -> p.volgorde() == volgorde).findFirst().orElseThrow();
         return partner.voornamen() + " " + partner.gekozenAchternaam();
+    }
+
+    private static String eigenNaam(PartnerGegevensDto partner) {
+        return partner.voornamen() + " " + partner.achternaam();
     }
 
     private List<DossierMailPogingDto> pogingen(UUID dossierId, long mailId) {

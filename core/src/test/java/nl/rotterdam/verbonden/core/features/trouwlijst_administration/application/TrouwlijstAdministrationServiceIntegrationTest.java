@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.features.trouwlijst_administration.applicati
 
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.trouwlijst_administration.domain.ListTrouwlijstDossierDto;
 import nl.rotterdam.verbonden.core.features.trouwlijst_administration.domain.TrouwlijstWeekDto;
 import nl.rotterdam.verbonden.core.identity.Roles;
@@ -92,6 +93,12 @@ class TrouwlijstAdministrationServiceIntegrationTest {
             assertThat(dto.dossierId()).isEqualTo(dossierId);
             assertThat(dto.datum()).isEqualTo(trouwdatum);
             assertThat(dto.partners()).hasSize(2);
+            assertThat(dto.taal()).isEqualTo(CeremonieTaal.NEDERLANDS.getLabel());
+            assertThat(dto.aantalBezoekers()).isEqualTo(4);
+            assertThat(dto.partners()).extracting(partner -> partner.naam())
+                    .containsExactlyElementsOf(marriageIntakeService.findPartnerGegevens(dossierId).stream()
+                            .map(partner -> partner.voornamen() + " " + partner.achternaam())
+                            .toList());
         });
         assertThat(trouwlijstAdministrationService.findBevestigdeDossiers(
                 maandag.plusWeeks(1), maandag.plusWeeks(1).plusDays(6))).isEmpty();
@@ -112,7 +119,12 @@ class TrouwlijstAdministrationServiceIntegrationTest {
             assertThat(sheet.getRow(0).getCell(0).getStringCellValue()).startsWith("Datum: ");
             assertThat(sheet.getRow(1).getCell(0).getStringCellValue()).startsWith("Trouwlocatie: ");
             assertThat(sheet.getRow(2).getCell(0).getStringCellValue()).isEqualTo("ABS");
+            assertThat(sheet.getRow(2).getCell(10).getStringCellValue()).isEqualTo("Taal");
+            assertThat(sheet.getRow(2).getCell(11).getStringCellValue()).isEqualTo("Aantal bezoekers");
             assertThat(sheet.getRow(3).getCell(3).getStringCellValue()).matches("\\d{2}:\\d{2}");
+            assertThat(sheet.getRow(3).getCell(10).getStringCellValue())
+                    .isEqualTo(CeremonieTaal.NEDERLANDS.getLabel());
+            assertThat(sheet.getRow(3).getCell(11).getStringCellValue()).isEqualTo("4");
         }
     }
 }
