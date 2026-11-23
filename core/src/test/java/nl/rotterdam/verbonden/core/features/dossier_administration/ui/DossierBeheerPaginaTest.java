@@ -2,12 +2,14 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.administration_common.RdFormFieldSelect;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PersoonsgegevensDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierInzageRepository;
+import nl.rotterdam.verbonden.core.features.location_administration.domain.ListLocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
@@ -189,6 +191,65 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         assertThat(detail.partners()).hasSize(2);
         assertThat(detail.partners().get(1).gegevens().buitenlandsPersoonsnummer())
                 .isEqualTo(new BuitenlandsPersoonsnummer("123-45-6789"));
+    }
+
+    @Test
+    void aanmaakPagina_maaktDossierMetVrijeLocatie() {
+        tester.startPage(DossierCreatePage.class);
+        assertThat(tester.getLastResponseAsString()).doesNotContain("Vrije locatie</label>");
+        FormTester form = formTester("dossierForm");
+        form.select(veld("dossierForm", "ceremonieSoort"), 2);
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        RdFormFieldSelect<?> ceremonie = (RdFormFieldSelect<?>) tester.getComponentFromLastRenderedPage(pad("ceremonieSoort"));
+        tester.executeAjaxEvent(ceremonie.getInput(), "change");
+
+        ListLocatieDto vrijeLocatie = marriageIntakeService.findLocaties().stream()
+                .filter(ListLocatieDto::vrijeLocatie)
+                .findFirst().orElseThrow();
+        int vrijeLocatieIndex = marriageIntakeService.findLocaties().indexOf(vrijeLocatie);
+        form = formTester("dossierForm");
+        form.select(veld("dossierForm", "locatie"), vrijeLocatieIndex);
+        RdFormFieldSelect<?> locatie = (RdFormFieldSelect<?>) tester.getComponentFromLastRenderedPage(pad("locatie"));
+        tester.executeAjaxEvent(locatie.getInput(), "change");
+        assertThat(tester.getLastResponseAsString()).contains("Naam van de locatie");
+
+        form = formTester("dossierForm");
+        form.select(veld("dossierForm", "kanaal"), 0);
+        form.select(veld("dossierForm", "registratieType"), 0);
+        form.select(veld("dossierForm", "ceremonieSoort"), 2);
+        form.select(veld("dossierForm", "locatie"), vrijeLocatieIndex);
+        form.setValue(veld("dossierForm", "bsnPartner1"), "999990007");
+        form.setValue(veld("dossierForm", "bsnPartner2"), "999990019");
+        form.setValue(veld("dossierForm", "identiteitPartner1Gecontroleerd"), true);
+        form.setValue(veld("dossierForm", "identiteitPartner2Gecontroleerd"), true);
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("dossierForm", "aanmaken"));
+
+        tester.assertRenderedPage(DossierCreatePage.class);
+        assertThat(tester.getLastResponseAsString())
+                .contains("Kies een trouwlocatie of vul alle verplichte gegevens van uw vrije locatie in");
+        assertThat(marriageIntakeService.findDossierIdByBsn(BSN_PARTNER_1)).isEmpty();
+
+        form = formTester("dossierForm");
+        form.select(veld("dossierForm", "kanaal"), 0);
+        form.select(veld("dossierForm", "registratieType"), 0);
+        form.select(veld("dossierForm", "ceremonieSoort"), 2);
+        form.select(veld("dossierForm", "locatie"), vrijeLocatieIndex);
+        form.setValue(veld("dossierForm", "bsnPartner1"), "999990007");
+        form.setValue(veld("dossierForm", "bsnPartner2"), "999990019");
+        form.setValue(veld("dossierForm", "identiteitPartner1Gecontroleerd"), true);
+        form.setValue(veld("dossierForm", "identiteitPartner2Gecontroleerd"), true);
+        form.setValue(veld("dossierForm", "vrijeLocatieNaam"), "Tuinzaal");
+        form.setValue(veld("dossierForm", "vrijeLocatieAdres"), "Straat 1, Rotterdam");
+        form.setValue(veld("dossierForm", "vrijeLocatieTelefoonnummer"), "0101234567");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("dossierForm", "aanmaken"));
+
+        tester.assertNoErrorMessage();
+        tester.assertRenderedPage(DossierDetailPage.class);
+        UUID dossierId = marriageIntakeService.findDossierIdByBsn(BSN_PARTNER_1).orElseThrow();
+        assertThat(dossierAdministrationService.findDetail(dossierId).vrijeTrouwlocatie().naam())
+                .isEqualTo("Tuinzaal");
     }
 
     @Test

@@ -26,6 +26,9 @@ public class TrouwlocatieEntity {
     @Column(name = "detail_url")
     private String detailUrl;
 
+    @Column(name = "vrije_locatie", nullable = false)
+    private boolean vrijeLocatie;
+
     @Column(name = "aangemaakt_op", nullable = false)
     private LocalDateTime aangemaaktOp = LocalDateTime.now();
 
@@ -69,6 +72,14 @@ public class TrouwlocatieEntity {
 
     public void setDetailUrl(String detailUrl) {
         this.detailUrl = detailUrl;
+    }
+
+    public boolean isVrijeLocatie() {
+        return vrijeLocatie;
+    }
+
+    public void setVrijeLocatie(boolean vrijeLocatie) {
+        this.vrijeLocatie = vrijeLocatie;
     }
 
     public LocalDateTime getAangemaaktOp() {

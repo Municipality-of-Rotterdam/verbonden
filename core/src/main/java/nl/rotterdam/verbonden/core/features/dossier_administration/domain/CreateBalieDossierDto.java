@@ -2,6 +2,7 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.domain;
 
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
@@ -21,6 +22,19 @@ public record CreateBalieDossierDto(
         BurgerServiceNummer bsnPartner1,
         BurgerServiceNummer bsnPartner2,
         BuitenlandsPersoonsnummer persoonsnummerPartner2,
-        PersoonsgegevensDto persoonsgegevensPartner2
+        PersoonsgegevensDto persoonsgegevensPartner2,
+        Long locatieId,
+        String vrijeLocatieNaam,
+        String vrijeLocatieAdres,
+        Telefoonnummer vrijeLocatieTelefoonnummer,
+        String vrijeLocatieContactpersoon
 ) {
+
+    public CreateBalieDossierDto(AanmaakKanaal kanaal, RegistratieType registratieType, CeremonieSoort ceremonieSoort,
+                                 BurgerServiceNummer bsnPartner1, BurgerServiceNummer bsnPartner2,
+                                 BuitenlandsPersoonsnummer persoonsnummerPartner2,
+                                 PersoonsgegevensDto persoonsgegevensPartner2) {
+        this(kanaal, registratieType, ceremonieSoort, bsnPartner1, bsnPartner2, persoonsnummerPartner2,
+                persoonsgegevensPartner2, null, null, null, null, null);
+    }
 }

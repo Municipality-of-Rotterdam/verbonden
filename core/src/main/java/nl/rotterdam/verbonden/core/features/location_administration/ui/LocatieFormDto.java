@@ -10,6 +10,7 @@ public class LocatieFormDto implements Serializable {
     private String fotoUrl = "";
     private String omschrijving = "";
     private String detailUrl = "";
+    private boolean vrijeLocatie;
 
     public String getNaam() {
         return naam;
@@ -43,6 +44,14 @@ public class LocatieFormDto implements Serializable {
         this.detailUrl = detailUrl;
     }
 
+    public boolean isVrijeLocatie() {
+        return vrijeLocatie;
+    }
+
+    public void setVrijeLocatie(boolean vrijeLocatie) {
+        this.vrijeLocatie = vrijeLocatie;
+    }
+
     public static LocatieFormDto leeg() {
         return new LocatieFormDto();
     }
@@ -53,6 +62,7 @@ public class LocatieFormDto implements Serializable {
         form.setFotoUrl(dto.fotoUrl());
         form.setOmschrijving(dto.omschrijving());
         form.setDetailUrl(dto.detailUrl());
+        form.setVrijeLocatie(dto.vrijeLocatie());
         return form;
     }
 }

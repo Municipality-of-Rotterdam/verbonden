@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
+import nl.rotterdam.verbonden.core.features.marriage_intake.domain.VrijeTrouwlocatieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
 
@@ -39,6 +40,7 @@ public record DossierDetailDto(
         CeremonieTaal taal,
         Integer aantalBezoekers,
         String locatieNaam,
+        VrijeTrouwlocatieDto vrijeTrouwlocatie,
         LocalDateTime datumTijdHuwelijk,
         Bedrag ceremoniePrijs,
         List<DetailPartnerDto> partners,

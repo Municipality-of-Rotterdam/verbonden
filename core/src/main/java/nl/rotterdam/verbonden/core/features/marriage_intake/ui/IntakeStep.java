@@ -25,7 +25,7 @@ public enum IntakeStep {
         return switch (onderdeel) {
             case TAAL -> MIJN_DAG.pageClass;
             case DATUM -> DatumKiezenPage.class;
-            case LOCATIE -> DE_DAG.pageClass;
+            case LOCATIE -> LocatieKiezenPage.class;
             case PARTNER_GEKOPPELD, ACHTERNAMEN -> JULLIE_GEGEVENS.pageClass;
             case GETUIGEN -> DE_GETUIGEN.pageClass;
             case AANTAL_BEZOEKERS -> EXTRAS.pageClass;
