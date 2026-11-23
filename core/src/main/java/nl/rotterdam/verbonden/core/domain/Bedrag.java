@@ -13,6 +13,10 @@ import java.util.Objects;
 public record Bedrag(BigDecimal value) implements ValueHolder<BigDecimal>, Comparable<Bedrag>, Serializable {
 
     public static final Bedrag ZERO = new Bedrag(BigDecimal.ZERO);
+    private static final DecimalFormatSymbols SYMBOLS = new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL"));
+    private static final DecimalFormat WHOLE_FORMAT = new DecimalFormat("#,##0", SYMBOLS);
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,##0.00", SYMBOLS);
+
 
     public Bedrag {
         Objects.requireNonNull(value, "Bedrag mag niet null zijn");
@@ -39,8 +43,11 @@ public record Bedrag(BigDecimal value) implements ValueHolder<BigDecimal>, Compa
     }
 
     public String format() {
-        return new DecimalFormat("#,##0.00", new DecimalFormatSymbols(Locale.forLanguageTag("nl-NL")))
-                .format(value);
+        // Check if the number is effectively a whole integer
+        if (value.stripTrailingZeros().scale() <= 0) {
+            return WHOLE_FORMAT.format(value);
+        }
+        return DECIMAL_FORMAT.format(value);
     }
 
     @Override

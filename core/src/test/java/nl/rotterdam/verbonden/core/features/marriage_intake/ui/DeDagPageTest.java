@@ -67,12 +67,12 @@ class DeDagPageTest extends BaseWicketTest {
     void kleineCeremonie_introNoemtDeGratisCeremonieEnDeDagKaarten() {
         startPage(maakDossier(CeremonieSoort.KLEIN));
 
-        tester.assertContains("Jullie hebben gekozen voor een gratis ceremonie.");
-        tester.assertContains("Die is altijd op maandagmorgen in de Felicitatiezaal van het stadhuis.");
-        tester.assertContains("De trouwambtenaar kunnen jullie niet zelf kiezen.");
-        tester.assertContains("Kies hieronder een datum voor de ceremonie. Vul daarna jullie gegevens in.");
-        tester.assertContains("Kies jullie datum");
-        tester.assertContains("Kies jullie trouwambtenaar");
+        tester.assertContains("U hebt gekozen voor een gratis ceremonie.");
+        tester.assertContains("Die is altijd op maandagochtend in de Felicitatiezaal van het stadhuis.");
+        tester.assertContains("De gemeente kiest de trouwambtenaar.");
+        tester.assertContains("Kies hieronder een datum en tijd voor de ceremonie. Vul daarna de gegevens in van u en uw partner.");
+        tester.assertContains("Kies uw datum en tijd");
+        tester.assertContains("Kies uw trouwambtenaar");
         tester.assertContainsNot("kleine ceremonie");
     }
 

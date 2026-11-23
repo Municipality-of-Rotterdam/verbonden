@@ -80,8 +80,8 @@ class MarriageIntakePageTest extends BaseWicketTest {
     void rendertIntroInDrieRegels() {
         tester.startPage(MarriageIntakePage.class);
         assertThat(tester.getLastResponseAsString())
-                .containsPattern("Gefeliciteerd!\\s*<br/>\\s*Hier doen jullie")
-                .containsPattern("ceremonie\\.\\s*<br/>\\s*Zoiets doet u");
+                .containsPattern("Gefeliciteerd!\\s*<br/>\\s*Hier doet u")
+                .containsPattern("ceremonie\\.\\s*<br/>\\s*Dat doet u");
     }
 
     @Test

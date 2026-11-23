@@ -21,10 +21,7 @@ import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.model.*;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
 import java.time.format.DateTimeFormatter;
@@ -182,7 +179,7 @@ public class MarriageIntakePage extends IntakeBasePage {
                 item.add(eersteGelegenheidBox);
 
                 // Submit button — creates a new dossier or updates an existing one
-                item.add(new RdButton("kiesButton", Model.of(dto.titel())) {
+                item.add(new RdButton("kiesButton", new StringResourceModel("intake.soort.button.prefix").setParameters(dto.titel())) {
 
                     {
                         setEnabled(dto.active());
