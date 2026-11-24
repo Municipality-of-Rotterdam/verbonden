@@ -570,9 +570,8 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         AuthenticatedUser user = currentUserProvider.getCurrentUser();
         String gebruikersnaam = user.getUserId();
-        String weergavenaam = user.getDisplayName() != null ? user.getDisplayName() : gebruikersnaam;
         DossierNotitieEntity notitie = new DossierNotitieEntity(
-                dossier, dto.tekst(), gebruikersnaam, weergavenaam, LocalDateTime.now(clock));
+                dossier, dto.tekst(), gebruikersnaam, LocalDateTime.now(clock));
         return dossierNotitieRepository.save(notitie).getId();
     }
 

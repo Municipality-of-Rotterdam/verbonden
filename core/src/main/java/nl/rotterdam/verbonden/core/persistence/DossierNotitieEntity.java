@@ -33,9 +33,6 @@ public class DossierNotitieEntity {
     @Column(name = "gebruikersnaam", nullable = false, updatable = false)
     private String gebruikersnaam;
 
-    @Column(name = "weergavenaam", nullable = false, updatable = false)
-    private String weergavenaam;
-
     @Column(name = "aangemaakt_op", nullable = false, updatable = false)
     private LocalDateTime aangemaaktOp;
 
@@ -43,11 +40,10 @@ public class DossierNotitieEntity {
     }
 
     public DossierNotitieEntity(HuwelijksDossierEntity dossier, String tekst, String gebruikersnaam,
-                                String weergavenaam, LocalDateTime aangemaaktOp) {
+                                LocalDateTime aangemaaktOp) {
         this.dossier = dossier;
         this.tekst = tekst;
         this.gebruikersnaam = gebruikersnaam;
-        this.weergavenaam = weergavenaam;
         this.aangemaaktOp = aangemaaktOp;
     }
 

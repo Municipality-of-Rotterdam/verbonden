@@ -15,7 +15,7 @@ public interface DossierNotitieRepository extends JpaRepository<DossierNotitieEn
 
     @Query("""
             SELECT new nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierNotitieDto(
-                n.id, n.tekst, n.gebruikersnaam, n.weergavenaam, n.aangemaaktOp)
+                n.id, n.tekst, n.gebruikersnaam, n.aangemaaktOp)
             FROM DossierNotitieEntity n
             WHERE n.dossier.uuid = :dossierId
             ORDER BY n.aangemaaktOp DESC, n.id DESC

@@ -7,7 +7,6 @@ public record ListDossierNotitieDto(
         long id,
         String tekst,
         String gebruikersnaam,
-        String weergavenaam,
         LocalDateTime aangemaaktOp
 ) implements Serializable {
 }

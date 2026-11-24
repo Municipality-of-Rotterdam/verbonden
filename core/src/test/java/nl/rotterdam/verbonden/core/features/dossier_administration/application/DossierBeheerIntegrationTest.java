@@ -282,7 +282,6 @@ class DossierBeheerIntegrationTest {
         assertThat(dossierAdministrationService.findNotities(dossierId).getFirst())
                 .satisfies(notitie -> {
                     assertThat(notitie.gebruikersnaam()).isEqualTo("medewerker");
-                    assertThat(notitie.weergavenaam()).isEqualTo("medewerker");
                     assertThat(notitie.aangemaaktOp()).isNotNull();
                 });
     }

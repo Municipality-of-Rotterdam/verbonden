@@ -4,7 +4,6 @@ CREATE TABLE dossier_notities
     dossier_id     BIGINT       NOT NULL REFERENCES huwelijksdossiers (id) ON DELETE CASCADE,
     tekst          VARCHAR(1000) NOT NULL,
     gebruikersnaam VARCHAR(255) NOT NULL,
-    weergavenaam   VARCHAR(255) NOT NULL,
     aangemaakt_op  TIMESTAMP    NOT NULL
 );
 
