@@ -15,9 +15,20 @@
     <div wicket:id="feedback"></div>
 
     <form wicket:id="getuigenForm" class="d-flex flex-column gap-3">
-        <div wicket:id="getuigen">
+        <section wicket:id="getuigen" class="d-flex flex-column gap-3">
+            <h2 wicket:id="kop">Getuige</h2>
             <div wicket:id="naam"></div>
-        </div>
+            <div class="d-flex flex-wrap gap-3">
+                <div wicket:id="voornamen"></div>
+                <div wicket:id="achternaam"></div>
+            </div>
+            <div wicket:id="geboortedatum"></div>
+            <div class="d-flex flex-wrap gap-3">
+                <div wicket:id="postcode"></div>
+                <div wicket:id="woonplaats"></div>
+            </div>
+            <div wicket:id="land"></div>
+        </section>
         <div>
             <button wicket:id="opslaan" type="submit"></button>
         </div>

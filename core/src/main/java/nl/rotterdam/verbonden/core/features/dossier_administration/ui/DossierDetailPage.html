@@ -68,7 +68,7 @@
     <section class="rd-dossier-sectie">
         <h2>Partners</h2>
         <div class="d-flex flex-wrap gap-4">
-            <div wicket:id="partners" class="rd-dossier-partner">
+            <div wicket:id="partners" class="rd-dossier-persoon">
                 <div class="d-flex gap-3 align-items-baseline">
                     <h3 wicket:id="titel">Partner 1</h3>
                     <a wicket:id="wijzigen">Wijzigen</a>
@@ -110,9 +110,27 @@
             <a wicket:id="getuigenWijzigen">Wijzigen</a>
         </div>
         <p wicket:id="getuigenAantal">0 van 2 ingevuld</p>
-        <ul class="utrecht-unordered-list">
-            <li wicket:id="getuigen" class="utrecht-unordered-list__item"><span wicket:id="naam">Naam</span></li>
-        </ul>
+        <div class="d-flex flex-wrap gap-4">
+            <div wicket:id="getuigen" class="rd-dossier-persoon">
+                <h3 wicket:id="titel">Getuige 1</h3>
+                <dl class="rd-dossier-gegevens">
+                    <dt>Naam</dt>
+                    <dd wicket:id="naam">-</dd>
+                    <dt>Voornamen</dt>
+                    <dd wicket:id="voornamen">-</dd>
+                    <dt>Achternaam</dt>
+                    <dd wicket:id="achternaam">-</dd>
+                    <dt>Geboortedatum</dt>
+                    <dd wicket:id="geboortedatum">-</dd>
+                    <dt>Postcode</dt>
+                    <dd wicket:id="postcode">-</dd>
+                    <dt>Woonplaats</dt>
+                    <dd wicket:id="woonplaats">-</dd>
+                    <dt>Land</dt>
+                    <dd wicket:id="land">-</dd>
+                </dl>
+            </div>
+        </div>
     </section>
 
     <section class="rd-dossier-sectie">

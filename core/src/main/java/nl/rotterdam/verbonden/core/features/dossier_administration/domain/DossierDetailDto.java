@@ -5,7 +5,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoort;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieTaal;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
@@ -42,7 +41,7 @@ public record DossierDetailDto(
         LocalDateTime datumTijdHuwelijk,
         Bedrag ceremoniePrijs,
         List<DetailPartnerDto> partners,
-        List<GetuigeDto> getuigen,
+        List<DetailGetuigeDto> getuigen,
         List<SidebarExtraItemDto> extras,
         ChangeExtrasDto extraKeuzes,
         Bedrag totaalPrijs,

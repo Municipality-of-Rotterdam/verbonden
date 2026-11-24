@@ -2,8 +2,11 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Postcode;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeGetuigeDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailGetuigeDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PersoonsgegevensDto;
@@ -14,6 +17,7 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.CeremonieSoor
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.BaseWicketTest;
+import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.tester.FormTester;
 import org.junit.jupiter.api.Test;
@@ -30,6 +34,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,6 +57,9 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private CompleetDossierTestData testData;
 
     @TempDir
     private Path tempDir;
@@ -94,6 +103,27 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
                 .contains("\"ceremonieSoort\" : \"KLEIN\"");
         assertThat(dossierInzageRepository.findByDossierUuidAndActie(dossierId, InzageActie.DOSSIER_BEKEKEN))
                 .hasSize(inzagesVoor + 1);
+    }
+
+    @Test
+    void json_bevatAlleGegevensVanDeGetuigen() {
+        UUID dossierId = testData.maakConceptDossier();
+        dossierAdministrationService.updateGetuigen(dossierId, List.of(
+                new ChangeGetuigeDto(1, "Kwik van Willegenburgh", "Kwik Donald", "van Willegenburgh",
+                        LocalDate.of(1990, 4, 1), new Postcode("b-1000"), "Brussel", "België")));
+
+        tester.executeUrl("beheer/dossiers/" + dossierId + "/json");
+
+        assertThat(tester.getLastResponseAsString())
+                .contains("\"volgnummer\" : 1")
+                .contains("\"naam\" : \"Kwik van Willegenburgh\"")
+                .contains("\"voornamen\" : \"Kwik Donald\"")
+                .contains("\"achternaam\" : \"van Willegenburgh\"")
+                .contains("\"geboortedatum\" : \"1990-04-01\"")
+                // Value type als zijn waarde, niet als {"value": ...}
+                .contains("\"postcode\" : \"B-1000\"")
+                .contains("\"woonplaats\" : \"Brussel\"")
+                .contains("\"land\" : \"België\"");
     }
 
     @Test
@@ -153,6 +183,126 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         assertThat(tester.getLastResponseAsString()).contains("Dit soort bestand is niet toegestaan");
         assertThat(dossierAdministrationService.findDetail(dossierId).bestanden()).isEmpty();
+    }
+
+    @Test
+    void getuigenPagina_slaatPersoonsgegevensOpEnToontZeOpDeDetailpagina() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(DossierGetuigenUpdatePage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+        assertPaginaSerialiseerbaar();
+
+        FormTester form = formTester("getuigenForm");
+        form.setValue(veld("getuigenForm", "voornamen"), "Kwik Donald");
+        form.setValue(veld("getuigenForm", "achternaam"), "van Willegenburgh");
+        form.setValue(veld("getuigenForm", "geboortedatum"), "1990-04-01");
+        form.setValue(veld("getuigenForm", "postcode"), "3011ad");
+        form.setValue(veld("getuigenForm", "woonplaats"), "Rotterdam");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("getuigenForm", "opslaan"));
+
+        tester.assertNoErrorMessage();
+        tester.assertRenderedPage(DossierDetailPage.class);
+        assertThat(tester.getLastResponseAsString())
+                .doesNotContain("jonger dan 18 jaar")
+                .contains("Kwik Donald")
+                .contains("01-04-1990")
+                .contains("3011 AD");
+        assertThat(dossierAdministrationService.findDetail(dossierId).getuigen())
+                .first()
+                .isEqualTo(new DetailGetuigeDto(1, "Kwik van Willegenburgh", "Kwik Donald", "van Willegenburgh",
+                        LocalDate.of(1990, 4, 1), new Postcode("3011 AD"), "Rotterdam", "Nederland"));
+    }
+
+    @Test
+    void getuigenPagina_buitenlandsAdres_wordtOpgeslagen() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(DossierGetuigenUpdatePage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+
+        FormTester form = formTester("getuigenForm");
+        form.setValue(veld("getuigenForm", "postcode"), "b-1000");
+        form.setValue(veld("getuigenForm", "woonplaats"), "Brussel");
+        form.setValue(veld("getuigenForm", "land"), "België");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("getuigenForm", "opslaan"));
+
+        tester.assertNoErrorMessage();
+        tester.assertRenderedPage(DossierDetailPage.class);
+        assertThat(dossierAdministrationService.findDetail(dossierId).getuigen())
+                .first()
+                .extracting(DetailGetuigeDto::postcode, DetailGetuigeDto::land)
+                .containsExactly(new Postcode("B-1000"), "België");
+    }
+
+    @Test
+    void getuigenPagina_inNederlandMetBuitenlandsePostcode_slaatNietOp() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(DossierGetuigenUpdatePage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+
+        // Het land staat standaard op Nederland
+        FormTester form = formTester("getuigenForm");
+        form.setValue(veld("getuigenForm", "postcode"), "B-1000");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("getuigenForm", "opslaan"));
+
+        tester.assertRenderedPage(DossierGetuigenUpdatePage.class);
+        tester.assertErrorMessages(
+                "Getuige 1: geef een Nederlandse postcode op (bijv. 3011 AD) of kies een ander land.");
+        assertThat(dossierAdministrationService.findDetail(dossierId).getuigen())
+                .extracting(DetailGetuigeDto::postcode)
+                .containsOnlyNulls();
+    }
+
+    @Test
+    void getuigenPagina_ongeldigePostcode_slaatNietOp() {
+        UUID dossierId = testData.maakCompleetDossier();
+        tester.startPage(DossierGetuigenUpdatePage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+
+        FormTester form = formTester("getuigenForm");
+        form.setValue(veld("getuigenForm", "postcode"), "3011 A?");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("getuigenForm", "opslaan"));
+
+        tester.assertRenderedPage(DossierGetuigenUpdatePage.class);
+        assertThat(tester.getLastResponseAsString()).contains("Geef een geldige postcode op");
+        assertThat(dossierAdministrationService.findDetail(dossierId).getuigen())
+                .extracting(DetailGetuigeDto::postcode)
+                .containsOnlyNulls();
+    }
+
+    @Test
+    void getuigenPagina_getuigeJongerDan18OpCeremonie_slaatOpMetWaarschuwing() {
+        UUID dossierId = testData.maakCompleetDossier();
+        LocalDate ceremonie = dossierAdministrationService.findDetail(dossierId).datumTijdHuwelijk().toLocalDate();
+        LocalDate geboortedatum = ceremonie.minusYears(18).plusDays(1);
+
+        slaGeboortedatumEersteGetuigeOp(dossierId, geboortedatum);
+
+        tester.assertRenderedPage(DossierDetailPage.class);
+        assertThat(tester.getLastResponseAsString()).contains("Getuige 1 is op de dag van de ceremonie ("
+                + ceremonie.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ") jonger dan 18 jaar.");
+        assertThat(dossierAdministrationService.findDetail(dossierId).getuigen())
+                .first()
+                .extracting(DetailGetuigeDto::geboortedatum)
+                .isEqualTo(geboortedatum);
+    }
+
+    @Test
+    void getuigenPagina_getuigeOpCeremonie18Jaar_geeftGeenWaarschuwing() {
+        UUID dossierId = testData.maakCompleetDossier();
+        LocalDate ceremonie = dossierAdministrationService.findDetail(dossierId).datumTijdHuwelijk().toLocalDate();
+
+        slaGeboortedatumEersteGetuigeOp(dossierId, ceremonie.minusYears(18));
+
+        tester.assertRenderedPage(DossierDetailPage.class);
+        assertThat(tester.getLastResponseAsString()).doesNotContain("jonger dan 18 jaar");
+    }
+
+    private void slaGeboortedatumEersteGetuigeOp(UUID dossierId, LocalDate geboortedatum) {
+        tester.startPage(DossierGetuigenUpdatePage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+        FormTester form = formTester("getuigenForm");
+        form.setValue(veld("getuigenForm", "geboortedatum"), geboortedatum.toString());
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("getuigenForm", "opslaan"));
     }
 
     @Test

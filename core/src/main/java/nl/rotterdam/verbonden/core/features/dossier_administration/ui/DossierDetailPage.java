@@ -11,6 +11,7 @@ import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance
 import nl.rotterdam.verbonden.core.administration_common.RdFormFieldFileUpload;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailGetuigeDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailPartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
@@ -18,7 +19,6 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDo
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierMailDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
@@ -100,8 +100,17 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                         + " van " + dossier.ceremonieSoort().getAantalGetuigen() + " ingevuld"),
                 new ListView<>("getuigen", dossier.getuigen()) {
                     @Override
-                    protected void populateItem(ListItem<GetuigeDto> item) {
-                        item.add(new Label("naam", tekst(item.getModelObject().naam())));
+                    protected void populateItem(ListItem<DetailGetuigeDto> item) {
+                        DetailGetuigeDto getuige = item.getModelObject();
+                        item.add(
+                                new Label("titel", "Getuige " + getuige.volgnummer()),
+                                new Label("naam", tekst(getuige.naam())),
+                                new Label("voornamen", tekst(getuige.voornamen())),
+                                new Label("achternaam", tekst(getuige.achternaam())),
+                                new Label("geboortedatum", datum(getuige.geboortedatum())),
+                                new Label("postcode", getuige.postcode() != null ? getuige.postcode().getValue() : "-"),
+                                new Label("woonplaats", tekst(getuige.woonplaats())),
+                                new Label("land", tekst(getuige.land())));
                     }
                 },
 

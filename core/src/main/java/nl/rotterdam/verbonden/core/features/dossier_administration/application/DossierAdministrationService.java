@@ -9,6 +9,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Change
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeGetuigeDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierMailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto;
@@ -17,7 +18,6 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Partne
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerNietInBrpException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietWijzigbaarException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -80,9 +80,9 @@ public interface DossierAdministrationService {
     void updatePartner(UUID dossierId, ChangePartnerDto dto);
 
     /**
-     * Vervangt de getuigen; getuigen zonder naam worden weggelaten.
+     * Vervangt de getuigen; getuigen waarvan niets is ingevuld worden weggelaten.
      */
-    void updateGetuigen(UUID dossierId, List<SaveGetuigenDto> getuigen);
+    void updateGetuigen(UUID dossierId, List<ChangeGetuigeDto> getuigen);
 
     List<TrouwboekjeKeuzeDto> findTrouwboekjes();
 
