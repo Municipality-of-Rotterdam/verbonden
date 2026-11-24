@@ -54,8 +54,8 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.assertContains("Uw partner moet inloggen met een eigen DigiD.");
         tester.assertContains("Kies allebei welke achternaam jullie willen gaan gebruiken.");
         tester.assertContains("Vul de gegevens van jullie getuigen in.");
-        tester.assertContains("Jullie gegevens invullen");
-        tester.assertContains("Jullie getuigen doorgeven");
+        tester.assertContains("Uw gegevens invullen");
+        tester.assertContains("Uw getuigen doorgeven");
     }
 
     @Test
