@@ -173,8 +173,11 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         String notities = response.substring(response.indexOf("<h2>Notities</h2>"));
         assertThat(notities).contains("<table class=\"utrecht-table rd-notities-tabel\">", "utrecht-table__header-cell",
                 "utrecht-table__body", "utrecht-table__row", "utrecht-table__cell");
-        assertThat(notities).containsPattern("(?s)<tr[^>]*>\\s*<td[^>]*>medewerker</td>"
-                + "\\s*<td[^>]*>[^<]+</td>\\s*<td[^>]*>Bestaande notitie</td>\\s*</tr>");
+        String nieuwsteNotitie = pad("notities") + ":0";
+        tester.assertLabel(nieuwsteNotitie + ":auteur", "medewerker");
+        tester.assertLabel(nieuwsteNotitie + ":tekst", "Bestaande notitie");
+        assertThat(tester.getComponentFromLastRenderedPage(nieuwsteNotitie + ":aangemaakt")
+                .getDefaultModelObjectAsString()).isNotBlank();
         assertThat(response.indexOf("Bestaande notitie")).isLessThan(response.indexOf("Oudste notitie"));
 
         FormTester form = formTester("notitieToevoegenForm");
