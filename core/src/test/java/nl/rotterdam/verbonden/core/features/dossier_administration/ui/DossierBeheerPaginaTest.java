@@ -7,6 +7,7 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Create
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PersoonsgegevensDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierInzageRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
@@ -187,7 +188,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         tester.assertRenderedPage(DossierDetailPage.class);
         assertThat(dossierAdministrationService.findNotities(dossierId))
-                .extracting(notitie -> notitie.tekst())
+                .extracting(ListDossierNotitieDto::tekst)
                 .containsExactly("Nieuwe notitie", "Bestaande notitie", "Oudste notitie");
         assertThat(tester.getLastResponseAsString()).contains("Nieuwe notitie");
     }
