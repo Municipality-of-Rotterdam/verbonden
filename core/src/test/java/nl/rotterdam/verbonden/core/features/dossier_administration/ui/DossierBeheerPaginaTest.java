@@ -165,6 +165,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
 
         String response = tester.getLastResponseAsString();
+        assertThat(response).contains("rd-notitie-tekst");
         assertThat(response).contains("Bestaande notitie", "Oudste notitie", "medewerker (medewerker)");
         assertThat(response).contains("maxlength=\"1000\"");
         assertThat(response).contains("<h2>E-mails</h2>", "<h2>Notities</h2>");

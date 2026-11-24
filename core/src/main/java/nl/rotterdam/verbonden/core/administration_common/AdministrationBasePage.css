@@ -241,3 +241,11 @@ body {
 .rd-dossier-partner {
     min-width: 22rem;
 }
+
+.rd-notitie-rij > td {
+    vertical-align: top;
+}
+
+.rd-notitie-tekst {
+    white-space: pre-line;
+}
