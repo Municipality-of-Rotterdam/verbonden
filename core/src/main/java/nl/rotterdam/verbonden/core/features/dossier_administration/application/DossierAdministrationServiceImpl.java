@@ -562,8 +562,9 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Override
     @Transactional
     public long createNotitie(UUID dossierId, CreateDossierNotitieDto dto) {
-        if (dto == null || dto.tekst() == null || dto.tekst().isBlank()
-                || dto.tekst().length() > CreateDossierNotitieDto.MAX_LENGTE) {
+        String tekst = dto == null || dto.tekst() == null ? ""
+                : dto.tekst().replace("\r\n", "\n").replace('\r', '\n').strip();
+        if (tekst.isEmpty() || tekst.length() > CreateDossierNotitieDto.MAX_LENGTE) {
             throw new IllegalArgumentException("Vul een notitie in van hoogstens "
                     + CreateDossierNotitieDto.MAX_LENGTE + " tekens.");
         }
@@ -571,7 +572,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         AuthenticatedUser user = currentUserProvider.getCurrentUser();
         String gebruikersnaam = user.getUserId();
         DossierNotitieEntity notitie = new DossierNotitieEntity(
-                dossier, dto.tekst(), gebruikersnaam, LocalDateTime.now(clock));
+                dossier, tekst, gebruikersnaam, LocalDateTime.now(clock));
         return dossierNotitieRepository.save(notitie).getId();
     }
 
