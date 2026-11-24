@@ -128,6 +128,8 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
         FormTester form = formTester("bestandToevoegenForm");
+        form.select(veld("bestandToevoegenForm", "bijlageType"), 0);
+        form.setValue(veld("bestandToevoegenForm", "opmerking"), "Legitimatie van de getuige");
         form.setFile(veld("bestandToevoegenForm", "bestand"), new File(pdf.toFile()), "application/pdf");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         form.submit(veld("bestandToevoegenForm", "toevoegen"));
@@ -135,8 +137,14 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         tester.assertRenderedPage(DossierDetailPage.class);
         assertThat(dossierAdministrationService.findDetail(dossierId).bestanden())
                 .singleElement()
-                .satisfies(b -> assertThat(b.bestandsnaam()).isEqualTo("paspoort.pdf"));
-        assertThat(tester.getLastResponseAsString()).contains("paspoort.pdf");
+                .satisfies(b -> {
+                    assertThat(b.bestandsnaam()).isEqualTo("paspoort.pdf");
+                    assertThat(b.opmerking()).isEqualTo("Legitimatie van de getuige");
+                });
+        assertThat(tester.getLastResponseAsString())
+                .contains("paspoort.pdf")
+                .contains("Getuigenlegitimatie")
+                .contains("Legitimatie van de getuige");
     }
 
     @Test
@@ -147,6 +155,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
         FormTester form = formTester("bestandToevoegenForm");
+        form.select(veld("bestandToevoegenForm", "bijlageType"), 0);
         form.setFile(veld("bestandToevoegenForm", "bestand"), new File(exe.toFile()), "application/octet-stream");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         form.submit(veld("bestandToevoegenForm", "toevoegen"));

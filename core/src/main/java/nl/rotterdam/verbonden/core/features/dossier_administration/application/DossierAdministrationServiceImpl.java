@@ -518,7 +518,11 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
             throw new BestandNietToegestaanException(
                     "De inhoud van het bestand past niet bij de extensie; het bestand is mogelijk beschadigd of hernoemd.");
         }
-        DossierBestandEntity bestand = new DossierBestandEntity(dossier, bestandsnaam, type, dto.inhoud(), medewerker());
+        if (dto.bijlageType() == null) {
+            throw new IllegalArgumentException("Selecteer een type bijlage.");
+        }
+        DossierBestandEntity bestand = new DossierBestandEntity(dossier, bestandsnaam, type, dto.bijlageType(),
+                dto.opmerking(), dto.inhoud(), medewerker());
         return dossierBestandRepository.save(bestand).getId();
     }
 

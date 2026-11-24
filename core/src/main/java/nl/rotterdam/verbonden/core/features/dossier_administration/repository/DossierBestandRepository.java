@@ -18,7 +18,7 @@ public interface DossierBestandRepository extends JpaRepository<DossierBestandEn
      */
     @Query("""
             SELECT new nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierBestandDto(
-                b.id, b.bestandsnaam, b.bestandType, b.grootte, b.toegevoegdDoor, b.toegevoegdOp)
+                b.id, b.bestandsnaam, b.bestandType, b.bijlageType, b.opmerking, b.grootte, b.toegevoegdDoor, b.toegevoegdOp)
             FROM DossierBestandEntity b
             WHERE b.dossier.id = :dossierId
             ORDER BY b.toegevoegdOp, b.id
