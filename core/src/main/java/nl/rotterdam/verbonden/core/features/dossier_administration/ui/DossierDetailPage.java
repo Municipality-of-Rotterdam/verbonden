@@ -183,8 +183,9 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                             Model.of("Notitie"),
                             Model.of("Maximaal 1000 tekens."))
                             .setRequired(true)
-                            .withTextArea((textArea, formField) -> textArea.add(AttributeModifier.replace(
-                                    "maxlength", CreateDossierNotitieDto.MAX_LENGTE))),
+                            .withTextArea((textArea, formField) -> textArea.add(
+                                    AttributeModifier.replace("maxlength", CreateDossierNotitieDto.MAX_LENGTE),
+                                    AttributeModifier.replace("rows", 8))),
                     new RdButton("toevoegen", Model.of("Notitie toevoegen"))
             );
         }

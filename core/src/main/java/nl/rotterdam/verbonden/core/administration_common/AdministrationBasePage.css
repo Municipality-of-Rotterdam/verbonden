@@ -258,3 +258,8 @@ body {
 .rd-notitie-tekst {
     white-space: pre-line;
 }
+
+.rd-notitie-formulier .utrecht-textarea {
+    --utrecht-textarea-max-inline-size: 640px;
+    --utrecht-textarea-min-block-size: 0;
+}

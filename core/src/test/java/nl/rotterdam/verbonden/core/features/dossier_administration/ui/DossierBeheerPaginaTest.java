@@ -169,6 +169,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         assertThat(response).contains("rd-notitie-tekst");
         assertThat(response).contains("Bestaande notitie", "Oudste notitie");
         assertThat(response).contains("maxlength=\"1000\"");
+        assertThat(response).contains("rd-notitie-formulier", "rows=\"8\"");
         assertThat(response).contains("<h2>E-mails</h2>", "<h2>Notities</h2>");
         assertThat(response.indexOf("<h2>E-mails</h2>")).isLessThan(response.indexOf("<h2>Notities</h2>"));
         String notities = response.substring(response.indexOf("<h2>Notities</h2>"));
