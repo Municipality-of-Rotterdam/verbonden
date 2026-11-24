@@ -50,10 +50,10 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
 
         tester.assertDisabled(BEVESTIG_BUTTON);
-        tester.assertContains("Voor jullie alle keuzes kunnen bevestigen:");
+        tester.assertContains("Voordat u alle keuzes kunt bevestigen:");
         tester.assertContains("Uw partner moet inloggen met een eigen DigiD.");
         tester.assertContains("Kies allebei welke achternaam jullie willen gaan gebruiken.");
-        tester.assertContains("Vul de gegevens van jullie getuigen in.");
+        tester.assertContains("Vul de gegevens van uw getuigen in.");
         tester.assertContains("Uw gegevens invullen");
         tester.assertContains("Uw getuigen doorgeven");
     }
@@ -67,13 +67,11 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
 
         String html = tester.getLastResponseAsString();
         assertThat(html)
-                .contains("Jullie dag")
-                .contains("Controleer uw keuzes goed.")
-                .contains("Na bevestiging gaat u verder naar de betaalpagina.")
-                .contains("Na betaling ontvangt u een bevestiging per e-mail.")
-                .contains("Jullie keuzes blijven 3 dagen bewaard.")
-                .contains("Zorg dat jullie binnen 3 dagen alles hebben ingevuld en de keuzes bevestigen.")
-                .contains("Dan betaalt u € 50 administratiekosten.")
+                .contains("Uw ceremonie")
+                .contains("Controleer of alle gegevens kloppen.")
+                .contains("Na uw betaling krijgt u een bevestiging per e-mail.")
+                .contains("Uw reservering blijft 3 dagen geldig. In die 3 dagen kunt u uw keuzes gratis aanpassen. Daarna kunt u niets meer aanpassen.")
+                .contains("Wilt u na die 3 dagen afzeggen? Dan betaalt u \u20AC 50 administratiekosten.")
                 .contains("rd-status-icon rd-status-icon--current-check")
                 .doesNotContain("<dialog");
         String confirmButtonMarkupId = tester.getComponentFromLastRenderedPage(BEVESTIG_BUTTON).getMarkupId();
@@ -115,7 +113,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         UUID dossierId = testData.maakCompleetBetaaldDossier();
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
         tester.assertEnabled(BEVESTIG_BUTTON);
-        tester.assertContains("Bevestigen en betalen");
+        tester.assertContains("Bevestig en betaal");
         assertPaginaSerialiseerbaar();
 
         tester.getRequest().setHeader("Origin", "http://localhost");
@@ -131,7 +129,7 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
     void gratisDossier_bevestigenDientMeteenInEnToontStatuspagina() {
         UUID dossierId = testData.maakCompleetDossier();
         tester.startPage(ControlerenPage.class, makeDossierPageParameters(dossierId));
-        tester.assertContains("Bevestigen en indienen");
+        tester.assertContains("Bevestig");
 
         // Zoals een browser: anders weigert Wicket's CSRF-bescherming de POST.
         tester.getRequest().setHeader("Origin", "http://localhost");
@@ -158,8 +156,8 @@ class AanvraagIndienenPageTest extends BaseWicketTest {
         tester.assertRenderedPage(ControlerenPage.class);
         tester.assertContains("Controleren");
         tester.assertContains("Samenvatting");
-        tester.assertContains("Jullie gegevens");
-        tester.assertContains("Jullie getuigen");
+        tester.assertContains("Uw gegevens");
+        tester.assertContains("Uw getuigen");
         tester.assertContains("Totaal bedrag");
         tester.assertEnabled(PAGE_BODY + ":bevestigForm:bevestigButton");
 

@@ -97,7 +97,7 @@ class DeDagPageTest extends BaseWicketTest {
         tester.assertContains("Kies een trouwlocatie");
         tester.assertContains("Uw partner moet inloggen met een eigen DigiD.");
         tester.assertContains("Kies allebei welke achternaam jullie willen gaan gebruiken.");
-        tester.assertContains("Vul de gegevens van jullie getuigen in.");
+        tester.assertContains("Vul de gegevens van uw getuigen in.");
 
         klikOp("bevestigForm:nogNietCompleetHint:specifiek:onderdelen:5:link");
 
