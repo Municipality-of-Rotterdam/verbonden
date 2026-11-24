@@ -160,7 +160,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         protected void populateItem(ListItem<ListDossierNotitieDto> item) {
             ListDossierNotitieDto notitie = item.getModelObject();
             item.add(
-                    new Label("auteur", notitie.weergavenaam() + " (" + notitie.gebruikersnaam() + ")"),
+                    new Label("auteur", notitie.gebruikersnaam()),
                     new Label("aangemaakt", datumTijd(notitie.aangemaaktOp())),
                     new Label("tekst", notitie.tekst())
             );

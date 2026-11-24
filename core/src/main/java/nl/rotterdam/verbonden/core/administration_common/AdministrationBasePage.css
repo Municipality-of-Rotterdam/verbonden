@@ -242,6 +242,15 @@ body {
     min-width: 22rem;
 }
 
+.rd-notities-tabel th {
+    text-align: start;
+}
+
+.rd-notities-tabel th:nth-child(-n+2),
+.rd-notities-tabel td:nth-child(-n+2) {
+    white-space: nowrap;
+}
+
 .rd-notitie-rij > td {
     vertical-align: top;
 }
