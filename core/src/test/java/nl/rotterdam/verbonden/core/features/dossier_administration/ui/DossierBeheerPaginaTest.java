@@ -305,6 +305,9 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         form.setValue(veld("getuigenForm", "geboortedatum"), geboortedatum.toString());
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         form.submit(veld("getuigenForm", "opslaan"));
+    }
+
+    @Test
     void detailPagina_notitiesToevoegenEnNieuwsteEerstWeergeven() {
         UUID dossierId = maakDossierMetPartnerZonderBsn();
         dossierAdministrationService.createNotitie(dossierId, new CreateDossierNotitieDto("Oudste notitie"));
