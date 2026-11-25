@@ -11,11 +11,13 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Change
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailGetuigeDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailPartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerHeeftAlDossierException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerNietInBrpException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PersoonsgegevensDto;
@@ -290,6 +292,90 @@ class DossierBeheerIntegrationTest {
         UUID anderDossier = maakDossierMetPartnerZonderBsn();
 
         assertThatThrownBy(() -> dossierAdministrationService.findBestand(anderDossier, bestandId))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void notitie_wordtOnveranderlijkOpgeslagenEnNieuwsteStaatBovenaan() {
+        UUID dossierId = testData.maakConceptDossier();
+        String oudste = "Eerste notitie";
+        String nieuwste = "Tweede notitie";
+
+        dossierAdministrationService.createNotitie(dossierId, new CreateDossierNotitieDto(oudste));
+        dossierAdministrationService.createNotitie(dossierId, new CreateDossierNotitieDto(nieuwste));
+
+        assertThat(dossierAdministrationService.findNotities(dossierId))
+                .extracting(ListDossierNotitieDto::tekst)
+                .containsExactly(nieuwste, oudste);
+        assertThat(dossierAdministrationService.findNotities(dossierId).getFirst())
+                .satisfies(notitie -> {
+                    assertThat(notitie.gebruikersnaam()).isEqualTo("medewerker");
+                    assertThat(notitie.aangemaaktOp()).isNotNull();
+                });
+    }
+
+    @Test
+    void notitie_magMaximaalDuizendTekensBevatten() {
+        UUID dossierId = testData.maakConceptDossier();
+        String tekst = "x".repeat(CreateDossierNotitieDto.MAX_LENGTE);
+
+        dossierAdministrationService.createNotitie(dossierId, new CreateDossierNotitieDto(tekst));
+
+        assertThat(dossierAdministrationService.findNotities(dossierId))
+                .singleElement()
+                .extracting(ListDossierNotitieDto::tekst)
+                .isEqualTo(tekst);
+    }
+
+    @Test
+    void notitie_telPerRegeleindeEenTeken_enBewaartGenormaliseerdeTekst() {
+        UUID dossierId = testData.maakConceptDossier();
+        String browserTekst = "x\r\n".repeat(499) + "xx";
+        String verwacht = "x\n".repeat(499) + "xx";
+
+        dossierAdministrationService.createNotitie(dossierId, new CreateDossierNotitieDto(browserTekst));
+
+        assertThat(browserTekst.length()).isGreaterThan(CreateDossierNotitieDto.MAX_LENGTE);
+        assertThat(verwacht.length()).isEqualTo(CreateDossierNotitieDto.MAX_LENGTE);
+        assertThat(dossierAdministrationService.findNotities(dossierId))
+                .singleElement()
+                .extracting(ListDossierNotitieDto::tekst)
+                .isEqualTo(verwacht);
+    }
+
+    @Test
+    void notitie_metDuizendEnEenTekensNaNormalisatie_wordtGeweigerd() {
+        UUID dossierId = testData.maakConceptDossier();
+        String tekst = "x\r\n".repeat(500) + "xx";
+
+        assertThatThrownBy(() -> dossierAdministrationService.createNotitie(dossierId,
+                new CreateDossierNotitieDto(tekst)))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void notitie_verwijdertWitruimteEnLegeRegelsAanBeginEnEind() {
+        UUID dossierId = testData.maakConceptDossier();
+
+        dossierAdministrationService.createNotitie(dossierId,
+                new CreateDossierNotitieDto("\r\n\r\n  regel 1\r\n\r\nregel 2 \r\n\r\n"));
+
+        assertThat(dossierAdministrationService.findNotities(dossierId))
+                .singleElement()
+                .extracting(ListDossierNotitieDto::tekst)
+                .isEqualTo("regel 1\n\nregel 2");
+    }
+
+    @Test
+    void notitie_metMeerDanDuizendTekensOfZonderTekst_wordtGeweigerd() {
+        UUID dossierId = testData.maakConceptDossier();
+
+        assertThatThrownBy(() -> dossierAdministrationService.createNotitie(dossierId,
+                new CreateDossierNotitieDto("x".repeat(CreateDossierNotitieDto.MAX_LENGTE + 1))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("1000");
+        assertThatThrownBy(() -> dossierAdministrationService.createNotitie(dossierId,
+                new CreateDossierNotitieDto(" \n")))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

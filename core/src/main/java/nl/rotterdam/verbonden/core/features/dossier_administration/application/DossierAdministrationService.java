@@ -8,10 +8,12 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Change
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangePartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeGetuigeDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierMailDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierMailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerHeeftAlDossierException;
@@ -138,6 +140,20 @@ public interface DossierAdministrationService {
     DossierBestandDto findBestand(UUID dossierId, long bestandId);
 
     void deleteBestand(UUID dossierId, long bestandId);
+
+    /**
+     * Voegt een onveranderlijke notitie toe namens de ingelogde medewerker.
+     *
+     * @throws IllegalArgumentException wanneer de notitie leeg is of meer dan 1000 tekens bevat
+     */
+    long createNotitie(UUID dossierId, CreateDossierNotitieDto dto);
+
+    /**
+     * De notities van het dossier, nieuwste eerst.
+     *
+     * @throws IllegalArgumentException wanneer het dossier niet bestaat
+     */
+    List<ListDossierNotitieDto> findNotities(UUID dossierId);
 
     /**
      * De e-mails die voor het dossier zijn verstuurd of nog worden verstuurd, de nieuwste eerst.

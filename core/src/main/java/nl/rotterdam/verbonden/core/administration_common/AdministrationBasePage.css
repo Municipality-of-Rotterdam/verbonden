@@ -241,3 +241,25 @@ body {
 .rd-dossier-persoon {
     min-width: 22rem;
 }
+
+.rd-notities-tabel th {
+    text-align: start;
+}
+
+.rd-notities-tabel th:nth-child(-n+2),
+.rd-notities-tabel td:nth-child(-n+2) {
+    white-space: nowrap;
+}
+
+.rd-notitie-rij > td {
+    vertical-align: top;
+}
+
+.rd-notitie-tekst {
+    white-space: pre-line;
+}
+
+.rd-notitie-formulier .utrecht-textarea {
+    --utrecht-textarea-max-inline-size: 640px;
+    --utrecht-textarea-min-block-size: 0;
+}
