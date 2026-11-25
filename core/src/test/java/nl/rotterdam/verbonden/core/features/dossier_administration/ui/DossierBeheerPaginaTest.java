@@ -66,6 +66,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         tester.assertRenderedPage(DossierDetailPage.class);
         assertThat(tester.getLastResponseAsString())
                 .contains("class=\"ams-dialog\"")
+                .contains("rd-bijlage-upload")
                 .contains("Bijlage toevoegen")
                 .doesNotContain("onclick=")
                 .contains("Van Muiswinkel")

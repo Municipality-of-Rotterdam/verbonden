@@ -227,7 +227,7 @@
         <button wicket:id="bijlageToevoegen" type="button" class="utrecht-button utrecht-button--primary-action">
             Bijlage toevoegen
         </button>
-        <form wicket:id="bestandToevoegenForm">
+        <form wicket:id="bestandToevoegenForm" class="rd-bijlage-upload">
             <dialog wicket:id="bijlageDialog">
                 <div class="d-flex flex-column gap-3">
                     <div wicket:id="formFeedback"></div>
@@ -238,7 +238,7 @@
                         <select wicket:id="input"></select>
                     </div>
                     <div wicket:id="opmerking"></div>
-                    <p wicket:id="toegestaan"></p>
+                    <p wicket:id="toegestaan" class="mb-0"></p>
                     <div><button wicket:id="toevoegen" type="submit"></button></div>
                 </div>
             </dialog>

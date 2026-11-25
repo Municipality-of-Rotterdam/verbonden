@@ -241,3 +241,14 @@ body {
 .rd-dossier-partner {
     min-width: 22rem;
 }
+
+.rd-bijlage-upload .ams-dialog {
+    --nl-heading-level-2-font-size: var(--rods-typography-scale-xl-font-size);
+    --nl-heading-level-2-line-height: var(--rods-typography-scale-xl-line-height);
+    --nl-heading-level-2-margin-block-start: 0;
+    --nl-heading-level-2-margin-block-end: 0;
+    --ams-dialog-header-padding-block: var(--rods-space-scale-3) 0;
+    --ams-dialog-header-medium-padding-block: var(--rods-space-scale-3) 0;
+    --ams-dialog-footer-padding-block: 0 var(--rods-space-scale-3);
+    --ams-dialog-footer-medium-padding-block: 0 var(--rods-space-scale-3);
+}
