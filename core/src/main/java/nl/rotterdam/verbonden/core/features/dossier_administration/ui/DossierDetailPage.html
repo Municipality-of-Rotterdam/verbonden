@@ -224,18 +224,25 @@
         </table>
         <p wicket:id="geenBestanden"></p>
 
-        <h3>Bestand toevoegen</h3>
-        <form wicket:id="bestandToevoegenForm" class="d-flex flex-column gap-3">
-            <div wicket:id="bestand">
-                <input wicket:id="input" type="file"/>
-            </div>
-            <select wicket:id="bijlageType"></select>
-            <div wicket:id="opmerking"></div>
-            <p wicket:id="toegestaan"></p>
-            <div>
-                <button wicket:id="toevoegen" type="submit"></button>
-            </div>
-        </form>
+        <button type="button" class="utrecht-button utrecht-button--primary-action"
+                onclick="document.getElementById('bijlageDialog').showModal()">Bijlage toevoegen</button>
+        <dialog id="bijlageDialog" class="rd-bijlage-dialog">
+            <h3>Bijlage toevoegen</h3>
+            <form wicket:id="bestandToevoegenForm" class="d-flex flex-column gap-3">
+                <div wicket:id="formFeedback"></div>
+                <div wicket:id="bestand">
+                    <input wicket:id="input" type="file"/>
+                </div>
+                <select wicket:id="bijlageType"></select>
+                <div wicket:id="opmerking"></div>
+                <p wicket:id="toegestaan"></p>
+                <div class="d-flex gap-3">
+                    <button wicket:id="toevoegen" type="submit"></button>
+                    <button type="button" class="utrecht-button utrecht-button--secondary-action"
+                            onclick="document.getElementById('bijlageDialog').close()">Annuleren</button>
+                </div>
+            </form>
+        </dialog>
     </section>
 
     <section class="rd-dossier-sectie">

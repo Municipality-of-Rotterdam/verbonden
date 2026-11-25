@@ -241,3 +241,15 @@ body {
 .rd-dossier-partner {
     min-width: 22rem;
 }
+
+.rd-bijlage-dialog {
+  min-width: 32rem;
+  max-width: 90vw;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.rd-bijlage-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}

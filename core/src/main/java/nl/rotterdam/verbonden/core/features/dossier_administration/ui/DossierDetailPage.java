@@ -33,7 +33,11 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
+import org.apache.wicket.markup.head.IHeaderResponse;
+import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.validation.validator.StringValidator;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.util.ListModel;
@@ -428,7 +432,9 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                     });
             bijlageType.setLabel(Model.of("Type bijlage")).setRequired(true);
             opmerking = new RdFormFieldTextInput<>("opmerking", Model.of(""), Model.of("Opmerking"));
+            opmerking.getTextField().add(StringValidator.maximumLength(255));
             add(
+                    new FeedbackPanel("formFeedback", new ContainerFeedbackMessageFilter(this)),
                     bestand,
                     bijlageType,
                     opmerking,
@@ -437,6 +443,15 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                             + DossierBestandType.MAX_GROOTTE / (1024 * 1024) + " MB."),
                     new RdButton("toevoegen", Model.of("Toevoegen"))
             );
+        }
+
+        @Override
+        public void renderHead(IHeaderResponse response) {
+            super.renderHead(response);
+            if (hasError()) {
+                response.render(OnDomReadyHeaderItem.forScript(
+                        "document.getElementById('bijlageDialog').showModal();"));
+            }
         }
 
         @Override

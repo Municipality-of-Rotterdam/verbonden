@@ -32,7 +32,7 @@ public class DossierBestandEntity {
     @Column(name = "bijlage_type", nullable = false, updatable = false)
     private DossierBijlageType bijlageType;
 
-    @Column(name = "opmerking", updatable = false)
+    @Column(name = "opmerking", length = 255, updatable = false)
     private String opmerking;
 
     @Column(name = "grootte", nullable = false, updatable = false)
