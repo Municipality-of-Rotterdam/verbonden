@@ -227,16 +227,20 @@
         <button wicket:id="bijlageToevoegen" type="button" class="utrecht-button utrecht-button--primary-action">
             Bijlage toevoegen
         </button>
-        <form wicket:id="bestandToevoegenForm" class="d-flex flex-column gap-3">
+        <form wicket:id="bestandToevoegenForm">
             <dialog wicket:id="bijlageDialog">
-                <div wicket:id="formFeedback"></div>
-                <div wicket:id="bestand">
-                    <input wicket:id="input" type="file"/>
+                <div class="d-flex flex-column gap-3">
+                    <div wicket:id="formFeedback"></div>
+                    <div wicket:id="bestand">
+                        <input wicket:id="input" type="file"/>
+                    </div>
+                    <div wicket:id="bijlageType">
+                        <select wicket:id="input"></select>
+                    </div>
+                    <div wicket:id="opmerking"></div>
+                    <p wicket:id="toegestaan"></p>
+                    <div><button wicket:id="toevoegen" type="submit"></button></div>
                 </div>
-                <select wicket:id="bijlageType"></select>
-                <div wicket:id="opmerking"></div>
-                <p wicket:id="toegestaan"></p>
-                <button wicket:id="toevoegen" type="submit"></button>
             </dialog>
         </form>
     </section>

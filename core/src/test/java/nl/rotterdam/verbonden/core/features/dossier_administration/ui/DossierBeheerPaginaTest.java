@@ -2,9 +2,11 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.administration_common.RdFormFieldSelect;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBijlageType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PersoonsgegevensDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierInzageRepository;
@@ -131,6 +133,11 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
         tester.executeAjaxEvent(pad("bijlageToevoegen"), "click");
+        RdFormFieldSelect<?> bijlageType =
+                (RdFormFieldSelect<?>) tester.getComponentFromLastRenderedPage(pad("bijlageType"));
+        assertThat(tester.getLastResponseAsString())
+                .contains("d-flex flex-column gap-3", "Type bijlage", "utrecht-select", "Opmerking", "utrecht-textbox",
+                        "for=\"" + bijlageType.getInput().getMarkupId() + "\"");
         FormTester form = formTester("bestandToevoegenForm");
         form.select(veld("bestandToevoegenForm", "bijlageType"), 0);
         form.setValue(veld("bestandToevoegenForm", "opmerking"), "Legitimatie van de getuige");
@@ -143,12 +150,30 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
                 .singleElement()
                 .satisfies(b -> {
                     assertThat(b.bestandsnaam()).isEqualTo("paspoort.pdf");
+                    assertThat(b.bijlageType()).isEqualTo(DossierBijlageType.GETUIGENLEGITIMATIE);
                     assertThat(b.opmerking()).isEqualTo("Legitimatie van de getuige");
                 });
         assertThat(tester.getLastResponseAsString())
                 .contains("paspoort.pdf")
                 .contains("Getuigenlegitimatie")
                 .contains("Legitimatie van de getuige");
+    }
+
+    @Test
+    void detailPagina_zonderBijlageType_toontValidatie() throws IOException {
+        UUID dossierId = maakDossierMetPartnerZonderBsn();
+        Path pdf = tempDir.resolve("paspoort.pdf");
+        Files.writeString(pdf, "%PDF-1.7 paspoort", StandardCharsets.US_ASCII);
+
+        tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+        tester.executeAjaxEvent(pad("bijlageToevoegen"), "click");
+        FormTester form = formTester("bestandToevoegenForm");
+        form.setFile(veld("bestandToevoegenForm", "bestand"), new File(pdf.toFile()), "application/pdf");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("bestandToevoegenForm", "toevoegen"));
+
+        assertThat(tester.getLastResponseAsString()).contains("Type bijlage", "showModal()");
+        assertThat(dossierAdministrationService.findDetail(dossierId).bestanden()).isEmpty();
     }
 
     @Test

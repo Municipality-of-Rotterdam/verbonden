@@ -13,6 +13,7 @@ import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
 import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogBorder;
 import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogHeadingLevel;
 import nl.rotterdam.verbonden.core.administration_common.RdFormFieldFileUpload;
+import nl.rotterdam.verbonden.core.administration_common.RdFormFieldSelect;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
@@ -35,7 +36,6 @@ import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -439,7 +439,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         private final IModel<List<FileUpload>> uploads = new ListModel<>();
         private BestandToevoegenDialog dialog;
         private RdFormFieldFileUpload bestand;
-        private DropDownChoice<DossierBijlageType> bijlageType;
+        private RdFormFieldSelect<DossierBijlageType> bijlageType;
         private RdFormFieldTextInput<String> opmerking;
 
         BestandToevoegenForm(String id) {
@@ -458,7 +458,8 @@ public class DossierDetailPage extends DossierBeheerBasePage {
             bestand = new RdFormFieldFileUpload("bestand", uploads, Model.of("Bestand"));
             bestand.withInput(input -> input.add(AttributeModifier.replace("accept", extensies)));
             dialog = new BestandToevoegenDialog("bijlageDialog");
-            bijlageType = new DropDownChoice<>("bijlageType", Model.of(), List.of(DossierBijlageType.values()),
+            bijlageType = new RdFormFieldSelect<>("bijlageType", Model.of(), Model.of("Type bijlage"),
+                    List.of(DossierBijlageType.values()),
                     new IChoiceRenderer<>() {
                         @Override
                         public Object getDisplayValue(DossierBijlageType object) {
@@ -469,8 +470,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                         public String getIdValue(DossierBijlageType object, int index) {
                             return Integer.toString(index);
                         }
-                    });
-            bijlageType.setLabel(Model.of("Type bijlage")).setRequired(true);
+                    }).setRequired(true);
             opmerking = new RdFormFieldTextInput<>("opmerking", Model.of(""), Model.of("Opmerking"));
             opmerking.getTextField().add(StringValidator.maximumLength(255));
             dialog.add(
@@ -494,7 +494,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                             try {
                                 dossierAdministrationService.createBestand(dossierId,
                                         new CreateDossierBestandDto(upload.getClientFileName(),
-                                                bijlageType.getModelObject(), opmerking.getModelObject(),
+                                                bijlageType.getInput().getModelObject(), opmerking.getModelObject(),
                                                 upload.getBytes()));
                                 naarDetailPagina();
                             } catch (BestandNietToegestaanException e) {
