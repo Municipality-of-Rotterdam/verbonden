@@ -9,7 +9,7 @@ import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
 import nl.rotterdam.verbonden.core.administration_common.RdFormFieldFileUpload;
-import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailPartnerDto;
@@ -397,7 +397,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         private final IModel<List<FileUpload>> uploads = new ListModel<>();
         private RdFormFieldFileUpload bestand;
         private DropDownChoice<DossierBijlageType> bijlageType;
-        private RdFormFieldTextArea<String> opmerking;
+        private RdFormFieldTextInput<String> opmerking;
 
         BestandToevoegenForm(String id) {
             super(id);
@@ -427,7 +427,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                         }
                     });
             bijlageType.setLabel(Model.of("Type bijlage")).setRequired(true);
-            opmerking = new RdFormFieldTextArea<>("opmerking", Model.of(""), Model.of("Opmerking"));
+            opmerking = new RdFormFieldTextInput<>("opmerking", Model.of(""), Model.of("Opmerking"));
             add(
                     bestand,
                     bijlageType,
