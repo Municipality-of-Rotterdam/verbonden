@@ -2,12 +2,16 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.ui;
 
 import nl.rotterdam.verbonden.core.features.betaling_administration.domain.ListBetalingDto;
 import nl.rotterdam.verbonden.core.features.betaling_administration.ui.BetalingAdministrationPage;
+import nl.rotterdam.nl_design_system.rotterdam_extensions.wicket.components.rotterdam_icon.RotterdamIconBehavior;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BetaalmutatieNietMogelijkException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListBetaalmutatieDto;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButton;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlert;
 import nl.rotterdam.nl_design_system.wicket.components.alert.RdAlertType;
 import nl.rotterdam.nl_design_system.wicket.components.button.RdButtonAppearance;
+import nl.rotterdam.nl_design_system.wicket.components.button.RdAjaxButton;
+import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogBorder;
+import nl.rotterdam.nl_design_system.wicket.components.dialog.RdDialogHeadingLevel;
 import nl.rotterdam.verbonden.core.administration_common.RdFormFieldFileUpload;
 import nl.rotterdam.nl_design_system.wicket.components.form_field_text_input.RdFormFieldTextInput;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
@@ -25,7 +29,12 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegeve
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
 import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.AjaxEventBehavior;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
@@ -34,8 +43,6 @@ import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.feedback.ContainerFeedbackMessageFilter;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.validation.validator.StringValidator;
 import org.apache.wicket.model.IModel;
@@ -70,6 +77,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         List<ListDossierMailDto> mails = dossierAdministrationService.findMails(dossierId);
         PageParameters dossierParams = parametersVoor(dossierId);
+        BestandToevoegenForm bestandToevoegenForm = new BestandToevoegenForm("bestandToevoegenForm");
 
         pageBody.add(
                 new Label("titel", "Dossier " + dossierId),
@@ -142,7 +150,13 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                 new BestandenListView("bestanden", dossier.bestanden()),
                 new Label("geenBestanden", "Er zijn nog geen bestanden toegevoegd.")
                         .setVisible(dossier.bestanden().isEmpty()),
-                new BestandToevoegenForm("bestandToevoegenForm"),
+                new WebMarkupContainer("bijlageToevoegen").add(new AjaxEventBehavior("click") {
+                    @Override
+                    protected void onEvent(AjaxRequestTarget target) {
+                        bestandToevoegenForm.dialog.showModal(target);
+                    }
+                }),
+                bestandToevoegenForm,
 
                 new MailsListView("mails", mails),
                 new Label("geenMails", "Er zijn nog geen e-mails verstuurd.").setVisible(mails.isEmpty())
@@ -396,9 +410,34 @@ public class DossierDetailPage extends DossierBeheerBasePage {
         }
     }
 
+    private class BestandToevoegenDialog extends RdDialogBorder {
+
+        BestandToevoegenDialog(String id) {
+            super(id, Model.of("Bijlage toevoegen"), () -> RotterdamIconBehavior.CLOSE,
+                    RdDialogHeadingLevel.LEVEL_2);
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            ((AjaxButton) getCloseButtonComponent()).setDefaultFormProcessing(false);
+        }
+
+        @Override
+        protected Component newFooterContent(String id) {
+            return new WebMarkupContainer(id);
+        }
+
+        @Override
+        protected void onClose(AjaxRequestTarget target) {
+            close(target);
+        }
+    }
+
     private class BestandToevoegenForm extends Form<Void> {
 
         private final IModel<List<FileUpload>> uploads = new ListModel<>();
+        private BestandToevoegenDialog dialog;
         private RdFormFieldFileUpload bestand;
         private DropDownChoice<DossierBijlageType> bijlageType;
         private RdFormFieldTextInput<String> opmerking;
@@ -418,6 +457,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                     .collect(Collectors.joining(","));
             bestand = new RdFormFieldFileUpload("bestand", uploads, Model.of("Bestand"));
             bestand.withInput(input -> input.add(AttributeModifier.replace("accept", extensies)));
+            dialog = new BestandToevoegenDialog("bijlageDialog");
             bijlageType = new DropDownChoice<>("bijlageType", Model.of(), List.of(DossierBijlageType.values()),
                     new IChoiceRenderer<>() {
                         @Override
@@ -433,7 +473,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
             bijlageType.setLabel(Model.of("Type bijlage")).setRequired(true);
             opmerking = new RdFormFieldTextInput<>("opmerking", Model.of(""), Model.of("Opmerking"));
             opmerking.getTextField().add(StringValidator.maximumLength(255));
-            add(
+            dialog.add(
                     new FeedbackPanel("formFeedback", new ContainerFeedbackMessageFilter(this)),
                     bestand,
                     bijlageType,
@@ -441,34 +481,37 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                     new Label("toegestaan", "Documenten en afbeeldingen ("
                             + String.join(", ", DossierBestandType.alleExtensies()) + "), maximaal "
                             + DossierBestandType.MAX_GROOTTE / (1024 * 1024) + " MB."),
-                    new RdButton("toevoegen", Model.of("Toevoegen"))
+                    new RdAjaxButton("toevoegen", Model.of("Toevoegen")) {
+                        @Override
+                        protected void onSubmit(AjaxRequestTarget target) {
+                            FileUpload upload = bestand.getFileUpload();
+                            if (upload == null) {
+                                error("Kies een bestand.");
+                                target.add(BestandToevoegenForm.this);
+                                dialog.showModal(target);
+                                return;
+                            }
+                            try {
+                                dossierAdministrationService.createBestand(dossierId,
+                                        new CreateDossierBestandDto(upload.getClientFileName(),
+                                                bijlageType.getModelObject(), opmerking.getModelObject(),
+                                                upload.getBytes()));
+                                naarDetailPagina();
+                            } catch (BestandNietToegestaanException e) {
+                                error(e.getMessage());
+                                target.add(BestandToevoegenForm.this);
+                                dialog.showModal(target);
+                            }
+                        }
+
+                        @Override
+                        protected void onError(AjaxRequestTarget target) {
+                            target.add(BestandToevoegenForm.this);
+                            dialog.showModal(target);
+                        }
+                    }
             );
-        }
-
-        @Override
-        public void renderHead(IHeaderResponse response) {
-            super.renderHead(response);
-            if (hasError()) {
-                response.render(OnDomReadyHeaderItem.forScript(
-                        "document.getElementById('bijlageDialog').showModal();"));
-            }
-        }
-
-        @Override
-        protected void onSubmit() {
-            FileUpload upload = bestand.getFileUpload();
-            if (upload == null) {
-                error("Kies een bestand.");
-                return;
-            }
-            try {
-                dossierAdministrationService.createBestand(dossierId,
-                        new CreateDossierBestandDto(upload.getClientFileName(), bijlageType.getModelObject(),
-                                opmerking.getModelObject(), upload.getBytes()));
-                naarDetailPagina();
-            } catch (BestandNietToegestaanException e) {
-                error(e.getMessage());
-            }
+            add(dialog);
         }
     }
 

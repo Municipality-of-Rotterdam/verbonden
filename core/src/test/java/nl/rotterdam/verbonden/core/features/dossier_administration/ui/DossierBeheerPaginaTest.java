@@ -63,6 +63,9 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         tester.assertRenderedPage(DossierDetailPage.class);
         assertThat(tester.getLastResponseAsString())
+                .contains("class=\"ams-dialog\"")
+                .contains("Bijlage toevoegen")
+                .doesNotContain("onclick=")
                 .contains("Van Muiswinkel")
                 .contains("999990007")
                 .contains("Smith")
@@ -127,6 +130,7 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         Files.writeString(pdf, "%PDF-1.7 paspoort", StandardCharsets.US_ASCII);
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+        tester.executeAjaxEvent(pad("bijlageToevoegen"), "click");
         FormTester form = formTester("bestandToevoegenForm");
         form.select(veld("bestandToevoegenForm", "bijlageType"), 0);
         form.setValue(veld("bestandToevoegenForm", "opmerking"), "Legitimatie van de getuige");
@@ -154,13 +158,16 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
         Files.writeString(exe, "MZ", StandardCharsets.US_ASCII);
 
         tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+        tester.executeAjaxEvent(pad("bijlageToevoegen"), "click");
         FormTester form = formTester("bestandToevoegenForm");
         form.select(veld("bestandToevoegenForm", "bijlageType"), 0);
         form.setFile(veld("bestandToevoegenForm", "bestand"), new File(exe.toFile()), "application/octet-stream");
         tester.addRequestHeader("sec-fetch-site", "same-origin");
         form.submit(veld("bestandToevoegenForm", "toevoegen"));
 
-        assertThat(tester.getLastResponseAsString()).contains("Dit soort bestand is niet toegestaan");
+        assertThat(tester.getLastResponseAsString())
+                .contains("Dit soort bestand is niet toegestaan")
+                .contains("showModal()");
         assertThat(dossierAdministrationService.findDetail(dossierId).bestanden()).isEmpty();
     }
 
