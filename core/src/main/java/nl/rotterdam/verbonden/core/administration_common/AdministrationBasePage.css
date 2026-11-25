@@ -223,6 +223,11 @@ body {
     margin-block-end: 2rem;
 }
 
+.rd-dossier-sectie .utrecht-table th,
+.rd-dossier-sectie .utrecht-table td {
+    padding-inline: 1rem;
+}
+
 .rd-dossier-gegevens {
     display: grid;
     grid-template-columns: max-content auto;
