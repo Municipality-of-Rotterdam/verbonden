@@ -260,6 +260,34 @@
         </table>
         <p wicket:id="geenMails"></p>
     </section>
+
+    <section class="rd-dossier-sectie">
+        <h2>Notities</h2>
+        <table class="utrecht-table rd-notities-tabel">
+            <thead class="utrecht-table__header">
+            <tr class="utrecht-table__row">
+                <th scope="col" class="utrecht-table__header-cell">Medewerker</th>
+                <th scope="col" class="utrecht-table__header-cell">Aangemaakt</th>
+                <th scope="col" class="utrecht-table__header-cell">Notitie</th>
+            </tr>
+            </thead>
+            <tbody class="utrecht-table__body">
+            <tr wicket:id="notities" class="utrecht-table__row rd-notitie-rij">
+                <td wicket:id="auteur" class="utrecht-table__cell">Gebruikersnaam</td>
+                <td wicket:id="aangemaakt" class="utrecht-table__cell">01-01-2026 10:00</td>
+                <td wicket:id="tekst" class="utrecht-table__cell rd-notitie-tekst">Notitietekst</td>
+            </tr>
+            </tbody>
+        </table>
+        <p wicket:id="geenNotities"></p>
+        <h3>Notitie toevoegen</h3>
+        <form wicket:id="notitieToevoegenForm" class="d-flex flex-column gap-3 rd-notitie-formulier">
+            <div wicket:id="notitie"></div>
+            <div>
+                <button wicket:id="toevoegen" type="submit"></button>
+            </div>
+        </form>
+    </section>
 </wicket:extend>
 </body>
 </html>

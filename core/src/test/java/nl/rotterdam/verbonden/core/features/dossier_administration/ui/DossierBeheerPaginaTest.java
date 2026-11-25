@@ -4,8 +4,10 @@ import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
 import nl.rotterdam.verbonden.core.features.dossier_administration.application.DossierAdministrationService;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PersoonsgegevensDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierInzageRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
@@ -153,6 +155,43 @@ class DossierBeheerPaginaTest extends BaseWicketTest {
 
         assertThat(tester.getLastResponseAsString()).contains("Dit soort bestand is niet toegestaan");
         assertThat(dossierAdministrationService.findDetail(dossierId).bestanden()).isEmpty();
+    }
+
+    @Test
+    void detailPagina_notitiesToevoegenEnNieuwsteEerstWeergeven() {
+        UUID dossierId = maakDossierMetPartnerZonderBsn();
+        dossierAdministrationService.createNotitie(dossierId, new CreateDossierNotitieDto("Oudste notitie"));
+        dossierAdministrationService.createNotitie(dossierId, new CreateDossierNotitieDto("Bestaande notitie"));
+
+        tester.startPage(DossierDetailPage.class, DossierBeheerBasePage.parametersVoor(dossierId));
+
+        String response = tester.getLastResponseAsString();
+        assertThat(response).contains("rd-notitie-tekst");
+        assertThat(response).contains("Bestaande notitie", "Oudste notitie");
+        assertThat(response).contains("maxlength=\"1000\"");
+        assertThat(response).contains("rd-notitie-formulier", "rows=\"8\"");
+        assertThat(response).contains("<h2>E-mails</h2>", "<h2>Notities</h2>");
+        assertThat(response.indexOf("<h2>E-mails</h2>")).isLessThan(response.indexOf("<h2>Notities</h2>"));
+        String notities = response.substring(response.indexOf("<h2>Notities</h2>"));
+        assertThat(notities).contains("<table class=\"utrecht-table rd-notities-tabel\">", "utrecht-table__header-cell",
+                "utrecht-table__body", "utrecht-table__row", "utrecht-table__cell");
+        String nieuwsteNotitie = pad("notities") + ":0";
+        tester.assertLabel(nieuwsteNotitie + ":auteur", "medewerker");
+        tester.assertLabel(nieuwsteNotitie + ":tekst", "Bestaande notitie");
+        assertThat(tester.getComponentFromLastRenderedPage(nieuwsteNotitie + ":aangemaakt")
+                .getDefaultModelObjectAsString()).isNotBlank();
+        assertThat(response.indexOf("Bestaande notitie")).isLessThan(response.indexOf("Oudste notitie"));
+
+        FormTester form = formTester("notitieToevoegenForm");
+        form.setValue(veld("notitieToevoegenForm", "notitie"), "Nieuwe notitie");
+        tester.addRequestHeader("sec-fetch-site", "same-origin");
+        form.submit(veld("notitieToevoegenForm", "toevoegen"));
+
+        tester.assertRenderedPage(DossierDetailPage.class);
+        assertThat(dossierAdministrationService.findNotities(dossierId))
+                .extracting(ListDossierNotitieDto::tekst)
+                .containsExactly("Nieuwe notitie", "Bestaande notitie", "Oudste notitie");
+        assertThat(tester.getLastResponseAsString()).contains("Nieuwe notitie");
     }
 
     @Test

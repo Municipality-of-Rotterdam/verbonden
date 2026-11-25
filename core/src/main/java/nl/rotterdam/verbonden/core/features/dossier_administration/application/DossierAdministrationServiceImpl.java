@@ -14,18 +14,21 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Change
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangePartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailPartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerHeeftAlDossierException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PartnerNietInBrpException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.PersoonsgegevensDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierAdministrationRepository;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierBestandRepository;
 import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierInzageRepository;
+import nl.rotterdam.verbonden.core.features.dossier_administration.repository.DossierNotitieRepository;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.AfspraakPlanningService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.application.MarriageIntakeService;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.AanmaakKanaal;
@@ -41,11 +44,13 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKe
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.GetuigenRepository;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
 import nl.rotterdam.verbonden.core.features.trouwboekje_administration.repository.TrouwboekjeRepository;
+import nl.rotterdam.verbonden.core.identity.AuthenticatedUser;
 import nl.rotterdam.verbonden.core.identity.CurrentUserProvider;
 import nl.rotterdam.verbonden.core.identity.PersonLookupService;
 import nl.rotterdam.verbonden.core.persistence.DossierBestandEntity;
 import nl.rotterdam.verbonden.core.persistence.DossierInzageEntity;
 import nl.rotterdam.verbonden.core.persistence.DossierMailEntity;
+import nl.rotterdam.verbonden.core.persistence.DossierNotitieEntity;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierMailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierMailPogingDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierMailDto;
@@ -79,6 +84,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     private final DossierBestandRepository dossierBestandRepository;
     private final DossierInzageRepository dossierInzageRepository;
     private final DossierMailRepository dossierMailRepository;
+    private final DossierNotitieRepository dossierNotitieRepository;
     private final GetuigenRepository getuigenRepository;
     private final MarriageTypeLocationRepository marriageTypeLocationRepository;
     private final TrouwboekjeRepository trouwboekjeRepository;
@@ -93,6 +99,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                                      DossierBestandRepository dossierBestandRepository,
                                      DossierInzageRepository dossierInzageRepository,
                                      DossierMailRepository dossierMailRepository,
+                                     DossierNotitieRepository dossierNotitieRepository,
                                      GetuigenRepository getuigenRepository,
                                      MarriageTypeLocationRepository marriageTypeLocationRepository,
                                      TrouwboekjeRepository trouwboekjeRepository,
@@ -106,6 +113,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
         this.dossierBestandRepository = dossierBestandRepository;
         this.dossierInzageRepository = dossierInzageRepository;
         this.dossierMailRepository = dossierMailRepository;
+        this.dossierNotitieRepository = dossierNotitieRepository;
         this.getuigenRepository = getuigenRepository;
         this.marriageTypeLocationRepository = marriageTypeLocationRepository;
         this.trouwboekjeRepository = trouwboekjeRepository;
@@ -549,6 +557,30 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
     @Transactional
     public void deleteBestand(UUID dossierId, long bestandId) {
         dossierBestandRepository.delete(getBestand(dossierId, bestandId));
+    }
+
+    @Override
+    @Transactional
+    public long createNotitie(UUID dossierId, CreateDossierNotitieDto dto) {
+        String tekst = dto == null || dto.tekst() == null ? ""
+                : dto.tekst().replace("\r\n", "\n").replace('\r', '\n').strip();
+        if (tekst.isEmpty() || tekst.length() > CreateDossierNotitieDto.MAX_LENGTE) {
+            throw new IllegalArgumentException("Vul een notitie in van hoogstens "
+                    + CreateDossierNotitieDto.MAX_LENGTE + " tekens.");
+        }
+        HuwelijksDossierEntity dossier = getDossier(dossierId);
+        AuthenticatedUser user = currentUserProvider.getCurrentUser();
+        String gebruikersnaam = user.getUserId();
+        DossierNotitieEntity notitie = new DossierNotitieEntity(
+                dossier, tekst, gebruikersnaam, LocalDateTime.now(clock));
+        return dossierNotitieRepository.save(notitie).getId();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ListDossierNotitieDto> findNotities(UUID dossierId) {
+        getDossier(dossierId);
+        return dossierNotitieRepository.findByDossierUuidOrderByAangemaaktOpDescIdDesc(dossierId);
     }
 
     @Override

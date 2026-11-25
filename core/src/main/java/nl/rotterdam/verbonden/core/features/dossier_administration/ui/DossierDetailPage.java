@@ -16,11 +16,14 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Dossie
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierMailDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierNotitieDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierNietCompleetException;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.GetuigeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
+import nl.rotterdam.nl_design_system.wicket.components.form_field_textarea.RdFormFieldTextArea;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
@@ -32,6 +35,7 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.LambdaModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -61,6 +65,7 @@ public class DossierDetailPage extends DossierBeheerBasePage {
 
         FeedbackPanel feedback = new FeedbackPanel("feedback");
         List<ListDossierMailDto> mails = dossierAdministrationService.findMails(dossierId);
+        List<ListDossierNotitieDto> notities = dossierAdministrationService.findNotities(dossierId);
         PageParameters dossierParams = parametersVoor(dossierId);
 
         pageBody.add(
@@ -136,9 +141,65 @@ public class DossierDetailPage extends DossierBeheerBasePage {
                         .setVisible(dossier.bestanden().isEmpty()),
                 new BestandToevoegenForm("bestandToevoegenForm"),
 
+                new NotitiesListView("notities", notities),
+                new Label("geenNotities", "Er zijn nog geen notities toegevoegd.").setVisible(notities.isEmpty()),
+                new NotitieToevoegenForm("notitieToevoegenForm"),
+
                 new MailsListView("mails", mails),
                 new Label("geenMails", "Er zijn nog geen e-mails verstuurd.").setVisible(mails.isEmpty())
         );
+    }
+
+    private class NotitiesListView extends ListView<ListDossierNotitieDto> {
+
+        NotitiesListView(String id, List<ListDossierNotitieDto> notities) {
+            super(id, notities);
+        }
+
+        @Override
+        protected void populateItem(ListItem<ListDossierNotitieDto> item) {
+            ListDossierNotitieDto notitie = item.getModelObject();
+            item.add(
+                    new Label("auteur", notitie.gebruikersnaam()),
+                    new Label("aangemaakt", datumTijd(notitie.aangemaaktOp())),
+                    new Label("tekst", notitie.tekst())
+            );
+        }
+    }
+
+    private class NotitieToevoegenForm extends Form<DossierNotitieFormDto> {
+
+        NotitieToevoegenForm(String id) {
+            super(id, Model.of(new DossierNotitieFormDto()));
+        }
+
+        @Override
+        protected void onInitialize() {
+            super.onInitialize();
+            add(
+                    new RdFormFieldTextArea<>("notitie",
+                            LambdaModel.of(getModel(), DossierNotitieFormDto::getTekst,
+                                    DossierNotitieFormDto::setTekst),
+                            Model.of("Notitie"),
+                            Model.of("Maximaal 1000 tekens."))
+                            .setRequired(true)
+                            .withTextArea((textArea, formField) -> textArea.add(
+                                    AttributeModifier.replace("maxlength", CreateDossierNotitieDto.MAX_LENGTE),
+                                    AttributeModifier.replace("rows", 8))),
+                    new RdButton("toevoegen", Model.of("Notitie toevoegen"))
+            );
+        }
+
+        @Override
+        protected void onSubmit() {
+            try {
+                dossierAdministrationService.createNotitie(dossierId,
+                        new CreateDossierNotitieDto(getModelObject().getTekst()));
+                naarDetailPagina();
+            } catch (IllegalArgumentException e) {
+                error(e.getMessage());
+            }
+        }
     }
 
     private class MailsListView extends ListView<ListDossierMailDto> {
