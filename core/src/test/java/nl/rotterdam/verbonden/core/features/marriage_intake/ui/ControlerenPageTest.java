@@ -86,7 +86,7 @@ class ControlerenPageTest extends BaseWicketTest {
         assertThat(tester.getLastResponseAsString())
                 .contains("Taal van de ceremonie")
                 .contains("Nederlands")
-                .contains("Aantal bezoekers");
+                .contains("Aantal mensen");
     }
 
     @Test

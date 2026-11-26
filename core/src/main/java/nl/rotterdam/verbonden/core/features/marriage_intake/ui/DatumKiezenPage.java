@@ -123,7 +123,7 @@ public class DatumKiezenPage extends BurgerBasePage {
             datePicker.setType(LocalDateTime.class);
 
             add(datePicker,
-                    new RdButton("bevestigButton", new ResourceModel("datum.kiezen.bevestig")));
+                    new RdButton("bevestigButton", new ResourceModel("datum.kiezen.kalender.bevestig")));
         }
 
         @Override
@@ -149,16 +149,26 @@ public class DatumKiezenPage extends BurgerBasePage {
                         ...datePicker.i18n,
                         nl: {
                             ...datePicker.i18n.nl,
-                            afspraakLocale: "Uw ceremonie is op:",
-                            chooseDatumLabelLocale: "Kies een datum voor uw ceremonie.",
-                            descriptionLocale: "U kunt alleen kiezen uit de beschikbare dagen. De beschikbare dagen zijn groen in de kalender.",
-                            selectLocale: "Kies een datum voor uw ceremonie.",
-                            selectTimeLocale: "Kies hoe laat uw ceremonie moet beginnen.",
-                            timeDescLocale: "Tijden waaruit u kunt kiezen:",
-                            confirmLocale: "Deze datum en tijd bevestigen"
+                            afspraakLocale: "%s",
+                            chooseDatumLabelLocale: "%s",
+                            descriptionLocale: "%s",
+                            selectLocale: "%s",
+                            selectTimeLocale: "%s",
+                            timeDescLocale: "%s",
+                            confirmLocale: "%s"
                         }
                     };
                 }
-                """));
+                """.formatted(
+                new ResourceModel("datum.kiezen.kalender.samenvatting.label").getObject(),
+                      new ResourceModel("datum.kiezen.kalender.title").getObject(),
+                      new ResourceModel("datum.kiezen.kalender.subtitle").getObject(),
+                      new ResourceModel("datum.kiezen.kalender.title").getObject(),
+                      new ResourceModel("datum.kiezen.kalender.tijdslot.title").getObject(),
+                      new ResourceModel("datum.kiezen.kalender.tijdslot.subtitle.prefix").getObject(),
+                      new ResourceModel("datum.kiezen.kalender.bevestig").getObject()
+
+        )));
+
     }
 }

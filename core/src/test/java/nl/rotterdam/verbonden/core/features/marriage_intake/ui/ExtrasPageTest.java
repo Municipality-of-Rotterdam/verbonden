@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ExtrasPageTest extends BaseWicketTest {
 
     private static final String INTERNATIONALE_AKTE_INTRO =
-            "Gaat u de huwelijksakte in het buitenland gebruiken? Kies dan voor een internationaal uittreksel. Dat is een korte versie van uw huwelijksakte. Er staat uitleg bij in 10 talen: Nederlands, Engels, Frans, Duits, Spaans, Grieks, Italiaans, Portugees, Turks en Servo-Kroatisch.";
+            "Gaat u uw huwelijksakte in het buitenland gebruiken? Kies dan een internationaal uittreksel. Dat is een korte versie van uw huwelijksakte, met uitleg in 10 talen: Nederlands, Engels, Frans, Duits, Spaans, Grieks, Italiaans, Portugees, Turks en Servo-Kroatisch.";
 
     private static final String PAGE_BODY = "pageLayout:pageLayout_body:pageBody:pageBody_body";
     private static final String FORM_PAD = PAGE_BODY + ":extrasForm";
@@ -149,7 +149,7 @@ class ExtrasPageTest extends BaseWicketTest {
         tester.startPage(ExtrasPage.class, new PageParameters().add("dossierId", dossierId.toString()));
 
         assertThat(tester.getLastResponseAsString())
-                .contains("Het aantal bezoekers is minimaal 4 en maximaal 8. Beide partners en de getuigen tellen mee.")
+                .contains("Dat zijn er minimaal 4 en maximaal 8. U, uw partner, de getuigen en eventueel de tolk tellen mee.")
                 .doesNotContain("{0}");
     }
 
@@ -238,7 +238,7 @@ class ExtrasPageTest extends BaseWicketTest {
 
         tester.assertRenderedPage(ExtrasPage.class);
         assertThat(tester.getLastResponseAsString()).contains(INTERNATIONALE_AKTE_INTRO);
-        assertThat(tester.getLastResponseAsString()).contains("Internationale huwelijksakte");
+        assertThat(tester.getLastResponseAsString()).contains("Internationaal uittreksel");
         tester.assertLabel("pageLayout:pageLayout_body:pageBody:pageBody_body:extrasForm:internationaleAkteSection:internationaleAktePrijs",
                 InternationaleAkteTarief.prijsOp(LocalDate.now()).format());
     }

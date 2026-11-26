@@ -55,9 +55,8 @@ class DeGetuigenPageTest extends BaseWicketTest {
         String html = tester.getLastResponseAsString();
         int readAloud = html.indexOf("data-intake-read-aloud");
         int previous = html.indexOf("Vorige stap");
-        int stepHeading = html.indexOf("Jullie getuigen", previous);
-        int question = html.indexOf("Wie zijn jullie getuigen?", stepHeading);
-        int intro = html.indexOf("Vul hieronder de namen van jullie getuigen in.", question);
+        int stepHeading = html.indexOf("Uw getuigen", previous);
+        int intro = html.indexOf("Vul de namen van uw getuigen in.", stepHeading);
         int content = html.indexOf("rd-intake-content", intro);
         int next = html.indexOf("Volgende stap", content);
 
@@ -65,12 +64,11 @@ class DeGetuigenPageTest extends BaseWicketTest {
         assertThat(readAloud).isGreaterThanOrEqualTo(0);
         assertThat(previous).isGreaterThan(readAloud);
         assertThat(stepHeading).isGreaterThan(previous);
-        assertThat(question).isGreaterThan(stepHeading);
-        assertThat(intro).isGreaterThan(question);
+        assertThat(intro).isGreaterThan(stepHeading);
         assertThat(content).isGreaterThan(intro);
         assertThat(next).isGreaterThan(content);
         assertThat(html).contains(
-                "Straks controleren we de identiteit van jullie getuigen via Mijn Loket. Dat gebeurt wanneer jullie alles bevestigd en betaald hebben.",
+                "De gemeente controleert later hun identiteit. Dat gebeurt nadat u en uw partner alles hebben bevestigd en betaald.",
                 "Voornaam en achternaam"
         );
     }

@@ -139,7 +139,7 @@ class JullieGegevensPageTest extends BaseWicketTest {
                 .doesNotContain("partnerUitnodigenLink");
         int sidebarStart = html.indexOf("rd-keuzes-panel");
         assertThat(html.indexOf("Uw partner moet inloggen met een eigen DigiD.", sidebarStart))
-                .isLessThan(html.indexOf("Jullie getuigen", sidebarStart));
+                .isLessThan(html.indexOf("Uw getuigen", sidebarStart));
     }
 
     @Test
@@ -176,8 +176,8 @@ class JullieGegevensPageTest extends BaseWicketTest {
         tester.assertVisible(SIDEBAR + "geenGegevens");
         tester.assertVisible(SIDEBAR + "geenGetuigen");
         assertThat(tester.getLastResponseAsString())
-                .contains("Jullie gegevens invullen")
-                .contains("Jullie getuigen doorgeven");
+                .contains("Uw gegevens invullen")
+                .contains("Uw getuigen doorgeven");
     }
 
     @Test

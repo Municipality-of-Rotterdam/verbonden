@@ -73,11 +73,10 @@ class DatumKiezenPageTest extends BaseWicketTest {
         assertThat(response)
                 .contains("Datum en tijd")
                 .contains("Kies een datum voor uw ceremonie.")
-                .contains("U kunt alleen kiezen uit de beschikbare dagen. De beschikbare dagen zijn groen in de kalender.")
-                .contains("Kies hoe laat uw ceremonie moet beginnen.")
-                .contains("Tijden waaruit u kunt kiezen:")
+                .contains("U kunt alleen een beschikbare dag kiezen. Dagen die niet beschikbaar zijn, zijn grijs.")
+                .contains("Kies hoe laat uw ceremonie begint.")
                 .contains("Uw ceremonie is op:")
-                .contains("Deze datum en tijd bevestigen");
+                .contains("Bevestig deze datum en tijd");
     }
 
     @Test
@@ -125,8 +124,8 @@ class DatumKiezenPageTest extends BaseWicketTest {
 
         String response = tester.getLastResponseAsString();
         // DatumKiezenPage hangt onder /mijn-dag/{dossierId}/de-dag/datum-kiezen
-        assertThat(response).contains("href=\"../../" + dossierId + "\"><span>Mijn dag</span>");
-        assertThat(response).contains("href=\"../de-dag\"><span>Dé dag</span>");
+        assertThat(response).contains("href=\"../../" + dossierId + "\"><span>Uw ceremonie</span>");
+        assertThat(response).contains("href=\"../de-dag\"><span>Uw ceremonie plannen</span>");
         assertThat(response).doesNotContain("bookmarkable");
     }
 

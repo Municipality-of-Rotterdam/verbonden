@@ -197,7 +197,7 @@ class BetalingRetourPageTest extends BaseWicketTest {
         tester.assertVisible(PAGE_BODY + ":teBetalen");
         assertPaginaSerialiseerbaar();
         tester.assertContains("Trouwboekje Luxe \\(bijbesteld\\)");
-        tester.assertContains("25,00");
+        tester.assertContains("25");
 
         tester.getRequest().setHeader("Origin", "http://localhost");
         formTester("betalenForm").submit("betalen");
@@ -277,13 +277,13 @@ class BetalingRetourPageTest extends BaseWicketTest {
                 new CreateBetaalmutatieDto("Trouwboekje Luxe (bijbesteld)", Bedrag.of("25.00")));
         tester.startPage(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));
         tester.assertContains("Nog te betalen");
-        tester.assertContains("U heeft € 17,80 betaald. Er staat nog € 25,00 open.");
+        tester.assertContains("U heeft € 17,80 betaald. Er staat nog € 25 open.");
 
         onlineBetalenService.startMutatieBetaling(dossierId, mutatieId,
                 CompleetDossierTestData.BSN_PARTNER_1, "https://verbonden.test/retour");
         tester.startPage(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));
         tester.assertContains("Betaling in behandeling");
-        tester.assertContains("Uw bank moet de betaling van € 25,00 nog bevestigen.");
+        tester.assertContains("Uw bank moet de betaling van € 25 nog bevestigen.");
         // Geen tweede betaling starten terwijl de eerste nog loopt
         tester.assertInvisible(pad("betalenForm"));
         tester.assertVisible(pad("inBehandeling"));
@@ -292,7 +292,7 @@ class BetalingRetourPageTest extends BaseWicketTest {
         verwerker.verwerkUitslag(new BetaalUitslagMelding(kenmerk, null, null, BetaalUitslag.MISLUKT));
         tester.startPage(AanvraagStatusPage.class, makeDossierPageParameters(dossierId));
         tester.assertContains("Betaling niet gelukt");
-        tester.assertContains("De betaling van € 25,00 is niet gelukt.");
+        tester.assertContains("De betaling van € 25 is niet gelukt.");
         tester.assertVisible(pad("betalenForm"));
 
         onlineBetalenService.startMutatieBetaling(dossierId, mutatieId,
