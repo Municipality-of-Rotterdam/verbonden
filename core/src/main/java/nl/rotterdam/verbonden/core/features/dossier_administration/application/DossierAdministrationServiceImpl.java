@@ -18,6 +18,8 @@ import nl.rotterdam.verbonden.core.features.dossier_administration.domain.Create
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailPartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandType;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeGetuigeDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailGetuigeDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierDetailDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.InzageActie;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ListDossierDto;
@@ -39,7 +41,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierSamenv
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SidebarExtraItemDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.InternationaleAkteTarief;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.TrouwboekjeKeuzeDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.repository.GetuigenRepository;
 import nl.rotterdam.verbonden.core.features.marriage_type_administration.repository.MarriageTypeLocationRepository;
@@ -174,7 +175,7 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
                 samenvatting.datumTijdHuwelijk(),
                 samenvatting.prijs(),
                 partners,
-                marriageIntakeService.findGetuigen(dossierId),
+                getuigen(dossier),
                 samenvatting.extras(),
                 extraKeuzes,
                 samenvatting.totalPrijs(),
@@ -431,17 +432,30 @@ class DossierAdministrationServiceImpl implements DossierAdministrationService {
 
     @Override
     @Transactional
-    public void updateGetuigen(UUID dossierId, List<SaveGetuigenDto> getuigen) {
+    public void updateGetuigen(UUID dossierId, List<ChangeGetuigeDto> getuigen) {
         HuwelijksDossierEntity dossier = getDossier(dossierId);
         getuigenRepository.deleteByDossier_Id(dossier.getId());
-        for (SaveGetuigenDto dto : getuigen) {
-            if (dto.naam() == null || dto.naam().isBlank()) {
+        for (ChangeGetuigeDto dto : getuigen) {
+            if (dto.isLeeg()) {
                 continue;
             }
             GetuigeEntity entity = new GetuigeEntity(dossier, dto.volgnummer());
             entity.setNaam(dto.naam());
+            entity.setVoornamen(dto.voornamen());
+            entity.setAchternaam(dto.achternaam());
+            entity.setGeboortedatum(dto.geboortedatum());
+            entity.setPostcode(dto.postcode());
+            entity.setWoonplaats(dto.woonplaats());
+            entity.setLand(dto.land());
             getuigenRepository.save(entity);
         }
+    }
+
+    private List<DetailGetuigeDto> getuigen(HuwelijksDossierEntity dossier) {
+        return getuigenRepository.findByDossier_IdOrderByVolgnummer(dossier.getId()).stream()
+                .map(g -> new DetailGetuigeDto(g.getVolgnummer(), g.getNaam(), g.getVoornamen(), g.getAchternaam(),
+                        g.getGeboortedatum(), g.getPostcode(), g.getWoonplaats(), g.getLand()))
+                .toList();
     }
 
     @Override

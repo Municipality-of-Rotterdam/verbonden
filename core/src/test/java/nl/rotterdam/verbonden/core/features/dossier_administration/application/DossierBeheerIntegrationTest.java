@@ -2,12 +2,15 @@ package nl.rotterdam.verbonden.core.features.dossier_administration.application;
 
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Postcode;
 import nl.rotterdam.verbonden.core.domain.Telefoonnummer;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.BestandNietToegestaanException;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeExtrasDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangeGetuigeDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.ChangePartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateBalieDossierDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierBestandDto;
+import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailGetuigeDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.CreateDossierNotitieDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DetailPartnerDto;
 import nl.rotterdam.verbonden.core.features.dossier_administration.domain.DossierBestandDto;
@@ -28,7 +31,6 @@ import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierAccess
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.DossierStatus;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.PartnerGegevensDto;
 import nl.rotterdam.verbonden.core.features.marriage_intake.domain.RegistratieType;
-import nl.rotterdam.verbonden.core.features.marriage_intake.domain.SaveGetuigenDto;
 import nl.rotterdam.verbonden.core.identity.Roles;
 import nl.rotterdam.verbonden.core.integration_test.CompleetDossierTestData;
 import nl.rotterdam.verbonden.core.integration_test.VerbondenIntegrationTest;
@@ -146,8 +148,8 @@ class DossierBeheerIntegrationTest {
         LocalDateTime slot = marriageIntakeService.findAllBeschikbareSlots(dossierId).iterator().next();
         dossierAdministrationService.updateAfspraak(dossierId, slot.toLocalDate(), slot.toLocalTime());
         dossierAdministrationService.updateGetuigen(dossierId, List.of(
-                new SaveGetuigenDto(1, "Kwik van Willegenburgh"),
-                new SaveGetuigenDto(2, "Kwek van Willegenburgh")));
+                getuige(1, "Kwik van Willegenburgh"),
+                getuige(2, "Kwek van Willegenburgh")));
         for (int volgorde = 1; volgorde <= 2; volgorde++) {
             PartnerGegevensDto partner = partner(dossierId, volgorde);
             dossierAdministrationService.updatePartner(dossierId, new ChangePartnerDto(volgorde, partner.versie(),
@@ -185,8 +187,8 @@ class DossierBeheerIntegrationTest {
         marriageIntakeService.dienIn(dossierId);
 
         dossierAdministrationService.updateGetuigen(dossierId, List.of(
-                new SaveGetuigenDto(1, "Kwak van Willegenburgh"),
-                new SaveGetuigenDto(2, "Kwek van Willegenburgh")));
+                getuige(1, "Kwak van Willegenburgh"),
+                getuige(2, "Kwek van Willegenburgh")));
         dossierAdministrationService.updateExtras(dossierId, new ChangeExtrasDto(true, false, null, true));
 
         DossierDetailDto detail = dossierAdministrationService.findDetail(dossierId);
@@ -196,6 +198,32 @@ class DossierBeheerIntegrationTest {
         assertThat(detail.extraKeuzes().internationaleAkte()).isTrue();
         // De prijs van de akte ligt vast op het tarief van de indieningsdatum
         assertThat(marriageIntakeService.findInternationaleAktePrijs(dossierId)).isNotNull();
+    }
+
+    @Test
+    void updateGetuigen_slaatPersoonsgegevensOp() {
+        UUID dossierId = testData.maakConceptDossier();
+
+        dossierAdministrationService.updateGetuigen(dossierId, List.of(
+                new ChangeGetuigeDto(1, "Kwik van Willegenburgh", "Kwik Donald", "van Willegenburgh",
+                        LocalDate.of(2000, 1, 31), new Postcode("SW1A 1AA"), "Londen", "Verenigd Koninkrijk"),
+                new ChangeGetuigeDto(2, null, null, null, null, null, null, "Nederland")));
+
+        assertThat(dossierAdministrationService.findDetail(dossierId).getuigen())
+                .containsExactly(new DetailGetuigeDto(1, "Kwik van Willegenburgh", "Kwik Donald", "van Willegenburgh",
+                        LocalDate.of(2000, 1, 31), new Postcode("SW1A 1AA"), "Londen", "Verenigd Koninkrijk"));
+    }
+
+    @Test
+    void updateGetuigen_bewaartGetuigeZonderNaamAlsErIetsAndersIsIngevuld() {
+        UUID dossierId = testData.maakConceptDossier();
+
+        dossierAdministrationService.updateGetuigen(dossierId, List.of(
+                new ChangeGetuigeDto(1, null, null, null, null, null, "Rotterdam", "Nederland")));
+
+        assertThat(dossierAdministrationService.findDetail(dossierId).getuigen())
+                .extracting(DetailGetuigeDto::woonplaats)
+                .containsExactly("Rotterdam");
     }
 
     @Test
@@ -383,5 +411,9 @@ class DossierBeheerIntegrationTest {
                 .filter(p -> p.volgorde() == volgorde)
                 .findFirst()
                 .orElseThrow();
+    }
+
+    private static ChangeGetuigeDto getuige(int volgnummer, String naam) {
+        return new ChangeGetuigeDto(volgnummer, naam, null, null, null, null, null, "Nederland");
     }
 }

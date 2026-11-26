@@ -18,10 +18,12 @@ import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsUpdatePag
 import nl.rotterdam.verbonden.core.features.babs_administration.ui.BabsAdministrationPage;
 import nl.rotterdam.verbonden.core.domain.BuitenlandsPersoonsnummer;
 import nl.rotterdam.verbonden.core.domain.BurgerServiceNummer;
+import nl.rotterdam.verbonden.core.domain.Postcode;
 import nl.rotterdam.verbonden.core.domain.Bedrag;
 import nl.rotterdam.verbonden.core.ui.BedragWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BuitenlandsPersoonsnummerWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.BurgerServiceNummerWicketConverter;
+import nl.rotterdam.verbonden.core.features.dossier_administration.ui.PostcodeWicketConverter;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAdministrationPage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierAfspraakUpdatePage;
 import nl.rotterdam.verbonden.core.features.dossier_administration.ui.DossierCeremonieUpdatePage;
@@ -143,6 +145,7 @@ public class WicketApplication extends WicketBootStandardWebApplication {
         locator.set(Emailadres.class, new EmailadresWicketConverter());
         locator.set(BurgerServiceNummer.class, new BurgerServiceNummerWicketConverter());
         locator.set(BuitenlandsPersoonsnummer.class, new BuitenlandsPersoonsnummerWicketConverter());
+        locator.set(Postcode.class, new PostcodeWicketConverter());
         return locator;
     }
 
