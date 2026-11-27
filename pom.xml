@@ -59,7 +59,7 @@
         <bootstrap.version>5.3.8</bootstrap.version>
         <wicket-spring-boot-starter.version>5.0.0</wicket-spring-boot-starter.version>
         <!-- Pinned to match the PostgreSQL major version used by compose.yml -->
-        <embedded-postgres-binaries.version>18.7.0</embedded-postgres-binaries.version>
+        <embedded-postgres-binaries.version>19.0.0</embedded-postgres-binaries.version>
     </properties>
 
     <dependencyManagement>
